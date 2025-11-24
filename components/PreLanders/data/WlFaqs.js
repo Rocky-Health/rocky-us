@@ -27,7 +27,7 @@ export const WlFaqs = [
   {
     question: "How do I schedule a call with my provider?",
     answer:
-      "After submitting your questionnaire, you will be able to schedule a call with a licensed Canadian prescriber. To request this, simply send a message to your prescriber through your account by clicking on messages. They will send you a link to schedule a call at your convenience.",
+      "After submitting your questionnaire, you will be able to schedule a call with a licensed Customer prescriber. To request this, simply send a message to your prescriber through your account by clicking on messages. They will send you a link to schedule a call at your convenience.",
   },
   {
     question: "Can I cancel at any time?",
