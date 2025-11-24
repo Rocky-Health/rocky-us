@@ -62,8 +62,8 @@ export default function CategoryPage({
                         {category?.name}
                     </h1>
                     <p className="text-[16px] md:text-[18px] text-[#000000B8] max-w-md leading-[140%]">
-                        Your guide to men's health from sex and hair to mental health,
-                        weight loss and more.
+                        Your guide to men's health from sex and hair to mental
+                        health, weight loss and more.
                     </p>
                 </div>
 
@@ -93,7 +93,7 @@ export default function CategoryPage({
                 /> */}
 
                 <MoreQuestions
-                    title="Join 350K+ Canadians & receive actionable health tips."
+                    title="Join 350K+ Customers & receive actionable health tips."
                     buttonText="Sign up to our newsletter"
                     buttonWidth="240"
                     link="/login-register?viewshow=register"
