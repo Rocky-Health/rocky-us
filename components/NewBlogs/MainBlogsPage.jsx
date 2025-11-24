@@ -1,32 +1,27 @@
 "use client";
 
-import { useEffect } from 'react';
-import { useBlogFilters } from './hooks/useBlogFilters';
-import { useBlogData } from './hooks/useBlogData';
-import BlogHeader from './components/BlogHeader';
-import CategoryFilters from './components/CategoryFilters';
-import FeaturedArticles from './components/FeaturedArticles';
-import LatestArticles from './components/LatestArticles';
-import NewsletterSignup from './components/NewsletterSignup';
+import { useEffect } from "react";
+import { useBlogFilters } from "./hooks/useBlogFilters";
+import { useBlogData } from "./hooks/useBlogData";
+import BlogHeader from "./components/BlogHeader";
+import CategoryFilters from "./components/CategoryFilters";
+import FeaturedArticles from "./components/FeaturedArticles";
+import LatestArticles from "./components/LatestArticles";
+import NewsletterSignup from "./components/NewsletterSignup";
 import MoreQuestions from "@/components/MoreQuestions";
-import BlogPageSkeleton from './components/BlogPageSkeleton';
+import BlogPageSkeleton from "./components/BlogPageSkeleton";
 
 export default function MainBlogsPage({
     initialBlogs = [],
     initialCategories = [],
-    initialTotalPages = 1
+    initialTotalPages = 1,
 }) {
-    const {
-        currentPage,
-        loadNextPage
-    } = useBlogFilters();
+    const { currentPage, loadNextPage } = useBlogFilters();
 
-    const {
-        blogs,
-        totalPages,
-        isLoading,
-        loadMoreBlogs
-    } = useBlogData(initialBlogs, initialTotalPages);
+    const { blogs, totalPages, isLoading, loadMoreBlogs } = useBlogData(
+        initialBlogs,
+        initialTotalPages
+    );
 
     useEffect(() => {
         if (currentPage > 1) {
@@ -69,7 +64,7 @@ export default function MainBlogsPage({
                 />
 
                 <MoreQuestions
-                    title="Join 350K+ Canadians & receive actionable health tips."
+                    title="Join 350K+ Customers & receive actionable health tips."
                     buttonText="Sign up to our newsletter"
                     buttonWidth="240"
                     link="/login-register?viewshow=register"

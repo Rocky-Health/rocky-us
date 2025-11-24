@@ -2,7 +2,7 @@ export const QUIZ_FEATURES = [
     {
         icon: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/Pre%20Sell/hospital%201.png",
         alt: "Hospital",
-        text: "Health Canada Approved Meds",
+        text: "FDA-Approved Meds",
     },
     {
         icon: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/Pre%20Sell/dns-services%201.png",
@@ -31,4 +31,4 @@ export const ED_PRE_QUIZ_DATA = {
     ],
 };
 
-export const QUIZ_TIMER_TEXT = "Take our 1-minute quiz."; 
+export const QUIZ_TIMER_TEXT = "Take our 1-minute quiz.";

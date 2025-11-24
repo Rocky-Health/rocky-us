@@ -1,9 +1,9 @@
 import FaqsSection from "@/components/FaqsSection";
 import MoreQuestions from "@/components/MoreQuestions";
 const faqs = [
-  {
-    question: "What are the potential side effects of using ZONNIC?",
-    answer: `
+    {
+        question: "What are the potential side effects of using ZONNIC?",
+        answer: `
       <div class="pb-4 text-gray-700">
         <ul class="list-disc list-inside ml-2 mb-5">
           <li>A burning sensation at the placement site inside the lip</li>
@@ -31,10 +31,10 @@ const faqs = [
         <p>NRTs are not recommended for occasional smokers, non-smokers, or non-nicotine users.</p>
       </div>
     `,
-  },
-  {
-    question: "Are there any precautions to take before using ZONNIC?",
-    answer: `
+    },
+    {
+        question: "Are there any precautions to take before using ZONNIC?",
+        answer: `
       <div class="pb-4 text-gray-700">
         <p>ZONNIC is not recommended for:</p>
         <ul class="list-disc list-inside ml-2 mb-5">
@@ -52,19 +52,19 @@ const faqs = [
         </ul>
       </div>
     `,
-  },
-  {
-    question:
-      "How do ZONNIC pouches compare to other Nicotine Replacement Therapy (NRT) options like lozenges, gums, or sprays?",
-    answer: `
+    },
+    {
+        question:
+            "How do ZONNIC pouches compare to other Nicotine Replacement Therapy (NRT) options like lozenges, gums, or sprays?",
+        answer: `
       <div class="pb-4 text-gray-700">
-        <p>Among the various Nicotine Replacement Therapy (NRT) products available in Canada, ZONNIC is unique as the only pouch format approved by Health Canada. Similar to lozenges and gums, ZONNIC provides nicotine via oral absorption, offering temporary relief from cravings and withdrawal symptoms.</p>
+        <p>Among the various Nicotine Replacement Therapy (NRT) products available in Canada, ZONNIC is unique as the only pouch format approved by FDA-Approved. Similar to lozenges and gums, ZONNIC provides nicotine via oral absorption, offering temporary relief from cravings and withdrawal symptoms.</p>
       </div>
     `,
-  },
-  {
-    question: "What ingredients are in ZONNIC pouches?",
-    answer: `
+    },
+    {
+        question: "What ingredients are in ZONNIC pouches?",
+        answer: `
       <div class="pb-4 text-gray-700">
         <p class="font-400"> Mint Flavour (grey)</p>
         <p class="font-[400]"><span class="font-[600]">Medicinal:</span> 4mg nicotine per pouch</p>
@@ -82,18 +82,18 @@ const faqs = [
         
       </div>
     `,
-  },
-  {
-    question: "Is ZONNIC similar to smokeless tobacco?",
-    answer: `
+    },
+    {
+        question: "Is ZONNIC similar to smokeless tobacco?",
+        answer: `
       <div class="pb-4 text-gray-700">
-        <p>No, ZONNIC does not contain tobacco. Unlike smokeless tobacco products available in Canada, ZONNIC is approved by Health Canada as a recognized Nicotine Replacement Therapy.</p>
+        <p>No, ZONNIC does not contain tobacco. Unlike smokeless tobacco products available in Canada, ZONNIC is approved by FDA-Approved as a recognized Nicotine Replacement Therapy.</p>
       </div>
     `,
-  },
-  {
-    question: "What is the recommended dosing schedule for ZONNIC?",
-    answer: `
+    },
+    {
+        question: "What is the recommended dosing schedule for ZONNIC?",
+        answer: `
       <div class="pb-4 text-gray-700">
         <ul class="list-disc list-inside ml-2 mb-5">
           <li><strong>Month 1:</strong> 1 pouch every 1-2 hours (up to 15 pouches a day).</li>
@@ -103,10 +103,11 @@ const faqs = [
         <p>Users should not exceed 15 pouches in a 24-hour period.</p>
       </div>
     `,
-  },
-  {
-    question: "What additional information can I offer my patients on ZONNIC?",
-    answer: `
+    },
+    {
+        question:
+            "What additional information can I offer my patients on ZONNIC?",
+        answer: `
       <div class="pb-4 text-gray-700">
         <ul class="list-disc list-inside ml-2 mb-5">
           <li>Place the nicotine pouch inside the upper lip; do not chew or swallow it</li>
@@ -120,21 +121,21 @@ const faqs = [
         </ul>
       </div>
     `,
-  },
+    },
 ];
 
 const ZonnicFaqsSection = () => {
-  return (
-    <div className="mx-auto">
-      <FaqsSection
-        faqs={faqs}
-        title="Your Questions, Answered"
-        subtitle="Frequently asked questions"
-        name="Meet ZONNIC"
-      />
-      <MoreQuestions link="/faqs/" />
-    </div>
-  );
+    return (
+        <div className="mx-auto">
+            <FaqsSection
+                faqs={faqs}
+                title="Your Questions, Answered"
+                subtitle="Frequently asked questions"
+                name="Meet ZONNIC"
+            />
+            <MoreQuestions link="/faqs/" />
+        </div>
+    );
 };
 
 export default ZonnicFaqsSection;
