@@ -41,7 +41,7 @@ export async function POST(request) {
           //   language: "en",
           //   country: "CA",
           // },
-          signUpSourceId: "948633",
+          signUpSourceId: "1239403",
           singleOptIn: false,
           subscriptionType: "MARKETING",
         }),
