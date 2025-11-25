@@ -122,6 +122,7 @@ const CheckoutPageContent = () => {
         populateAddressData,
         saveAddressData,
         clearStoredAddresses,
+        fetchProfileData,
     } = useAddressManager();
     const [formData, setFormData] = useState({
         additional_fields: [],
@@ -663,6 +664,74 @@ const CheckoutPageContent = () => {
             }
             // --- END FLOW CHECKING LOGIC ---
 
+            // Check if personal info fields are empty in cart data and fetch from profile if needed
+            // This ensures first_name, last_name, phone, and date_of_birth are populated
+            // Check both billing and shipping addresses
+            if (updateFormData) {
+                const hasEmptyPersonalInfo = 
+                    !data.billing_address?.first_name ||
+                    !data.billing_address?.last_name ||
+                    !data.billing_address?.phone ||
+                    !data.billing_address?.date_of_birth ||
+                    !data.shipping_address?.first_name ||
+                    !data.shipping_address?.last_name ||
+                    !data.shipping_address?.phone ||
+                    !data.shipping_address?.date_of_birth;
+
+                if (hasEmptyPersonalInfo) {
+                    logger.log("=== CART HAS EMPTY PERSONAL INFO (BILLING OR SHIPPING), FETCHING FROM PROFILE ===");
+                    // Fetch profile data and merge only the missing personal fields
+                    const profileData = await fetchProfileData();
+                    if (profileData && profileData.success) {
+                        logger.log("=== PROFILE DATA FETCHED, MERGING PERSONAL INFO ===", {
+                            first_name: profileData.first_name,
+                            last_name: profileData.last_name,
+                            phone: profileData.phone,
+                            date_of_birth: profileData.date_of_birth || profileData.raw_profile_data?.custom_meta?.date_of_birth,
+                        });
+                        
+                        // Fill in only the empty personal info fields in billing address
+                        data.billing_address = {
+                            ...data.billing_address,
+                            first_name: data.billing_address?.first_name || profileData.first_name || "",
+                            last_name: data.billing_address?.last_name || profileData.last_name || "",
+                            phone: data.billing_address?.phone || profileData.phone || "",
+                            date_of_birth: data.billing_address?.date_of_birth || 
+                                           profileData.date_of_birth || 
+                                           profileData.raw_profile_data?.custom_meta?.date_of_birth || ""
+                        };
+                        
+                        // Fill in only the empty personal info fields in shipping address
+                        data.shipping_address = {
+                            ...data.shipping_address,
+                            first_name: data.shipping_address?.first_name || profileData.first_name || "",
+                            last_name: data.shipping_address?.last_name || profileData.last_name || "",
+                            phone: data.shipping_address?.phone || profileData.phone || "",
+                            date_of_birth: data.shipping_address?.date_of_birth || 
+                                           profileData.date_of_birth || 
+                                           profileData.raw_profile_data?.custom_meta?.date_of_birth || ""
+                        };
+                        
+                        logger.log("=== PERSONAL INFO MERGED INTO CART DATA ===", {
+                            billing_first_name: data.billing_address.first_name,
+                            billing_last_name: data.billing_address.last_name,
+                            billing_phone: data.billing_address.phone,
+                            billing_date_of_birth: data.billing_address.date_of_birth,
+                            shipping_first_name: data.shipping_address.first_name,
+                            shipping_last_name: data.shipping_address.last_name,
+                            shipping_phone: data.shipping_address.phone,
+                            shipping_date_of_birth: data.shipping_address.date_of_birth,
+                        });
+                        
+                        // Immediately save the merged data to localStorage to prevent it from being overwritten
+                        saveAddressData(data.billing_address, data.shipping_address);
+                        logger.log("=== SAVED MERGED DATA TO LOCALSTORAGE ===");
+                    } else {
+                        logger.log("=== NO PROFILE DATA AVAILABLE TO MERGE ===");
+                    }
+                }
+            }
+
             // Update form data with shipping and billing addresses from cart only if requested
             // This serves as a fallback for guest checkout on initial load
             // For logged-in users, fetchUserProfile will override this with fresh data
@@ -1086,15 +1155,10 @@ const CheckoutPageContent = () => {
                 // await fetchUserProfile();
                 // logger.log("=== PROFILE DATA LOADED ===");
 
-                // STEP 3: Ensure address data is populated from all available sources
-                logger.log("=== ENSURING ADDRESS DATA POPULATED ===");
-                const updatedFormDataWithAddresses = await populateAddressData(
-                    formData
-                );
-                if (updatedFormDataWithAddresses !== formData) {
-                    setFormData(updatedFormDataWithAddresses);
-                }
-                logger.log("=== ADDRESS DATA CHECK COMPLETED ===");
+                // STEP 3: Profile data is already fetched and merged in fetchCartItems
+                // No need to call populateAddressData again as it would use stale formData state
+                // The profile data merging happens inside fetchCartItems before setFormData is called
+                logger.log("=== ADDRESS DATA ALREADY POPULATED IN FETCHCARTITEMS ===");
 
                 // STEP 4: Load saved cards (doesn't affect form data)
                 await fetchSavedCards();
