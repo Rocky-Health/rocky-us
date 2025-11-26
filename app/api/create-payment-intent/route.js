@@ -226,6 +226,7 @@ export async function POST(req) {
         success: true,
         paymentIntent: paymentIntent,
         chargeId: chargeId,
+        stripeCustomerId: stripeCustomerId || null,
       });
     }
 
@@ -235,6 +236,7 @@ export async function POST(req) {
         success: true,
         paymentIntent: paymentIntent,
         clientSecret: paymentIntent.client_secret,
+        stripeCustomerId: stripeCustomerId || null,
       });
     }
 
@@ -246,6 +248,7 @@ export async function POST(req) {
         success: true,
         paymentIntent: paymentIntent,
         chargeId: chargeId,
+        stripeCustomerId: stripeCustomerId || null,
       });
     }
 
