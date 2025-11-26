@@ -1,17 +1,8 @@
-import * as Sentry from "@sentry/nextjs";
+// Instrumentation file for Next.js
+// This file is used to register instrumentation hooks
 
 export async function register() {
-  if (process.env.NEXT_RUNTIME === "nodejs") {
-    await import("./sentry.server.config");
-  }
-
-  if (process.env.NEXT_RUNTIME === "edge") {
-    await import("./sentry.edge.config");
-  }
-
-  if (process.env.NEXT_RUNTIME === "browser") {
-    await import("./sentry.client.config");
-  }
+  // No instrumentation needed
 }
 
-export const onRequestError = Sentry.captureRequestError;
+// No request error handler needed

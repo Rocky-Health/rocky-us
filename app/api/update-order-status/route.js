@@ -146,6 +146,100 @@ export async function POST(req) {
 
     logger.log("Order updated:", response.data.id, response.data.status);
 
+    // Update associated subscriptions with payment method information
+    // This enables automatic renewals instead of manual renewal
+    if (stripeCustomerId && paymentMethodId && paymentMethod === "stripe_cc") {
+      try {
+        logger.log("Updating subscriptions with payment method information...");
+        
+        // Get subscriptions for this order
+        const subscriptionsResponse = await axios.get(
+          `${BASE_URL}/wp-json/wc/v3/subscriptions`,
+          {
+            params: {
+              parent: orderId,
+            },
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Basic ${Buffer.from(
+                `${CONSUMER_KEY}:${CONSUMER_SECRET}`
+              ).toString("base64")}`,
+            },
+          }
+        );
+
+        const subscriptions = subscriptionsResponse.data || [];
+
+        if (subscriptions.length > 0) {
+          logger.log(
+            `Found ${subscriptions.length} subscription(s) to update with payment method`
+          );
+
+          // Update each subscription with payment method info
+          const subscriptionUpdatePromises = subscriptions.map(
+            async (subscription) => {
+              const subscriptionUpdateData = {
+                payment_method: "stripe_cc",
+                payment_method_title: "Stripe",
+                meta_data: [
+                  {
+                    key: "_stripe_customer_id",
+                    value: stripeCustomerId,
+                  },
+                  {
+                    key: "_payment_method_token",
+                    value: paymentMethodId,
+                  },
+                  {
+                    key: "_stripe_source_id",
+                    value: paymentMethodId,
+                  },
+                ],
+              };
+
+              // Add payment intent ID if available
+              if (paymentIntentId) {
+                subscriptionUpdateData.meta_data.push({
+                  key: "_payment_intent_id",
+                  value: paymentIntentId,
+                });
+              }
+
+              logger.log(
+                `Updating subscription ${subscription.id} with payment method`
+              );
+
+              return axios.put(
+                `${BASE_URL}/wp-json/wc/v3/subscriptions/${subscription.id}`,
+                subscriptionUpdateData,
+                {
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Basic ${Buffer.from(
+                      `${CONSUMER_KEY}:${CONSUMER_SECRET}`
+                    ).toString("base64")}`,
+                  },
+                }
+              );
+            }
+          );
+
+          await Promise.all(subscriptionUpdatePromises);
+          logger.log(
+            "✅ All subscriptions updated with payment method information"
+          );
+        } else {
+          logger.log("No subscriptions found for this order");
+        }
+      } catch (subscriptionError) {
+        logger.error(
+          "Failed to update subscriptions with payment method:",
+          subscriptionError.response?.data || subscriptionError.message
+        );
+        // Don't fail the order update if subscription update fails
+      }
+    }
+
     // Add order note
     if (orderNote) {
       await axios.post(
