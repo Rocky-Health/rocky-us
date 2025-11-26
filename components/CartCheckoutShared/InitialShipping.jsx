@@ -51,22 +51,25 @@ const InitialShipping = ({
 
     // Get the selected province from form data first, then fallback to cartItems
     // This ensures the displayed province is always in sync with the form
+    // If "Ship to a different address" is checked, ONLY use the shipping address state from formData
+    // DO NOT fall back to cartItems.shipping_address.state as it might mirror billing
+    // If NOT checked, billing and shipping are the same, so use either
 
-    const selectedProvince =
-        cartItems?.shipping_address?.state ||
-        cartItems?.billing_address?.state ||
-        formData?.billing_address?.state ||
-        formData?.shipping_address?.state;
+    const isShipToDifferentAddress = Boolean(formData?.shipping_address?.ship_to_different_address);
+    
+    const selectedProvince = isShipToDifferentAddress
+        ? formData?.shipping_address?.state  // ONLY use formData when "ship to different" is checked
+        : (cartItems?.shipping_address?.state || cartItems?.billing_address?.state || formData?.billing_address?.state || formData?.shipping_address?.state);
 
     // Debug logging to track province synchronization
-    logger.log("InitialShipping province sync debug:", {
+    logger.log("🎯 InitialShipping province sync debug:", {
+        isShipToDifferentAddress: isShipToDifferentAddress,
         formDataShipping: formData?.shipping_address?.state,
         formDataBilling: formData?.billing_address?.state,
         cartShipping: cartItems?.shipping_address?.state,
         cartBilling: cartItems?.billing_address?.state,
         selectedProvince: selectedProvince,
-        cartItemsExists: !!cartItems,
-        cartItemsTotalsExists: !!cartItems?.totals,
+        ">>> DISPLAYED STATE >>>": selectedProvince,
     });
 
     // If cartItems is not available, show loading state
