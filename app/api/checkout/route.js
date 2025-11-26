@@ -119,12 +119,117 @@ export async function POST(req) {
     const cookieStore = await cookies();
     const encodedCredentials = cookieStore.get("authToken");
     const cartNonce = cookieStore.get("cart-nonce");
+    const userId = cookieStore.get("userId");
 
     if (!encodedCredentials) {
       return NextResponse.json(
         { error: "Not authenticated." },
         { status: 401 }
       );
+    }
+
+    // Get or retrieve Stripe customer ID for Stripe payments
+    let stripeCustomerId = null;
+    if (useStripe && userId && encodedCredentials) {
+      try {
+        // Check if we have Stripe customer ID in cookies first (fastest path)
+        const cachedStripeCustomerId = cookieStore.get("stripeCustomerId");
+        if (cachedStripeCustomerId && cachedStripeCustomerId.value) {
+          stripeCustomerId = cachedStripeCustomerId.value;
+          logger.log(
+            "Using cached Stripe customer ID from cookies:",
+            stripeCustomerId
+          );
+        } else {
+          // Fetch from WooCommerce customer metadata
+          logger.log(
+            "Fetching WooCommerce customer data for user:",
+            userId.value
+          );
+
+          const customerResponse = await axios.get(
+            `${BASE_URL}/wp-json/wc/v3/customers/${userId.value}`,
+            {
+              headers: {
+                Authorization:
+                  process.env.ADMIN_TOKEN || encodedCredentials.value,
+              },
+            }
+          );
+
+          const customerData = customerResponse.data;
+          const metaData = customerData.meta_data || [];
+
+          // Look for existing Stripe customer ID in metadata
+          const stripeCustomerMeta = metaData.find(
+            (meta) => meta.key === "_stripe_customer_id"
+          );
+
+          if (stripeCustomerMeta && stripeCustomerMeta.value) {
+            stripeCustomerId = stripeCustomerMeta.value;
+            logger.log(
+              "Found existing Stripe customer ID in WooCommerce:",
+              stripeCustomerId
+            );
+
+            // Save to cookies for future requests
+            cookieStore.set("stripeCustomerId", stripeCustomerId);
+            logger.log("Saved Stripe customer ID to cookies for future use");
+          } else {
+            // Create new Stripe customer
+            logger.log("Creating new Stripe customer...");
+            const stripeCustomer = await stripe.customers.create({
+              email: email,
+              name: `${firstName} ${lastName}`,
+              metadata: {
+                woocommerce_user_id: userId.value,
+              },
+            });
+
+            stripeCustomerId = stripeCustomer.id;
+            logger.log("Created new Stripe customer:", stripeCustomerId);
+
+            // Save Stripe customer ID to cookies
+            cookieStore.set("stripeCustomerId", stripeCustomerId);
+            logger.log("Saved new Stripe customer ID to cookies");
+
+            // Save Stripe customer ID to WooCommerce metadata
+            try {
+              await axios.put(
+                `${BASE_URL}/wp-json/wc/v3/customers/${userId.value}`,
+                {
+                  meta_data: [
+                    {
+                      key: "_stripe_customer_id",
+                      value: stripeCustomerId,
+                    },
+                  ],
+                },
+                {
+                  headers: {
+                    Authorization:
+                      process.env.ADMIN_TOKEN || encodedCredentials.value,
+                    "Content-Type": "application/json",
+                  },
+                }
+              );
+              logger.log("Saved Stripe customer ID to WooCommerce metadata");
+            } catch (metaError) {
+              logger.error(
+                "Failed to save Stripe customer ID to WooCommerce:",
+                metaError.message
+              );
+              // Continue anyway - customer was created in Stripe
+            }
+          }
+        }
+      } catch (customerError) {
+        logger.error(
+          "Error fetching/creating Stripe customer:",
+          customerError.message
+        );
+        // Continue without customer ID - payment can still succeed
+      }
     }
 
     let token = "";
@@ -218,6 +323,14 @@ export async function POST(req) {
         { key: "_awin_awc", value: resolvedAwinAwc || "" },
         { key: "_awin_channel", value: resolvedAwinChannel },
         { key: "_is_created_from_rocky_fe", value: "true" },
+        // Add Stripe customer ID if available (for Stripe payments)
+        // Send with both key names for compatibility
+        ...(stripeCustomerId && useStripe
+          ? [
+              { key: "_stripe_customer_id", value: stripeCustomerId },
+              { key: "_wc_stripe_customer", value: stripeCustomerId },
+            ]
+          : []),
       ],
     };
 
