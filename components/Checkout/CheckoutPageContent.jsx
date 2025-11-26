@@ -2107,10 +2107,14 @@ const CheckoutPageContent = () => {
                     }
 
                     const paymentIntent = intentResult.paymentIntent;
+                    const stripeCustomerId = intentResult.stripeCustomerId || null;
                     logger.log(
                         "✅ PaymentIntent created and confirmed:",
                         paymentIntent.id
                     );
+                    if (stripeCustomerId) {
+                        logger.log("✅ Stripe Customer ID:", stripeCustomerId);
+                    }
 
                     // Extract payment details for WooCommerce metadata
                     const paymentMethodId = paymentIntent?.payment_method;
@@ -2131,6 +2135,7 @@ const CheckoutPageContent = () => {
                         currency,
                         cardBrand,
                         cardLast4,
+                        stripeCustomerId,
                     });
 
                     // Step 5: Update order status with full Stripe metadata
@@ -2148,6 +2153,7 @@ const CheckoutPageContent = () => {
                                     intentResult.paymentIntentId,
                                 chargeId: chargeId,
                                 paymentMethodId: paymentMethodId, // Critical for WC to capture
+                                stripeCustomerId: stripeCustomerId, // Stripe customer ID
                                 paymentMethod: "stripe_cc",
                                 currency: currency,
                                 cardBrand: cardBrand,

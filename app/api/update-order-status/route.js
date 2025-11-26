@@ -21,6 +21,7 @@ export async function POST(req) {
       cardBrand,
       cardLast4,
       errorMessage, // For failed status
+      stripeCustomerId, // Stripe customer ID
     } = requestData;
 
     if (!orderId || !status) {
@@ -36,13 +37,22 @@ export async function POST(req) {
     logger.log("Payment Intent:", paymentIntentId);
     logger.log("Charge ID:", chargeId);
     logger.log("Payment Method ID:", paymentMethodId);
+    logger.log("Stripe Customer ID:", stripeCustomerId);
     logger.log("==============================");
 
     const metaData = [];
 
-    // Add Stripe metadata - CRITICAL for WooCommerce to capture payment
+    // Add Stripe customer ID - CRITICAL for linking payment to customer
+    if (stripeCustomerId) {
+      metaData.push({ key: "_stripe_customer_id", value: stripeCustomerId });
+      logger.log("✅ Added Stripe customer ID:", stripeCustomerId);
+    }
+
+    // Add payment intent ID with both key names for compatibility
     if (paymentIntentId) {
       metaData.push({ key: "_stripe_intent_id", value: paymentIntentId });
+      metaData.push({ key: "_payment_intent_id", value: paymentIntentId });
+      logger.log("✅ Added Payment Intent ID:", paymentIntentId);
     }
 
     if (chargeId) {
@@ -51,8 +61,10 @@ export async function POST(req) {
     }
 
     // CRITICAL: PaymentMethod ID is required for WooCommerce to capture
+    // Add with both key names for compatibility
     if (paymentMethodId) {
       metaData.push({ key: "_stripe_source_id", value: paymentMethodId });
+      metaData.push({ key: "_payment_method_token", value: paymentMethodId });
       logger.log("✅ Added PaymentMethod ID for capture:", paymentMethodId);
     }
 
