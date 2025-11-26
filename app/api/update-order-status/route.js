@@ -43,8 +43,10 @@ export async function POST(req) {
     const metaData = [];
 
     // Add Stripe customer ID - CRITICAL for linking payment to customer
+    // Send with both key names for compatibility
     if (stripeCustomerId) {
       metaData.push({ key: "_stripe_customer_id", value: stripeCustomerId });
+      metaData.push({ key: "_wc_stripe_customer", value: stripeCustomerId });
       logger.log("✅ Added Stripe customer ID:", stripeCustomerId);
     }
 
@@ -151,7 +153,7 @@ export async function POST(req) {
     if (stripeCustomerId && paymentMethodId && paymentMethod === "stripe_cc") {
       try {
         logger.log("Updating subscriptions with payment method information...");
-        
+
         // Get subscriptions for this order
         const subscriptionsResponse = await axios.get(
           `${BASE_URL}/wp-json/wc/v3/subscriptions`,
@@ -184,6 +186,10 @@ export async function POST(req) {
                 meta_data: [
                   {
                     key: "_stripe_customer_id",
+                    value: stripeCustomerId,
+                  },
+                  {
+                    key: "_wc_stripe_customer",
                     value: stripeCustomerId,
                   },
                   {
