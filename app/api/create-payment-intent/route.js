@@ -163,10 +163,41 @@ export async function POST(req) {
           customer: stripeCustomerId,
         });
         logger.log("✅ Payment method attached to customer successfully");
+
+        // Set as default payment method for customer (required for WooCommerce renewals)
+        try {
+          await stripe.customers.update(stripeCustomerId, {
+            invoice_settings: {
+              default_payment_method: paymentMethodId,
+            },
+          });
+          logger.log("✅ Set payment method as default for customer");
+        } catch (defaultError) {
+          logger.warn(
+            "Failed to set default payment method:",
+            defaultError.message
+          );
+          // Continue anyway - not critical for initial payment, but may affect renewals
+        }
       } catch (attachError) {
         // Payment method might already be attached to this or another customer
         if (attachError.code === "resource_already_exists") {
           logger.log("Payment method already attached to a customer");
+          
+          // Still try to set as default even if already attached
+          try {
+            await stripe.customers.update(stripeCustomerId, {
+              invoice_settings: {
+                default_payment_method: paymentMethodId,
+              },
+            });
+            logger.log("✅ Set existing payment method as default for customer");
+          } catch (defaultError) {
+            logger.warn(
+              "Failed to set default payment method:",
+              defaultError.message
+            );
+          }
         } else {
           logger.warn("Failed to attach payment method:", attachError.message);
           // Continue anyway - PaymentIntent creation will still work
