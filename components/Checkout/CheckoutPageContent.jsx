@@ -122,6 +122,7 @@ const CheckoutPageContent = () => {
         populateAddressData,
         saveAddressData,
         clearStoredAddresses,
+        fetchProfileData,
     } = useAddressManager();
     const [formData, setFormData] = useState({
         additional_fields: [],
@@ -299,48 +300,86 @@ const CheckoutPageContent = () => {
         try {
             setIsUpdatingShipping(true);
 
+            // Check if user has enabled "Ship to a different address"
+            const hasShipToDifferentAddress = Boolean(formData.shipping_address.ship_to_different_address);
+
+            logger.log("🚚 Province change handler:", {
+                hasShipToDifferentAddress,
+                addressType,
+                newProvince,
+                currentShippingState: formData.shipping_address.state,
+                currentBillingState: formData.billing_address.state,
+            });
+
+            // If "Ship to a different address" is checked AND we're changing billing address,
+            // do NOT update shipping address at all - it should remain completely independent
+            if (hasShipToDifferentAddress && addressType === "billing") {
+                logger.log("🛡️🛡️🛡️ EARLY RETURN - Ship to different address is enabled");
+                logger.log("🛡️ Shipping state will NOT be updated. Current shipping state:", formData.shipping_address.state);
+                logger.log("🛡️ Billing state being changed to:", newProvince);
+                setIsUpdatingShipping(false);
+                return; // Exit early, don't update shipping
+            }
+
             // Prepare address data based on whether we should clear fields
             let addressData;
 
             if (shouldClearFields) {
                 // Create a basic address with province and country to trigger shipping calculation
+                // Only use billing address fallbacks if user hasn't checked "ship to different address"
+                // or if we're changing the shipping address directly
+                const useBillingFallback = !hasShipToDifferentAddress || addressType === "shipping";
+                const preserveShippingState = hasShipToDifferentAddress && addressType === "billing";
+                
                 addressData = {
                     first_name:
                         formData.shipping_address.first_name ||
-                        formData.billing_address.first_name ||
+                        (useBillingFallback ? formData.billing_address.first_name : "") ||
                         "",
                     last_name:
                         formData.shipping_address.last_name ||
-                        formData.billing_address.last_name ||
+                        (useBillingFallback ? formData.billing_address.last_name : "") ||
                         "",
                     company: "",
                     address_1: "",
                     address_2: "",
                     city: "",
-                    state: newProvince,
+                    state: preserveShippingState ? (formData.shipping_address.state || "") : newProvince,
                     postcode: "",
                     country: "US",
+                    ship_to_different_address: hasShipToDifferentAddress || false, // PRESERVE THE FLAG!
                 };
             } else {
                 // Keep existing address data when province changes due to address selection
+                // If user has checked "ship to different address" AND we're changing billing address,
+                // preserve shipping address without fallback to billing
+                const preserveShippingAsIs = hasShipToDifferentAddress && addressType === "billing";
+                
                 addressData = {
                     first_name:
                         formData.shipping_address.first_name ||
-                        formData.billing_address.first_name ||
+                        (!preserveShippingAsIs ? formData.billing_address.first_name : "") ||
                         "",
                     last_name:
                         formData.shipping_address.last_name ||
-                        formData.billing_address.last_name ||
+                        (!preserveShippingAsIs ? formData.billing_address.last_name : "") ||
                         "",
                     company: formData.shipping_address.company || "",
                     address_1: formData.shipping_address.address_1 || "",
                     address_2: formData.shipping_address.address_2 || "",
                     city: formData.shipping_address.city || "",
-                    state: newProvince,
+                    state: preserveShippingAsIs ? (formData.shipping_address.state || "") : newProvince,
                     postcode: formData.shipping_address.postcode || "",
                     country: "US",
+                    ship_to_different_address: hasShipToDifferentAddress || false, // PRESERVE THE FLAG!
                 };
             }
+
+            logger.log("🚚 Address data prepared:", {
+                addressDataState: addressData.state,
+                ship_to_different_address: addressData.ship_to_different_address,
+                willPreserveShipping: hasShipToDifferentAddress && addressType === "billing",
+            });
 
             // Prepare customer data for API call
             const customerData = {
@@ -403,7 +442,14 @@ const CheckoutPageContent = () => {
                     return; // Don't clear fields if we have recent address data
                 }
 
+                // Check if user has enabled "Ship to a different address"
+                const hasShipToDifferentAddress = Boolean(formData.shipping_address.ship_to_different_address);
+
                 setFormData((prev) => {
+                    // If user has checked "ship to different address" AND we're changing billing,
+                    // preserve the shipping address as-is
+                    const shouldPreserveShipping = hasShipToDifferentAddress && addressType === "billing";
+
                     const updatedData = {
                         ...prev,
                         billing_address: {
@@ -422,7 +468,7 @@ const CheckoutPageContent = () => {
                                     ? newProvince
                                     : prev.billing_address.state || newProvince,
                         },
-                        shipping_address: addressData,
+                        shipping_address: shouldPreserveShipping ? prev.shipping_address : addressData,
                     };
 
                     logger.log("FormData after clearing fields:", {
@@ -430,6 +476,9 @@ const CheckoutPageContent = () => {
                             updatedData.billing_address.address_1,
                         shipping_address_1:
                             updatedData.shipping_address.address_1,
+                        shipping_state: updatedData.shipping_address.state,
+                        ship_to_different_address: updatedData.shipping_address.ship_to_different_address,
+                        shouldPreserveShipping: shouldPreserveShipping,
                     });
 
                     return updatedData;
@@ -482,6 +531,10 @@ const CheckoutPageContent = () => {
             const updatedCart = await response.json();
 
             if (response.ok && !updatedCart.error) {
+                logger.log("✅ Cart updated from API. Checking shipping address:", {
+                    shipping_state: updatedCart.shipping_address?.state,
+                    ship_to_different_address: updatedCart.shipping_address?.ship_to_different_address,
+                });
                 // Update cart state with new shipping rates
                 setCartItems(updatedCart);
             } else {
@@ -610,6 +663,74 @@ const CheckoutPageContent = () => {
                 }
             }
             // --- END FLOW CHECKING LOGIC ---
+
+            // Check if personal info fields are empty in cart data and fetch from profile if needed
+            // This ensures first_name, last_name, phone, and date_of_birth are populated
+            // Check both billing and shipping addresses
+            if (updateFormData) {
+                const hasEmptyPersonalInfo = 
+                    !data.billing_address?.first_name ||
+                    !data.billing_address?.last_name ||
+                    !data.billing_address?.phone ||
+                    !data.billing_address?.date_of_birth ||
+                    !data.shipping_address?.first_name ||
+                    !data.shipping_address?.last_name ||
+                    !data.shipping_address?.phone ||
+                    !data.shipping_address?.date_of_birth;
+
+                if (hasEmptyPersonalInfo) {
+                    logger.log("=== CART HAS EMPTY PERSONAL INFO (BILLING OR SHIPPING), FETCHING FROM PROFILE ===");
+                    // Fetch profile data and merge only the missing personal fields
+                    const profileData = await fetchProfileData();
+                    if (profileData && profileData.success) {
+                        logger.log("=== PROFILE DATA FETCHED, MERGING PERSONAL INFO ===", {
+                            first_name: profileData.first_name,
+                            last_name: profileData.last_name,
+                            phone: profileData.phone,
+                            date_of_birth: profileData.date_of_birth || profileData.raw_profile_data?.custom_meta?.date_of_birth,
+                        });
+                        
+                        // Fill in only the empty personal info fields in billing address
+                        data.billing_address = {
+                            ...data.billing_address,
+                            first_name: data.billing_address?.first_name || profileData.first_name || "",
+                            last_name: data.billing_address?.last_name || profileData.last_name || "",
+                            phone: data.billing_address?.phone || profileData.phone || "",
+                            date_of_birth: data.billing_address?.date_of_birth || 
+                                           profileData.date_of_birth || 
+                                           profileData.raw_profile_data?.custom_meta?.date_of_birth || ""
+                        };
+                        
+                        // Fill in only the empty personal info fields in shipping address
+                        data.shipping_address = {
+                            ...data.shipping_address,
+                            first_name: data.shipping_address?.first_name || profileData.first_name || "",
+                            last_name: data.shipping_address?.last_name || profileData.last_name || "",
+                            phone: data.shipping_address?.phone || profileData.phone || "",
+                            date_of_birth: data.shipping_address?.date_of_birth || 
+                                           profileData.date_of_birth || 
+                                           profileData.raw_profile_data?.custom_meta?.date_of_birth || ""
+                        };
+                        
+                        logger.log("=== PERSONAL INFO MERGED INTO CART DATA ===", {
+                            billing_first_name: data.billing_address.first_name,
+                            billing_last_name: data.billing_address.last_name,
+                            billing_phone: data.billing_address.phone,
+                            billing_date_of_birth: data.billing_address.date_of_birth,
+                            shipping_first_name: data.shipping_address.first_name,
+                            shipping_last_name: data.shipping_address.last_name,
+                            shipping_phone: data.shipping_address.phone,
+                            shipping_date_of_birth: data.shipping_address.date_of_birth,
+                        });
+                        
+                        // Immediately save the merged data to localStorage to prevent it from being overwritten
+                        saveAddressData(data.billing_address, data.shipping_address);
+                        logger.log("=== SAVED MERGED DATA TO LOCALSTORAGE ===");
+                    } else {
+                        logger.log("=== NO PROFILE DATA AVAILABLE TO MERGE ===");
+                    }
+                }
+            }
 
             // Update form data with shipping and billing addresses from cart only if requested
             // This serves as a fallback for guest checkout on initial load
@@ -1034,15 +1155,10 @@ const CheckoutPageContent = () => {
                 // await fetchUserProfile();
                 // logger.log("=== PROFILE DATA LOADED ===");
 
-                // STEP 3: Ensure address data is populated from all available sources
-                logger.log("=== ENSURING ADDRESS DATA POPULATED ===");
-                const updatedFormDataWithAddresses = await populateAddressData(
-                    formData
-                );
-                if (updatedFormDataWithAddresses !== formData) {
-                    setFormData(updatedFormDataWithAddresses);
-                }
-                logger.log("=== ADDRESS DATA CHECK COMPLETED ===");
+                // STEP 3: Profile data is already fetched and merged in fetchCartItems
+                // No need to call populateAddressData again as it would use stale formData state
+                // The profile data merging happens inside fetchCartItems before setFormData is called
+                logger.log("=== ADDRESS DATA ALREADY POPULATED IN FETCHCARTITEMS ===");
 
                 // STEP 4: Load saved cards (doesn't affect form data)
                 await fetchSavedCards();

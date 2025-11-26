@@ -15,6 +15,14 @@ const BillingAndShipping = ({
     onAgeValidationReset,
 }) => {
     const handleBillingAddressChange = (e, fromAutocomplete = false) => {
+        // Debug logging for STATE changes
+        if (e.target.name === "state") {
+            logger.log("=== BILLING STATE CHANGE ===");
+            logger.log("New billing state:", e.target.value);
+            logger.log("Current shipping state BEFORE change:", formData.shipping_address?.state);
+            logger.log("Ship to different address?:", formData.shipping_address?.ship_to_different_address);
+        }
+        
         // Debug logging for address changes
         if (e.target.name === "address_1") {
             logger.log("=== BILLING ADDRESS_1 CHANGE ===");
@@ -66,6 +74,12 @@ const BillingAndShipping = ({
                 );
             }
 
+            // Debug log for STATE changes
+            if (e.target.name === "state") {
+                logger.log("AFTER setFormData - Shipping state:", updatedFormData.shipping_address?.state);
+                logger.log("AFTER setFormData - Billing state:", updatedFormData.billing_address?.state);
+            }
+
             return updatedFormData;
         });
 
@@ -77,6 +91,13 @@ const BillingAndShipping = ({
     };
 
     const handleShippingAddressChange = (e, fromAutocomplete = false) => {
+        // Debug logging for shipping STATE changes
+        if (e.target.name === "state") {
+            logger.log("=== SHIPPING STATE CHANGE ===");
+            logger.log("New shipping state:", e.target.value);
+            logger.log("From autocomplete:", fromAutocomplete);
+        }
+        
         setFormData((prev) => {
             return {
                 ...prev,
@@ -94,14 +115,20 @@ const BillingAndShipping = ({
         }
     };
     const handleAnotherShippingAddressChange = (e) => {
+        logger.log("=== SHIP TO DIFFERENT ADDRESS CHECKBOX ===");
+        logger.log("Checkbox name:", e.target.name);
+        logger.log("Checkbox checked:", e.target.checked);
+        
         setFormData((prev) => {
-            return {
+            const updated = {
                 ...prev,
                 shipping_address: {
                     ...prev.shipping_address,
                     [e.target.name]: e.target.checked,
                 },
             };
+            logger.log("Updated formData.shipping_address.ship_to_different_address:", updated.shipping_address.ship_to_different_address);
+            return updated;
         });
     };
     const handleOrderNotesChange = (e) => {
