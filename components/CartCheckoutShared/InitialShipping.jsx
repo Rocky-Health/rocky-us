@@ -51,15 +51,22 @@ const InitialShipping = ({
 
     // Get the selected province from form data first, then fallback to cartItems
     // This ensures the displayed province is always in sync with the form
+    // Prioritize formData over cartItems so it updates immediately when user selects a state
     // If "Ship to a different address" is checked, ONLY use the shipping address state from formData
-    // DO NOT fall back to cartItems.shipping_address.state as it might mirror billing
-    // If NOT checked, billing and shipping are the same, so use either
+    // If NOT checked, billing and shipping are the same, so use billing address from formData first
 
-    const isShipToDifferentAddress = Boolean(formData?.shipping_address?.ship_to_different_address);
-    
+    const isShipToDifferentAddress = Boolean(
+        formData?.shipping_address?.ship_to_different_address
+    );
+
+    // Get state code - prioritize formData for immediate updates
+    // Display state code directly (e.g., "NY" not "New York")
     const selectedProvince = isShipToDifferentAddress
-        ? formData?.shipping_address?.state  // ONLY use formData when "ship to different" is checked
-        : (cartItems?.shipping_address?.state || cartItems?.billing_address?.state || formData?.billing_address?.state || formData?.shipping_address?.state);
+        ? formData?.shipping_address?.state // ONLY use formData shipping when "ship to different" is checked
+        : formData?.billing_address?.state ||
+          formData?.shipping_address?.state ||
+          cartItems?.shipping_address?.state ||
+          cartItems?.billing_address?.state;
 
     // Debug logging to track province synchronization
     logger.log("🎯 InitialShipping province sync debug:", {
