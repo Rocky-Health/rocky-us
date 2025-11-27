@@ -19,10 +19,16 @@ const BillingAndShipping = ({
         if (e.target.name === "state") {
             logger.log("=== BILLING STATE CHANGE ===");
             logger.log("New billing state:", e.target.value);
-            logger.log("Current shipping state BEFORE change:", formData.shipping_address?.state);
-            logger.log("Ship to different address?:", formData.shipping_address?.ship_to_different_address);
+            logger.log(
+                "Current shipping state BEFORE change:",
+                formData.shipping_address?.state
+            );
+            logger.log(
+                "Ship to different address?:",
+                formData.shipping_address?.ship_to_different_address
+            );
         }
-        
+
         // Debug logging for address changes
         if (e.target.name === "address_1") {
             logger.log("=== BILLING ADDRESS_1 CHANGE ===");
@@ -76,14 +82,39 @@ const BillingAndShipping = ({
 
             // Debug log for STATE changes
             if (e.target.name === "state") {
-                logger.log("AFTER setFormData - Shipping state:", updatedFormData.shipping_address?.state);
-                logger.log("AFTER setFormData - Billing state:", updatedFormData.billing_address?.state);
+                logger.log(
+                    "AFTER setFormData - Shipping state:",
+                    updatedFormData.shipping_address?.state
+                );
+                logger.log(
+                    "AFTER setFormData - Billing state:",
+                    updatedFormData.billing_address?.state
+                );
+
+                // Clear empty address fields if state changed (not from autocomplete)
+                if (!fromAutocomplete) {
+                    const fieldsToCheck = [
+                        "postcode",
+                        "city",
+                        "address_2",
+                        "address_1",
+                    ];
+                    fieldsToCheck.forEach((field) => {
+                        // If field is empty or just whitespace, explicitly set it to empty string
+                        const fieldValue = prev.billing_address?.[field];
+                        if (fieldValue && typeof fieldValue === "string") {
+                            updatedFormData.billing_address[field] = "";
+                        }
+                    });
+                }
             }
 
             return updatedFormData;
         });
 
         // Check for Quebec restriction when province changes
+        // Call onProvinceChange to trigger update-customer API call with cleared empty fields
+        // handleProvinceChange already handles clearing fields when shouldClearFields=true
         if (e.target.name === "state" && onProvinceChange) {
             // Pass shouldClearFields as false when coming from autocomplete
             onProvinceChange(e.target.value, "billing", !fromAutocomplete);
@@ -97,15 +128,46 @@ const BillingAndShipping = ({
             logger.log("New shipping state:", e.target.value);
             logger.log("From autocomplete:", fromAutocomplete);
         }
-        
+
         setFormData((prev) => {
-            return {
+            const updatedFormData = {
                 ...prev,
                 shipping_address: {
                     ...prev.shipping_address,
                     [e.target.name]: e.target.value,
                 },
             };
+
+            // Debug log for STATE changes
+            if (e.target.name === "state") {
+                logger.log(
+                    "AFTER setFormData - Shipping state:",
+                    updatedFormData.shipping_address?.state
+                );
+                logger.log(
+                    "AFTER setFormData - Billing state:",
+                    updatedFormData.billing_address?.state
+                );
+
+                // Clear empty address fields if state changed (not from autocomplete)
+                if (!fromAutocomplete) {
+                    const fieldsToCheck = [
+                        "postcode",
+                        "city",
+                        "address_2",
+                        "address_1",
+                    ];
+                    fieldsToCheck.forEach((field) => {
+                        // If field is empty or just whitespace, explicitly set it to empty string
+                        const fieldValue = prev.shipping_address?.[field];
+                        if (fieldValue && typeof fieldValue === "string") {
+                            updatedFormData.shipping_address[field] = "";
+                        }
+                    });
+                }
+            }
+
+            return updatedFormData;
         });
 
         // Check for Quebec restriction when province changes
@@ -118,7 +180,7 @@ const BillingAndShipping = ({
         logger.log("=== SHIP TO DIFFERENT ADDRESS CHECKBOX ===");
         logger.log("Checkbox name:", e.target.name);
         logger.log("Checkbox checked:", e.target.checked);
-        
+
         setFormData((prev) => {
             const updated = {
                 ...prev,
@@ -127,7 +189,10 @@ const BillingAndShipping = ({
                     [e.target.name]: e.target.checked,
                 },
             };
-            logger.log("Updated formData.shipping_address.ship_to_different_address:", updated.shipping_address.ship_to_different_address);
+            logger.log(
+                "Updated formData.shipping_address.ship_to_different_address:",
+                updated.shipping_address.ship_to_different_address
+            );
             return updated;
         });
     };
