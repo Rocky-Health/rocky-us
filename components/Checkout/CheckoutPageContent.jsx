@@ -32,6 +32,14 @@ import useCheckoutValidation from "@/lib/hooks/useCheckoutValidation";
 import { checkAgeRestriction } from "@/utils/ageValidation";
 import QuebecRestrictionPopup from "../Popups/QuebecRestrictionPopup";
 import AgeRestrictionPopup from "../Popups/AgeRestrictionPopup";
+import ProductNotAvailablePopup from "../Popups/ProductNotAvailablePopup";
+import {
+    isRestrictedCartItem,
+    isEdStateRestricted,
+    isWlStateRestricted,
+    isRestrictedEdCartItem,
+    isRestrictedWlCartItem,
+} from "@/utils/edShippingRestrictions";
 import { getAwinFromUrlOrStorage } from "@/utils/awin";
 import StripeElementsPayment from "./StripeElementsPayment";
 import { Elements, useStripe } from "@stripe/react-stripe-js";
@@ -202,6 +210,8 @@ const CheckoutPageContent = () => {
     const [showQuebecPopup, setShowQuebecPopup] = useState(false);
     const [showAgePopup, setShowAgePopup] = useState(false);
     const [ageValidationFailed, setAgeValidationFailed] = useState(false);
+    const [showEdRestrictionPopup, setShowEdRestrictionPopup] = useState(false);
+    const [restrictedProductName, setRestrictedProductName] = useState("");
     const [isUpdatingShipping, setIsUpdatingShipping] = useState(false);
 
     // Handle province change for real-time Quebec validation and shipping updates
@@ -330,7 +340,7 @@ const CheckoutPageContent = () => {
                 // or if we're changing the shipping address directly
                 const useBillingFallback = !hasShipToDifferentAddress || addressType === "shipping";
                 const preserveShippingState = hasShipToDifferentAddress && addressType === "billing";
-                
+
                 addressData = {
                     first_name:
                         formData.shipping_address.first_name ||
@@ -354,7 +364,7 @@ const CheckoutPageContent = () => {
                 // If user has checked "ship to different address" AND we're changing billing address,
                 // preserve shipping address without fallback to billing
                 const preserveShippingAsIs = hasShipToDifferentAddress && addressType === "billing";
-                
+
                 addressData = {
                     first_name:
                         formData.shipping_address.first_name ||
@@ -456,12 +466,12 @@ const CheckoutPageContent = () => {
                             ...prev.billing_address,
                             ...(addressType === "billing"
                                 ? {
-                                      address_1: "",
-                                      address_2: "",
-                                      city: "",
-                                      postcode: "",
-                                      country: "US",
-                                  }
+                                    address_1: "",
+                                    address_2: "",
+                                    city: "",
+                                    postcode: "",
+                                    country: "US",
+                                }
                                 : {}),
                             state:
                                 addressType === "billing"
@@ -580,9 +590,8 @@ const CheckoutPageContent = () => {
             newParams.set("smoking-flow", "1");
 
             // Update the URL without triggering a page reload
-            const newUrl = `${
-                window.location.pathname
-            }?${newParams.toString()}`;
+            const newUrl = `${window.location.pathname
+                }?${newParams.toString()}`;
             window.history.replaceState({ path: newUrl }, "", newUrl);
 
             // Update the flowParams object
@@ -648,9 +657,8 @@ const CheckoutPageContent = () => {
                                 window.location.search
                             );
                             newParams.set(match.flowType, "1");
-                            const newUrl = `${
-                                window.location.pathname
-                            }?${newParams.toString()}`;
+                            const newUrl = `${window.location.pathname
+                                }?${newParams.toString()}`;
                             window.history.replaceState(
                                 { path: newUrl },
                                 "",
@@ -668,7 +676,7 @@ const CheckoutPageContent = () => {
             // This ensures first_name, last_name, phone, and date_of_birth are populated
             // Check both billing and shipping addresses
             if (updateFormData) {
-                const hasEmptyPersonalInfo = 
+                const hasEmptyPersonalInfo =
                     !data.billing_address?.first_name ||
                     !data.billing_address?.last_name ||
                     !data.billing_address?.phone ||
@@ -689,29 +697,29 @@ const CheckoutPageContent = () => {
                             phone: profileData.phone,
                             date_of_birth: profileData.date_of_birth || profileData.raw_profile_data?.custom_meta?.date_of_birth,
                         });
-                        
+
                         // Fill in only the empty personal info fields in billing address
                         data.billing_address = {
                             ...data.billing_address,
                             first_name: data.billing_address?.first_name || profileData.first_name || "",
                             last_name: data.billing_address?.last_name || profileData.last_name || "",
                             phone: data.billing_address?.phone || profileData.phone || "",
-                            date_of_birth: data.billing_address?.date_of_birth || 
-                                           profileData.date_of_birth || 
-                                           profileData.raw_profile_data?.custom_meta?.date_of_birth || ""
+                            date_of_birth: data.billing_address?.date_of_birth ||
+                                profileData.date_of_birth ||
+                                profileData.raw_profile_data?.custom_meta?.date_of_birth || ""
                         };
-                        
+
                         // Fill in only the empty personal info fields in shipping address
                         data.shipping_address = {
                             ...data.shipping_address,
                             first_name: data.shipping_address?.first_name || profileData.first_name || "",
                             last_name: data.shipping_address?.last_name || profileData.last_name || "",
                             phone: data.shipping_address?.phone || profileData.phone || "",
-                            date_of_birth: data.shipping_address?.date_of_birth || 
-                                           profileData.date_of_birth || 
-                                           profileData.raw_profile_data?.custom_meta?.date_of_birth || ""
+                            date_of_birth: data.shipping_address?.date_of_birth ||
+                                profileData.date_of_birth ||
+                                profileData.raw_profile_data?.custom_meta?.date_of_birth || ""
                         };
-                        
+
                         logger.log("=== PERSONAL INFO MERGED INTO CART DATA ===", {
                             billing_first_name: data.billing_address.first_name,
                             billing_last_name: data.billing_address.last_name,
@@ -722,7 +730,7 @@ const CheckoutPageContent = () => {
                             shipping_phone: data.shipping_address.phone,
                             shipping_date_of_birth: data.shipping_address.date_of_birth,
                         });
-                        
+
                         // Immediately save the merged data to localStorage to prevent it from being overwritten
                         saveAddressData(data.billing_address, data.shipping_address);
                         logger.log("=== SAVED MERGED DATA TO LOCALSTORAGE ===");
@@ -951,8 +959,8 @@ const CheckoutPageContent = () => {
                             prev.billing_address.last_name ||
                             (storedUserName
                                 ? decodeURIComponent(storedUserName)
-                                      .replace(storedFirstName, "")
-                                      .trim()
+                                    .replace(storedFirstName, "")
+                                    .trim()
                                 : profileData.last_name || ""),
                         email:
                             prev.billing_address.email ||
@@ -1009,8 +1017,8 @@ const CheckoutPageContent = () => {
                             prev.shipping_address.last_name ||
                             (storedUserName
                                 ? decodeURIComponent(storedUserName)
-                                      .replace(storedFirstName, "")
-                                      .trim()
+                                    .replace(storedFirstName, "")
+                                    .trim()
                                 : profileData.last_name || ""),
                         phone:
                             prev.shipping_address.phone ||
@@ -1126,22 +1134,22 @@ const CheckoutPageContent = () => {
                             // Clean up URL parameters - use the detected flow type from result
                             cleanupCartUrlParameters(
                                 result.flowType ||
-                                    (isEdFlow
-                                        ? "ed"
-                                        : flowParams["hair-flow"]
+                                (isEdFlow
+                                    ? "ed"
+                                    : flowParams["hair-flow"]
                                         ? "hair"
                                         : flowParams["wl-flow"]
-                                        ? "wl"
-                                        : flowParams["mh-flow"]
-                                        ? "mh"
-                                        : flowParams["skincare-flow"]
-                                        ? "skincare"
-                                        : "general")
+                                            ? "wl"
+                                            : flowParams["mh-flow"]
+                                                ? "mh"
+                                                : flowParams["skincare-flow"]
+                                                    ? "skincare"
+                                                    : "general")
                             );
                         } else if (result.status === "error") {
                             toast.error(
                                 result.message ||
-                                    "Failed to add products to cart."
+                                "Failed to add products to cart."
                             );
                         }
                     } finally {
@@ -1194,7 +1202,7 @@ const CheckoutPageContent = () => {
                 logger.log("Form validation failed:", validationResult.errors);
                 toast.error(
                     validationResult.formattedMessage ||
-                        "Please check your form data and try again."
+                    "Please check your form data and try again."
                 );
                 setSubmitting(false);
                 return;
@@ -1291,6 +1299,47 @@ const CheckoutPageContent = () => {
                         );
                     }
                 }
+
+                // Check for product shipping restrictions (ED and WL products)
+                const useShippingAddressForCheck =
+                    formData.shipping_address.ship_to_different_address;
+                const shippingState = useShippingAddressForCheck
+                    ? formData.shipping_address.state
+                    : formData.billing_address.state;
+                const billingState = formData.billing_address.state;
+                const stateToCheck = shippingState || billingState;
+
+                // Check for restricted ED products (sildenafil/tadalafil)
+                const restrictedEdItem = cartItems.items.find((item) =>
+                    isRestrictedEdCartItem(item)
+                );
+
+                if (restrictedEdItem && stateToCheck && isEdStateRestricted(stateToCheck)) {
+                    logger.log(
+                        `ED product shipping restricted for state: ${stateToCheck}`,
+                        restrictedEdItem
+                    );
+                    setRestrictedProductName(restrictedEdItem.name || "this");
+                    setShowEdRestrictionPopup(true);
+                    setSubmitting(false);
+                    return;
+                }
+
+                // Check for restricted WL products (Ozempic/Monjaro)
+                const restrictedWlItem = cartItems.items.find((item) =>
+                    isRestrictedWlCartItem(item)
+                );
+
+                if (restrictedWlItem && stateToCheck && isWlStateRestricted(stateToCheck)) {
+                    logger.log(
+                        `WL product shipping restricted for state: ${stateToCheck}`,
+                        restrictedWlItem
+                    );
+                    setRestrictedProductName(restrictedWlItem.name || "this");
+                    setShowEdRestrictionPopup(true);
+                    setSubmitting(false);
+                    return;
+                }
             }
 
             // Update customer data on server before checkout to ensure latest info is saved
@@ -1315,39 +1364,39 @@ const CheckoutPageContent = () => {
                     },
                     shipping_address: useShippingAddress
                         ? {
-                              first_name:
-                                  formData.shipping_address.first_name || "",
-                              last_name:
-                                  formData.shipping_address.last_name || "",
-                              company: formData.shipping_address.company || "",
-                              address_1:
-                                  formData.shipping_address.address_1 || "",
-                              address_2:
-                                  formData.shipping_address.address_2 || "",
-                              city: formData.shipping_address.city || "",
-                              state: formData.shipping_address.state || "",
-                              postcode:
-                                  formData.shipping_address.postcode || "",
-                              country:
-                                  formData.shipping_address.country || "US",
-                              phone: formData.shipping_address.phone || "",
-                          }
+                            first_name:
+                                formData.shipping_address.first_name || "",
+                            last_name:
+                                formData.shipping_address.last_name || "",
+                            company: formData.shipping_address.company || "",
+                            address_1:
+                                formData.shipping_address.address_1 || "",
+                            address_2:
+                                formData.shipping_address.address_2 || "",
+                            city: formData.shipping_address.city || "",
+                            state: formData.shipping_address.state || "",
+                            postcode:
+                                formData.shipping_address.postcode || "",
+                            country:
+                                formData.shipping_address.country || "US",
+                            phone: formData.shipping_address.phone || "",
+                        }
                         : {
-                              first_name:
-                                  formData.billing_address.first_name || "",
-                              last_name:
-                                  formData.billing_address.last_name || "",
-                              company: formData.billing_address.company || "",
-                              address_1:
-                                  formData.billing_address.address_1 || "",
-                              address_2:
-                                  formData.billing_address.address_2 || "",
-                              city: formData.billing_address.city || "",
-                              state: formData.billing_address.state || "",
-                              postcode: formData.billing_address.postcode || "",
-                              country: formData.billing_address.country || "US",
-                              phone: formData.billing_address.phone || "",
-                          },
+                            first_name:
+                                formData.billing_address.first_name || "",
+                            last_name:
+                                formData.billing_address.last_name || "",
+                            company: formData.billing_address.company || "",
+                            address_1:
+                                formData.billing_address.address_1 || "",
+                            address_2:
+                                formData.billing_address.address_2 || "",
+                            city: formData.billing_address.city || "",
+                            state: formData.billing_address.state || "",
+                            postcode: formData.billing_address.postcode || "",
+                            country: formData.billing_address.country || "US",
+                            phone: formData.billing_address.phone || "",
+                        },
                 };
 
                 const updateResponse = await fetch(
@@ -1542,8 +1591,8 @@ const CheckoutPageContent = () => {
                 cardType: selectedCard
                     ? ""
                     : formData.payment_data.find(
-                          (d) => d.key === "wc-bambora-credit-card-card-type"
-                      )?.value,
+                        (d) => d.key === "wc-bambora-credit-card-card-type"
+                    )?.value,
                 cardExpMonth: selectedCard ? "" : expiry.slice(0, 2),
                 cardExpYear: selectedCard ? "" : expiry.slice(3),
                 cardCVD: selectedCard ? "" : cvc,
@@ -1561,10 +1610,10 @@ const CheckoutPageContent = () => {
                     cartItems.totals && cartItems.totals.total_price
                         ? parseFloat(cartItems.totals.total_price) / 100
                         : cartItems.totals && cartItems.totals.total
-                        ? parseFloat(
-                              cartItems.totals.total.replace(/[^0-9.]/g, "")
-                          )
-                        : 0,
+                            ? parseFloat(
+                                cartItems.totals.total.replace(/[^0-9.]/g, "")
+                            )
+                            : 0,
 
                 // ED Flow parameter
                 isEdFlow: isEdFlow,
@@ -2102,7 +2151,7 @@ const CheckoutPageContent = () => {
                     if (!intentResult.success) {
                         throw new Error(
                             intentResult.error ||
-                                "Failed to create payment intent"
+                            "Failed to create payment intent"
                         );
                     }
 
@@ -2261,8 +2310,7 @@ const CheckoutPageContent = () => {
                 }
 
                 router.push(
-                    `/checkout/order-received/${order_id}?key=${order_key}${
-                        buildFlowQueryString() ? buildFlowQueryString() : ""
+                    `/checkout/order-received/${order_id}?key=${order_key}${buildFlowQueryString() ? buildFlowQueryString() : ""
                     }`
                 );
             }
@@ -2364,6 +2412,13 @@ const CheckoutPageContent = () => {
                     // Don't reset ageValidationFailed here - it should only reset when user enters valid age
                 }}
                 message="Sorry, you must be at least 19 years old to purchase this product."
+            />
+
+            {/* ED Product Shipping Restriction Popup */}
+            <ProductNotAvailablePopup
+                isOpen={showEdRestrictionPopup}
+                onClose={() => setShowEdRestrictionPopup(false)}
+                productName={restrictedProductName}
             />
         </>
     );
