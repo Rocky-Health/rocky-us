@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { logger } from "@/utils/devLogger";
 import Link from "next/link";
 import CartPopup from "../Cart/CartPopup";
@@ -8,6 +8,15 @@ import { addItemToCart } from "@/lib/cart/cartService";
 import { addRequiredConsultation } from "@/utils/requiredConsultation";
 import { analyticsService } from "@/utils/analytics/analyticsService";
 import { formatPrice } from "@/utils/priceFormatter";
+import {
+  checkShippingRestriction,
+  getUserState,
+  isEdRestrictedProduct,
+  isEdRestrictedSlug,
+  isWlRestrictedProduct,
+  isWlRestrictedSlug,
+} from "@/utils/edShippingRestrictions";
+import ProductNotAvailablePopup from "../Popups/ProductNotAvailablePopup";
 
 const ProductActions = ({
   price = 90,
@@ -18,6 +27,28 @@ const ProductActions = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showCartPopup, setShowCartPopup] = useState(false);
+  const [showRestrictionPopup, setShowRestrictionPopup] = useState(false);
+  const [restrictedProductName, setRestrictedProductName] = useState("");
+  const [userProfile, setUserProfile] = useState(null);
+
+  // Fetch user profile data on component mount
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetch("/api/profile");
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            setUserProfile(data);
+          }
+        }
+      } catch (error) {
+        logger.error("Error fetching user profile:", error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
 
   // Use the selectedVariationPrice if available, otherwise fall back to the default price
   const displayPrice =
@@ -28,7 +59,7 @@ const ProductActions = ({
     selectedVariation &&
     selectedVariation.sale_price &&
     Number(selectedVariation.sale_price) <
-      Number(selectedVariation.regular_price);
+    Number(selectedVariation.regular_price);
 
   // If there's a sale price, use it, otherwise use the regular price
   const finalPrice = hasSalePrice
@@ -43,6 +74,81 @@ const ProductActions = ({
       if (!product || !product.id) {
         logger.error("No product ID available for adding to cart");
         return;
+      }
+
+      // Check for product shipping restrictions (ED or WL products)
+      // Check both product name and slug
+      const isRestrictedProduct =
+        isEdRestrictedProduct(product.name) ||
+        (product.slug && isEdRestrictedSlug(product.slug)) ||
+        isWlRestrictedProduct(product.name) ||
+        (product.slug && isWlRestrictedSlug(product.slug));
+
+      logger.log(
+        `[Product Restriction] Checking product - name: "${product.name}", slug: "${product.slug || 'N/A'}", isRestrictedProduct: ${isRestrictedProduct}`
+      );
+
+      if (isRestrictedProduct) {
+        // Fetch user profile if not already loaded
+        let profileData = userProfile;
+        if (!profileData) {
+          try {
+            logger.log("[ED Restriction] Fetching user profile...");
+            const response = await fetch("/api/profile");
+            if (response.ok) {
+              const data = await response.json();
+              if (data.success) {
+                profileData = data;
+                setUserProfile(data);
+                logger.log("[ED Restriction] User profile fetched:", {
+                  shipping_state: data.shipping_state,
+                  billing_state: data.billing_state,
+                  province: data.province,
+                });
+              }
+            }
+          } catch (error) {
+            logger.error("Error fetching user profile for restriction check:", error);
+          }
+        } else {
+          logger.log("[ED Restriction] Using cached user profile:", {
+            shipping_state: profileData.shipping_state,
+            billing_state: profileData.billing_state,
+            province: profileData.province,
+          });
+        }
+
+        if (profileData) {
+          const userState = getUserState(profileData);
+          logger.log(
+            `[Product Restriction] User state from profile: "${userState}"`
+          );
+
+          if (userState) {
+            const isRestricted = checkShippingRestriction(userState, product);
+            logger.log(
+              `[Product Restriction] Check result for product "${product.name}" and state "${userState}": ${isRestricted}`
+            );
+
+            if (isRestricted) {
+              logger.log(
+                `[Product Restriction] BLOCKING: Product ${product.name} is restricted for state: ${userState}`
+              );
+              setIsLoading(false);
+              setRestrictedProductName(product.name);
+              setShowRestrictionPopup(true);
+              return;
+            }
+          } else {
+            logger.log(
+              "[Product Restriction] No user state found in profile, allowing add to cart"
+            );
+          }
+        } else {
+          logger.log(
+            "[Product Restriction] No user profile data available, allowing add to cart"
+          );
+        }
       }
 
       // --- FLOW DETECTION AND LOCALSTORAGE LOGIC ---
@@ -118,8 +224,7 @@ const ProductActions = ({
         if (isVariableProduct && !cartData.convertToSub) {
           const varId = selectedVariation.variation_id || selectedVariation.id;
           logger.log(
-            `Variable product detected, using variation ID ${varId} as productId for ${
-              product.name || product.id
+            `Variable product detected, using variation ID ${varId} as productId for ${product.name || product.id
             }`
           );
           cartData.productId = varId;
@@ -162,22 +267,22 @@ const ProductActions = ({
             undefined,
           item_variant: selectedVariation?.attributes
             ? Object.entries(selectedVariation.attributes)
-                .map(
-                  ([key, val]) =>
-                    `${key
-                      .replace(/^attribute_/, "")
-                      .replace(/^pa_/, "")}: ${val}`
-                )
-                .join(", ")
+              .map(
+                ([key, val]) =>
+                  `${key
+                    .replace(/^attribute_/, "")
+                    .replace(/^pa_/, "")}: ${val}`
+              )
+              .join(", ")
             : "",
           // Pass through minimal attributes if variation selected
           attributes: selectedVariation?.attributes
             ? Object.entries(selectedVariation.attributes).map(
-                ([key, val]) => ({
-                  name: key.replace(/^attribute_/, "").replace(/^pa_/, ""),
-                  options: [val],
-                })
-              )
+              ([key, val]) => ({
+                name: key.replace(/^attribute_/, "").replace(/^pa_/, ""),
+                options: [val],
+              })
+            )
             : [],
         };
         analyticsService.trackAddToCart(productForTracking, 1);
@@ -226,6 +331,13 @@ const ProductActions = ({
         isOpen={showCartPopup}
         onClose={() => setShowCartPopup(false)}
         productType={productType}
+      />
+
+      {/* Product Not Available Popup */}
+      <ProductNotAvailablePopup
+        isOpen={showRestrictionPopup}
+        onClose={() => setShowRestrictionPopup(false)}
+        productName={restrictedProductName}
       />
     </div>
   );

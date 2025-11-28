@@ -999,6 +999,48 @@ export const addToCartEarly = async (
       }`
     );
 
+    // Check for shipping restrictions (for authenticated users only)
+    if (isAuthenticated) {
+      const {
+        checkShippingRestriction,
+        getUserState,
+      } = await import("@/utils/edShippingRestrictions");
+
+      try {
+        // Fetch user profile to check state
+        const response = await fetch("/api/profile");
+        if (response.ok) {
+          const profileData = await response.json();
+          if (profileData.success) {
+            const userState = getUserState(profileData);
+            const productName = mainProduct.name || "";
+
+            logger.log(
+              `[Product Restriction] Checking restriction for product "${productName}" in state "${userState}"`
+            );
+
+            if (userState && checkShippingRestriction(userState, mainProduct)) {
+              logger.log(
+                `[Product Restriction] BLOCKING: Product "${productName}" is restricted for state: ${userState}`
+              );
+              return {
+                success: false,
+                error: `Sorry, ${productName} product is currently not available in your selected state.`,
+                restricted: true,
+                flowType,
+              };
+            }
+          }
+        }
+      } catch (restrictionError) {
+        logger.error(
+          "Error checking shipping restriction:",
+          restrictionError
+        );
+        // Continue with cart addition if restriction check fails
+      }
+    }
+
     if (isAuthenticated) {
       // ===== AUTHENTICATED FLOW: Direct API Calls =====
       return await handleAuthenticatedEarlyAddition(mainProduct, flowType, {
