@@ -7,6 +7,7 @@ import { ProgressBar } from "../EdQuestionnaire/ProgressBar";
 import { useProductsWithAvailability } from "./productData";
 import { stepConfig, determineRecommendedProduct } from "./utils/stepUtils";
 import { addToCartEarly } from "@/utils/flowCartHandler";
+import ProductNotAvailablePopup from "../Popups/ProductNotAvailablePopup";
 
 // Import Step Components
 import WeightConcerns from "./steps/WeightConcerns";
@@ -83,6 +84,10 @@ const WeightQuestionnaire = () => {
   const [showCrossSellPopup, setShowCrossSellPopup] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [initialCartData, setInitialCartData] = useState(null);
+
+  // For shipping restriction popup
+  const [showRestrictionPopup, setShowRestrictionPopup] = useState(false);
+  const [restrictedProductName, setRestrictedProductName] = useState("");
 
   useEffect(() => {
     checkFinalStep();
@@ -416,14 +421,21 @@ const WeightQuestionnaire = () => {
             result.redirectUrl ||
             result.checkoutUrl ||
             "/checkout?wl-flow=1" +
-              (result.authenticationRequired === false ? "&onboarding=1" : "");
+            (result.authenticationRequired === false ? "&onboarding=1" : "");
           window.location.href = checkoutUrl;
         } else {
           logger.error("❌ Failed to add product to cart:", result.error);
           setIsAddingToCart(false);
-          alert(
-            result.error || "Failed to add product to cart. Please try again."
-          );
+
+          // Check if this is a shipping restriction error
+          if (result.restricted) {
+            setRestrictedProductName(productState.selected.name);
+            setShowRestrictionPopup(true);
+          } else {
+            alert(
+              result.error || "Failed to add product to cart. Please try again."
+            );
+          }
         }
       } catch (error) {
         logger.error("Error adding product to cart:", error);
@@ -497,14 +509,21 @@ const WeightQuestionnaire = () => {
             result.redirectUrl ||
             result.checkoutUrl ||
             "/checkout?wl-flow=1" +
-              (result.authenticationRequired === false ? "&onboarding=1" : "");
+            (result.authenticationRequired === false ? "&onboarding=1" : "");
           window.location.href = checkoutUrl;
         } else {
           logger.error("❌ Failed to add Ozempic to cart:", result.error);
           setIsAddingToCart(false);
-          alert(
-            result.error || "Failed to add product to cart. Please try again."
-          );
+
+          // Check if this is a shipping restriction error
+          if (result.restricted) {
+            setRestrictedProductName(ozempicProduct.name);
+            setShowRestrictionPopup(true);
+          } else {
+            alert(
+              result.error || "Failed to add product to cart. Please try again."
+            );
+          }
         }
       } catch (error) {
         logger.error("Error adding Ozempic to cart:", error);
@@ -560,7 +579,7 @@ const WeightQuestionnaire = () => {
             result.redirectUrl ||
             result.checkoutUrl ||
             "/checkout?wl-flow=1" +
-              (result.authenticationRequired === false ? "&onboarding=1" : "");
+            (result.authenticationRequired === false ? "&onboarding=1" : "");
           window.location.href = checkoutUrl;
         } else {
           logger.error("❌ Failed to add Rybelsus to cart:", result.error);
@@ -813,6 +832,13 @@ const WeightQuestionnaire = () => {
           box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
         }
       `}</style>
+
+      {/* Product Shipping Restriction Popup */}
+      <ProductNotAvailablePopup
+        isOpen={showRestrictionPopup}
+        onClose={() => setShowRestrictionPopup(false)}
+        productName={restrictedProductName}
+      />
     </div>
   );
 };
