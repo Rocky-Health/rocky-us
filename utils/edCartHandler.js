@@ -1,15 +1,76 @@
 // Create a utility file for ED cart functions
 import { toast } from "react-toastify";
 import { logger } from "@/utils/devLogger";
+import {
+  checkEdShippingRestriction,
+  getUserState,
+  isEdRestrictedProduct,
+} from "@/utils/edShippingRestrictions";
 
 /**
  * Add ED product to cart directly using API
  * @param {Object} productOptions - Product options including variation ID, preference, etc.
  * @param {String} dosage - Selected dosage
+ * @param {Function} onRestrictionBlocked - Callback when restriction is detected (optional)
  * @returns {Promise<Object>} Result of the cart addition operation
  */
-export const addEdProductToCart = async (productOptions, dosage) => {
+export const addEdProductToCart = async (
+  productOptions,
+  dosage,
+  onRestrictionBlocked = null
+) => {
   try {
+    // Check for ED product shipping restrictions
+    // Note: We need product name to check, but productOptions might not have it
+    // For ED products, we can assume they are restricted if they're being added via this function
+    // We'll check the state/province restriction
+    
+    // Fetch user profile to check state
+    let profileData = null;
+    try {
+      const response = await fetch("/api/profile");
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          profileData = data;
+        }
+      }
+    } catch (error) {
+      logger.error("Error fetching user profile for restriction check:", error);
+    }
+
+    if (profileData) {
+      const userState = getUserState(profileData);
+      // Since this is an ED product handler, we know it's a restricted product type
+      // We just need to check if the state is restricted
+      const restrictedStates = [
+        "ALASKA",
+        "CALIFORNIA",
+        "DELAWARE",
+        "HAWAII",
+        "MASSACHUSETTS",
+        "NEW HAMPSHIRE",
+        "NEW MEXICO",
+        "NORTH CAROLINA",
+        "RHODE ISLAND",
+        "VERMONT",
+      ];
+      
+      const normalizedState = userState.toUpperCase().trim();
+      if (restrictedStates.includes(normalizedState)) {
+        logger.log(
+          `ED product is restricted for state: ${userState}`
+        );
+        if (onRestrictionBlocked) {
+          onRestrictionBlocked();
+        }
+        return {
+          success: false,
+          error: "Product not available in your state",
+          restricted: true,
+        };
+      }
+    }
     // Construct the request body for the cart API
     const requestBody = {
       productId:
