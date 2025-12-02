@@ -29,6 +29,14 @@ const readCookie = (name) => {
 // Configure AWIN.Tracking.Sale and explicitly fire the AWIN JS conversion (sread.js)
 const fireAwinClientPixel = (orderData, s2sOrderData = null) => {
   try {
+    // Check if Awin tracking is enabled
+    const awinEnabled = process.env.NEXT_PUBLIC_AWIN_ENABLED;
+    const isEnabled = awinEnabled === undefined || awinEnabled === "" || awinEnabled === "true" || awinEnabled === "1";
+    if (!isEnabled) {
+      logger?.log?.("[AWIN] Tracking is disabled, skipping client pixel");
+      return;
+    }
+
     if (!orderData || !orderData.id) return;
     const merchantId = process.env.NEXT_PUBLIC_AWIN_MERCHANT_ID || "101159";
     const subtotal = s2sOrderData
@@ -106,6 +114,14 @@ const fireAwinClientPixel = (orderData, s2sOrderData = null) => {
 
 // Function to send AWIN tracking
 const sendAwinTracking = async (orderData) => {
+  // Check if Awin tracking is enabled
+  const awinEnabled = process.env.NEXT_PUBLIC_AWIN_ENABLED;
+  const isEnabled = awinEnabled === undefined || awinEnabled === "" || awinEnabled === "true" || awinEnabled === "1";
+  if (!isEnabled) {
+    logger?.log?.("[AWIN] Tracking is disabled, skipping server-side tracking");
+    return null;
+  }
+
   if (!orderData || !orderData.id) {
     logger.warn("[AWIN] No order data provided for tracking");
     return null;

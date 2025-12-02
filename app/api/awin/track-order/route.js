@@ -46,6 +46,18 @@ function buildBd0({ merchant, orderRef, group, items, fallbackCategory = "Defaul
 
 export async function POST(req) {
   try {
+    // Check if Awin tracking is enabled
+    const awinEnabled = process.env.AWIN_ENABLED;
+    const isEnabled = awinEnabled === undefined || awinEnabled === "" || awinEnabled === "true" || awinEnabled === "1";
+    if (!isEnabled) {
+      console.log("[AWIN] Tracking is disabled, skipping tracking request");
+      return NextResponse.json({
+        success: false,
+        skipped: true,
+        reason: "tracking_disabled",
+      });
+    }
+
     const { order_id, order_data } = await req.json();
     if (!order_id) {
       return NextResponse.json(
@@ -232,6 +244,26 @@ export async function POST(req) {
 // GET: Fallback pixel endpoint for noscript environments
 export async function GET(req) {
   try {
+    // Check if Awin tracking is enabled
+    const awinEnabled = process.env.AWIN_ENABLED;
+    const isEnabled = awinEnabled === undefined || awinEnabled === "" || awinEnabled === "true" || awinEnabled === "1";
+    if (!isEnabled) {
+      // Return a 1x1 transparent GIF even when disabled to avoid broken image
+      const oneByOneGif = Buffer.from(
+        "R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==",
+        "base64"
+      );
+      return new NextResponse(oneByOneGif, {
+        status: 200,
+        headers: {
+          "Content-Type": "image/gif",
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      });
+    }
+
     const { searchParams } = new URL(req.url);
 
     // If we have order_id, mirror POST logic to compute canonical values

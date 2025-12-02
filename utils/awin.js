@@ -1,6 +1,22 @@
 /**
+ * Check if Awin tracking is enabled
+ * @returns {boolean} True if Awin tracking is enabled, false otherwise
+ */
+export function isAwinTrackingEnabled() {
+  if (typeof window !== "undefined") {
+    // Client-side: check NEXT_PUBLIC_AWIN_ENABLED (defaults to true for backward compatibility)
+    const enabled = process.env.NEXT_PUBLIC_AWIN_ENABLED;
+    return enabled === undefined || enabled === "" || enabled === "true" || enabled === "1";
+  }
+  // Server-side: check AWIN_ENABLED (defaults to true for backward compatibility)
+  const enabled = process.env.AWIN_ENABLED;
+  return enabled === undefined || enabled === "" || enabled === "true" || enabled === "1";
+}
+
+/**
  * AWIN helper: capture `awc` from URL once and persist to localStorage + cookie.
  * Safe to call multiple times and on SSR.
+ * Only sets cookies/storage if Awin tracking is enabled.
  */
 export function getAwinFromUrlOrStorage() {
   if (typeof window === "undefined") {
@@ -11,7 +27,8 @@ export function getAwinFromUrlOrStorage() {
     const params = new URLSearchParams(window.location.search || "");
     const awcFromUrl = params.get("awc");
 
-    if (awcFromUrl) {
+    // Only set cookies/storage if Awin tracking is enabled
+    if (awcFromUrl && isAwinTrackingEnabled()) {
       try {
         window.localStorage.setItem("awin_awc", awcFromUrl);
       } catch (_) {}

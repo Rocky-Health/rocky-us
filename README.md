@@ -76,6 +76,10 @@ Define variables in your deployment environment. Never commit secrets.
   - `VERCEL_URL` (provided by Vercel)
 - Tracking
   - `NEXT_PUBLIC_TIKTOK_PIXEL_ID` (public, optional)
+  - `NEXT_PUBLIC_AWIN_ENABLED` (public, optional): Enable/disable Awin tracking on client-side. Defaults to `true` if not set. Set to `"false"` or `"0"` to disable.
+  - `AWIN_ENABLED` (server-side, optional): Enable/disable Awin tracking on server-side. Defaults to `true` if not set. Set to `"false"` or `"0"` to disable.
+  - `AWIN_MERCHANT_ID` (server-side, optional): Awin merchant ID. Defaults to `"101159"` if not set.
+  - `AWIN_TESTMODE` (server-side, optional): Awin test mode. Set to `"1"` to enable test mode.
   - Vercel Analytics/Speed Insights require no secrets
 - Northbeam
   - `NB_CLIENT_ID` or `NORTHBEAM_CLIENT_ID`

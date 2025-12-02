@@ -7,19 +7,25 @@ const OrderReceivedPage = async ({ params }) => {
   const userId = cookieStore.get("userId")?.value;
   const orderId = params?.id || "";
 
+  // Check if Awin tracking is enabled
+  const awinEnabled = process.env.AWIN_ENABLED;
+  const isAwinEnabled = awinEnabled === undefined || awinEnabled === "" || awinEnabled === "true" || awinEnabled === "1";
+
   return (
     <Suspense fallback={<></>}>
       <OrderReceivedPageContent userId={userId} />
       {/* AWIN noscript fallback: use order_id when available so server computes values */}
-      <noscript>
-        <img
-          src={`/api/awin/track-order?order_id=${orderId}`}
-          width="1"
-          height="1"
-          style={{ display: "none" }}
-          alt=""
-        />
-      </noscript>
+      {isAwinEnabled && (
+        <noscript>
+          <img
+            src={`/api/awin/track-order?order_id=${orderId}`}
+            width="1"
+            height="1"
+            style={{ display: "none" }}
+            alt=""
+          />
+        </noscript>
+      )}
     </Suspense>
   );
 };

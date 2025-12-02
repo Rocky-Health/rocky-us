@@ -69,24 +69,32 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        {/* AWIN Consent (set true if no CMP; adjust if integrating CMP) */}
-        <Script id="awin-consent" strategy="beforeInteractive">
-          {`
-            window.AWIN = window.AWIN || {};
-            AWIN.Tracking = AWIN.Tracking || {};
-            if (typeof AWIN.Tracking.AdvertiserConsent === 'undefined') {
-              AWIN.Tracking.AdvertiserConsent = true;
-            }
-          `}
-        </Script>
-        {/* AWIN MasterTag - sitewide */}
-        <Script
-          id="awin-mastertag"
-          strategy="beforeInteractive"
-          src={`https://www.dwin1.com/${
-            process.env.AWIN_MERCHANT_ID || "101159"
-          }.js`}
-        />
+        {/* AWIN Consent and MasterTag - only load if tracking is enabled */}
+        {(() => {
+          const awinEnabled = process.env.NEXT_PUBLIC_AWIN_ENABLED;
+          const isEnabled = awinEnabled === undefined || awinEnabled === "" || awinEnabled === "true" || awinEnabled === "1";
+          if (!isEnabled) return null;
+          return (
+            <>
+              <Script id="awin-consent" strategy="beforeInteractive">
+                {`
+                  window.AWIN = window.AWIN || {};
+                  AWIN.Tracking = AWIN.Tracking || {};
+                  if (typeof AWIN.Tracking.AdvertiserConsent === 'undefined') {
+                    AWIN.Tracking.AdvertiserConsent = true;
+                  }
+                `}
+              </Script>
+              <Script
+                id="awin-mastertag"
+                strategy="beforeInteractive"
+                src={`https://www.dwin1.com/${
+                  process.env.AWIN_MERCHANT_ID || "101159"
+                }.js`}
+              />
+            </>
+          );
+        })()}
         {/* Google Tag Manager - Changed to beforeInteractive for earlier loading */}
         {
           <Script id="google-tag-manager" strategy="beforeInteractive">
