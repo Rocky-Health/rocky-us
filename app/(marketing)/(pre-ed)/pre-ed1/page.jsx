@@ -16,7 +16,7 @@ export default function edPrelander() {
                 title="Not Feeling as Hard? Let Rocky Help."
                 subTitle="Digital Healthcare for men without the wait time or stigma. Trusted by 350K+ Customers."
                 btnText="Get Started →"
-                quizHref="/ed-pre-consultation-quiz"
+                quizHref="/ed-flow"
             />
             <Section bg={"bg-[#FFFFFF]"}>
                 <HowRockyWorks />
