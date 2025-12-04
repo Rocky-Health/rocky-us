@@ -13,6 +13,13 @@ const OrderReceivedPage = async ({ params }) => {
 
   return (
     <Suspense fallback={<></>}>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          #launcher {
+            display: none !important;
+          }
+        `
+      }} />
       <OrderReceivedPageContent userId={userId} />
       {/* AWIN noscript fallback: use order_id when available so server computes values */}
       {isAwinEnabled && (
