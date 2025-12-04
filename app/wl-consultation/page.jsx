@@ -4,8 +4,8 @@ import { cookies } from "next/headers";
 // Force dynamic rendering for this page
 export const dynamic = "force-dynamic";
 
-export default function WeightConsultationPage() {
-  const cookieStore = cookies();
+export default async function WeightConsultationPage() {
+  const cookieStore = await cookies();
   const pn = cookieStore.get("pn")?.value;
   const userName = cookieStore.get("userName")?.value;
   const userEmail = cookieStore.get("userEmail")?.value;
