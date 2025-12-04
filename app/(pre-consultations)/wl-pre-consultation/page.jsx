@@ -1,10 +1,10 @@
 import React from "react";
-import WeightQuestionnaire from "@/components/WLPreConsultationQuiz/WLPreConsultation";
+import WLFlowTwo from "@/components/WLPreConsultationQuizV2/WLFlow2/WLFlowTwo";
 
 export default function WLQuizPage() {
   return (
     <main>
-      <WeightQuestionnaire />
+      <WLFlowTwo />
     </main>
   );
 }

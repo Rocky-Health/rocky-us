@@ -1,9 +1,20 @@
-import HyperpigmentationQuiz from "@/components/SkincareConsultation/HyperpigmentationQuiz/HyperpigmentationQuiz"
+import HyperpigmentationQuiz from "@/components/SkincareConsultation/HyperpigmentationQuiz/HyperpigmentationQuiz";
 
 const HyperpigmentationQuizPage = () => {
-    return (
-        <HyperpigmentationQuiz />
-    )
-}
+  return (
+    <>
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+          #launcher {
+            display: none !important;
+          }
+        `,
+        }}
+      />{" "}
+      <HyperpigmentationQuiz />
+    </>
+  );
+};
 
-export default HyperpigmentationQuizPage  
+export default HyperpigmentationQuizPage;
