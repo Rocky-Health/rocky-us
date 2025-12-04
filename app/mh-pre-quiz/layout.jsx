@@ -47,6 +47,9 @@ export default function MHPreQuestionnaireLayout({ children }) {
           padding-bottom: 0 !important;
           margin-bottom: 0 !important;
         }
+          #launcher {
+            display: none !important;
+          }
       `}</style>
       
       {children}
