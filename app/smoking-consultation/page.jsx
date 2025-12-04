@@ -1,8 +1,8 @@
 import ZonnicConsultationQuiz from "@/components/ZonnicQuestionnaire/ZonicQuestionnaire";
 import { cookies } from "next/headers";
 
-export default function ZonnicConsultationPage() {
-  const cookieStore = cookies();
+export default async function ZonnicConsultationPage() {
+  const cookieStore = await cookies();
   const phone = cookieStore.get("phone")?.value;
   const displayName = cookieStore.get("displayName")?.value;
   const lastName = cookieStore.get("lastName")?.value;
