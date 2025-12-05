@@ -14,16 +14,23 @@
       "pillOptions": {
         "monthly-supply": [
           {
+            "count": 6,
+            "genericPrice": 107,
+            "brandPrice": 450,
+            "genericVariationId": "3287",
+            "brandVariationId": "3471"
+          },
+          {
             "count": 8,
-            "genericPrice": 138,
-            "brandPrice": 195,
+            "genericPrice": 84,
+            "brandPrice": 600,
             "genericVariationId": "259",
             "brandVariationId": "1422"
           },
           {
             "count": 12,
-            "genericPrice": 204,
-            "brandPrice": 285,
+            "genericPrice": 126,
+            "brandPrice": 900,
             "genericVariationId": "1960",
             "brandVariationId": "1962"
           }
@@ -31,24 +38,24 @@
         "quarterly-supply": [
           {
             "count": 12,
-            "genericPrice": 204,
-            "brandPrice": 285,
+            "genericPrice": 126,
+            "brandPrice": 900,
             "genericVariationId": "260",
             "brandVariationId": "1423"
           },
           {
             "count": 24,
-            "genericPrice": 399,
-            "brandPrice": 555,
+            "genericPrice": 252,
+            "brandPrice": 1800,
             "genericVariationId": "261",
             "brandVariationId": "1424"
           },
           {
             "count": 36,
-            "genericPrice": 595,
-            "brandPrice": 829,
+            "genericPrice": 378,
+            "brandPrice": 2700,
             "genericVariationId": "1961",
-            "brandVariationId": "1420"
+            "brandVariationId": "1967"
           }
         ]
       }
@@ -58,7 +65,7 @@
       "tagline": "\"The one-nighter\"",
       "image": "https://myrocky.b-cdn.net/WP%20Images/Sexual%20Health/webp-images/RockyHealth-viagra-400px.webp",
       "activeIngredient": "Sildenafil",
-      "strengths": ["25mg", "50mg", "100mg"],
+      "strengths": ["50mg", "100mg"],
       "preferences": ["generic", "brand"],
       "frequencies": {
         "monthly-supply": "One Month",
@@ -67,16 +74,23 @@
       "pillOptions": {
         "monthly-supply": [
           {
+            "count": 6,
+            "genericPrice": 76,
+            "brandPrice": 690,
+            "genericVariationId": "3440",
+            "brandVariationId": "3467"
+          },
+          {
             "count": 8,
-            "genericPrice": 108,
-            "brandPrice": 136,
+            "genericPrice": 64,
+            "brandPrice": 920,
             "genericVariationId": "233",
             "brandVariationId": "1428"
           },
           {
             "count": 12,
-            "genericPrice": 159,
-            "brandPrice": 199,
+            "genericPrice": 96,
+            "brandPrice": 1380,
             "genericVariationId": "234",
             "brandVariationId": "1429"
           }
@@ -84,22 +98,22 @@
         "quarterly-supply": [
           {
             "count": 12,
-            "genericPrice": 159,
-            "brandPrice": 199,
+            "genericPrice": 96,
+            "brandPrice": 1380,
             "genericVariationId": "235",
             "brandVariationId": "1430"
           },
           {
             "count": 24,
-            "genericPrice": 305,
-            "brandPrice": 388,
+            "genericPrice": 192,
+            "brandPrice": 2760,
             "genericVariationId": "236",
             "brandVariationId": "1431"
           },
           {
             "count": 36,
-            "genericPrice": 449,
-            "brandPrice": 577,
+            "genericPrice": 288,
+            "brandPrice": 4140,
             "genericVariationId": "237",
             "brandVariationId": "1432"
           }
@@ -121,39 +135,39 @@
         "monthly-supply": [
           {
             "count": "4/4",
-            "genericPrice": 134,
-            "brandPrice": 174,
-            "genericVariationId": "37668,37669",
+            "genericPrice": 112,
+            "brandPrice": 760,
+            "genericVariationId": "37669,37668",
             "brandVariationId": "1421,1427"
           },
           {
             "count": "6/6",
-            "genericPrice": 190,
-            "brandPrice": 255,
-            "genericVariationId": "548815,548850",
-            "brandVariationId": "548805,548838"
+            "genericPrice": 183,
+            "brandPrice": 1140,
+            "genericVariationId": "3440,3287",
+            "brandVariationId": "3471,3467"
           }
         ],
         "quarterly-supply": [
           {
             "count": "6/6",
-            "genericPrice": 190,
-            "brandPrice": 255,
-            "genericVariationId": "3438,3439",
+            "genericPrice": 183,
+            "brandPrice": 1140,
+            "genericVariationId": "3439,3438",
             "brandVariationId": "3470,3466"
           },
           {
             "count": "12/12",
-            "genericPrice": 363,
-            "brandPrice": 484,
-            "genericVariationId": "37674,37673",
+            "genericPrice": 263,
+            "brandPrice": 2280,
+            "genericVariationId": "37673,37674",
             "brandVariationId": "1423,1430"
           },
           {
             "count": "18/18",
-            "genericPrice": 533,
-            "brandPrice": 739,
-            "genericVariationId": "3437,6987",
+            "genericPrice": 469,
+            "brandPrice": 3420,
+            "genericVariationId": "3442,3437",
             "brandVariationId": "3469,3465"
           }
         ]
