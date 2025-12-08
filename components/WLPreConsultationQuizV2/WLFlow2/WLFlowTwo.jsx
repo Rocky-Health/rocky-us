@@ -4,6 +4,7 @@ import { logger } from "@/utils/devLogger";
 import { useWLFlowTwo } from "./hooks/useWLFlowTwo";
 import { quizConfig } from "./config/quizConfig";
 import GenericPopup from "../components/GenericPopup";
+import { PasswordProvider } from "../contexts/PasswordContext";
 
 import QuizStepRenderer from "./QuizStepRenderer";
 
@@ -141,59 +142,63 @@ const WLFlowTwo = () => {
   // Only short-circuit the whole flow when the popup is intended to be a full page
   if (activePopup && (activePopupConfig?.asPage ?? true)) {
     return (
-      <GenericPopup
-        isOpen={!!activePopup}
-        onClose={closePopup}
-        popupConfig={activePopupConfig}
-        asPage={activePopupConfig?.asPage ?? true}
-        onAction={handleAction}
-        currentPage={currentStep}
-        progressBar={progressPercent}
-        setUserData={setUserData}
-      />
+      <PasswordProvider>
+        <GenericPopup
+          isOpen={!!activePopup}
+          onClose={closePopup}
+          popupConfig={activePopupConfig}
+          asPage={activePopupConfig?.asPage ?? true}
+          onAction={handleAction}
+          currentPage={currentStep}
+          progressBar={progressPercent}
+          setUserData={setUserData}
+        />
+      </PasswordProvider>
     );
   }
 
   return (
-    <div className="min-h-screen">
-      <div className="bg-black text-white text-[14px] leading-[140%] font-medium items-center text-center p-2">
-        Lose Weight or Your Money Back
-      </div>
-      {/* QuestionnaireNavbar */}
-      <QuestionnaireNavbar onBackClick={handleBack} currentPage={currentStep} />
-      {/* Progress Bar - Hide for recommendation step */}
-      {currentStep !== 12 && (
-        <div className="pt-4 pb-6">
-          <ProgressBar progress={progressPercent || 100} />
+    <PasswordProvider>
+      <div className="min-h-screen">
+        <div className="bg-black text-white text-[14px] leading-[140%] font-medium items-center text-center p-2">
+          Lose Weight or Your Money Back
         </div>
-      )}
+        {/* QuestionnaireNavbar */}
+        <QuestionnaireNavbar onBackClick={handleBack} currentPage={currentStep} />
+        {/* Progress Bar - Hide for recommendation step */}
+        {currentStep !== 12 && (
+          <div className="pt-4 pb-6">
+            <ProgressBar progress={progressPercent || 100} />
+          </div>
+        )}
 
-      {/* Main content */}
-      <div className="flex-1">
-        <QuizStepRenderer
-          currentStep={currentStep}
-          userData={userData}
+        {/* Main content */}
+        <div className="flex-1">
+          <QuizStepRenderer
+            currentStep={currentStep}
+            userData={userData}
+            setUserData={setUserData}
+            selectedProduct={selectedProduct}
+            setSelectedProduct={setSelectedProduct}
+            handleContinue={handleContinue}
+            handleAction={handleAction}
+            handleRecommendationContinue={handleRecommendationContinue}
+          />
+        </div>
+
+        {/* Generic popup */}
+        <GenericPopup
+          isOpen={!!activePopup}
+          onClose={closePopup}
+          popupConfig={activePopupConfig}
+          asPage={activePopupConfig?.asPage ?? true}
+          onAction={handleAction}
+          currentPage={currentStep}
+          progressBar={progressPercent}
           setUserData={setUserData}
-          selectedProduct={selectedProduct}
-          setSelectedProduct={setSelectedProduct}
-          handleContinue={handleContinue}
-          handleAction={handleAction}
-          handleRecommendationContinue={handleRecommendationContinue}
         />
       </div>
-
-      {/* Generic popup */}
-      <GenericPopup
-        isOpen={!!activePopup}
-        onClose={closePopup}
-        popupConfig={activePopupConfig}
-        asPage={activePopupConfig?.asPage ?? true}
-        onAction={handleAction}
-        currentPage={currentStep}
-        progressBar={progressPercent}
-        setUserData={setUserData}
-      />
-    </div>
+    </PasswordProvider>
   );
 };
 
