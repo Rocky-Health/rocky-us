@@ -4,6 +4,7 @@ import { logger } from "@/utils/devLogger";
 import Link from "next/link";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
+import { usePassword } from "../contexts/PasswordContext";
 
 const WeightLossResultPasswordPopup = ({
   onSubmit,
@@ -11,6 +12,7 @@ const WeightLossResultPasswordPopup = ({
   style,
   setUserData,
 }) => {
+  const { password: contextPassword, setPassword: setContextPassword } = usePassword();
   const [isAuth, setIsAuth] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -52,12 +54,16 @@ const WeightLossResultPasswordPopup = ({
     // attempt login
     try {
       setLoading(true);
+      
+      // Use password from Context (memory) or fallback to parameter
+      const loginPassword = contextPassword || password || "";
+      
       const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           username: email || "",
-          password: password || "",
+          password: loginPassword,
         }),
       });
       if (res.ok) {
@@ -171,7 +177,11 @@ const WeightLossResultPasswordPopup = ({
                     className="w-full border border-[#E5E5E5] rounded-lg px-4 py-4 text-[14px] focus:outline-none focus:border-black pr-12"
                     placeholder="Enter Password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      // Store in Context (memory) for use in registration/login
+                      setContextPassword(e.target.value);
+                    }}
                   />
                   <button
                     type="button"

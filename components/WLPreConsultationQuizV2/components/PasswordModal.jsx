@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { usePassword } from "../contexts/PasswordContext";
 
 const PasswordModal = ({ open, onClose, onSubmit }) => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const { setPassword: setContextPassword } = usePassword();
 
   if (!open) return null;
 
@@ -10,6 +12,8 @@ const PasswordModal = ({ open, onClose, onSubmit }) => {
   const handleSubmit = () => {
     const isValid = /^(?=.*[a-z])(?=.*[A-Z]).{8,}$/.test(password);
     if (isValid) {
+      // Store password in Context (memory only)
+      setContextPassword(password);
       onSubmit(password);
       setPassword("");
     }
