@@ -369,7 +369,7 @@ const Form = ({
       return false;
     }
 
-    // Step 2 validation (phone, dob, province)
+    // Step 2 validation (phone, dob, state)
     if (!mergedUserData.phone) {
       toast.error("Phone number is required");
       setLoading(false);
@@ -380,8 +380,8 @@ const Form = ({
       setLoading(false);
       return false;
     }
-    if (!mergedUserData.province) {
-      toast.error("Province is required");
+    if (!mergedUserData.state) {
+      toast.error("State is required");
       setLoading(false);
       return false;
     }
@@ -391,10 +391,10 @@ const Form = ({
     if (formattedDOB && formattedDOB.includes("/")) {
       const parts = formattedDOB.split("/");
       if (parts.length === 3) {
-        formattedDOB = `${parts[2]}-${parts[1].padStart(
+        formattedDOB = `${parts[2]}-${parts[0].padStart(
           2,
           "0"
-        )}-${parts[0].padStart(2, "0")}`;
+        )}-${parts[1].padStart(2, "0")}`;
       }
     }
 
@@ -429,7 +429,7 @@ const Form = ({
           password: mergedUserData.password,
           phone: mergedUserData.phone,
           date_of_birth: formattedDOB,
-          province: mergedUserData.province,
+          province: mergedUserData.state,
           gender: mergedUserData.gender,
           register_step: 2,
         }),
@@ -440,7 +440,7 @@ const Form = ({
         setLoading(false);
         return false;
       }
-      //toast.success(data2.message || "Registration successful!");
+      toast.success(data2.message || "Registration successful!");
       setLoading(false);
       return true;
     } catch (err) {
