@@ -3,7 +3,7 @@ const WLProducts = {
     id: "142976",
     name: "Ozempic",
     description: "(semaglutide) injection",
-    price: "$320",
+    price: "$1310",
     details:
       "A once-weekly injectable GLP-1 medication with weight loss benefits.",
     url: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/ozempic/ozempic_2x.webp",
@@ -14,9 +14,9 @@ const WLProducts = {
     id: "160469",
     name: "Mounjaro",
     description: "(tirzepatide) injection",
-    price: "$505",
+    price: "$1410",
     details:
-      "Mounjaro® is the brand name for Tirzepatide which is a Health Canada approved drug. It helps reduce appetite and keeps you feeling fuller for longer.",
+      "Mounjaro® is the brand name for Tirzepatide which is a FDA approved drug. It helps reduce appetite and keeps you feeling fuller for longer.",
     url: "/products/monjaro.png",
     supplyAvailable: true,
   },
@@ -24,7 +24,7 @@ const WLProducts = {
     id: "276274",
     name: "Wegovy",
     description: "(semaglutide) injection",
-    price: "$565",
+    price: "$1770",
     details:
       "A high-dose GLP-1 injection approved for chronic weight management.",
     url: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/wegovy/wegovy_2x.webp",
@@ -34,7 +34,7 @@ const WLProducts = {
     id: "369795",
     name: "Rybelsus",
     description: "(semaglutide) tablets",
-    price: "$315",
+    price: "$1310",
     details:
       "The first oral GLP-1 tablet designed to support modest weight loss.",
     url: "/products/rybelsus.png",
