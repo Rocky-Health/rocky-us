@@ -57,7 +57,7 @@ const RadioQuestion = ({ config, userData, onSelect }) => {
         {/* Privacy text - WL style */}
         <div className="text-[10px] my-6  text-[#00000059] text-left font-[400] leading-[140%] tracking-[0%] mb-64">
           We respect your privacy. All of your information is securely stored on
-          our PIPEDA Compliant server.
+          our HIPPA Compliant server.
         </div>
       </div>
       

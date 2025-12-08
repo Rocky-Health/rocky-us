@@ -117,7 +117,7 @@ const Counter = ({ seconds = 3, texts = [], title , onAction}) => {
 
 
       <p className="text-[10px] text-[#00000059] leading-[140%] mt-[40px]">
-        We respect your privacy. All of your information is securely stored on our PIPEDA Compliant server.
+        We respect your privacy. All of your information is securely stored on our HIPPA Compliant server.
       </p>
     </div>
   );
