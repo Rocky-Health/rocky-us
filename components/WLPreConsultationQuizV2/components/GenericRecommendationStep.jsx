@@ -374,7 +374,7 @@ const GenericRecommendationStep = ({
                 </span>
                 <div>
                   <div className="font-medium text-[14px]">
-                    Health Canada Approved Treatments
+                    FDA Approved Treatments
                   </div>
                 </div>
               </li>
