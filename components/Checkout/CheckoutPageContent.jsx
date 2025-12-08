@@ -1325,7 +1325,7 @@ const CheckoutPageContent = () => {
                     return;
                 }
 
-                // Check for restricted WL products (Ozempic/Monjaro)
+                // Check for restricted WL products (Ozempic/Mounjaro/Wegovy/Rybelsus)
                 const restrictedWlItem = cartItems.items.find((item) =>
                     isRestrictedWlCartItem(item)
                 );
