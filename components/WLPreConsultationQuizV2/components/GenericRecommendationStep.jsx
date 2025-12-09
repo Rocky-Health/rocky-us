@@ -40,7 +40,7 @@ const GenericRecommendationStep = ({
   const PrivacyText = () => (
     <p className="text-xs text-[#353535] my-1 md:my-4">
       We respect your privacy. All of your information is securely stored on our
-      PIPEDA Compliant server.
+      HIPPA Compliant server.
     </p>
   );
 
