@@ -2087,28 +2087,40 @@ export default function WeightLossConsultationQuiz({
     }
   };
 
-  const handleGLP1AllergySelect = (optionValue, fieldId) => {
+  const handleGLP1AllergySelect = (textValue, fieldId, optionValue) => {
     clearError();
+    
     const newFormData = { ...formData };
     const currentValue = newFormData[fieldId] || "";
-    const currentValues = currentValue ? currentValue.split(",").map(v => v.trim()) : [];
+    
+    const SEPARATOR = "|||";
+    const currentValues = currentValue && currentValue.trim() 
+      ? currentValue.split(SEPARATOR)
+          .map(v => v.trim())
+          .filter(v => v !== "" && v !== "1" && v !== "2" && v !== "3" && v !== "4" && v !== "1,2" && v !== "2,1")
+      : [];
+
+    let newValue = "";
 
     if (optionValue === "3" || optionValue === "4") {
-      if (currentValues.includes(optionValue)) {
-        newFormData[fieldId] = "";
+      if (currentValues.includes(textValue)) {
+        newValue = "";
       } else {
-        newFormData[fieldId] = optionValue;
+        newValue = textValue;
       }
     } else {
-      if (currentValues.includes(optionValue)) {
-        const newValues = currentValues.filter(v => v !== optionValue);
-        newFormData[fieldId] = newValues.length > 0 ? newValues.join(",") : "";
+      const isCurrentlySelected = currentValues.includes(textValue);
+      
+      if (isCurrentlySelected) {
+        const newValues = currentValues.filter(v => v !== textValue);
+        newValue = newValues.join(SEPARATOR);
       } else {
-        const newValues = [...currentValues.filter(v => v !== "3" && v !== "4"), optionValue].sort();
-        newFormData[fieldId] = newValues.join(",");
+        const filteredValues = currentValues.filter(v => v !== "No" && v !== "Unsure");
+        newValue = [...filteredValues, textValue].join(SEPARATOR);
       }
     }
 
+    newFormData[fieldId] = newValue;
     setFormData(newFormData);
     updateLocalStorage(newFormData);
 
@@ -2116,7 +2128,7 @@ export default function WeightLossConsultationQuiz({
       ".quiz-continue-button"
     );
     if (continueButton) {
-      continueButton.style.visibility = newFormData[fieldId] ? "" : "hidden";
+      continueButton.style.visibility = newValue ? "" : "hidden";
     }
   };
 
@@ -3565,6 +3577,50 @@ export default function WeightLossConsultationQuiz({
       {
         page: 16,
         validate: () => {
+          if (!formData["621"] || formData["621"].trim() === "") {
+            return showError("Please select an option");
+          }
+          return true;
+        },
+      },
+      {
+        page: 17,
+        validate: () => {
+          if (!formData["622"] || formData["622"].trim() === "") {
+            return showError("Please select an option");
+          }
+          return true;
+        },
+      },
+      {
+        page: 18,
+        validate: () => {
+          const hasSelection =
+            formData["624_1"] ||
+            formData["624_2"] ||
+            formData["624_3"] ||
+            formData["624_4"] ||
+            formData["624_5"] ||
+            formData["624_6"];
+
+          if (!hasSelection) {
+            return showError("Please select at least one option");
+          }
+          return true;
+        },
+      },
+      {
+        page: 19,
+        validate: () => {
+          if (!formData["623"] || formData["623"].trim() === "") {
+            return showError("Please select an option");
+          }
+          return true;
+        },
+      },
+      {
+        page: 20,
+        validate: () => {
           if (!formData["614"]) {
             return showError("Please select an option");
           }
@@ -3577,7 +3633,7 @@ export default function WeightLossConsultationQuiz({
         },
       },
       {
-        page: 17,
+        page: 21,
         validate: () => {
           const hasSelection =
             formData["615_1"] ||
@@ -3603,7 +3659,7 @@ export default function WeightLossConsultationQuiz({
         },
       },
       {
-        page: 18,
+        page: 22,
         validate: () => {
           if (!formData["616"]) {
             return showError("Please select an option");
@@ -3617,7 +3673,7 @@ export default function WeightLossConsultationQuiz({
         },
       },
       {
-        page: 19,
+        page: 23,
         validate: () => {
           if (!formData["619"]) {
             return showError("Please make a selection");
@@ -3630,7 +3686,7 @@ export default function WeightLossConsultationQuiz({
         },
       },
       {
-        page: 20,
+        page: 24,
         validate: () => {
           if (!photoIdAcknowledged) {
             return showError("Please acknowledge the message");
@@ -3639,7 +3695,7 @@ export default function WeightLossConsultationQuiz({
         },
       },
       {
-        page: 21,
+        page: 25,
         validate: () => {
           if (!photoIdFile && !formData["196"]) {
             return showError("Please upload your photo ID to continue");
@@ -3648,7 +3704,7 @@ export default function WeightLossConsultationQuiz({
         },
       },
       {
-        page: 22,
+        page: 26,
         validate: () => {
           if (!frontPhotoFile && !formData["197"]) {
             return showError("Please upload a front view photo");
@@ -4610,12 +4666,14 @@ export default function WeightLossConsultationQuiz({
                                 },
                               ].map((option) => {
                                 const currentValue = formData["621"] || "";
-                                const selectedValues = currentValue ? currentValue.split(",").map(v => v.trim()) : [];
-                                const isChecked = selectedValues.includes(option.optionValue);
+                                const selectedValues = currentValue && currentValue.trim()
+                                  ? currentValue.split("|||").map(v => v.trim()).filter(v => v !== "")
+                                  : [];
+                                const isChecked = selectedValues.includes(option.value);
                                 
                                 return (
                                   <div
-                                    key={option.id}
+                                    key={`${option.id}-${formData["621"] || "empty"}`}
                                     className="option-container"
                                   >
                                     <QuestionOption
@@ -4624,7 +4682,7 @@ export default function WeightLossConsultationQuiz({
                                       value={option.value}
                                       checked={isChecked}
                                       onChange={() =>
-                                        handleGLP1AllergySelect(option.optionValue, "621")
+                                        handleGLP1AllergySelect(option.value, "621", option.optionValue)
                                       }
                                       type="checkbox"
                                     />
@@ -4666,12 +4724,14 @@ export default function WeightLossConsultationQuiz({
                                 },
                               ].map((option) => {
                                 const currentValue = formData["622"] || "";
-                                const selectedValues = currentValue ? currentValue.split(",").map(v => v.trim()) : [];
-                                const isChecked = selectedValues.includes(option.optionValue);
+                                const selectedValues = currentValue && currentValue.trim()
+                                  ? currentValue.split("|||").map(v => v.trim()).filter(v => v !== "")
+                                  : [];
+                                const isChecked = selectedValues.includes(option.value);
                                 
                                 return (
                                   <div
-                                    key={option.id}
+                                    key={`${option.id}-${formData["622"] || "empty"}`}
                                     className="option-container"
                                   >
                                     <QuestionOption
@@ -4680,7 +4740,7 @@ export default function WeightLossConsultationQuiz({
                                       value={option.value}
                                       checked={isChecked}
                                       onChange={() =>
-                                        handleGLP1AllergySelect(option.optionValue, "622")
+                                        handleGLP1AllergySelect(option.value, "622", option.optionValue)
                                       }
                                       type="checkbox"
                                     />
@@ -4778,12 +4838,14 @@ export default function WeightLossConsultationQuiz({
                                 },
                               ].map((option) => {
                                 const currentValue = formData["623"] || "";
-                                const selectedValues = currentValue ? currentValue.split(",").map(v => v.trim()) : [];
-                                const isChecked = selectedValues.includes(option.optionValue);
+                                const selectedValues = currentValue && currentValue.trim()
+                                  ? currentValue.split("|||").map(v => v.trim()).filter(v => v !== "")
+                                  : [];
+                                const isChecked = selectedValues.includes(option.value);
                                 
                                 return (
                                   <div
-                                    key={option.id}
+                                    key={`${option.id}-${formData["623"] || "empty"}`}
                                     className="option-container"
                                   >
                                     <QuestionOption
@@ -4792,7 +4854,7 @@ export default function WeightLossConsultationQuiz({
                                       value={option.value}
                                       checked={isChecked}
                                       onChange={() =>
-                                        handleGLP1AllergySelect(option.optionValue, "623")
+                                        handleGLP1AllergySelect(option.value, "623", option.optionValue)
                                       }
                                       type="checkbox"
                                     />
