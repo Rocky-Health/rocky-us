@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { logger } from "@/utils/devLogger";
 
 const STORAGE_KEY = "wl_flow2_quiz_data";
+const HISTORY_STORAGE_KEY = "history";
 
 export const useQuizData = () => {
   // Initialize from localStorage if available
@@ -37,26 +38,58 @@ export const useQuizData = () => {
     return null;
   });
 
+  const [history, setHistory] = useState(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem(HISTORY_STORAGE_KEY);
+        if (stored) {
+          return JSON.parse(stored);
+        }
+      } catch (e) {
+        logger.error("Failed to load history from localStorage:", e);
+      }
+    }
+    return [];
+  });
+
   // Save to localStorage whenever userData or selectedProduct changes
+  // IMPORTANT: Password is excluded from localStorage and only kept in memory (PasswordContext)
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
         const stored = localStorage.getItem(STORAGE_KEY);
         const existing = stored ? JSON.parse(stored) : {};
         
+        // Exclude password from localStorage - it's stored in memory only via PasswordContext
+        const dataToSave = { ...userData };
+        delete dataToSave.password;
+        
         localStorage.setItem(
           STORAGE_KEY,
           JSON.stringify({
             ...existing,
-            userData,
+            userData: dataToSave,
             selectedProduct,
           })
         );
+
+        localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(dataToSave));
       } catch (e) {
         logger.error("Failed to save to localStorage:", e);
       }
     }
   }, [userData, selectedProduct]);
+
+  // Save history to its own localStorage key
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+       // localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(userData));
+      } catch (e) {
+        logger.error("Failed to save history to localStorage:", e);
+      }
+    }
+  }, [history]);
 
   const handleAction = (action, payload, onContinue) => {
     switch (action) {
@@ -98,9 +131,11 @@ export const useQuizData = () => {
     if (typeof window !== "undefined") {
       try {
         localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(HISTORY_STORAGE_KEY);
         setUserData({});
         setSelectedProduct(null);
         setActivePopup(null);
+        setHistory([]);
       } catch (e) {
         logger.error("Failed to clear quiz data:", e);
       }
@@ -113,6 +148,8 @@ export const useQuizData = () => {
     activePopup,
     selectedProduct,
     setSelectedProduct,
+    history,
+    setHistory,
     handleAction,
     closePopup,
     handleRecommendationContinue,
