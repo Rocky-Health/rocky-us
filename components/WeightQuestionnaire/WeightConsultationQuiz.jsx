@@ -163,6 +163,12 @@ export default function WeightLossConsultationQuiz({
       pre_quiz_q3: "",
       pre_quiz_q4: "",
       pre_quiz_q5: "",
+      eatingDisorderDiagnosis: "",
+      medicalConditions: "",
+      medications: "",
+      pregnantOrbreastfeeding: "",
+      accomplishment: "",
+      weightImpactStatements: "",
     };
   };
 
@@ -599,39 +605,71 @@ export default function WeightLossConsultationQuiz({
           }));
         }
 
-        if (weightData.pre_quiz_q1) {
+
+        const preQuizUpdates = {};
+        
+        Object.keys(weightData).forEach((key) => {
+          if (key.startsWith("pre_quiz_q")) {
+            preQuizUpdates[key] = weightData[key];
+          }
+        });
+
+        if (Object.keys(preQuizUpdates).length > 0) {
           setFormData((prev) => ({
             ...prev,
-            pre_quiz_q1: weightData.pre_quiz_q1,
+            ...preQuizUpdates,
           }));
         }
 
-        if (weightData.pre_quiz_q2) {
-          setFormData((prev) => ({
-            ...prev,
-            pre_quiz_q2: weightData.pre_quiz_q2,
-          }));
-        }
+        try {
+          let storedFlow2Data = localStorage.getItem("wl_flow2_quiz_data");
+          if (storedFlow2Data) {
+            const flow2Data = JSON.parse(storedFlow2Data);
+            const userData = flow2Data.userData || {};
 
-        if (weightData.pre_quiz_q3) {
-          setFormData((prev) => ({
-            ...prev,
-            pre_quiz_q3: weightData.pre_quiz_q3,
-          }));
-        }
+            const flow2Updates = {};
 
-        if (weightData.pre_quiz_q4) {
-          setFormData((prev) => ({
-            ...prev,
-            pre_quiz_q4: weightData.pre_quiz_q4,
-          }));
-        }
+            if (userData.eatingDisorderDiagnosis) {
+              flow2Updates.eatingDisorderDiagnosis = userData.eatingDisorderDiagnosis;
+            }
 
-        if (weightData.pre_quiz_q5) {
-          setFormData((prev) => ({
-            ...prev,
-            pre_quiz_q5: weightData.pre_quiz_q5,
-          }));
+            if (userData.medicalConditions) {
+              flow2Updates.medicalConditions = userData.medicalConditions;
+            }
+
+            if (userData.medications) {
+              flow2Updates.medications = userData.medications;
+            }
+
+            if (userData.pregnantOrbreastfeeding) {
+              flow2Updates.pregnantOrbreastfeeding = userData.pregnantOrbreastfeeding;
+            }
+
+            if (userData.accomplishment) {
+              if (Array.isArray(userData.accomplishment)) {
+                flow2Updates.accomplishment = userData.accomplishment.join(", ");
+              } else {
+                flow2Updates.accomplishment = userData.accomplishment;
+              }
+            }
+
+            if (userData.weightImpactStatements) {
+              if (Array.isArray(userData.weightImpactStatements)) {
+                flow2Updates.weightImpactStatements = userData.weightImpactStatements.join(", ");
+              } else {
+                flow2Updates.weightImpactStatements = userData.weightImpactStatements;
+              }
+            }
+
+            if (Object.keys(flow2Updates).length > 0) {
+              setFormData((prev) => ({
+                ...prev,
+                ...flow2Updates,
+              }));
+            }
+          }
+        } catch (flow2Error) {
+          logger.error("Error loading flow2 quiz data:", flow2Error);
         }
       }
     } catch (error) {
@@ -682,38 +720,65 @@ export default function WeightLossConsultationQuiz({
           }));
         }
 
-        if (weightData.pre_quiz_q1) {
+        const preQuizUpdates = {};
+        
+        Object.keys(weightData).forEach((key) => {
+          if (key.startsWith("pre_quiz_q")) {
+            preQuizUpdates[key] = weightData[key];
+          }
+        });
+
+        if (Object.keys(preQuizUpdates).length > 0) {
           setFormData((prev) => ({
             ...prev,
-            pre_quiz_q1: weightData.pre_quiz_q1,
+            ...preQuizUpdates,
           }));
         }
+      }
 
-        if (weightData.pre_quiz_q2) {
-          setFormData((prev) => ({
-            ...prev,
-            pre_quiz_q2: weightData.pre_quiz_q2,
-          }));
+      let storedFlow2Data = localStorage.getItem("wl_flow2_quiz_data");
+      if (storedFlow2Data) {
+        const flow2Data = JSON.parse(storedFlow2Data);
+        const userData = flow2Data.userData || {};
+
+        const flow2Updates = {};
+
+        if (userData.eatingDisorderDiagnosis) {
+          flow2Updates.eatingDisorderDiagnosis = userData.eatingDisorderDiagnosis;
         }
 
-        if (weightData.pre_quiz_q3) {
-          setFormData((prev) => ({
-            ...prev,
-            pre_quiz_q3: weightData.pre_quiz_q3,
-          }));
+        if (userData.medicalConditions) {
+          flow2Updates.medicalConditions = userData.medicalConditions;
         }
 
-        if (weightData.pre_quiz_q4) {
-          setFormData((prev) => ({
-            ...prev,
-            pre_quiz_q4: weightData.pre_quiz_q4,
-          }));
+        if (userData.medications) {
+          flow2Updates.medications = userData.medications;
         }
 
-        if (weightData.pre_quiz_q5) {
+        if (userData.pregnantOrbreastfeeding) {
+          flow2Updates.pregnantOrbreastfeeding = userData.pregnantOrbreastfeeding;
+        }
+
+        if (userData.accomplishment) {
+          if (Array.isArray(userData.accomplishment)) {
+            flow2Updates.accomplishment = userData.accomplishment.join(", ");
+          } else {
+            flow2Updates.accomplishment = userData.accomplishment;
+          }
+        }
+
+        if (userData.weightImpactStatements) {
+          if (Array.isArray(userData.weightImpactStatements)) {
+            flow2Updates.weightImpactStatements = userData.weightImpactStatements.join(", ");
+          } else {
+            flow2Updates.weightImpactStatements = userData.weightImpactStatements;
+          }
+        }
+
+        if (Object.keys(flow2Updates).length > 0) {
           setFormData((prev) => ({
             ...prev,
-            pre_quiz_q5: weightData.pre_quiz_q5,
+            ...flow2Updates,
           }));
         }
       }
