@@ -40,6 +40,16 @@ const WLProducts = {
     url: "/products/rybelsus.png",
     supplyAvailable: true,
   },
+  COMPOUNDED_SEMAGLUTIDE: {
+    id: "168208",
+    name: "Compounded Semaglutide",
+    description: "(semaglutide) injection",
+    price: "$240",
+    details:
+      "A cost-effective compounded version of semaglutide injection that offers the same active ingredient as brand-name GLP-1 medications.",
+    url: "https://mycdn.myrocky.ca/wp-content/uploads/20240403133712/semaglutide-cover-image.png",
+    supplyAvailable: true,
+  },
 };
 
 const EDProducts = {
