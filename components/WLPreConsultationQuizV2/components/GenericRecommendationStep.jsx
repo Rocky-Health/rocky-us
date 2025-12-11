@@ -15,6 +15,7 @@ const WEIGHT_LOSS_PRODUCT_IDS = [
   "160468", // MOUNJARO
   "250827", // WEGOVY
   "369618", // RYBELSUS
+  "168208", // COMPOUNDED_SEMAGLUTIDE
 ];
 
 const GenericRecommendationStep = ({
@@ -164,19 +165,19 @@ const GenericRecommendationStep = ({
           "✅ WL cart addition successful, redirecting to:",
           result.redirectUrl
         );
-        
+
         // Clear all localStorage keys used in WL flow before redirecting
         try {
           if (typeof window !== "undefined" && window.localStorage) {
             // Remove WL flow specific key (used by useStepNavigation and useQuizData hooks)
             localStorage.removeItem("wl_flow2_quiz_data");
-            
+
             logger.log("✓ Cleared WL flow localStorage key before redirect");
           }
         } catch (e) {
           logger.error("Error clearing localStorage:", e);
         }
-        
+
         // Use a full-page navigation to ensure server-side state (cookies/nonce)
         // is properly established and the next page does a full reload.
         try {
@@ -313,7 +314,7 @@ const GenericRecommendationStep = ({
           )}
         </div>
 
-        
+
 
         {/* Alternative Products */}
         {showAlternatives &&
@@ -332,7 +333,7 @@ const GenericRecommendationStep = ({
             </div>
           )}
 
-          {/* What's included section */}
+        {/* What's included section */}
 
         {showIncluded && (
           <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8 shadow-sm">
@@ -432,8 +433,8 @@ const GenericRecommendationStep = ({
         )}
         <button
           className={`w-full py-3 rounded-full font-medium ${isContinueEnabled
-              ? "bg-black text-white"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            ? "bg-black text-white"
+            : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
           onClick={isContinueEnabled ? handleCheckout : null}
           disabled={!isContinueEnabled || isCheckoutLoading}
