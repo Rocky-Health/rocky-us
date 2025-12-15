@@ -15,7 +15,6 @@ const WEIGHT_LOSS_PRODUCT_IDS = [
   "160468", // MOUNJARO
   "250827", // WEGOVY
   "369618", // RYBELSUS
-  "168208", // COMPOUNDED_SEMAGLUTIDE
 ];
 
 const GenericRecommendationStep = ({
