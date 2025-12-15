@@ -2,8 +2,7 @@
 
 import Logo from "../Navbar/Logo";
 
-const QuestionnaireNavbar = ({ onBackClick, currentPage = 1, hideBackButton = false }) => {
-  const isThankYouPage = currentPage === 22;
+const QuestionnaireNavbar = ({ onBackClick, currentPage = 1, hideBackButton = false, isThankYouPage = false }) => {
   const showBackButton = currentPage > 1 && !isThankYouPage && !hideBackButton;
 
   const handleBackClick = (e) => {
