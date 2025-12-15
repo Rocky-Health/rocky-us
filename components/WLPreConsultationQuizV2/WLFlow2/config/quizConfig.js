@@ -21,7 +21,7 @@ export const quizConfig = {
       },
       outcome: {
         recommended: WLProducts.RYBELSUS,
-        alternatives: [WLProducts.OZEMPIC, WLProducts.WEGOVY, WLProducts.RYBELSUS, WLProducts.COMPOUNDED_SEMAGLUTIDE],
+        alternatives: [WLProducts.OZEMPIC, WLProducts.WEGOVY, WLProducts.RYBELSUS],
       },
     },
     {
@@ -30,14 +30,14 @@ export const quizConfig = {
       },
       outcome: {
         recommended: WLProducts.OZEMPIC,
-        alternatives: [WLProducts.WEGOVY, WLProducts.MOUNJARO, WLProducts.RYBELSUS, WLProducts.COMPOUNDED_SEMAGLUTIDE],
+        alternatives: [WLProducts.WEGOVY, WLProducts.MOUNJARO, WLProducts.RYBELSUS],
       },
     },
     {
       conditions: {}, // Default case
       outcome: {
         recommended: WLProducts.OZEMPIC,
-        alternatives: [WLProducts.WEGOVY, WLProducts.MOUNJARO, WLProducts.RYBELSUS, WLProducts.COMPOUNDED_SEMAGLUTIDE],
+        alternatives: [WLProducts.WEGOVY, WLProducts.MOUNJARO, WLProducts.RYBELSUS],
       },
     },
   ],
