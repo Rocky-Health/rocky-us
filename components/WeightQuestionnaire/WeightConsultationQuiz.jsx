@@ -905,6 +905,9 @@ export default function WeightLossConsultationQuiz({
       nextPage = 5;
     }
 
+    if (nextPage < 1) nextPage = 1;
+    if (nextPage > 26) nextPage = 26;
+
     setFormData((prev) => {
       const updatedFormData = {
         ...prev,
@@ -3617,7 +3620,7 @@ export default function WeightLossConsultationQuiz({
         },
       },
       {
-        page: 17,
+        page: 21,
         validate: () => {
           const hasSelection =
             formData["615_1"] ||
@@ -3643,7 +3646,7 @@ export default function WeightLossConsultationQuiz({
         },
       },
       {
-        page: 18,
+        page: 22,
         validate: () => {
           if (!formData["616"]) {
             return showError("Please select an option");
@@ -3657,7 +3660,7 @@ export default function WeightLossConsultationQuiz({
         },
       },
       {
-        page: 19,
+        page: 23,
         validate: () => {
           if (!formData["619"]) {
             return showError("Please make a selection");
@@ -3670,7 +3673,7 @@ export default function WeightLossConsultationQuiz({
         },
       },
       {
-        page: 20,
+        page: 24,
         validate: () => {
           if (!photoIdAcknowledged) {
             return showError("Please acknowledge the message");
@@ -3679,7 +3682,7 @@ export default function WeightLossConsultationQuiz({
         },
       },
       {
-        page: 21,
+        page: 25,
         validate: () => {
           if (!photoIdFile && !formData["196"]) {
             return showError("Please upload your photo ID to continue");
@@ -3688,7 +3691,7 @@ export default function WeightLossConsultationQuiz({
         },
       },
       {
-        page: 22,
+        page: 26,
         validate: () => {
           if (!frontPhotoFile && !formData["197"]) {
             return showError("Please upload a front view photo");
@@ -3750,7 +3753,7 @@ export default function WeightLossConsultationQuiz({
       )}
       {!showBMICalculator && (
         <>
-          {currentPage <= 22 && (
+          {currentPage <= 23 && (
             <>
               <QuestionnaireNavbar
                 onBackClick={handleBackClick}
@@ -3761,7 +3764,7 @@ export default function WeightLossConsultationQuiz({
             </>
           )}
 
-          {currentPage <= 22 && (
+          {currentPage <= 26 && (
             <div className="flex-1">
               <div
                 className="quiz-page-wrapper relative md:container md:w-[768px] mx-auto bg-[#FFFFFF]"
