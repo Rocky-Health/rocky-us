@@ -332,14 +332,14 @@ export default function WeightLossConsultationQuiz({
 
     let hasStoredBMI = false;
     try {
-      const storedWeightData = localStorage.getItem("wl_pre_quiz_data");
+      const storedWeightData = localStorage.getItem("wl_flow2_quiz_data");
       if (storedWeightData) {
         const weightData = JSON.parse(storedWeightData);
         hasStoredBMI = !!(
-          weightData.bmi_result &&
-          weightData.weightPounds &&
-          weightData.feetValue &&
-          weightData.inchesValue
+          weightData.userData?.bmi &&
+          weightData.userData?.weight &&
+          weightData.userData?.height?.feet &&
+          weightData.userData?.height?.inches
         );
       }
     } catch (error) {
@@ -460,7 +460,7 @@ export default function WeightLossConsultationQuiz({
                 }));
               } else {
                 setCurrentPage(21);
-                const newProgress = Math.ceil((25 / 26) * 100);
+                const newProgress = Math.ceil((21 / 26) * 100);
                 setProgress(newProgress);
                 setFormData((prev) => ({
                   ...prev,
@@ -551,7 +551,7 @@ export default function WeightLossConsultationQuiz({
               }));
             } else {
               setCurrentPage(21);
-              const newProgress = Math.ceil((21 / 22) * 100);
+              const newProgress = Math.ceil((21 / 26) * 100);
               setProgress(newProgress);
               setFormData((prev) => ({
                 ...prev,
@@ -562,7 +562,7 @@ export default function WeightLossConsultationQuiz({
             setCurrentPage(storedPage);
             const calculatedProgress = Math.max(
               0,
-              Math.ceil((storedPage / 22) * 100)
+              Math.ceil((storedPage / 26) * 100)
             );
             setProgress(calculatedProgress);
           }
@@ -1193,9 +1193,14 @@ export default function WeightLossConsultationQuiz({
         stage: "body-photos-upload",
       };
 
-      setFormData(updatedData);
-      updateLocalStorage(updatedData);
-      queueFormSubmission(updatedData);
+      const finalData = {
+        ...updatedData,
+        page_step: 23,
+      };
+      
+      setFormData(finalData);
+      updateLocalStorage(finalData);
+      queueFormSubmission(finalData);
 
       document.querySelector(
         "label[for=front_photo_upload]"
@@ -1204,13 +1209,14 @@ export default function WeightLossConsultationQuiz({
         "green";
       document.querySelector(".upload-button").classList.add("hidden");
 
-      setCurrentPage(23);
-      setProgress(100);
-      setFormData((prev) => ({
-        ...prev,
-        page_step: 23,
-      }));
       setUploadSuccess(true);
+      setIsUploadingPhotos(false);
+      hideLoader();
+      
+      setTimeout(() => {
+        setCurrentPage(23);
+        setProgress(100);
+      }, 100);
     } catch (error) {
       logger.error("Error uploading photos:", error);
 
@@ -1368,10 +1374,6 @@ export default function WeightLossConsultationQuiz({
 
       setFormData(updatedData);
       updateLocalStorage(updatedData);
-
-      setCurrentPage(21);
-      const newProgress = Math.ceil((21 / 22) * 100);
-      setProgress(Math.max(0, newProgress));
 
       setIsUploading(false);
 
@@ -2784,8 +2786,7 @@ export default function WeightLossConsultationQuiz({
         photo_id_acknowledged: formData["photo_id_acknowledged"],
       },
       25: {
-        197: formData["197"],
-        198: formData["198"],
+        196: formData["196"],
       },
       26: {
         197: formData["197"],
@@ -2977,8 +2978,7 @@ export default function WeightLossConsultationQuiz({
         photo_id_acknowledged: formData["photo_id_acknowledged"],
       },
       25: {
-        197: formData["197"],
-        198: formData["198"],
+        196: formData["196"],
       },
       26: {
         197: formData["197"],
@@ -3750,18 +3750,19 @@ export default function WeightLossConsultationQuiz({
       )}
       {!showBMICalculator && (
         <>
-          {currentPage <= 22 && (
+          {currentPage <= 26 && !(currentPage === 23 && formData.completion_state === "Full") && (
             <>
               <QuestionnaireNavbar
                 onBackClick={handleBackClick}
                 currentPage={currentPage}
+                isThankYouPage={currentPage === 23 && formData.completion_state === "Full"}
               />
 
               <ProgressBar progress={progress} />
             </>
           )}
 
-          {currentPage <= 22 && (
+          {currentPage <= 26 && !(currentPage === 23 && formData.completion_state === "Full") && (
             <div className="flex-1">
               <div
                 className="quiz-page-wrapper relative md:container md:w-[768px] mx-auto bg-[#FFFFFF]"
