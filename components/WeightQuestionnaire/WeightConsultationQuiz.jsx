@@ -330,6 +330,10 @@ export default function WeightLossConsultationQuiz({
     const hasFormDataBMI =
       dataToCheck.wl_BMI && dataToCheck.wl_height && dataToCheck.wl_weight;
 
+    if (hasFormDataBMI) {
+      return true;
+    }
+
     let hasStoredBMI = false;
     try {
       const storedWeightData = localStorage.getItem("wl_pre_quiz_data");
@@ -346,7 +350,30 @@ export default function WeightLossConsultationQuiz({
       logger.error("Error checking stored BMI data:", error);
     }
 
-    return hasFormDataBMI || hasStoredBMI;
+    if (hasStoredBMI) {
+      return true;
+    }
+
+    try {
+      const essentialConsulData = localStorage.getItem("essential-consul");
+      if (essentialConsulData) {
+        const parsed = JSON.parse(essentialConsulData);
+        const hasEssentialConsulBMI = !!(
+          parsed.weight &&
+          parsed.height &&
+          parsed.height.feet &&
+          parsed.height.inches !== undefined &&
+          parsed.bmi
+        );
+        if (hasEssentialConsulBMI) {
+          return true;
+        }
+      }
+    } catch (error) {
+      logger.error("Error checking essential-consul BMI data:", error);
+    }
+
+    return false;
   };
 
   const handleBMIComplete = () => {
@@ -396,6 +423,98 @@ export default function WeightLossConsultationQuiz({
     }
   };
 
+  const extractPreQuizAttributes = (essentialConsulData) => {
+    const attributes = {};
+    
+    if (essentialConsulData.accomplishment) {
+      if (Array.isArray(essentialConsulData.accomplishment)) {
+        attributes.accomplishment = essentialConsulData.accomplishment.join(", ");
+      } else if (typeof essentialConsulData.accomplishment === "string") {
+        attributes.accomplishment = essentialConsulData.accomplishment;
+      }
+    }
+    
+    if (essentialConsulData.pregnantOrbreastfeeding) {
+      attributes.pregnantOrbreastfeeding = essentialConsulData.pregnantOrbreastfeeding;
+    }
+    
+    if (essentialConsulData.weightImpactStatements) {
+      if (Array.isArray(essentialConsulData.weightImpactStatements)) {
+        attributes.weightImpactStatements = essentialConsulData.weightImpactStatements.join(", ");
+      } else if (typeof essentialConsulData.weightImpactStatements === "string") {
+        attributes.weightImpactStatements = essentialConsulData.weightImpactStatements;
+      }
+    }
+    
+    if (essentialConsulData.medications) {
+      attributes.medications = essentialConsulData.medications;
+    } else if (essentialConsulData.medicalConditions) {
+      attributes.medications = essentialConsulData.medicalConditions;
+    }
+    
+    if (essentialConsulData.eatingDisorderDiagnosis) {
+      attributes.eatingDisorderDiagnosis = essentialConsulData.eatingDisorderDiagnosis;
+    }
+    
+    return attributes;
+  };
+
+  const mergeEssentialConsulData = (formDataToMerge) => {
+    try {
+      const essentialConsulData = localStorage.getItem("essential-consul");
+      if (essentialConsulData) {
+        const parsed = JSON.parse(essentialConsulData);
+        const merged = { ...formDataToMerge };
+        if (parsed["601"] && !merged["601"]) {
+          merged["601"] = parsed["601"];
+        }
+        if (parsed["602"] && !merged["602"]) {
+          merged["602"] = parsed["602"];
+        }
+        if (parsed["603"] && !merged["603"]) {
+          merged["603"] = parsed["603"];
+        }
+        
+        if (parsed.weight && parsed.height && parsed.bmi) {
+          const weight = parsed.weight;
+          const height = parsed.height;
+          const bmi = parsed.bmi;
+          
+          if (!merged.wl_weight && weight) {
+            merged.wl_weight = `${weight} lbs`;
+          }
+          
+          if (!merged.wl_height && height && height.feet && height.inches !== undefined) {
+            merged.wl_height = `${height.feet}ft ${height.inches}in`;
+          }
+          
+          if (!merged.wl_BMI && bmi) {
+            merged.wl_BMI = typeof bmi === "number" ? bmi.toString() : bmi;
+          }
+        }
+        
+        const preQuizAttributes = extractPreQuizAttributes(parsed);
+        Object.assign(merged, preQuizAttributes);
+        
+        if (Object.keys(preQuizAttributes).length > 0) {
+          try {
+            const existingAttributes = localStorage.getItem("wl_pre_quiz_attributes");
+            const storedAttributes = existingAttributes ? JSON.parse(existingAttributes) : {};
+            const updatedAttributes = { ...storedAttributes, ...preQuizAttributes };
+            localStorage.setItem("wl_pre_quiz_attributes", JSON.stringify(updatedAttributes));
+          } catch (storageError) {
+            logger.error("Error storing pre-quiz attributes:", storageError);
+          }
+        }
+        
+        return merged;
+      }
+    } catch (error) {
+      logger.error("Error reading essential-consul data:", error);
+    }
+    return formDataToMerge;
+  };
+
   useEffect(() => {
     const initializeForm = async () => {
       try {
@@ -416,10 +535,12 @@ export default function WeightLossConsultationQuiz({
         const serverEntrykey = data.entrykey;
 
         if (storedQuizData) {
-          const updatedFormData = {
+          let updatedFormData = {
             ...storedQuizData,
             entrykey: storedQuizData.entrykey || serverEntrykey,
           };
+
+          updatedFormData = mergeEssentialConsulData(updatedFormData);
 
           setFormData(updatedFormData);
 
@@ -504,14 +625,19 @@ export default function WeightLossConsultationQuiz({
             }
           }
         } else {
+          let initialFormData = {};
           if (serverEntrykey) {
-            setFormData((prev) => ({
-              ...prev,
-              entrykey: serverEntrykey,
-            }));
+            initialFormData.entrykey = serverEntrykey;
           }
 
-          if (!checkBMIDataExists()) {
+          initialFormData = mergeEssentialConsulData(initialFormData);
+
+          setFormData((prev) => ({
+            ...prev,
+            ...initialFormData,
+          }));
+
+          if (!checkBMIDataExists(initialFormData)) {
             setShowBMICalculator(true);
             return;
           }
@@ -519,7 +645,10 @@ export default function WeightLossConsultationQuiz({
       } catch (error) {
         logger.error("Error initializing form:", error);
 
-        if (!checkBMIDataExists()) {
+        let fallbackFormData = getInitialFormData();
+        fallbackFormData = mergeEssentialConsulData(fallbackFormData);
+        
+        if (!checkBMIDataExists(fallbackFormData)) {
           setShowBMICalculator(true);
           return;
         }
@@ -528,8 +657,14 @@ export default function WeightLossConsultationQuiz({
         if (!storedData) return;
 
         try {
-          const quizFormData = JSON.parse(storedData);
+          let quizFormData = JSON.parse(storedData);
+          quizFormData = mergeEssentialConsulData(quizFormData);
           setFormData(quizFormData);
+          
+          if (!checkBMIDataExists(quizFormData)) {
+            setShowBMICalculator(true);
+            return;
+          }
 
           if (!quizFormData.page_step) return;
 
@@ -738,6 +873,19 @@ export default function WeightLossConsultationQuiz({
         const initialData = getInitialFormData();
         updateLocalStorage(initialData);
         logger.log("Weight quiz: Initial form data saved to localStorage");
+      }
+      
+      try {
+        const storedAttributes = localStorage.getItem("wl_pre_quiz_attributes");
+        if (storedAttributes) {
+          const attributes = JSON.parse(storedAttributes);
+          setFormData((prev) => ({
+            ...prev,
+            ...attributes,
+          }));
+        }
+      } catch (error) {
+        logger.error("Error loading pre-quiz attributes from localStorage:", error);
       }
     }
   }, []);
@@ -2639,10 +2787,34 @@ export default function WeightLossConsultationQuiz({
   };
 
   const collectCumulativeData = () => {
+    let essentialConsulData = {};
+    try {
+      const essentialConsul = localStorage.getItem("essential-consul");
+      if (essentialConsul) {
+        essentialConsulData = JSON.parse(essentialConsul);
+      }
+    } catch (error) {
+      logger.error("Error reading essential-consul in collectCumulativeData:", error);
+    }
+
+    let storedAttributes = {};
+    try {
+      const attributesData = localStorage.getItem("wl_pre_quiz_attributes");
+      if (attributesData) {
+        storedAttributes = JSON.parse(attributesData);
+      }
+    } catch (error) {
+      logger.error("Error reading stored pre-quiz attributes:", error);
+    }
+
+    const getValue = (key) => {
+      return formData[key] || essentialConsulData[key] || "";
+    };
+
     const pageDataMap = {
-      1: { 601: formData["601"] },
-      2: { 602: formData["602"] },
-      3: { 603: formData["603"] },
+      1: { 601: getValue("601") },
+      2: { 602: getValue("602") },
+      3: { 603: getValue("603") },
       4: {
         "604_1": formData["604_1"],
         "604_2": formData["604_2"],
@@ -2826,6 +2998,48 @@ export default function WeightLossConsultationQuiz({
     }
     if (formData.wl_BMI) {
       filteredData.wl_BMI = formData.wl_BMI;
+    }
+
+   const preQuizAttributes = extractPreQuizAttributes(essentialConsulData);
+    
+    if (formData.accomplishment) {
+      filteredData.accomplishment = formData.accomplishment;
+    } else if (preQuizAttributes.accomplishment) {
+      filteredData.accomplishment = preQuizAttributes.accomplishment;
+    } else if (storedAttributes.accomplishment) {
+      filteredData.accomplishment = storedAttributes.accomplishment;
+    }
+    
+    if (formData.pregnantOrbreastfeeding) {
+      filteredData.pregnantOrbreastfeeding = formData.pregnantOrbreastfeeding;
+    } else if (preQuizAttributes.pregnantOrbreastfeeding) {
+      filteredData.pregnantOrbreastfeeding = preQuizAttributes.pregnantOrbreastfeeding;
+    } else if (storedAttributes.pregnantOrbreastfeeding) {
+      filteredData.pregnantOrbreastfeeding = storedAttributes.pregnantOrbreastfeeding;
+    }
+    
+    if (formData.weightImpactStatements) {
+      filteredData.weightImpactStatements = formData.weightImpactStatements;
+    } else if (preQuizAttributes.weightImpactStatements) {
+      filteredData.weightImpactStatements = preQuizAttributes.weightImpactStatements;
+    } else if (storedAttributes.weightImpactStatements) {
+      filteredData.weightImpactStatements = storedAttributes.weightImpactStatements;
+    }
+    
+    if (formData.medications) {
+      filteredData.medications = formData.medications;
+    } else if (preQuizAttributes.medications) {
+      filteredData.medications = preQuizAttributes.medications;
+    } else if (storedAttributes.medications) {
+      filteredData.medications = storedAttributes.medications;
+    }
+    
+    if (formData.eatingDisorderDiagnosis) {
+      filteredData.eatingDisorderDiagnosis = formData.eatingDisorderDiagnosis;
+    } else if (preQuizAttributes.eatingDisorderDiagnosis) {
+      filteredData.eatingDisorderDiagnosis = preQuizAttributes.eatingDisorderDiagnosis;
+    } else if (storedAttributes.eatingDisorderDiagnosis) {
+      filteredData.eatingDisorderDiagnosis = storedAttributes.eatingDisorderDiagnosis;
     }
 
     return filteredData;
