@@ -3,6 +3,7 @@ import { logger } from "@/utils/devLogger";
 
 const STORAGE_KEY = "wl_flow2_quiz_data";
 const HISTORY_STORAGE_KEY = "history";
+const ESSENTIAL_CONSUL_STORAGE_KEY = "essential-consul"; //Created by omkar for pre-quiz data transfer. DO NOT DELETE
 
 export const useQuizData = () => {
   // Initialize from localStorage if available
@@ -74,6 +75,7 @@ export const useQuizData = () => {
         );
 
         localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(dataToSave));
+        localStorage.setItem(ESSENTIAL_CONSUL_STORAGE_KEY, JSON.stringify(dataToSave));
       } catch (e) {
         logger.error("Failed to save to localStorage:", e);
       }
@@ -132,6 +134,7 @@ export const useQuizData = () => {
       try {
         localStorage.removeItem(STORAGE_KEY);
         localStorage.removeItem(HISTORY_STORAGE_KEY);
+        localStorage.removeItem(ESSENTIAL_CONSUL_STORAGE_KEY);
         setUserData({});
         setSelectedProduct(null);
         setActivePopup(null);
