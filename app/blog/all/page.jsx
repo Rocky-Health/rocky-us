@@ -4,11 +4,14 @@ import { logger } from "@/utils/devLogger";
 
 export default async function AllBlogsPageRoute({ searchParams }) {
   try {
+    // Await searchParams as it's now a promise in Next.js 15+
+    const resolvedSearchParams = await searchParams;
+
     // Get category from query parameter, default to "0" if not provided
-    const categoryId = searchParams?.category || "0";
+    const categoryId = resolvedSearchParams?.category || "0";
 
     // Get current page from searchParams for initial load
-    const currentPage = parseInt(searchParams?.page) || 1;
+    const currentPage = parseInt(resolvedSearchParams?.page) || 1;
 
     // Fetch all blogs and categories using the new getAllPageBlogs function
     const blogsData = await blogService.getAllPageBlogs(
