@@ -3,7 +3,6 @@ import { logger } from "@/utils/devLogger";
 import { blogService } from "@/components/NewBlogs/services/blogService";
 import { MainBlogsPage } from "@/components/NewBlogs";
 import BlogPageSkeleton from "@/components/NewBlogs/components/BlogPageSkeleton";
-import ErrorUI from "./ErrorUI";
 
 async function BlogsContent() {
   try {
@@ -21,7 +20,19 @@ async function BlogsContent() {
     );
   } catch (error) {
     logger.error("Error loading blogs page:", error);
-    return <ErrorUI error={error} />;
+
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            Something went wrong
+          </h1>
+          <p className="text-gray-600">
+            We're having trouble loading the blogs. Please try again later.
+          </p>
+        </div>
+      </div>
+    );
   }
 }
 
