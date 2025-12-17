@@ -17,7 +17,7 @@ import Loader from "@/components/Loader";
 import NotFound from "./not-found";
 
 export default function BlogSlugPage({ params }) {
-  const slug = use(params);
+  const resolvedParams = use(params);
   const [Blog, setBlog] = useState(null);
   const [BlogLoading, setBlogLoading] = useState(true);
   const [showNotFound, setShowNotFound] = useState(false);
@@ -35,16 +35,16 @@ export default function BlogSlugPage({ params }) {
       setBlogLoading(true);
 
       // Check if slug is available
-      if (!slug || !slug.slug) {
-        logger.error("No slug available:", slug);
+      if (!resolvedParams || !resolvedParams.slug) {
+        logger.error("No slug available:", resolvedParams);
         throw new Error("No slug provided");
       }
 
       // Use the individual blog API route
-      var url = `/api/blogs/${slug.slug}`;
+      var url = `/api/blogs/${resolvedParams.slug}`;
       logger.log("Fetching blog from URL:", url);
-      logger.log("Slug object:", slug);
-      logger.log("Slug slug property:", slug.slug);
+      logger.log("Slug object:", resolvedParams);
+      logger.log("Slug slug property:", resolvedParams.slug);
 
       const res = await fetch(url);
       logger.log("Response status:", res.status);
@@ -255,7 +255,7 @@ export default function BlogSlugPage({ params }) {
     }
   }, [Blog]);
 
-  const onClickCategoryBtn = (category) => {};
+  const onClickCategoryBtn = (category) => { };
 
   // Show system loader while blog is loading
   if (BlogLoading) {

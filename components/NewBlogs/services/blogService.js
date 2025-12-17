@@ -1,13 +1,5 @@
 import { logger } from "@/utils/devLogger";
 
-function getBaseUrl() {
-  if (typeof window === "undefined") {
-    return "https://www.myrocky.com";
-  }
-  // Client-side: use relative URLs to proxy through Next.js API routes
-  return "";
-}
-
 function getHeaders() {
   // Only include Authorization header on server-side
   if (typeof window === "undefined") {
@@ -25,9 +17,22 @@ function getHeaders() {
 export const blogService = {
   async getBlogs(page = 1, categories = null) {
     try {
-      let url = `${getBaseUrl()}/api/blogs?page=${page}&_embed`;
-      if (categories && categories !== "0") {
-        url += `&categories=${categories}`;
+      const isServerSide = typeof window === "undefined";
+      let url;
+
+      if (isServerSide) {
+        // Server-side: Call WordPress API directly
+        const baseUrl = process.env.BASE_URL || "https://www.myrocky.com";
+        url = `${baseUrl}/wp-json/wp/v2/posts?page=${page}&per_page=12&_embed=true`;
+        if (categories && categories !== "0") {
+          url += `&categories=${categories}`;
+        }
+      } else {
+        // Client-side: Call Next.js API route
+        url = `/api/blogs?page=${page}&_embed`;
+        if (categories && categories !== "0") {
+          url += `&categories=${categories}`;
+        }
       }
 
       const res = await fetch(url, {
@@ -53,14 +58,19 @@ export const blogService = {
 
       const data = await res.json();
 
+      // Check if data is an array or object with blogs property
+      const blogsArray = Array.isArray(data) ? data : data.blogs || [];
+
       const totalPages =
         parseInt(res.headers.get("TotalPages")) ||
         parseInt(res.headers.get("X-Total-Pages")) ||
+        parseInt(res.headers.get("x-total-pages")) ||
+        parseInt(res.headers.get("x-wp-totalpages")) ||
         data.totalPages ||
         1;
 
       return {
-        blogs: data,
+        blogs: blogsArray,
         totalPages,
         currentPage: page,
       };
@@ -75,10 +85,22 @@ export const blogService = {
       // Always fetch categories first
       const categoriesData = await this.getBlogCategories();
 
-      // Build URL for blogs - use environment variable for server-side, relative for client-side
-      let url = `${getBaseUrl()}/api/blogs?page=${currentPage}`;
-      if (categories && categories !== "0") {
-        url += `&categories=${categories}`;
+      const isServerSide = typeof window === "undefined";
+      let url;
+
+      if (isServerSide) {
+        // Server-side: Call WordPress API directly
+        const baseUrl = process.env.BASE_URL || "https://www.myrocky.com";
+        url = `${baseUrl}/wp-json/wp/v2/posts?page=${currentPage}&per_page=12&_embed=true`;
+        if (categories && categories !== "0") {
+          url += `&categories=${categories}`;
+        }
+      } else {
+        // Client-side: Call Next.js API route
+        url = `/api/blogs?page=${currentPage}`;
+        if (categories && categories !== "0") {
+          url += `&categories=${categories}`;
+        }
       }
 
       const res = await fetch(url, {
@@ -104,17 +126,26 @@ export const blogService = {
 
       const data = await res.json();
 
+      // Check if data is an array or object with blogs property
+      const blogsArray = Array.isArray(data) ? data : data.blogs || [];
+
       // Create page numbers array like in BlogsPage.jsx
+      const totalPagesCount = parseInt(res.headers.get("TotalPages")) ||
+        parseInt(res.headers.get("X-Total-Pages")) ||
+        parseInt(res.headers.get("x-total-pages")) ||
+        parseInt(res.headers.get("x-wp-totalpages")) ||
+        1;
+
       const pageNumbers = Array.from(
-        { length: parseInt(res.headers.get("TotalPages")) || 1 },
+        { length: totalPagesCount },
         (_, index) => index + 1
       );
 
       return {
-        blogs: data,
+        blogs: blogsArray,
         categories: categoriesData,
         totalPages: pageNumbers,
-        totalPagesCount: parseInt(res.headers.get("TotalPages")) || 1,
+        totalPagesCount: totalPagesCount,
         currentPage: currentPage,
       };
     } catch (error) {
@@ -144,9 +175,8 @@ export const blogService = {
   async getBlogBySlug(slug) {
     try {
       // Direct WordPress API call instead of going through our API route
-      const url = `${
-        process.env.BASE_URL || "https://www.myrocky.com"
-      }/wp-json/wp/v2/posts?slug=${slug}&_embed=true`;
+      const url = `${process.env.BASE_URL || "https://www.myrocky.com"
+        }/wp-json/wp/v2/posts?slug=${slug}&_embed=true`;
       const res = await fetch(url, {
         cache: "no-store",
         headers: {
@@ -187,7 +217,19 @@ export const blogService = {
 
   async getBlogCategories() {
     try {
-      const res = await fetch(`${getBaseUrl()}/api/BlogCategories`, {
+      const isServerSide = typeof window === "undefined";
+      let url;
+
+      if (isServerSide) {
+        // Server-side: Call WordPress API directly
+        const baseUrl = process.env.BASE_URL || "https://www.myrocky.com";
+        url = `${baseUrl}/wp-json/wp/v2/categories?per_page=100`;
+      } else {
+        // Client-side: Call Next.js API route
+        url = `/api/BlogCategories`;
+      }
+
+      const res = await fetch(url, {
         cache: "no-store",
         headers: getHeaders(),
       });
