@@ -124,31 +124,47 @@ export async function POST(req) {
     }
 
     // Get cart items and coupons to build order line items
+    // OPTIMIZATION: Accept cart items from client to avoid server-side fetch (saves 500-1000ms)
     let cartItems = [];
     let appliedCoupons = [];
-    try {
-      const cartResponse = await axios.get(
-        `${BASE_URL}/wp-json/wc/store/cart`,
-        {
-          headers: {
-            Authorization: encodedCredentials.value,
-            Nonce: cartNonce?.value || "",
-          },
-        }
-      );
-      cartItems = cartResponse.data.items || [];
-      appliedCoupons = cartResponse.data.coupons || [];
-      logger.log("Cart data retrieved:", {
+    
+    // Check if cart items were provided in the request (optimization)
+    if (requestData.cartItems && Array.isArray(requestData.cartItems) && requestData.cartItems.length > 0) {
+      logger.log("Using cart items from client (optimization)");
+      cartItems = requestData.cartItems;
+      appliedCoupons = requestData.appliedCoupons || [];
+      logger.log("Cart data from client:", {
         itemsCount: cartItems.length,
         couponsCount: appliedCoupons.length,
-        coupons: appliedCoupons.map((c) => c.code),
+        coupons: appliedCoupons.map((c) => c.code || c),
       });
-    } catch (cartError) {
-      logger.error("Failed to fetch cart items:", cartError);
-      return NextResponse.json(
-        { error: "Failed to fetch cart items" },
-        { status: 500 }
-      );
+    } else {
+      // Fallback: Fetch cart from server if not provided
+      try {
+        logger.log("Fetching cart from server (fallback)");
+        const cartResponse = await axios.get(
+          `${BASE_URL}/wp-json/wc/store/cart`,
+          {
+            headers: {
+              Authorization: encodedCredentials.value,
+              Nonce: cartNonce?.value || "",
+            },
+          }
+        );
+        cartItems = cartResponse.data.items || [];
+        appliedCoupons = cartResponse.data.coupons || [];
+        logger.log("Cart data retrieved from server:", {
+          itemsCount: cartItems.length,
+          couponsCount: appliedCoupons.length,
+          coupons: appliedCoupons.map((c) => c.code),
+        });
+      } catch (cartError) {
+        logger.error("Failed to fetch cart items:", cartError);
+        return NextResponse.json(
+          { error: "Failed to fetch cart items" },
+          { status: 500 }
+        );
+      }
     }
 
     // Build line items from cart with subscription metadata
@@ -309,166 +325,171 @@ export async function POST(req) {
       status: response.data.status,
     });
 
-    // Create subscriptions using WooCommerce Subscriptions REST API
-    // This is the official approach for creating subscriptions programmatically
-    try {
-      logger.log(
-        "Creating subscriptions using WooCommerce Subscriptions REST API..."
-      );
+    // ========================================
+    // ASYNC: Create subscriptions (non-blocking)
+    // Subscriptions are created in the background after order is returned
+    // ========================================
+    const order = response.data;
+    
+    // Group line items by subscription schedule (period + interval)
+    // Only include items that have subscription metadata (excludes one-time purchases)
+    const subscriptionGroups = new Map();
 
-      const order = response.data;
-
-      // Group line items by subscription schedule (period + interval)
-      // Only include items that have subscription metadata (excludes one-time purchases)
-      const subscriptionGroups = new Map();
-
-      for (const lineItem of order.line_items) {
-        if (lineItem.meta_data) {
-          const periodMeta = lineItem.meta_data.find(
-            (meta) => meta.key === "_subscription_period"
-          );
-          const intervalMeta = lineItem.meta_data.find(
-            (meta) => meta.key === "_subscription_period_interval"
-          );
-
-          if (periodMeta && intervalMeta) {
-            const scheduleKey = `${periodMeta.value}_${intervalMeta.value}`;
-
-            if (!subscriptionGroups.has(scheduleKey)) {
-              subscriptionGroups.set(scheduleKey, {
-                billing_period: periodMeta.value,
-                billing_interval: parseInt(intervalMeta.value),
-                line_items: [],
-                meta_data: lineItem.meta_data.filter((meta) =>
-                  meta.key.startsWith("_subscription_")
-                ),
-              });
-            }
-
-            // Build complete line item with all product details for subscription
-            const subscriptionLineItem = {
-              product_id: lineItem.product_id,
-              quantity: lineItem.quantity,
-            };
-
-            // Add variation_id if present (critical for variable products like different pill counts)
-            if (lineItem.variation_id) {
-              subscriptionLineItem.variation_id = lineItem.variation_id;
-            }
-
-            // Add product name for proper display in subscription details
-            if (lineItem.name) {
-              subscriptionLineItem.name = lineItem.name;
-            }
-
-            // Add SKU if available
-            if (lineItem.sku) {
-              subscriptionLineItem.sku = lineItem.sku;
-            }
-
-            // Add price information to ensure correct subscription pricing
-            if (lineItem.price !== undefined && lineItem.price !== null) {
-              subscriptionLineItem.price = lineItem.price;
-            }
-
-            // Include subtotal and total if available
-            if (lineItem.subtotal !== undefined) {
-              subscriptionLineItem.subtotal = lineItem.subtotal;
-            }
-            if (lineItem.total !== undefined) {
-              subscriptionLineItem.total = lineItem.total;
-            }
-
-            subscriptionGroups
-              .get(scheduleKey)
-              .line_items.push(subscriptionLineItem);
-
-            logger.log(
-              `Product ${lineItem.product_id} (${
-                lineItem.name || "N/A"
-              }) added to subscription group: ${scheduleKey}`,
-              {
-                variation_id: subscriptionLineItem.variation_id || "none",
-                quantity: subscriptionLineItem.quantity,
-                price: subscriptionLineItem.price,
-              }
-            );
-          } else {
-            logger.log(
-              `Product ${lineItem.product_id} (${lineItem.name}) skipped - no subscription metadata (likely one-time purchase)`
-            );
-          }
-        }
-      }
-
-      if (subscriptionGroups.size === 0) {
-        logger.log(
-          "No subscription items found in order. Skipping subscription creation."
+    for (const lineItem of order.line_items) {
+      if (lineItem.meta_data) {
+        const periodMeta = lineItem.meta_data.find(
+          (meta) => meta.key === "_subscription_period"
         );
-        return NextResponse.json({
-          success: true,
-          data: {
-            id: response.data.id,
-            order_id: response.data.id,
-            order_key: response.data.order_key,
-            status: response.data.status,
-            payment_deferred: true,
-            message:
-              "Order created successfully (one-time purchase). Payment will be processed separately.",
-          },
-        });
-      }
+        const intervalMeta = lineItem.meta_data.find(
+          (meta) => meta.key === "_subscription_period_interval"
+        );
 
-      // Create a subscription for each distinct subscription schedule
-      const subscriptionPromises = Array.from(subscriptionGroups.entries()).map(
-        async ([scheduleKey, subscriptionData]) => {
-          const subscriptionPayload = {
-            parent_id: order.id,
-            customer_id: order.customer_id,
-            status: "pending", // Leave pending until payment is captured
-            billing_period: subscriptionData.billing_period,
-            billing_interval: subscriptionData.billing_interval,
-            line_items: subscriptionData.line_items,
-            billing: order.billing,
-            shipping: order.shipping,
-            meta_data: subscriptionData.meta_data,
+        if (periodMeta && intervalMeta) {
+          const scheduleKey = `${periodMeta.value}_${intervalMeta.value}`;
+
+          if (!subscriptionGroups.has(scheduleKey)) {
+            subscriptionGroups.set(scheduleKey, {
+              billing_period: periodMeta.value,
+              billing_interval: parseInt(intervalMeta.value),
+              line_items: [],
+              meta_data: lineItem.meta_data.filter((meta) =>
+                meta.key.startsWith("_subscription_")
+              ),
+            });
+          }
+
+          // Build complete line item with all product details for subscription
+          const subscriptionLineItem = {
+            product_id: lineItem.product_id,
+            quantity: lineItem.quantity,
           };
 
-          logger.log(
-            `Creating subscription for schedule ${scheduleKey}:`,
-            subscriptionPayload
-          );
+          // Add variation_id if present (critical for variable products like different pill counts)
+          if (lineItem.variation_id) {
+            subscriptionLineItem.variation_id = lineItem.variation_id;
+          }
 
-          const subscriptionResponse = await axios.post(
-            `${BASE_URL}/wp-json/wc/v3/subscriptions`,
-            subscriptionPayload,
+          // Add product name for proper display in subscription details
+          if (lineItem.name) {
+            subscriptionLineItem.name = lineItem.name;
+          }
+
+          // Add SKU if available
+          if (lineItem.sku) {
+            subscriptionLineItem.sku = lineItem.sku;
+          }
+
+          // Add price information to ensure correct subscription pricing
+          if (lineItem.price !== undefined && lineItem.price !== null) {
+            subscriptionLineItem.price = lineItem.price;
+          }
+
+          // Include subtotal and total if available
+          if (lineItem.subtotal !== undefined) {
+            subscriptionLineItem.subtotal = lineItem.subtotal;
+          }
+          if (lineItem.total !== undefined) {
+            subscriptionLineItem.total = lineItem.total;
+          }
+
+          subscriptionGroups
+            .get(scheduleKey)
+            .line_items.push(subscriptionLineItem);
+
+          logger.log(
+            `Product ${lineItem.product_id} (${
+              lineItem.name || "N/A"
+            }) added to subscription group: ${scheduleKey}`,
             {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Basic ${Buffer.from(
-                  `${CONSUMER_KEY}:${CONSUMER_SECRET}`
-                ).toString("base64")}`,
-              },
+              variation_id: subscriptionLineItem.variation_id || "none",
+              quantity: subscriptionLineItem.quantity,
+              price: subscriptionLineItem.price,
             }
           );
-
-          return subscriptionResponse.data;
+        } else {
+          logger.log(
+            `Product ${lineItem.product_id} (${lineItem.name}) skipped - no subscription metadata (likely one-time purchase)`
+          );
         }
-      );
+      }
+    }
 
-      const createdSubscriptions = await Promise.all(subscriptionPromises);
-
+    // Create subscriptions asynchronously (fire and forget)
+    if (subscriptionGroups.size > 0) {
       logger.log(
-        `Successfully created ${createdSubscriptions.length} subscriptions for order:`,
-        order.id,
-        createdSubscriptions.map((sub) => sub.id)
+        `Creating ${subscriptionGroups.size} subscription(s) asynchronously for order: ${order.id}`
       );
-    } catch (subscriptionError) {
-      logger.error(
-        "Error creating subscriptions via REST API:",
-        subscriptionError.response?.data || subscriptionError.message
+
+      // Fire and forget - don't await
+      Promise.all(
+        Array.from(subscriptionGroups.entries()).map(
+          async ([scheduleKey, subscriptionData]) => {
+            try {
+              const subscriptionPayload = {
+                parent_id: order.id,
+                customer_id: order.customer_id,
+                status: "pending", // Leave pending until payment is captured
+                billing_period: subscriptionData.billing_period,
+                billing_interval: subscriptionData.billing_interval,
+                line_items: subscriptionData.line_items,
+                billing: order.billing,
+                shipping: order.shipping,
+                meta_data: subscriptionData.meta_data,
+              };
+
+              logger.log(
+                `Creating subscription for schedule ${scheduleKey} (async):`,
+                subscriptionPayload
+              );
+
+              const subscriptionResponse = await axios.post(
+                `${BASE_URL}/wp-json/wc/v3/subscriptions`,
+                subscriptionPayload,
+                {
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Basic ${Buffer.from(
+                      `${CONSUMER_KEY}:${CONSUMER_SECRET}`
+                    ).toString("base64")}`,
+                  },
+                }
+              );
+
+              logger.log(
+                `✅ Subscription created successfully (async): ${subscriptionResponse.data.id}`
+              );
+              return subscriptionResponse.data;
+            } catch (subscriptionError) {
+              logger.error(
+                `Error creating subscription for schedule ${scheduleKey} (async):`,
+                subscriptionError.response?.data || subscriptionError.message
+              );
+              // Don't throw - log for manual review
+              return null;
+            }
+          }
+        )
+      )
+        .then((createdSubscriptions) => {
+          const successfulSubscriptions = createdSubscriptions.filter(
+            (sub) => sub !== null
+          );
+          logger.log(
+            `✅ Successfully created ${successfulSubscriptions.length}/${subscriptionGroups.size} subscriptions for order ${order.id} (async)`,
+            successfulSubscriptions.map((sub) => sub.id)
+          );
+        })
+        .catch((asyncError) => {
+          logger.error(
+            "Error in async subscription creation:",
+            asyncError
+          );
+          // Don't throw - subscriptions can be created manually if needed
+        });
+    } else {
+      logger.log(
+        "No subscription items found in order. Skipping subscription creation."
       );
-      // Don't fail the order creation if subscription creation fails - log it for manual review
     }
 
     // Return the response in a consistent format
