@@ -50,14 +50,18 @@ export async function POST(req) {
     logger.log("Customer:", customerEmail);
     logger.log("================================");
 
-    // Get or create Stripe customer
+    // Get or create Stripe customer (minimal sync operations - only what's needed for PaymentIntent)
     let stripeCustomerId = null;
+    let userId = null;
+    let authToken = null;
+    let needsWooCommerceUpdate = false; // Flag to update WooCommerce async later
+
     try {
       const cookieStore = await cookies();
-      const userId = cookieStore.get("userId");
-      const authToken = cookieStore.get("authToken");
+      userId = cookieStore.get("userId");
+      authToken = cookieStore.get("authToken");
 
-      // Check if we have Stripe customer ID in cookies first (fastest path)
+      // Check if we have Stripe customer ID in cookies first (fastest path - no API calls)
       const cachedStripeCustomerId = cookieStore.get("stripeCustomerId");
       if (cachedStripeCustomerId && cachedStripeCustomerId.value) {
         stripeCustomerId = cachedStripeCustomerId.value;
@@ -66,141 +70,58 @@ export async function POST(req) {
           stripeCustomerId
         );
       } else if (userId && authToken) {
-        // Cookie not found, fetch from WooCommerce
-        logger.log(
-          "Fetching WooCommerce customer data for user:",
-          userId.value
-        );
+        // Cookie not found - create Stripe customer quickly (don't wait for WooCommerce lookup)
+        // This is faster than fetching from WooCommerce first
+        logger.log("Creating new Stripe customer (fast path)...");
+        const stripeCustomer = await stripe.customers.create({
+          email: customerEmail,
+          name: customerName,
+          metadata: {
+            woocommerce_user_id: userId.value,
+          },
+        });
 
-        // Fetch WooCommerce customer data to check for existing Stripe customer ID
-        const customerResponse = await axios.get(
-          `${BASE_URL}/wp-json/wc/v3/customers/${userId.value}`,
-          {
-            headers: {
-              Authorization: process.env.ADMIN_TOKEN || authToken.value,
-            },
-          }
-        );
+        stripeCustomerId = stripeCustomer.id;
+        logger.log("Created new Stripe customer:", stripeCustomerId);
 
-        const customerData = customerResponse.data;
-        const metaData = customerData.meta_data || [];
+        // Save to cookies immediately (fast)
+        cookieStore.set("stripeCustomerId", stripeCustomerId);
+        logger.log("Saved new Stripe customer ID to cookies");
 
-        // Look for existing Stripe customer ID in metadata
-        const stripeCustomerMeta = metaData.find(
-          (meta) => meta.key === "_stripe_customer_id"
-        );
-
-        if (stripeCustomerMeta && stripeCustomerMeta.value) {
-          stripeCustomerId = stripeCustomerMeta.value;
-          logger.log(
-            "Found existing Stripe customer ID in WooCommerce:",
-            stripeCustomerId
-          );
-
-          // Save to cookies for future requests
-          cookieStore.set("stripeCustomerId", stripeCustomerId);
-          logger.log("Saved Stripe customer ID to cookies for future use");
-        } else {
-          // Create new Stripe customer
-          logger.log("Creating new Stripe customer...");
-          const stripeCustomer = await stripe.customers.create({
-            email: customerEmail,
-            name: customerName,
-            metadata: {
-              woocommerce_user_id: userId.value,
-            },
-          });
-
-          stripeCustomerId = stripeCustomer.id;
-          logger.log("Created new Stripe customer:", stripeCustomerId);
-
-          // Save Stripe customer ID to cookies
-          cookieStore.set("stripeCustomerId", stripeCustomerId);
-          logger.log("Saved new Stripe customer ID to cookies");
-
-          // Save Stripe customer ID to WooCommerce metadata
-          try {
-            await axios.put(
-              `${BASE_URL}/wp-json/wc/v3/customers/${userId.value}`,
-              {
-                meta_data: [
-                  {
-                    key: "_stripe_customer_id",
-                    value: stripeCustomerId,
-                  },
-                ],
-              },
-              {
-                headers: {
-                  Authorization: process.env.ADMIN_TOKEN || authToken.value,
-                  "Content-Type": "application/json",
-                },
-              }
-            );
-            logger.log("Saved Stripe customer ID to WooCommerce metadata");
-          } catch (metaError) {
-            logger.error(
-              "Failed to save Stripe customer ID to WooCommerce:",
-              metaError.message
-            );
-            // Continue anyway - customer was created in Stripe
-          }
-        }
+        // Mark that we need to update WooCommerce async later
+        needsWooCommerceUpdate = true;
       }
     } catch (customerError) {
       logger.error(
-        "Error fetching/creating Stripe customer:",
+        "Error creating Stripe customer:",
         customerError.message
       );
       // Continue without customer ID - payment can still succeed
     }
 
-    // Attach payment method to customer if we have a customer ID
+    // ========================================
+    // CRITICAL: Attach PaymentMethod to Customer BEFORE creating PaymentIntent
+    // This is required for the PaymentMethod to be reusable for renewals.
+    // If a PaymentMethod is used in a PaymentIntent without Customer attachment,
+    // Stripe won't allow it to be reused later.
+    // ========================================
     if (stripeCustomerId && paymentMethodId) {
       try {
-        logger.log("Attaching payment method to customer...");
+        // Attach payment method to customer (synchronous - must complete before PaymentIntent)
         await stripe.paymentMethods.attach(paymentMethodId, {
           customer: stripeCustomerId,
         });
-        logger.log("✅ Payment method attached to customer successfully");
-
-        // Set as default payment method for customer (required for WooCommerce renewals)
-        try {
-          await stripe.customers.update(stripeCustomerId, {
-            invoice_settings: {
-              default_payment_method: paymentMethodId,
-            },
-          });
-          logger.log("✅ Set payment method as default for customer");
-        } catch (defaultError) {
-          logger.warn(
-            "Failed to set default payment method:",
-            defaultError.message
-          );
-          // Continue anyway - not critical for initial payment, but may affect renewals
-        }
+        logger.log("✅ Payment method attached to customer (before PaymentIntent)");
       } catch (attachError) {
-        // Payment method might already be attached to this or another customer
         if (attachError.code === "resource_already_exists") {
-          logger.log("Payment method already attached to a customer");
-          
-          // Still try to set as default even if already attached
-          try {
-            await stripe.customers.update(stripeCustomerId, {
-              invoice_settings: {
-                default_payment_method: paymentMethodId,
-              },
-            });
-            logger.log("✅ Set existing payment method as default for customer");
-          } catch (defaultError) {
-            logger.warn(
-              "Failed to set default payment method:",
-              defaultError.message
-            );
-          }
+          logger.log("Payment method already attached to customer");
         } else {
-          logger.warn("Failed to attach payment method:", attachError.message);
-          // Continue anyway - PaymentIntent creation will still work
+          logger.warn(
+            "Failed to attach payment method before PaymentIntent:",
+            attachError.message
+          );
+          // Continue anyway - payment might still work, but renewals may fail
+          // This is a critical error for renewals, but we don't want to block the payment
         }
       }
     }
@@ -248,6 +169,71 @@ export async function POST(req) {
       capture_method: paymentIntent.capture_method,
       captured: paymentIntent.captured,
     });
+
+    // ========================================
+    // ASYNC OPERATIONS (non-blocking)
+    // Perform customer updates after PaymentIntent is created
+    // These run in the background and don't block the response
+    // ========================================
+    if (stripeCustomerId && paymentMethodId) {
+      // Fire and forget - don't await these operations
+      const asyncOperations = [];
+
+      // Set as default payment method (non-critical for initial payment)
+      asyncOperations.push(
+        stripe.customers
+          .update(stripeCustomerId, {
+            invoice_settings: {
+              default_payment_method: paymentMethodId,
+            },
+          })
+          .then(() => {
+            logger.log("✅ Set payment method as default (async)");
+          })
+          .catch((defaultError) => {
+            logger.warn("Failed to set default payment method (async):", defaultError.message);
+          })
+      );
+
+      // Update WooCommerce metadata if needed (async)
+      if (needsWooCommerceUpdate && userId && authToken) {
+        asyncOperations.push(
+          axios
+            .put(
+              `${BASE_URL}/wp-json/wc/v3/customers/${userId.value}`,
+              {
+                meta_data: [
+                  {
+                    key: "_stripe_customer_id",
+                    value: stripeCustomerId,
+                  },
+                ],
+              },
+              {
+                headers: {
+                  Authorization: process.env.ADMIN_TOKEN || authToken.value,
+                  "Content-Type": "application/json",
+                },
+              }
+            )
+            .then(() => {
+              logger.log("✅ Saved Stripe customer ID to WooCommerce (async)");
+            })
+            .catch((metaError) => {
+              logger.error(
+                "Failed to save Stripe customer ID to WooCommerce (async):",
+                metaError.message
+              );
+            })
+        );
+      }
+
+      // Execute all async operations in parallel (fire and forget)
+      Promise.all(asyncOperations).catch((asyncError) => {
+        logger.error("Error in async customer operations:", asyncError);
+        // Don't throw - these are non-critical operations
+      });
+    }
 
     // Handle successful authorization (requires_capture)
     if (paymentIntent.status === "requires_capture") {

@@ -24,7 +24,7 @@ const leadershipTeam = [
   {
     name: "Mina Rizk",
     title: "R.Ph. MPharm",
-    subtitle: "Chief Operating Officer & Chief Pharmaceutical Officer",
+    subtitle: "Chief Operating Officer",
     description:
       "Mina is a licensed pharmacist in Ontario and British Columbia, with a Master’s degree in Pharmacy from the UK. He has extensive experience in community pharmacy, including owning and operating several pharmacies in Ontario. His background in both managing pharmacies and providing patient care brings a comprehensive understanding of the healthcare landscape, making him well-versed in the healthcare space and a valuable asset to our leadership team.",
     imageSrc: "https://myrocky.b-cdn.net/team-members/mina-rizk.png",
@@ -33,7 +33,7 @@ const leadershipTeam = [
   {
     name: "Aba Anton",
     title: "MPharm",
-    subtitle: "Chief Executive Officerr",
+    subtitle: "Chief Executive Officer",
     description:
       "Aba earned his Master’s degree in Pharmacy from the UK and gained valuable experience which leverages his entrepreneurial background to drive innovation in healthcare. Focused on modernizing outdated practices, Aba is dedicated to bridging the gap between patient needs and accessibility. His commitment to improving healthcare delivery through strategic advancements makes him a valuable addition to our leadership team.",
     imageSrc: "https://myrocky.b-cdn.net/team-members/aba-aanton.jpg",
