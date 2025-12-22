@@ -99,6 +99,33 @@ export async function POST(req) {
       // Continue without customer ID - payment can still succeed
     }
 
+    // ========================================
+    // CRITICAL: Attach PaymentMethod to Customer BEFORE creating PaymentIntent
+    // This is required for the PaymentMethod to be reusable for renewals.
+    // If a PaymentMethod is used in a PaymentIntent without Customer attachment,
+    // Stripe won't allow it to be reused later.
+    // ========================================
+    if (stripeCustomerId && paymentMethodId) {
+      try {
+        // Attach payment method to customer (synchronous - must complete before PaymentIntent)
+        await stripe.paymentMethods.attach(paymentMethodId, {
+          customer: stripeCustomerId,
+        });
+        logger.log("✅ Payment method attached to customer (before PaymentIntent)");
+      } catch (attachError) {
+        if (attachError.code === "resource_already_exists") {
+          logger.log("Payment method already attached to customer");
+        } else {
+          logger.warn(
+            "Failed to attach payment method before PaymentIntent:",
+            attachError.message
+          );
+          // Continue anyway - payment might still work, but renewals may fail
+          // This is a critical error for renewals, but we don't want to block the payment
+        }
+      }
+    }
+
     // Create PaymentIntent with manual capture for authorization-only payments
     // This will create an "uncaptured" payment in Stripe dashboard
     const paymentIntentData = {
@@ -152,25 +179,7 @@ export async function POST(req) {
       // Fire and forget - don't await these operations
       const asyncOperations = [];
 
-      // Attach payment method to customer
-      asyncOperations.push(
-        stripe.paymentMethods
-          .attach(paymentMethodId, {
-            customer: stripeCustomerId,
-          })
-          .then(() => {
-            logger.log("✅ Payment method attached to customer (async)");
-          })
-          .catch((attachError) => {
-            if (attachError.code === "resource_already_exists") {
-              logger.log("Payment method already attached (async)");
-            } else {
-              logger.warn("Failed to attach payment method (async):", attachError.message);
-            }
-          })
-      );
-
-      // Set as default payment method
+      // Set as default payment method (non-critical for initial payment)
       asyncOperations.push(
         stripe.customers
           .update(stripeCustomerId, {
