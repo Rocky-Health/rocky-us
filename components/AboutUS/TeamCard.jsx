@@ -39,10 +39,10 @@ const TeamCard = ({
         </div>
 
         <p className="text-[22px] md:text-[30px] headers-font mb-4">{name}</p>
-        <p className="text-[14px] md:text-[16px] leading-[140%] text-[#212121] mb-2 md:mb-4">
+        <p className="text-[14px] md:text-[16px] leading-[140%] text-[#212121] mb-1">
           {title}
         </p>
-        <p className="text-[14px] md:text-[16px] mb-4 hidden">{subtitle}</p>
+        <p className="text-[14px] md:text-[16px] leading-[140%] text-[#757575] mb-2 md:mb-4">{subtitle}</p>
         <div
           className="text-[#212121] text-[14px]  font-normal underline leading-tight cursor-pointer"
           onClick={handleReadMore}
