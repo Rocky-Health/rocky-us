@@ -1,40 +1,93 @@
+"use client";
 import CustomImage from "../utils/CustomImage";
 import CustomContainImage from "../utils/CustomContainImage";
+import { partners } from "./partnersData";
 
 const HeaderProudPartner = () => {
   return (
-    <div className="bg-[#003876] text-white py-2 text-center flex justify-center items-center gap-3">
-      <span className="font-[500] text-[12px] md:text-[18px] md:me-2">
-        Proud partner
-      </span>
-      <div className="w-0 h-8 origin-top-left  outline outline-1 outline-offset-[-0.50px] outline-white/50"></div>
-
-      <div className="flex items-center gap-2 md:mx-2">
-        <div className="relative overflow-hidden w-[26px] h-[28px] md:w-[37px] md:h-[40px] md:mx-1">
-          <CustomImage
-            src="/proud-logo/TML-Primary-White-R.png"
-            alt="TML Primary White R%201"
-            fill
-          />
+    <div className="bg-[#003876] text-white py-2">
+      {/* Desktop view - static display */}
+      <div className="hidden md:flex items-center justify-center">
+        <span className="font-[500] text-[18px]">Proud partner</span>
+        <div className="px-3">
+          <div className="w-0 h-8 origin-top-left outline outline-1 outline-offset-[-0.50px] outline-white/50"></div>
         </div>
-        <span className="hidden md:inline font-[500] text-[12px] md:text-[18px]">
-          Toronto Maple Leafs
-        </span>
+
+        {partners.map((partner, index) => (
+          <div key={index} className="flex items-center">
+            <div className="flex items-center gap-1">
+              <div
+                className={`relative overflow-hidden ${partner.desktopSize}`}
+              >
+                {partner.useContain ? (
+                  <CustomContainImage
+                    src={partner.logo}
+                    alt={partner.name}
+                    fill
+                  />
+                ) : (
+                  <CustomImage src={partner.logo} alt={partner.name} fill />
+                )}
+              </div>
+              <span className="font-[500] text-[18px]">{partner.name}</span>
+            </div>
+            {index < partners.length - 1 && (
+              <div className="px-4">
+                <div className="w-0 h-8 origin-top-left outline outline-1 outline-offset-[-0.50px] outline-white/50"></div>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
 
-      <div className="w-0 h-8 origin-top-left  outline outline-1 outline-offset-[-0.50px] outline-white/50"></div>
-
-      <div className="flex items-center gap-2 md:mx-2">
-        <div className="relative  overflow-hidden w-[35px] h-[25px] md:w-[46px] md:h-[40px] md:mx-1">
-          <CustomContainImage
-            src="/proud-logo/TBJ.png"
-            alt="Toronto Blue Jays"
-            fill
-          />
+      {/* Mobile view - scrolling display */}
+      <div className="md:hidden flex items-center justify-center pl-[10px] md:pl-0">
+        {/* Fixed "Proud partner" text */}
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <span className="font-[500] text-[12px]">Proud partner</span>
+          {/* <div className="w-0 h-8 origin-top-left outline outline-1 outline-offset-[-0.50px] outline-white/50"></div> */}
         </div>
-        <span className="hidden md:inline font-[500] text-[12px] md:text-[18px]">
-          Toronto Blue Jays
-        </span>
+
+        {/* Scrolling container */}
+        <div className="relative overflow-hidden flex-1">
+          {/* Gradient overlays - fade in when scroll starts */}
+          <div className="bg-[linear-gradient(270deg,#00387600_0%,#003876_100%)] absolute left-0 w-[80px] h-full z-[1] animate-gradient-delayed"></div>
+          <div className="bg-[linear-gradient(270deg,#00387600_0%,#003876_100%)] absolute right-0 w-[80px] h-full z-[1] rotate-180 animate-gradient-delayed"></div>
+
+          {/* Partners container */}
+          <div className="flex items-center whitespace-nowrap w-fit overflow-hidden animate-partner-scroll">
+            {partners
+              .concat(partners)
+              .concat(partners)
+              .map((partner, index) => (
+                <div key={index} className="flex items-center flex-shrink-0">
+                  <div className="flex items-center gap-2 px-3">
+                    <div
+                      className={`relative overflow-hidden ${partner.mobileSize}`}
+                    >
+                      {partner.useContain ? (
+                        <CustomContainImage
+                          src={partner.logo}
+                          alt={partner.name}
+                          fill
+                        />
+                      ) : (
+                        <CustomImage
+                          src={partner.logo}
+                          alt={partner.name}
+                          fill
+                        />
+                      )}
+                    </div>
+                    <span className="font-[500] text-[12px]">
+                      {partner.name}
+                    </span>
+                  </div>
+                  <div className="w-0 h-8 origin-top-left outline outline-1 outline-offset-[-0.50px] outline-white/50 mx-3"></div>
+                </div>
+              ))}
+          </div>
+        </div>
       </div>
     </div>
   );
