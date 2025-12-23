@@ -299,7 +299,7 @@ const varietyPackProduct = {
     "quarterly-supply": [
       {
         count: "6/6",
-        genericPrice: 183,
+        genericPrice: 111,
         brandPrice: 1140,
         variationId: "3439,3438",
         brandVariationId: "3470,3466",
