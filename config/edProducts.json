@@ -15,7 +15,7 @@
         "monthly-supply": [
           {
             "count": 6,
-            "genericPrice": 107,
+            "genericPrice": 63,
             "brandPrice": 450,
             "genericVariationId": "3287",
             "brandVariationId": "3471"
@@ -75,7 +75,7 @@
         "monthly-supply": [
           {
             "count": 6,
-            "genericPrice": 76,
+            "genericPrice": 48,
             "brandPrice": 690,
             "genericVariationId": "3440",
             "brandVariationId": "3467"
@@ -142,7 +142,7 @@
           },
           {
             "count": "6/6",
-            "genericPrice": 183,
+            "genericPrice": 111,
             "brandPrice": 1140,
             "genericVariationId": "3440,3287",
             "brandVariationId": "3471,3467"
@@ -151,7 +151,7 @@
         "quarterly-supply": [
           {
             "count": "6/6",
-            "genericPrice": 183,
+            "genericPrice": 111,
             "brandPrice": 1140,
             "genericVariationId": "3439,3438",
             "brandVariationId": "3470,3466"

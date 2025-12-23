@@ -159,7 +159,7 @@ const cialisProduct = {
     "monthly-supply": [
       {
         count: 6,
-        genericPrice: 107,
+        genericPrice: 63,
         brandPrice: 450,
         variationId: "3287",
         brandVariationId: "3471",
@@ -221,7 +221,7 @@ const viagraProduct = {
     "monthly-supply": [
       {
         count: 6,
-        genericPrice: 76,
+        genericPrice: 48,
         brandPrice: 690,
         variationId: "3440",
         brandVariationId: "3467",
@@ -290,7 +290,7 @@ const varietyPackProduct = {
       },
       {
         count: "6/6",
-        genericPrice: 183,
+        genericPrice: 111,
         brandPrice: 1140,
         variationId: "3440,3287",
         brandVariationId: "3471,3467",
