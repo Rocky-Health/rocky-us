@@ -94,8 +94,18 @@ export default function BlogSlugPage({ params }) {
 
       setBlog(blog);
 
-      if (blog.authors && blog.authors.length > 0) {
-        setAuthorContent(blog.authors[0]);
+      // Get author data from _embedded.author
+      if (blog._embedded && blog._embedded.author && blog._embedded.author.length > 0) {
+        const author = blog._embedded.author[0];
+
+        // Structure author data with proper avatar
+        const authorData = {
+          display_name: author.name,
+          description: author.description,
+          avatar_url: author.mpp_avatar?.full || author.avatar_urls?.[96] || ""
+        };
+
+        setAuthorContent(authorData);
       }
 
       if (
