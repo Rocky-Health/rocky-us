@@ -17,6 +17,7 @@
     "@woocommerce/woocommerce-rest-api": "^1.0.1",
     "aws-sdk": "^2.1692.0",
     "axios": "^1.7.9",
+    "capi-param-builder-nodejs": "^1.2.0",
     "classnames": "^2.5.1",
     "framer-motion": "^11.0.3",
     "jsonwebtoken": "^9.0.2",
