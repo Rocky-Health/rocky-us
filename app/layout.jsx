@@ -17,6 +17,7 @@ import GlobalQuebecPopup from "@/components/GlobalQuebecPopup";
 import ZendeskWidget from "@/components/Layout/ZendeskWidget";
 import GoogleOAuthProvider from "@/components/Layout/GoogleOAuthProvider";
 import MetaCookieInitializer from "@/components/Layout/MetaCookieInitializer";
+import { Suspense } from "react";
 
 // Layout will use client-side path detection to avoid forcing dynamic rendering
 
@@ -149,7 +150,9 @@ export default function RootLayout({ children }) {
           />
         </noscript>
         {/* End Google Tag Manager (noscript) */} <CacheClearer />
-        <MetaCookieInitializer />
+        <Suspense fallback={null}>
+          <MetaCookieInitializer />
+        </Suspense>
         <LoadingOverlay />
         {/* <CronHitHandler /> */}
         <GoogleOAuthProvider>

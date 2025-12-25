@@ -50,6 +50,7 @@ All META and TikTok CAPI components have been successfully implemented according
 - ✅ **`components/Layout/MetaCookieInitializer.jsx`** - Created & Added to Layout
   - React component to initialize Meta cookies on every page load
   - Integrated into `app/layout.jsx`
+  - Wrapped in Suspense boundary for Next.js compatibility
   
 - ✅ **Package `capi-param-builder-nodejs`** - Installed
   
@@ -334,6 +335,9 @@ All components have been implemented exactly as specified in the META_TIKTOK_CAP
 **Files Created**: 13 new files
 **Files Updated**: 2 existing files
 **Package Installed**: capi-param-builder-nodejs
+
+### Build Fix Applied
+- ✅ Wrapped `MetaCookieInitializer` in Suspense boundary to fix Next.js static generation
 
 ---
 
