@@ -5,14 +5,34 @@
 
 import { logger } from '@/utils/devLogger';
 import { META_CAPI_GATEWAYS } from './metaCapiConfig';
+import { enrichOrderWithProductData } from './enrichOrderData';
 
 /**
  * Categorize product by checking its WooCommerce categories
+ * Falls back to product name matching if categories are missing
  */
 export const categorizeProduct = (product) => {
   const productCategories = product.categories?.map(c => 
     (c.slug || c.name || c).toLowerCase()
   ) || [];
+  
+  const productName = (product.name || '').toLowerCase();
+  const productId = product.product_id || product.id;
+  
+  // Debug logging to help troubleshoot categorization issues
+  console.log(`[Meta CAPI] 🔍 Categorizing product ${productId}:`, {
+    name: product.name,
+    categories: productCategories,
+    has_categories: productCategories.length > 0
+  });
+  
+  if (logger?.log) {
+    logger.log(`[Meta CAPI] Categorizing product ${productId}:`, {
+      name: product.name,
+      categories: productCategories,
+      has_categories: productCategories.length > 0
+    });
+  }
   
   // Check each gateway's category matches (in priority order)
   for (const [gatewayKey, config] of Object.entries(META_CAPI_GATEWAYS)) {
@@ -23,8 +43,41 @@ export const categorizeProduct = (product) => {
     );
     
     if (matches) {
+      console.log(`[Meta CAPI] ✅ Product ${productId} matched to ${gatewayKey} gateway (by category)`);
+      if (logger?.log) {
+        logger.log(`[Meta CAPI] Product matched to ${gatewayKey} gateway`);
+      }
       return gatewayKey;
     }
+  }
+  
+  // Fallback: Try to match by product name keywords
+  console.log(`[Meta CAPI] ⚠️ No category match for product ${productId}, trying name-based matching...`);
+  
+  const nameKeywords = {
+    ED: ['erectile', 'ed ', 'sildenafil', 'tadalafil', 'viagra', 'cialis'],
+    WL: ['weight', 'semaglutide', 'tirzepatide', 'ozempic', 'wegovy', 'body optimization'],
+    HL: ['hair', 'finasteride', 'minoxidil', 'hairloss', 'hair loss', 'dutasteride'],
+    SMOKING: ['smoking', 'nicotine', 'zonnic', 'cessation', 'quit smoking'],
+    SKINCARE: ['skin', 'tretinoin', 'acne', 'retinol', 'hyperpigmentation', 'anti-aging', 'skincare']
+  };
+  
+  for (const [gatewayKey, keywords] of Object.entries(nameKeywords)) {
+    const nameMatches = keywords.some(keyword => productName.includes(keyword));
+    if (nameMatches) {
+      console.log(`[Meta CAPI] ✅ Product ${productId} matched to ${gatewayKey} gateway (by name: "${product.name}")`);
+      if (logger?.log) {
+        logger.log(`[Meta CAPI] Product matched to ${gatewayKey} gateway by name`);
+      }
+      return gatewayKey;
+    }
+  }
+  
+  console.warn(`[Meta CAPI] ❌ Product ${productId} ("${product.name}") defaulting to OTHERS - no category or name match found`);
+  console.warn(`[Meta CAPI] Categories found:`, productCategories);
+  
+  if (logger?.warn) {
+    logger.warn(`[Meta CAPI] Product ${productId} defaulting to OTHERS - no category match found`);
   }
   
   return 'OTHERS'; // Default fallback
@@ -159,12 +212,50 @@ export const trackMetaCapiPurchase = async (order, additionalData = {}, debug = 
     if (logger?.error) {
       logger.error('[Meta CAPI] Invalid order data - missing order or order.id');
     }
+    console.error('[Meta CAPI] Invalid order data - missing order or order.id');
     return;
   }
 
   try {
-    // Split order by gateway
-    const gatewaySplits = splitOrderByGateway(order);
+    console.log(`[Meta CAPI] ▶️ Starting tracking for order ${order.id}`);
+    console.log(`[Meta CAPI] Order has ${order.line_items?.length || 0} line items`);
+    
+    // **CRITICAL**: Enrich order with product categories BEFORE categorization
+    // Without this, all products will be categorized as OTHERS
+    if (logger?.log) {
+      logger.log(`[Meta CAPI] Enriching order ${order.id} with product categories...`);
+    }
+    console.log(`[Meta CAPI] 🔍 Enriching order ${order.id} with product categories...`);
+    
+    const enrichedOrder = await enrichOrderWithProductData(order, { 
+      debug: debug 
+    });
+    
+    if (!enrichedOrder) {
+      console.error('[Meta CAPI] ❌ Enrichment returned null/undefined');
+      return;
+    }
+    
+    if (logger?.log) {
+      logger.log(`[Meta CAPI] Order ${order.id} enrichment complete`);
+    }
+    console.log(`[Meta CAPI] ✅ Order ${order.id} enrichment complete`);
+    
+    // Log enrichment results for debugging
+    const itemsWithCategories = enrichedOrder.line_items?.filter(
+      item => item.categories && Array.isArray(item.categories) && item.categories.length > 0
+    ).length || 0;
+    console.log(`[Meta CAPI] ${itemsWithCategories}/${enrichedOrder.line_items?.length || 0} items have categories`);
+    
+    // Log first item's categories for debugging
+    if (enrichedOrder.line_items && enrichedOrder.line_items.length > 0) {
+      const firstItem = enrichedOrder.line_items[0];
+      console.log(`[Meta CAPI] First item (${firstItem.name}) categories:`, 
+        firstItem.categories?.map(c => c.slug || c.name).join(', ') || 'NONE');
+    }
+    
+    // Split order by gateway (now with categories!)
+    const gatewaySplits = splitOrderByGateway(enrichedOrder);
     
     if (Object.keys(gatewaySplits).length === 0) {
       if (logger?.warn) {
@@ -176,7 +267,7 @@ export const trackMetaCapiPurchase = async (order, additionalData = {}, debug = 
     // Calculate costs for each split
     const splitsWithCosts = {};
     for (const [gateway, split] of Object.entries(gatewaySplits)) {
-      const costs = allocateCostsForSplit(order, split.items);
+      const costs = allocateCostsForSplit(enrichedOrder, split.items);
       splitsWithCosts[gateway] = {
         ...split,
         costs
@@ -184,13 +275,13 @@ export const trackMetaCapiPurchase = async (order, additionalData = {}, debug = 
     }
 
     // Reconcile penny differences
-    const reconciledSplits = reconcilePennyDifferences(order, splitsWithCosts);
+    const reconciledSplits = reconcilePennyDifferences(enrichedOrder, splitsWithCosts);
 
     // Send to each gateway in parallel
     const sendPromises = Object.entries(reconciledSplits).map(async ([gatewayKey, split]) => {
       try {
         const payload = {
-          order_id: order.id,
+          order_id: enrichedOrder.id,
           gateway: gatewayKey,
           value: split.costs.total,
           subtotal: split.costs.subtotal,
@@ -198,10 +289,10 @@ export const trackMetaCapiPurchase = async (order, additionalData = {}, debug = 
           shipping: split.costs.shipping,
           tax: split.costs.tax,
           discount: split.costs.discount,
-          currency: order.currency || 'CAD',
+          currency: enrichedOrder.currency || 'USD',
           content_ids: split.content_ids,
           num_items: split.num_items,
-          order_data: order,
+          order_data: enrichedOrder,
           ...additionalData
         };
 

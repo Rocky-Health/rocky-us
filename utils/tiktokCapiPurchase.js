@@ -1,6 +1,7 @@
 import { logger } from '@/utils/devLogger';
 import { TIKTOK_CAPI_GATEWAYS } from './tiktokCapiConfig';
 import { splitOrderByGateway, allocateCostsForSplit, reconcilePennyDifferences } from './metaCapiPurchase';
+import { enrichOrderWithProductData } from './enrichOrderData';
 
 /**
  * Track purchase across all relevant TikTok pixels
@@ -8,17 +9,48 @@ import { splitOrderByGateway, allocateCostsForSplit, reconcilePennyDifferences }
  */
 export const trackTikTokCapiPurchase = async (order, additionalData = {}, debug = true) => {
   if (!order || !order.id) {
+    console.error('[TikTok CAPI] Invalid order data - missing order or order.id');
     if (logger?.error) logger.error('[TikTok CAPI] Invalid order data');
     return;
   }
 
   try {
+    console.log(`[TikTok CAPI] ▶️ Starting tracking for order ${order.id}`);
+    console.log(`[TikTok CAPI] Order has ${order.line_items?.length || 0} line items`);
+    
     if (debug && logger?.log) {
       logger.log('[TikTok CAPI] Processing purchase for order:', order.id);
     }
 
-    // Reuse the exact same split logic as Meta
-    const gatewaySplits = splitOrderByGateway(order);
+    // **CRITICAL**: Enrich order with product categories BEFORE categorization
+    // Without this, all products will be categorized as OTHERS
+    if (logger?.log) {
+      logger.log(`[TikTok CAPI] Enriching order ${order.id} with product categories...`);
+    }
+    console.log(`[TikTok CAPI] 🔍 Enriching order ${order.id} with product categories...`);
+    
+    const enrichedOrder = await enrichOrderWithProductData(order, { 
+      debug: debug 
+    });
+    
+    if (!enrichedOrder) {
+      console.error('[TikTok CAPI] ❌ Enrichment returned null/undefined');
+      return;
+    }
+    
+    if (logger?.log) {
+      logger.log(`[TikTok CAPI] Order ${order.id} enrichment complete`);
+    }
+    console.log(`[TikTok CAPI] ✅ Order ${order.id} enrichment complete`);
+    
+    // Log enrichment results for debugging
+    const itemsWithCategories = enrichedOrder.line_items?.filter(
+      item => item.categories && Array.isArray(item.categories) && item.categories.length > 0
+    ).length || 0;
+    console.log(`[TikTok CAPI] ${itemsWithCategories}/${enrichedOrder.line_items?.length || 0} items have categories`);
+
+    // Reuse the exact same split logic as Meta (now with categories!)
+    const gatewaySplits = splitOrderByGateway(enrichedOrder);
     
     if (Object.keys(gatewaySplits).length === 0) {
       if (logger?.warn) logger.warn('[TikTok CAPI] No items to track for order:', order.id);
@@ -30,21 +62,21 @@ export const trackTikTokCapiPurchase = async (order, additionalData = {}, debug 
     for (const [gateway, split] of Object.entries(gatewaySplits)) {
       if (!TIKTOK_CAPI_GATEWAYS[gateway]) continue;
 
-      const costs = allocateCostsForSplit(order, split.items);
+      const costs = allocateCostsForSplit(enrichedOrder, split.items);
       splitsWithCosts[gateway] = { ...split, costs };
     }
 
     // Reconcile pennies
-    const reconciledSplits = reconcilePennyDifferences(order, splitsWithCosts);
+    const reconciledSplits = reconcilePennyDifferences(enrichedOrder, splitsWithCosts);
 
     // Send to each gateway in parallel
     const sendPromises = Object.entries(reconciledSplits).map(async ([gatewayKey, split]) => {
       try {
         const payload = {
-          order_id: order.id,
+          order_id: enrichedOrder.id,
           gateway: gatewayKey,
           value: split.costs.total,
-          currency: order.currency || 'CAD',
+          currency: enrichedOrder.currency || 'USD',
           contents: split.items.map(item => ({
             content_id: item.sku || item.product_id?.toString(),
             content_type: 'product',
@@ -52,7 +84,7 @@ export const trackTikTokCapiPurchase = async (order, additionalData = {}, debug 
             quantity: parseInt(item.quantity) || 1,
             price: parseFloat(item.subtotal) || 0
           })),
-          order_data: order,
+          order_data: enrichedOrder,
           ...additionalData
         };
 
