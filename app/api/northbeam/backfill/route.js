@@ -60,8 +60,8 @@ const convertToISO3166Alpha3 = (countryCode) => {
     return code;
   }
   
-  // Convert 2-letter to 3-letter, default to CAN if not found
-  return countryMap[code] || "CAN";
+  // Convert 2-letter to 3-letter, default to USA for US platform
+  return countryMap[code] || "USA";
 };
 
 /**
@@ -183,7 +183,7 @@ export async function POST(req) {
         customer_id: canonicalCustomerId || String(order?.customer_id || email || ""),
         customer_id_canonical: canonicalCustomerId || String(order?.customer_id || email || ""),
         time_of_purchase: new Date(timeCandidate || order?.date_created || Date.now()).toISOString(),
-        currency: order?.currency || "CAD",
+        currency: order?.currency || "USD",
         purchase_total: purchaseTotal,
         tax,
         shipping_cost: shipping,

@@ -59,8 +59,8 @@ const convertToISO3166Alpha3 = (countryCode) => {
     return code;
   }
   
-  // Convert 2-letter to 3-letter, default to CAN if not found
-  return countryMap[code] || "CAN";
+  // Convert 2-letter to 3-letter, default to USA for US platform
+  return countryMap[code] || "USA";
 };
 
 /**
@@ -309,10 +309,10 @@ export async function POST(req) {
     // Build the Northbeam API payload - send as array directly
     const payload = [
       {
-        order_id: order.order_id,
-        customer_id: derivedCustomerId, // Ensure customer_id is a string
-        time_of_purchase: timeOfPurchaseIso, // Ensure proper ISO format
-        currency: order.currency || "CAD",
+      order_id: order.order_id,
+      customer_id: derivedCustomerId, // Ensure customer_id is a string
+      time_of_purchase: timeOfPurchaseIso, // Ensure proper ISO format
+      currency: order.currency || "USD",
         purchase_total: parseFloat(order.purchase_total) || 0, // Keep in dollars, not cents
         tax: parseFloat(order.tax) || 0, // Keep in dollars, not cents
         shipping_cost: parseFloat(order.shipping_cost) || 0,
