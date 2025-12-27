@@ -246,8 +246,8 @@ export const analyticsService = {
       const billingPhone = order?.billing?.phone || "";
       const [billing_email_hash, billing_phone_hash] = await Promise.all([
         hashEmail(billingEmail),
-        // Always default to CA for normalization safety
-        hashPhone(billingPhone, "CA"),
+        // Always default to US for normalization safety (US platform)
+        hashPhone(billingPhone, "US"),
       ]);
 
       const additionalData = {
