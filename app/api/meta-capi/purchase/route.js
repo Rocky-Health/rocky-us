@@ -219,7 +219,7 @@ export async function POST(req) {
     let city = billing.city || '';
     let state = billing.state || '';
     let zip = billing.postcode || '';
-    let country = billing.country || 'CA';
+    let country = billing.country || 'US';
 
     // Fetch customer profile for enhanced data (gender, DOB)
     let customerData = null;
@@ -303,7 +303,7 @@ export async function POST(req) {
     // Build custom_data object
     const customData = {
       value: parseFloat(value),
-      currency: currency || 'CAD',
+      currency: currency || 'USD',
       content_ids: content_ids || [],
       content_type: 'item',
       num_items: num_items || 0,

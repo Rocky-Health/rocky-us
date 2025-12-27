@@ -138,7 +138,7 @@ export async function POST(req) {
       context: contextObj,
       properties: {
         contents: contents || [],
-        currency: currency || 'CAD',
+        currency: currency || 'USD',
         value: parseFloat(value)
       }
     };
