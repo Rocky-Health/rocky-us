@@ -66,8 +66,7 @@ const CheckoutPageWrapper = () => {
                     theme: "stripe",
                 },
                 paymentMethodCreation: "manual", // Required for createPaymentMethod with PaymentElement
-                // Configure payment methods at the Elements level
-                paymentMethodTypes: ["card", "link"], // Allow card and link payments
+                paymentMethodTypes: ["card"],
             }}
         >
             <CheckoutPageContent />
