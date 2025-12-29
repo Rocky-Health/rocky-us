@@ -118,6 +118,9 @@ const CheckoutPageContent = () => {
     const [showPaymentProcessingPopup, setShowPaymentProcessingPopup] = useState(false);
     const [paymentError, setPaymentError] = useState(null);
     const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+    
+    // Store payment retry data
+    const [retryPaymentData, setRetryPaymentData] = useState(null);
 
     // Initialize checkout validation hook
     const {
@@ -1186,6 +1189,463 @@ const CheckoutPageContent = () => {
         loadCheckoutData();
     }, []);
 
+    // Reusable function to process Stripe payment (from step 2 onwards - after order creation)
+    const processStripePayment = async (orderId, orderKey, amountInCents, dataToSend) => {
+        try {
+            // CRITICAL: elements.submit() must be called before createPaymentMethod()
+            // This validates the card details and prepares the payment element
+            logger.log("Validating card details with elements.submit()...");
+            const { error: submitError } = await stripeElements.submit();
+            
+            if (submitError) {
+                // Card validation failed
+                logger.error("Card validation failed:", submitError.message);
+                throw new Error(submitError.message || "Please enter valid card details.");
+            }
+            
+            logger.log("✅ Card details validated - proceeding with payment method creation");
+            
+            // Step 2: Get the payment method from PaymentElement
+            logger.log("Getting payment method from PaymentElement...");
+            const { error: pmError, paymentMethod } =
+                await stripe.createPaymentMethod({
+                    elements: stripeElements,
+                    params: {
+                        billing_details: {
+                            name: `${dataToSend.firstName} ${dataToSend.lastName}`,
+                            email: dataToSend.email,
+                            phone: dataToSend.phone,
+                            address: {
+                                line1: dataToSend.addressOne,
+                                line2: dataToSend.addressTwo || "",
+                                city: dataToSend.city,
+                                state: dataToSend.state,
+                                postal_code: dataToSend.postcode,
+                                country: dataToSend.country,
+                            },
+                        },
+                    },
+                });
+
+            if (pmError) {
+                throw new Error(pmError.message);
+            }
+
+            if (!paymentMethod) {
+                throw new Error("Failed to create payment method");
+            }
+
+            logger.log("✅ Payment method created:", paymentMethod.id);
+
+            // Step 3: Create PaymentIntent with manual capture using the payment method
+            logger.log("Creating PaymentIntent with manual capture...");
+            const intentResponse = await fetch(
+                "/api/create-payment-intent",
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        orderId,
+                        amount: amountInCents,
+                        paymentMethodId: paymentMethod.id,
+                        customerEmail: dataToSend.email,
+                        customerName: `${dataToSend.firstName} ${dataToSend.lastName}`,
+                    }),
+                }
+            );
+
+            const intentResult = await intentResponse.json();
+
+            // Initialize paymentIntent variable
+            let paymentIntent = null;
+            const stripeCustomerId = intentResult.stripeCustomerId || null;
+
+            // Check if payment requires 3D Secure authentication
+            if (intentResult.requiresAction && intentResult.clientSecret) {
+                logger.log("⚠️ Payment requires 3D Secure authentication - showing 3DS modal");
+                
+                // Show 3DS authentication modal using stripe.confirmPayment()
+                const { error: confirmError, paymentIntent: confirmedIntent } = 
+                    await stripe.confirmPayment({
+                        elements: stripeElements,
+                        clientSecret: intentResult.clientSecret,
+                        confirmParams: {
+                            return_url: `${window.location.origin}/checkout/order-received/${orderId}?key=${orderKey}${buildFlowQueryString()}`,
+                        },
+                        redirect: "if_required", // Only redirect if absolutely necessary
+                    });
+
+                if (confirmError) {
+                    // User cancelled or 3DS failed
+                    logger.error("❌ 3D Secure authentication failed:", confirmError.message);
+                    throw new Error(
+                        confirmError.message || "3D Secure authentication failed. Please try again."
+                    );
+                }
+
+                // Check if payment is now authorized after 3DS completion
+                if (!confirmedIntent) {
+                    throw new Error("Payment authentication incomplete. Please try again.");
+                }
+
+                // Use the confirmed paymentIntent
+                paymentIntent = confirmedIntent;
+                
+                // Verify payment is authorized
+                if (paymentIntent.status !== "requires_capture" && paymentIntent.status !== "succeeded") {
+                    logger.warn("⚠️ PaymentIntent status after 3DS:", paymentIntent.status);
+                    throw new Error(
+                        `Payment authentication incomplete. Status: ${paymentIntent.status}`
+                    );
+                }
+
+                logger.log("✅ 3D Secure authentication completed successfully");
+            } else if (intentResult.requiresAction) {
+                // requiresAction but no clientSecret - this shouldn't happen
+                logger.error("❌ Payment requires 3DS but no clientSecret provided");
+                throw new Error(
+                    "3D Secure authentication is required but could not be initiated. Please try again."
+                );
+            } else {
+                // No 3DS required - use paymentIntent from response
+                // Check if payment is incomplete (3DS started but not completed)
+                if (intentResult.paymentIntent?.status === "incomplete") {
+                    logger.error("❌ Payment is incomplete - 3DS authentication was not completed");
+                    throw new Error(
+                        "Payment incomplete. 3D Secure authentication was not completed. Please try again."
+                    );
+                }
+
+                if (!intentResult.success) {
+                    throw new Error(
+                        intentResult.error ||
+                        "Failed to create payment intent"
+                    );
+                }
+
+                paymentIntent = intentResult.paymentIntent;
+                
+                // Only log success if payment is actually authorized
+                if (paymentIntent.status === "requires_capture" || paymentIntent.status === "succeeded") {
+                    logger.log(
+                        "✅ PaymentIntent created and authorized:",
+                        paymentIntent.id
+                    );
+                } else {
+                    logger.warn(
+                        "⚠️ PaymentIntent created but not authorized. Status:",
+                        paymentIntent.status
+                    );
+                    throw new Error(
+                        `Payment not authorized. Status: ${paymentIntent.status}`
+                    );
+                }
+            }
+            
+            // Ensure paymentIntent is set
+            if (!paymentIntent) {
+                throw new Error("Payment intent not available. Please try again.");
+            }
+            
+            if (stripeCustomerId) {
+                logger.log("✅ Stripe Customer ID:", stripeCustomerId);
+            }
+
+            // Extract payment details for WooCommerce metadata
+            const paymentMethodId = paymentIntent?.payment_method;
+            const chargeId = paymentIntent?.latest_charge;
+            const currency =
+                paymentIntent?.currency?.toUpperCase() || "USD";
+
+            // Try to get card details if available
+            const cardBrand =
+                paymentIntent?.payment_method_details?.card?.brand;
+            const cardLast4 =
+                paymentIntent?.payment_method_details?.card?.last4;
+
+            logger.log("Payment details for WooCommerce:", {
+                paymentIntentId: paymentIntent?.id,
+                chargeId,
+                paymentMethodId,
+                currency,
+                cardBrand,
+                cardLast4,
+                stripeCustomerId,
+            });
+
+            // Hide payment processing modal and show success
+            setIsProcessingPayment(false);
+            setShowPaymentProcessingPopup(false);
+            setPaymentError(null);
+            setRetryPaymentData(null); // Clear retry data on success
+
+            // Show success toast
+            toast.success("Payment successful!");
+
+            // ========================================
+            // ASYNC: Update customer data AFTER payment success (non-blocking)
+            // These updates happen in the background and don't block user flow
+            // ========================================
+            (async () => {
+                try {
+                    logger.log("Updating customer data asynchronously (non-blocking)...");
+                    const useShippingAddress =
+                        formData.shipping_address.ship_to_different_address;
+
+                    const customerUpdateData = {
+                        billing_address: {
+                            first_name: formData.billing_address.first_name || "",
+                            last_name: formData.billing_address.last_name || "",
+                            company: formData.billing_address.company || "",
+                            address_1: formData.billing_address.address_1 || "",
+                            address_2: formData.billing_address.address_2 || "",
+                            city: formData.billing_address.city || "",
+                            state: formData.billing_address.state || "",
+                            postcode: formData.billing_address.postcode || "",
+                            country: formData.billing_address.country || "US",
+                            email: formData.billing_address.email || "",
+                            phone: formData.billing_address.phone || "",
+                        },
+                        shipping_address: useShippingAddress
+                            ? {
+                                first_name:
+                                    formData.shipping_address.first_name || "",
+                                last_name:
+                                    formData.shipping_address.last_name || "",
+                                company: formData.shipping_address.company || "",
+                                address_1:
+                                    formData.shipping_address.address_1 || "",
+                                address_2:
+                                    formData.shipping_address.address_2 || "",
+                                city: formData.shipping_address.city || "",
+                                state: formData.shipping_address.state || "",
+                                postcode:
+                                    formData.shipping_address.postcode || "",
+                                country:
+                                    formData.shipping_address.country || "US",
+                                phone: formData.shipping_address.phone || "",
+                            }
+                            : {
+                                first_name:
+                                    formData.billing_address.first_name || "",
+                                last_name:
+                                    formData.billing_address.last_name || "",
+                                company: formData.billing_address.company || "",
+                                address_1:
+                                    formData.billing_address.address_1 || "",
+                                address_2:
+                                    formData.billing_address.address_2 || "",
+                                city: formData.billing_address.city || "",
+                                state: formData.billing_address.state || "",
+                                postcode: formData.billing_address.postcode || "",
+                                country: formData.billing_address.country || "US",
+                                phone: formData.billing_address.phone || "",
+                            },
+                    };
+
+                    const updateResponse = await fetch(
+                        "/api/cart/update-customer",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(customerUpdateData),
+                        }
+                    );
+
+                    const updateResult = await updateResponse.json();
+
+                    if (updateResponse.ok && !updateResult.error) {
+                        logger.log(
+                            "✅ Customer cart data updated successfully (async)"
+                        );
+
+                        // Also update the customer's permanent profile in WooCommerce
+                        try {
+                            logger.log("Updating customer profile permanently (async)...");
+
+                            // Include date_of_birth in the profile update
+                            const profileData = {
+                                ...customerUpdateData,
+                                date_of_birth:
+                                    formData.billing_address.date_of_birth ||
+                                    formData.date_of_birth ||
+                                    "",
+                            };
+
+                            logger.log("Profile data with DOB:", {
+                                date_of_birth: profileData.date_of_birth,
+                                phone: profileData.billing_address?.phone,
+                            });
+
+                            const profileUpdateResponse = await fetch(
+                                "/api/update-customer-profile",
+                                {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                    },
+                                    body: JSON.stringify(profileData),
+                                }
+                            );
+
+                            const profileUpdateResult =
+                                await profileUpdateResponse.json();
+
+                            logger.log("=== PROFILE UPDATE API RESPONSE (async) ===", {
+                                status: profileUpdateResponse.status,
+                                ok: profileUpdateResponse.ok,
+                                response: profileUpdateResult,
+                            });
+
+                            if (
+                                profileUpdateResponse.ok &&
+                                profileUpdateResult.success
+                            ) {
+                                logger.log(
+                                    "✅ Customer profile updated permanently (async) ✓"
+                                );
+                                logger.log(
+                                    "Updated customer data:",
+                                    profileUpdateResult.data
+                                );
+
+                                // Check metadata update status
+                                if (profileUpdateResult.metadata_update) {
+                                    logger.log(
+                                        "=== METADATA UPDATE STATUS (async) ===",
+                                        profileUpdateResult.metadata_update
+                                    );
+
+                                    if (
+                                        profileUpdateResult.metadata_update
+                                            .attempted
+                                    ) {
+                                        if (
+                                            profileUpdateResult.metadata_update
+                                                .success
+                                        ) {
+                                            logger.log(
+                                                "✓ User metadata (DOB, phone) updated successfully (async)"
+                                            );
+                                        } else {
+                                            logger.error(
+                                                "✗ User metadata update FAILED (async):",
+                                                profileUpdateResult.metadata_update
+                                                    .error
+                                            );
+                                        }
+                                    } else {
+                                        logger.warn(
+                                            "⚠ Metadata update was not attempted (no DOB or phone provided) (async)"
+                                        );
+                                    }
+                                }
+                            } else {
+                                logger.warn(
+                                    "Failed to update customer profile (async):",
+                                    profileUpdateResult.error
+                                );
+                            }
+                        } catch (profileError) {
+                            logger.error(
+                                "Error updating customer profile (async):",
+                                profileError
+                            );
+                            // Don't throw - these are non-critical operations
+                        }
+                    } else {
+                        logger.warn(
+                            "Failed to update customer data (async):",
+                            updateResult.error
+                        );
+                        // Don't throw - these are non-critical operations
+                    }
+                } catch (error) {
+                    logger.error(
+                        "Error updating customer data (async):",
+                        error
+                    );
+                    // Don't throw - these are non-critical operations
+                }
+            })(); // End of async IIFE - fire and forget
+
+            // Step 5: Update order status asynchronously (non-blocking)
+            logger.log("Updating order status asynchronously...");
+            fetch("/api/update-order-status", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    orderId,
+                    status: "on-hold", // Keep as on-hold for manual capture
+                    paymentIntentId:
+                        paymentIntent?.id ||
+                        intentResult.paymentIntentId,
+                    chargeId: chargeId,
+                    paymentMethodId: paymentMethodId, // Critical for WC to capture
+                    stripeCustomerId: stripeCustomerId, // Stripe customer ID
+                    paymentMethod: "stripe_cc",
+                    currency: currency,
+                    cardBrand: cardBrand,
+                    cardLast4: cardLast4,
+                }),
+            })
+                .then((updateResponse) => updateResponse.json())
+                .then((updateResult) => {
+                    if (updateResult.success) {
+                        logger.log("✅ Order updated successfully");
+                    } else {
+                        logger.error(
+                            "Failed to update order status:",
+                            updateResult.error
+                        );
+                        // Don't block user flow - order was created and payment processed
+                    }
+                })
+                .catch((updateError) => {
+                    logger.error(
+                        "Error updating order status:",
+                        updateError
+                    );
+                    // Don't block user flow - order was created and payment processed
+                });
+
+            // Empty cart
+            try {
+                const { emptyCart } = await import(
+                    "@/lib/cart/cartService"
+                );
+                await emptyCart();
+                logger.log("Cart emptied successfully");
+            } catch (error) {
+                logger.error("Error emptying cart:", error);
+            }
+
+            // Redirect to success page
+            router.push(
+                `/checkout/order-received/${orderId}?key=${orderKey}${buildFlowQueryString()}`
+            );
+        } catch (error) {
+            logger.error("❌ Stripe payment processing error:", error);
+            // Store retry data for retry functionality
+            setRetryPaymentData({
+                orderId,
+                orderKey,
+                amountInCents,
+                dataToSend,
+            });
+            // Show error in modal
+            setIsProcessingPayment(false);
+            setPaymentError(
+                error.message || "Payment failed. Please try again."
+            );
+            setSubmitting(false);
+            // Keep modal open to show error and retry option
+            throw error; // Re-throw to be caught by caller
+        }
+    };
+
     const handleSubmit = async () => {
         try {
             setSubmitting(true);
@@ -2106,359 +2566,12 @@ const CheckoutPageContent = () => {
                         return;
                     }
 
-                    // Step 2: Get the payment method from PaymentElement
-                    // Note: PaymentElement was already submitted during validation above
-                    logger.log("Getting payment method from PaymentElement...");
-                    const { error: pmError, paymentMethod } =
-                        await stripe.createPaymentMethod({
-                            elements: stripeElements,
-                            params: {
-                                billing_details: {
-                                    name: `${dataToSend.firstName} ${dataToSend.lastName}`,
-                                    email: dataToSend.email,
-                                    phone: dataToSend.phone,
-                                    address: {
-                                        line1: dataToSend.addressOne,
-                                        line2: dataToSend.addressTwo || "",
-                                        city: dataToSend.city,
-                                        state: dataToSend.state,
-                                        postal_code: dataToSend.postcode,
-                                        country: dataToSend.country,
-                                    },
-                                },
-                            },
-                        });
-
-                    if (pmError) {
-                        throw new Error(pmError.message);
-                    }
-
-                    if (!paymentMethod) {
-                        throw new Error("Failed to create payment method");
-                    }
-
-                    logger.log("✅ Payment method created:", paymentMethod.id);
-
-                    // Step 4: Create PaymentIntent with manual capture using the payment method
-                    logger.log("Creating PaymentIntent with manual capture...");
-                    const intentResponse = await fetch(
-                        "/api/create-payment-intent",
-                        {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                orderId,
-                                amount: amountInCents,
-                                paymentMethodId: paymentMethod.id,
-                                customerEmail: dataToSend.email,
-                                customerName: `${dataToSend.firstName} ${dataToSend.lastName}`,
-                            }),
-                        }
-                    );
-
-                    const intentResult = await intentResponse.json();
-
-                    if (!intentResult.success) {
-                        throw new Error(
-                            intentResult.error ||
-                            "Failed to create payment intent"
-                        );
-                    }
-
-                    const paymentIntent = intentResult.paymentIntent;
-                    const stripeCustomerId = intentResult.stripeCustomerId || null;
-                    logger.log(
-                        "✅ PaymentIntent created and confirmed:",
-                        paymentIntent.id
-                    );
-                    if (stripeCustomerId) {
-                        logger.log("✅ Stripe Customer ID:", stripeCustomerId);
-                    }
-
-                    // Extract payment details for WooCommerce metadata
-                    const paymentMethodId = paymentIntent?.payment_method;
-                    const chargeId = paymentIntent?.latest_charge;
-                    const currency =
-                        paymentIntent?.currency?.toUpperCase() || "USD";
-
-                    // Try to get card details if available
-                    const cardBrand =
-                        paymentIntent?.payment_method_details?.card?.brand;
-                    const cardLast4 =
-                        paymentIntent?.payment_method_details?.card?.last4;
-
-                    logger.log("Payment details for WooCommerce:", {
-                        paymentIntentId: paymentIntent?.id,
-                        chargeId,
-                        paymentMethodId,
-                        currency,
-                        cardBrand,
-                        cardLast4,
-                        stripeCustomerId,
-                    });
-
-                    // Hide payment processing modal and show success
-                    setIsProcessingPayment(false);
-                    setShowPaymentProcessingPopup(false);
-                    setPaymentError(null);
-
-                    // Show success toast
-                    toast.success("Payment successful!");
-
-                    // ========================================
-                    // ASYNC: Update customer data AFTER payment success (non-blocking)
-                    // These updates happen in the background and don't block user flow
-                    // ========================================
-                    (async () => {
-                        try {
-                            logger.log("Updating customer data asynchronously (non-blocking)...");
-                            const useShippingAddress =
-                                formData.shipping_address.ship_to_different_address;
-
-                            const customerUpdateData = {
-                                billing_address: {
-                                    first_name: formData.billing_address.first_name || "",
-                                    last_name: formData.billing_address.last_name || "",
-                                    company: formData.billing_address.company || "",
-                                    address_1: formData.billing_address.address_1 || "",
-                                    address_2: formData.billing_address.address_2 || "",
-                                    city: formData.billing_address.city || "",
-                                    state: formData.billing_address.state || "",
-                                    postcode: formData.billing_address.postcode || "",
-                                    country: formData.billing_address.country || "US",
-                                    email: formData.billing_address.email || "",
-                                    phone: formData.billing_address.phone || "",
-                                },
-                                shipping_address: useShippingAddress
-                                    ? {
-                                        first_name:
-                                            formData.shipping_address.first_name || "",
-                                        last_name:
-                                            formData.shipping_address.last_name || "",
-                                        company: formData.shipping_address.company || "",
-                                        address_1:
-                                            formData.shipping_address.address_1 || "",
-                                        address_2:
-                                            formData.shipping_address.address_2 || "",
-                                        city: formData.shipping_address.city || "",
-                                        state: formData.shipping_address.state || "",
-                                        postcode:
-                                            formData.shipping_address.postcode || "",
-                                        country:
-                                            formData.shipping_address.country || "US",
-                                        phone: formData.shipping_address.phone || "",
-                                    }
-                                    : {
-                                        first_name:
-                                            formData.billing_address.first_name || "",
-                                        last_name:
-                                            formData.billing_address.last_name || "",
-                                        company: formData.billing_address.company || "",
-                                        address_1:
-                                            formData.billing_address.address_1 || "",
-                                        address_2:
-                                            formData.billing_address.address_2 || "",
-                                        city: formData.billing_address.city || "",
-                                        state: formData.billing_address.state || "",
-                                        postcode: formData.billing_address.postcode || "",
-                                        country: formData.billing_address.country || "US",
-                                        phone: formData.billing_address.phone || "",
-                                    },
-                            };
-
-                            const updateResponse = await fetch(
-                                "/api/cart/update-customer",
-                                {
-                                    method: "POST",
-                                    headers: {
-                                        "Content-Type": "application/json",
-                                    },
-                                    body: JSON.stringify(customerUpdateData),
-                                }
-                            );
-
-                            const updateResult = await updateResponse.json();
-
-                            if (updateResponse.ok && !updateResult.error) {
-                                logger.log(
-                                    "✅ Customer cart data updated successfully (async)"
-                                );
-
-                                // Also update the customer's permanent profile in WooCommerce
-                                try {
-                                    logger.log("Updating customer profile permanently (async)...");
-
-                                    // Include date_of_birth in the profile update
-                                    const profileData = {
-                                        ...customerUpdateData,
-                                        date_of_birth:
-                                            formData.billing_address.date_of_birth ||
-                                            formData.date_of_birth ||
-                                            "",
-                                    };
-
-                                    logger.log("Profile data with DOB:", {
-                                        date_of_birth: profileData.date_of_birth,
-                                        phone: profileData.billing_address?.phone,
-                                    });
-
-                                    const profileUpdateResponse = await fetch(
-                                        "/api/update-customer-profile",
-                                        {
-                                            method: "POST",
-                                            headers: {
-                                                "Content-Type": "application/json",
-                                            },
-                                            body: JSON.stringify(profileData),
-                                        }
-                                    );
-
-                                    const profileUpdateResult =
-                                        await profileUpdateResponse.json();
-
-                                    logger.log("=== PROFILE UPDATE API RESPONSE (async) ===", {
-                                        status: profileUpdateResponse.status,
-                                        ok: profileUpdateResponse.ok,
-                                        response: profileUpdateResult,
-                                    });
-
-                                    if (
-                                        profileUpdateResponse.ok &&
-                                        profileUpdateResult.success
-                                    ) {
-                                        logger.log(
-                                            "✅ Customer profile updated permanently (async) ✓"
-                                        );
-                                        logger.log(
-                                            "Updated customer data:",
-                                            profileUpdateResult.data
-                                        );
-
-                                        // Check metadata update status
-                                        if (profileUpdateResult.metadata_update) {
-                                            logger.log(
-                                                "=== METADATA UPDATE STATUS (async) ===",
-                                                profileUpdateResult.metadata_update
-                                            );
-
-                                            if (
-                                                profileUpdateResult.metadata_update
-                                                    .attempted
-                                            ) {
-                                                if (
-                                                    profileUpdateResult.metadata_update
-                                                        .success
-                                                ) {
-                                                    logger.log(
-                                                        "✓ User metadata (DOB, phone) updated successfully (async)"
-                                                    );
-                                                } else {
-                                                    logger.error(
-                                                        "✗ User metadata update FAILED (async):",
-                                                        profileUpdateResult.metadata_update
-                                                            .error
-                                                    );
-                                                }
-                                            } else {
-                                                logger.warn(
-                                                    "⚠ Metadata update was not attempted (no DOB or phone provided) (async)"
-                                                );
-                                            }
-                                        }
-                                    } else {
-                                        logger.warn(
-                                            "Failed to update customer profile (async):",
-                                            profileUpdateResult.error
-                                        );
-                                    }
-                                } catch (profileError) {
-                                    logger.error(
-                                        "Error updating customer profile (async):",
-                                        profileError
-                                    );
-                                    // Don't throw - these are non-critical operations
-                                }
-                            } else {
-                                logger.warn(
-                                    "Failed to update customer data (async):",
-                                    updateResult.error
-                                );
-                                // Don't throw - these are non-critical operations
-                            }
-                        } catch (error) {
-                            logger.error(
-                                "Error updating customer data (async):",
-                                error
-                            );
-                            // Don't throw - these are non-critical operations
-                        }
-                    })(); // End of async IIFE - fire and forget
-
-                    // Step 5: Update order status asynchronously (non-blocking)
-                    logger.log("Updating order status asynchronously...");
-                    fetch("/api/update-order-status", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            orderId,
-                            status: "on-hold",
-                            paymentIntentId:
-                                paymentIntent?.id ||
-                                intentResult.paymentIntentId,
-                            chargeId: chargeId,
-                            paymentMethodId: paymentMethodId, // Critical for WC to capture
-                            stripeCustomerId: stripeCustomerId, // Stripe customer ID
-                            paymentMethod: "stripe_cc",
-                            currency: currency,
-                            cardBrand: cardBrand,
-                            cardLast4: cardLast4,
-                        }),
-                    })
-                        .then((updateResponse) => updateResponse.json())
-                        .then((updateResult) => {
-                            if (updateResult.success) {
-                                logger.log("✅ Order updated successfully");
-                            } else {
-                                logger.error(
-                                    "Failed to update order status:",
-                                    updateResult.error
-                                );
-                                // Don't block user flow - order was created and payment processed
-                            }
-                        })
-                        .catch((updateError) => {
-                            logger.error(
-                                "Error updating order status:",
-                                updateError
-                            );
-                            // Don't block user flow - order was created and payment processed
-                        });
-
-                    // Empty cart
-                    try {
-                        const { emptyCart } = await import(
-                            "@/lib/cart/cartService"
-                        );
-                        await emptyCart();
-                        logger.log("Cart emptied successfully");
-                    } catch (error) {
-                        logger.error("Error emptying cart:", error);
-                    }
-
-                    // Redirect to success page
-                    router.push(
-                        `/checkout/order-received/${orderId}?key=${orderKey}${buildFlowQueryString()}`
-                    );
+                    // Process payment using reusable function
+                    await processStripePayment(orderId, orderKey, amountInCents, dataToSend);
                     return;
                 } catch (error) {
                     logger.error("❌ Stripe payment error:", error);
-                    // Show error in modal
-                    setIsProcessingPayment(false);
-                    setPaymentError(
-                        error.message || "Payment failed. Please try again."
-                    );
-                    setSubmitting(false);
-                    // Keep modal open to show error and retry option
+                    // Error is already handled in processStripePayment
                     return;
                 }
             }
@@ -2649,12 +2762,35 @@ const CheckoutPageContent = () => {
                 }}
                 isProcessing={isProcessingPayment}
                 error={paymentError}
-                onRetry={() => {
-                    // Reset error state - user can try again by clicking place order
-                    setPaymentError(null);
-                    setIsProcessingPayment(false);
-                    setShowPaymentProcessingPopup(false);
-                    setSubmitting(false);
+                onRetry={async () => {
+                    // Retry payment processing if we have retry data
+                    if (retryPaymentData && stripe && stripeElements) {
+                        try {
+                            logger.log("🔄 Retrying payment...");
+                            // Clear error and show processing state
+                            setPaymentError(null);
+                            setIsProcessingPayment(true);
+                            setSubmitting(true);
+                            
+                            // Retry payment processing
+                            await processStripePayment(
+                                retryPaymentData.orderId,
+                                retryPaymentData.orderKey,
+                                retryPaymentData.amountInCents,
+                                retryPaymentData.dataToSend
+                            );
+                        } catch (error) {
+                            // Error is already handled in processStripePayment
+                            logger.error("❌ Retry failed:", error);
+                        }
+                    } else {
+                        // No retry data available - close modal and let user try from form
+                        logger.warn("No retry data available, closing modal");
+                        setPaymentError(null);
+                        setIsProcessingPayment(false);
+                        setShowPaymentProcessingPopup(false);
+                        setSubmitting(false);
+                    }
                 }}
             />
         </>

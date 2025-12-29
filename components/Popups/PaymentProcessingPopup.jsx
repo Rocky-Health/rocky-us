@@ -59,7 +59,7 @@ const PaymentProcessingModal = ({
               </>
             )}
 
-            {error && (
+            {error && !isProcessing && (
               <>
                 {/* Error Icon */}
                 <div className="flex justify-center mb-4">
@@ -73,8 +73,8 @@ const PaymentProcessingModal = ({
                   Payment Failed
                 </h2>
 
-                {/* Generic Error Message */}
-                <p className="text-gray-700 mb-6">
+                {/* Error Message */}
+                <p className="text-gray-700 mb-6 break-words">
                   {error}
                 </p>
 
