@@ -103,6 +103,17 @@ export async function POST(req) {
       });
     }
 
+    // Handle incomplete payments (3DS started but not completed)
+    if (paymentIntent.status === "incomplete") {
+      logger.log("⚠️ Payment is incomplete - 3DS authentication was not completed");
+      return NextResponse.json({
+        success: false,
+        error: "Payment incomplete. 3D Secure authentication was not completed.",
+        paymentIntentId: paymentIntent.id,
+        status: paymentIntent.status,
+      });
+    }
+
     // Handle failed payment
     if (
       paymentIntent.status === "canceled" ||
