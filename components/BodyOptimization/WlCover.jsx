@@ -36,11 +36,12 @@ const wlCoverData = {
   ],
 };
 
-const WlCover = ({ btnColor = null }) => {
+const WlCover = ({ btnColor = null, subtitle = null }) => {
   if (btnColor) wlCoverData.buttons[0].color = btnColor;
+  const data = subtitle ? { ...wlCoverData, subtitle } : wlCoverData;
   return (
     <>
-      <PageCover data={wlCoverData} items={items} />
+      <PageCover data={data} items={items} />
     </>
   );
 };
