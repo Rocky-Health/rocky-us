@@ -248,12 +248,28 @@ export async function POST(req) {
     }
 
     // Handle payments requiring action (e.g., 3D Secure)
+    // This is NOT a success - payment is not authorized yet
+    // Only return success after 3DS is completed and payment is authorized
     if (paymentIntent.status === "requires_action") {
+      logger.log("⚠️ Payment requires 3D Secure authentication - NOT authorized yet");
       return NextResponse.json({
-        success: true,
+        success: false,
+        requiresAction: true,
         paymentIntent: paymentIntent,
         clientSecret: paymentIntent.client_secret,
         stripeCustomerId: stripeCustomerId || null,
+        error: "3D Secure authentication required. Please complete authentication.",
+      });
+    }
+
+    // Handle incomplete payments (3DS started but not completed)
+    if (paymentIntent.status === "incomplete") {
+      logger.log("⚠️ Payment is incomplete - 3DS authentication was not completed");
+      return NextResponse.json({
+        success: false,
+        paymentIntent: paymentIntent,
+        stripeCustomerId: stripeCustomerId || null,
+        error: "Payment incomplete. 3D Secure authentication was not completed.",
       });
     }
 
