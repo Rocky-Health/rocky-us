@@ -14,7 +14,7 @@ export default function edPrelander() {
                 desktopBgImage="/ed-prelander-5/prelander-background.png"
                 mobileBgImage="/ed-prelander-5/ed.png"
                 title="Not Feeling as Hard? Let Rocky Help."
-                subTitle="Digital Healthcare for men without the wait time or stigma. Trusted by 350K+ Customers."
+                subTitle="Digital Healthcare without the wait time or stigma. Trusted by 350,000+ men."
                 btnText="Get Started →"
                 quizHref="/ed-flow"
             />
