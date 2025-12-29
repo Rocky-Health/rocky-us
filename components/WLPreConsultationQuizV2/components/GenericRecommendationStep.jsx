@@ -313,8 +313,6 @@ const GenericRecommendationStep = ({
           )}
         </div>
 
-
-
         {/* Alternative Products */}
         {showAlternatives &&
           showMoreOptions &&
@@ -355,7 +353,11 @@ const GenericRecommendationStep = ({
               </li>
               <li className="flex items-center  gap-3 border-b border-[#E2E2E1] pt-4 pb-4">
                 <span className="text-[#B4845A]">
-                  <CustomImage src="https://myrocky.b-cdn.net/WP%20Images/bo3/chat1.png" width="24" height="24" />
+                  <CustomImage
+                    src="https://myrocky.b-cdn.net/WP%20Images/bo3/chat1.png"
+                    width="24"
+                    height="24"
+                  />
                 </span>
                 <div>
                   <div className="font-medium text-[14px]">
@@ -387,13 +389,17 @@ const GenericRecommendationStep = ({
                 </span>
                 <div>
                   <div className="font-medium text-[14px]">
-                    Health Canada Approved Treatments
+                    FDA-Approved Treatments
                   </div>
                 </div>
               </li>
               <li className="flex items-center gap-3 border-b border-[#E2E2E1] pt-4 pb-4">
                 <span className="text-[#B4845A]">
-                  <CustomImage src="https://myrocky.b-cdn.net/WP%20Images/bo3/ibm1.png" width="30" height="30" />
+                  <CustomImage
+                    src="https://myrocky.b-cdn.net/WP%20Images/bo3/ibm1.png"
+                    width="30"
+                    height="30"
+                  />
                 </span>
                 <div>
                   <div className="font-medium text-[14px]">
@@ -403,7 +409,11 @@ const GenericRecommendationStep = ({
               </li>
               <li className="flex items-center gap-3 border-b border-[#E2E2E1] pt-4 pb-4">
                 <span className="text-[#B4845A]">
-                  <CustomImage src="https://myrocky.b-cdn.net/WP%20Images/bo3/ibm.png" width="24" height="24" />
+                  <CustomImage
+                    src="https://myrocky.b-cdn.net/WP%20Images/bo3/ibm.png"
+                    width="24"
+                    height="24"
+                  />
                 </span>
                 <div>
                   <div className="font-medium">
@@ -431,10 +441,11 @@ const GenericRecommendationStep = ({
           </button>
         )}
         <button
-          className={`w-full py-3 rounded-full font-medium ${isContinueEnabled
-            ? "bg-black text-white"
-            : "bg-gray-300 text-gray-500 cursor-not-allowed"
-            }`}
+          className={`w-full py-3 rounded-full font-medium ${
+            isContinueEnabled
+              ? "bg-black text-white"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+          }`}
           onClick={isContinueEnabled ? handleCheckout : null}
           disabled={!isContinueEnabled || isCheckoutLoading}
         >
