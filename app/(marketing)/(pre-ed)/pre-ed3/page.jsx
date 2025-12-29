@@ -12,7 +12,7 @@ export default function PreEd3() {
                 desktopBgImage="/ed-prelander-5/prelander-background.png"
                 mobileBgImage="/ed-prelander-5/ed.png"
                 title="Make her fall in love even more"
-                subTitle="Digital Healthcare for men without the wait time or stigma. Trusted by 350K+ Customers."
+                subTitle="Digital Healthcare without the wait time or stigma. Trusted by 350,000+ men."
                 btnText="Get Started →"
                 quizHref="/ed-pre-consultation-quiz"
             ></EdHeroSection>

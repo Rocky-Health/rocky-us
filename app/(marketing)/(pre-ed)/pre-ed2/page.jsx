@@ -12,7 +12,7 @@ export default function edPrelander2() {
                 desktopBgImage="/ed-prelander-5/prelander-background.png"
                 mobileBgImage="/ed-prelander-5/ed.png"
                 title="Reclaim your sex life. Hers, too."
-                subTitle="Digital Healthcare for men without the wait time or stigma. Trusted by 350K+ Customers."
+                subTitle="Digital Healthcare without the wait time or stigma. Trusted by 350,000+ men."
                 btnText="Get Started →"
                 quizHref="/ed-pre-consultation-quiz"
             ></EdHeroSection>
