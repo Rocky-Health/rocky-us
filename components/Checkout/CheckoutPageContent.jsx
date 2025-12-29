@@ -1967,7 +1967,34 @@ const CheckoutPageContent = () => {
                 try {
                     logger.log("Processing Stripe Elements payment...");
 
-                    // Step 1: Create pending order first to check the amount
+                    // VALIDATION: Check if Stripe Elements is ready and card details are entered
+                    if (!stripeElements) {
+                        toast.error("Payment form is not ready. Please wait and try again.");
+                        setSubmitting(false);
+                        return;
+                    }
+
+                    if (!stripe) {
+                        toast.error("Payment system is not loaded. Please refresh and try again.");
+                        setSubmitting(false);
+                        return;
+                    }
+
+                    // Validate that card details are entered before creating order
+                    logger.log("Validating card details are entered...");
+                    const { error: submitError } = await stripeElements.submit();
+                    
+                    if (submitError) {
+                        // Card validation failed - DO NOT create order
+                        logger.error("Card validation failed - no order created:", submitError.message);
+                        toast.error(submitError.message || "Please enter valid card details.");
+                        setSubmitting(false);
+                        return;
+                    }
+                    
+                    logger.log("✅ Card details validated - proceeding with order creation");
+
+                    // Step 1: Create pending order (card details are validated)
                     logger.log("Creating pending order...");
                     const orderResponse = await fetch(
                         "/api/create-pending-order",
@@ -2079,30 +2106,8 @@ const CheckoutPageContent = () => {
                         return;
                     }
 
-                    // Validate Stripe Elements is ready (only for paid orders)
-                    if (!stripeElements) {
-                        throw new Error(
-                            "Stripe payment form not ready. Please try again."
-                        );
-                    }
-
-                    // Validate Stripe instance is available (only for paid orders)
-                    if (!stripe) {
-                        throw new Error(
-                            "Stripe is not loaded. Please refresh and try again."
-                        );
-                    }
-
-                    // Step 2: Submit Payment Element to collect payment method
-                    logger.log("Submitting Payment Element...");
-                    const { error: submitError } =
-                        await stripeElements.submit();
-
-                    if (submitError) {
-                        throw new Error(submitError.message);
-                    }
-
-                    // Step 3: Get the payment method from PaymentElement
+                    // Step 2: Get the payment method from PaymentElement
+                    // Note: PaymentElement was already submitted during validation above
                     logger.log("Getting payment method from PaymentElement...");
                     const { error: pmError, paymentMethod } =
                         await stripe.createPaymentMethod({
