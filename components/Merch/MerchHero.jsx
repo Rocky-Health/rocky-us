@@ -92,7 +92,7 @@ function MerchHero() {
                 <div className="flex items-center space-x-3">
                   <FaCheckCircle className="text-[#AE7E56] text-[17.5px] w-[17.5px] h-[17.5px]" />
                   <span className="text-black font-normal text-[16px] leading-[140%] tracking-[0%]">
-                    Crafted in Canada
+                    Crafted in US
                   </span>
                 </div>
 
