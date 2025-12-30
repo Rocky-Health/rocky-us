@@ -49,7 +49,7 @@ export default function PharmacyServices() {
         </li>
       </ul>
       <p className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9] mb-6">
-        Delivery will be via Canada Post, Fedex, UPS, or DHL depending on
+        Delivery will be via US Post, Fedex, UPS, or DHL depending on
         location and availability. All items will be shipped via express tracked
         shipping to ensure the medication arrives safely and in a timely manner.
         Furthermore, unless stated otherwise, prices, shipments and risk of loss

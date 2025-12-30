@@ -100,7 +100,7 @@ const HairCrossSellPopup = ({
       price: "30.00",
       image: "/supplements/night-boost.webp",
       bulletPoints: [
-        "Made in Canada",
+        "Made in US",
         "Non GMO - no fillers or chemicals",
         "Third party tested for purity",
       ],
@@ -115,7 +115,7 @@ const HairCrossSellPopup = ({
       price: "36.00",
       image: "/supplements/mood.webp",
       bulletPoints: [
-        "Made in Canada",
+        "Made in US",
         "Non GMO - no fillers or chemicals",
         "Third party tested for purity",
       ],
@@ -130,7 +130,7 @@ const HairCrossSellPopup = ({
       price: "36.00",
       image: "/supplements/gut.webp",
       bulletPoints: [
-        "Made in Canada",
+        "Made in US",
         "Non GMO - no fillers or chemicals",
         "Third party tested for purity",
       ],

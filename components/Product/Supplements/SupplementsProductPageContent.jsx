@@ -179,8 +179,8 @@ const SupplementsProductPageContent = memo(({ clientProps, faqs }) => {
                     answer: "Essential T-Boost can be taken with or without food, depending on individual preferences. However, taking it with water may aid in faster absorption.",
                 },
                 {
-                    question: "Is Essential T-Boost Health-Canada Approved?",
-                    answer: "Yes- we are proud to offer supplements to our customers which are Health-Canada approved. This way we can guarantee safety & efficacy, and stand behind our product.",
+                    question: "Is Essential T-Boost Health-US Approved?",
+                    answer: "Yes- we are proud to offer supplements to our customers which are Health-US approved. This way we can guarantee safety & efficacy, and stand behind our product.",
                 },
                 {
                     question:
@@ -453,7 +453,7 @@ const SupplementsProductPageContent = memo(({ clientProps, faqs }) => {
                     secTitle: "Other supplements",
                     thirdTitle: "",
                     features: [
-                        "Made in Canada",
+                        "Made in US",
                         "Third party tested for purity",
                         "No Drowsiness",
                         "Non GMO without fillers",
@@ -708,7 +708,7 @@ const SupplementsProductPageContent = memo(({ clientProps, faqs }) => {
                 secTitle: "Other supplements",
                 thirdTitle: "",
                 features: [
-                    "Made in Canada",
+                    "Made in US",
                     "Third party tested for purity",
                     "No Drowsiness",
                     "Non GMO without fillers",
