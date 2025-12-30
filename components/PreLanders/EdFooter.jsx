@@ -5,12 +5,12 @@ const EdFooter = () => {
     <>
       <footer className="bg-black text-[#efe7df] p-4 text-center">
         <img
-          src="https://myrocky.b-cdn.net/WP%20Images/Sexual%20Health/webp-images/Logo.webp"
+          src="https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-white.webp"
           className=" w-[180px]  mx-auto my-4"
         />
         <img
-          src="/ed-prelander-5/ed-footer.png"
-          className="w-[74px] h-[64px] mx-auto my-4"
+          src="https://static.legitscript.com/seals/44796030.png"
+          className="w-[80px] h-[80px] mx-auto my-4"
         />
 
         <Link
@@ -30,8 +30,9 @@ const EdFooter = () => {
         </Link>
         <hr className="mt-8 mb-4 w-[80%] ml-[10%] border-[#AEAEAE]" />
         <p className="text-[#AEAEAE]">
-          ©2024 Rocky Health Inc. All rights reserved. Rocky Health Pharmacy
-          Inc. & Rocky Health Clinic Inc. are subsidiaries of Rocky Health Inc.
+          ©{new Date().getFullYear()} Rocky Health Inc. All rights reserved.
+          Rocky Health Pharmacy Inc. & Rocky Health Clinic Inc. are subsidiaries
+          of Rocky Health Inc.
         </p>
       </footer>
     </>
