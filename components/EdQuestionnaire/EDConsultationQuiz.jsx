@@ -3931,6 +3931,7 @@ export default function EDConsultationQuiz({
       <QuestionnaireNavbar
         onBackClick={handleBackClick}
         currentPage={currentPage}
+        isThankYouPage={currentPage === 22 && showThankYou}
       />
 
       <ProgressBar progress={progress} />

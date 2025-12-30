@@ -790,14 +790,16 @@ export default function WeightLossConsultationQuiz({
       return e.returnValue;
     };
 
-    if (currentPage >= 1 && currentPage <= 26) {
+    const isThankYouPage = currentPage === 23 && formData.completion_state === "Full";
+    
+    if (currentPage >= 1 && currentPage <= 26 && !isThankYouPage) {
       window.addEventListener("beforeunload", handleBeforeUnload);
     }
 
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [currentPage]);
+  }, [currentPage, formData.completion_state]);
 
   useEffect(() => {
     try {
