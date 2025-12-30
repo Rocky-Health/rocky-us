@@ -41,7 +41,7 @@ const ChewalisProducts = () => {
       <div className="flex flex-wrap justify-between items-start mt-[32px] md:mt-[24px]">
         <div className="w-full md:w-[584px]">
           <p className="hidden lg:block text-[12px] font-[400] text-[#212121]">
-            In Canada, erectile dysfunction medications are available
+            In US, erectile dysfunction medications are available
             over-the-counter (OTC) and may be obtained after a prescription.
             This medication will ensure proper dosage for legal and medical
             guidelines within the country. An important note: this document must

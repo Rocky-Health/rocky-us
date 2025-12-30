@@ -45,7 +45,7 @@ const InterpretationAndDefinitions = () => {
 
         <div className="text-[16px] mb-4  md:text-[18px] leading-[160%] font-[400]">
           <span className="font-[600] opacity-100 mt-4 mb-4">Country </span>
-          refers to: Ontario, Canada
+          refers to: Florida, US
         </div>
 
         <div className="text-[16px] mb-4  md:text-[18px] leading-[160%] font-[400]">
