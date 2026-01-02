@@ -708,7 +708,7 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
 
           <div className="w-full text-center text-xs text-gray-600 mb-6 pt-[4rem]">
             <p className="mb-3">
-              By continuing, you agree to and have read the{" "}
+              By continuing, you confirm that you've read and agree to our{" "}
               <Link href="/terms-of-use" className="text-[#AE7E56] underline">
                 Terms and Conditions
               </Link>
@@ -719,10 +719,17 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
               ,{" "}
               <Link href="/privacy-policy" className="text-[#AE7E56] underline">
                 Privacy Policy
-              </Link>{" "}
-              and{" "}
+              </Link>
+              ,{" "}
               <Link href="/terms-of-use" className="text-[#AE7E56] underline">
                 Telehealth Consent
+              </Link>{" "}
+              and{" "}
+              <Link
+                href="/implied-consent"
+                className="text-[#AE7E56] underline"
+              >
+                Implied Consent.
               </Link>
             </p>
             <p>
