@@ -8,7 +8,7 @@ const howRockyWorksCards = [
     step: "Step 1",
     title: "Choose Treatment",
     description: "Take the quiz or select the treatment you want.",
-    image: "/how-rocky-works/choose-treatment.webp",
+    image: "https://myrocky.b-cdn.net/WP%20Images/hrw1.png",
   },
   {
     step: "Step 2",
