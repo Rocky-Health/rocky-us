@@ -60,7 +60,13 @@ export async function GET(req) {
       timeout: 10000, // 10 second timeout
     });
 
-    const totalPages = blogs.headers.get("X-WP-TotalPages");
+    logger.log("API: WordPress response status:", blogs.status);
+    logger.log("API: WordPress response headers:", blogs.headers);
+    logger.log("API: WordPress response data length:", blogs.data?.length);
+    logger.log("API: First blog:", blogs.data?.[0] ? "exists" : "missing");
+
+    const totalPages = blogs.headers["x-wp-totalpages"] || blogs.headers["X-WP-TotalPages"] || "1";
+    logger.log("API: Total pages:", totalPages);
 
     return new Response(JSON.stringify(blogs.data), {
       status: 200,

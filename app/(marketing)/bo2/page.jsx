@@ -15,7 +15,7 @@ export default async function BO2() {
   return (
     <main>
       <CoverSection>
-        <WlCover btnColor="bg-[forestgreen]" />
+        <WlCover btnColor="bg-[forestgreen]" subtitle="Medical Weight Loss: Real Results That Last" />
       </CoverSection>
       <RockyFeatures />
       <Section bg={"bg-gradient-to-t from-[#F6F8FB] to-transparent"}>

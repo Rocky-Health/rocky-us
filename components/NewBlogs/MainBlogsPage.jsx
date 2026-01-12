@@ -33,9 +33,26 @@ export default function MainBlogsPage({
         loadNextPage();
     };
 
-    // Show skeleton if no initial data
-    if (!initialBlogs || initialBlogs.length === 0) {
+    // Show skeleton only if initial data is loading
+    // Don't show skeleton if blogs array is empty but defined
+    if (isLoading && (!initialBlogs || initialBlogs.length === 0)) {
         return <BlogPageSkeleton />;
+    }
+
+    // Show error message if no blogs found but not loading
+    if (!isLoading && (!initialBlogs || initialBlogs.length === 0)) {
+        return (
+            <div className="min-h-screen bg-white flex items-center justify-center">
+                <div className="text-center">
+                    <h1 className="text-2xl font-bold text-gray-900 mb-4">
+                        No blogs found
+                    </h1>
+                    <p className="text-gray-600">
+                        There are no blog posts available at the moment.
+                    </p>
+                </div>
+            </div>
+        );
     }
 
     return (

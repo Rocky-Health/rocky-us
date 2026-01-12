@@ -47,6 +47,10 @@ export default function MHQuestionnaireLayout({ children }) {
           padding-bottom: 0 !important;
           margin-bottom: 0 !important;
         }
+
+          #launcher {
+            display: none !important;
+          }
       `}</style>
       {children}
     </div>

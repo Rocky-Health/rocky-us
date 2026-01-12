@@ -33,7 +33,7 @@ export const ED_RESTRICTED_STATE_CODES = {
 };
 
 /**
- * List of restricted states/provinces for Ozempic and Monjaro shipping (full names)
+ * List of restricted states/provinces for Ozempic, Mounjaro, Wegovy, and Rybelsus shipping (full names)
  */
 export const WL_RESTRICTED_STATES = [
     "ARKANSAS",
@@ -96,7 +96,7 @@ export const isEdStateRestricted = (state) => {
 };
 
 /**
- * Check if a state/province is restricted for WL product (Ozempic/Monjaro) shipping
+ * Check if a state/province is restricted for WL product (Ozempic/Mounjaro/Wegovy/Rybelsus) shipping
  * Handles both state codes (e.g., "AR") and full names (e.g., "ARKANSAS")
  * @param {string} state - State or province name or code (case-insensitive)
  * @returns {boolean} True if the state is restricted for WL products
@@ -191,9 +191,9 @@ export const isEdRestrictedProduct = (productName) => {
 };
 
 /**
- * Check if a product name contains Ozempic or Monjaro
+ * Check if a product name contains Ozempic, Mounjaro, Wegovy, or Rybelsus
  * @param {string} productName - Product name to check
- * @returns {boolean} True if product contains Ozempic or Monjaro
+ * @returns {boolean} True if product contains Ozempic, Mounjaro, Wegovy, or Rybelsus
  */
 export const isWlRestrictedProduct = (productName) => {
     if (!productName) return false;
@@ -203,10 +203,16 @@ export const isWlRestrictedProduct = (productName) => {
     // Check for Ozempic
     const hasOzempic = normalizedName.includes("OZEMPIC");
 
-    // Check for Monjaro
-    const hasMonjaro = normalizedName.includes("MONJARO");
+    // Check for Mounjaro
+    const hasMounjaro = normalizedName.includes("MONJARO") || normalizedName.includes("MOUNJARO");
 
-    return hasOzempic || hasMonjaro;
+    // Check for Wegovy
+    const hasWegovy = normalizedName.includes("WEGOVY");
+
+    // Check for Rybelsus
+    const hasRybelsus = normalizedName.includes("RYBELSUS");
+
+    return hasOzempic || hasMounjaro || hasWegovy || hasRybelsus;
 };
 
 /**
@@ -227,7 +233,7 @@ export const isEdRestrictedSlug = (slug) => {
 };
 
 /**
- * Check if a product slug indicates Ozempic or Monjaro
+ * Check if a product slug indicates Ozempic, Mounjaro, Wegovy, or Rybelsus
  * @param {string} slug - Product slug to check
  * @returns {boolean} True if slug indicates restricted WL product
  */
@@ -237,7 +243,10 @@ export const isWlRestrictedSlug = (slug) => {
     const normalizedSlug = slug.toLowerCase();
     return (
         normalizedSlug.includes("ozempic") ||
-        normalizedSlug.includes("monjaro")
+        normalizedSlug.includes("monjaro") ||
+        normalizedSlug.includes("mounjaro") ||
+        normalizedSlug.includes("wegovy") ||
+        normalizedSlug.includes("rybelsus")
     );
 };
 
@@ -276,7 +285,7 @@ export const isRestrictedEdCartItem = (cartItem) => {
 };
 
 /**
- * Check if a cart item is a restricted WL product (Ozempic/Monjaro)
+ * Check if a cart item is a restricted WL product (Ozempic/Mounjaro/Wegovy/Rybelsus)
  * @param {Object} cartItem - Cart item object with name, sku, or other identifiers
  * @returns {boolean} True if the cart item is a restricted WL product
  */
@@ -293,7 +302,10 @@ export const isRestrictedWlCartItem = (cartItem) => {
         const skuUpper = cartItem.sku.toUpperCase();
         if (
             skuUpper.includes("OZEMPIC") ||
-            skuUpper.includes("MONJARO")
+            skuUpper.includes("MONJARO") ||
+            skuUpper.includes("MOUNJARO") ||
+            skuUpper.includes("WEGOVY") ||
+            skuUpper.includes("RYBELSUS")
         ) {
             return true;
         }

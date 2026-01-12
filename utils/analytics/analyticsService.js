@@ -200,6 +200,8 @@ export const analyticsService = {
       // Separate idempotency guards per integration to avoid blocking S2S
       const guardKeyGA4 = `analytics:purchase:ga4:${order.id}`;
       const guardKeyNB = `analytics:purchase:nb:${order.id}`;
+      const guardKeyMetaCAPI = `analytics:purchase:meta-capi:${order.id}`;
+      const guardKeyTikTokCAPI = `analytics:purchase:tiktok-capi:${order.id}`;
 
       const ecommerce = await mapOrderToEcommerce(order);
 
@@ -244,8 +246,8 @@ export const analyticsService = {
       const billingPhone = order?.billing?.phone || "";
       const [billing_email_hash, billing_phone_hash] = await Promise.all([
         hashEmail(billingEmail),
-        // Always default to CA for normalization safety
-        hashPhone(billingPhone, "CA"),
+        // Always default to US for normalization safety (US platform)
+        hashPhone(billingPhone, "US"),
       ]);
 
       const additionalData = {
@@ -274,8 +276,28 @@ export const analyticsService = {
           additionalData,
           true
         );
-        // Track TikTok event
+        // Track TikTok event (client-side legacy pixel)
         trackTikTokPurchase(order, additionalData, true);
+      }
+
+      // Track Meta CAPI event (server-side)
+      if (setOnce(guardKeyMetaCAPI)) {
+        try {
+          const { trackMetaCapiPurchase } = await import('@/utils/metaCapiPurchase');
+          await trackMetaCapiPurchase(order, additionalData, true);
+        } catch (metaError) {
+          logger.error("[Analytics] Meta CAPI tracking failed:", metaError);
+        }
+      }
+
+      // Track TikTok CAPI event (server-side)
+      if (setOnce(guardKeyTikTokCAPI)) {
+        try {
+          const { trackTikTokCapiPurchase } = await import('@/utils/tiktokCapiPurchase');
+          await trackTikTokCapiPurchase(order, additionalData, true);
+        } catch (tiktokError) {
+          logger.error("[Analytics] TikTok CAPI tracking failed:", tiktokError);
+        }
       }
 
       // Track Northbeam event (await to reduce pixel-only cases)

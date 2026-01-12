@@ -1,9 +1,16 @@
-import Link from "next/link";
+"use client";
+
 import Logo from "../Navbar/Logo";
 
-const QuestionnaireNavbar = ({ onBackClick, currentPage, hideBackButton = false }) => {
-  const isThankYouPage = currentPage === 22;
+const QuestionnaireNavbar = ({ onBackClick, currentPage = 1, hideBackButton = false, isThankYouPage = false }) => {
   const showBackButton = currentPage > 1 && !isThankYouPage && !hideBackButton;
+
+  const handleBackClick = (e) => {
+    e?.preventDefault();
+    if (onBackClick && typeof onBackClick === 'function') {
+      onBackClick();
+    }
+  };
 
   return (
     <header
@@ -14,7 +21,7 @@ const QuestionnaireNavbar = ({ onBackClick, currentPage, hideBackButton = false 
       <div className="w-full md:w-[520px] mx-auto px-5 md:px-0 relative h-[40px] flex items-center">
         {showBackButton && (
           <button
-            onClick={onBackClick}
+            onClick={handleBackClick}
             className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-900"
             aria-label="Go back to previous question"
           >
