@@ -147,7 +147,7 @@ export async function POST(req) {
       // Configure automatic payment methods to not allow redirects
       automatic_payment_methods: {
         enabled: true,
-        allow_redirects: "if_required",
+        allow_redirects: "never",
       },
     };
 
