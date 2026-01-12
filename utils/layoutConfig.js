@@ -25,7 +25,7 @@ export const layoutExemptRoutes = [
   "/pre-wl5",
   "/ed-5",
   "/wl-pre-cf1",
-  "/bo3",
+
   "/bo3_v2",
   "/quiz_wl",
   "/quiz_wl2",
