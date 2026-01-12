@@ -3,7 +3,7 @@
 import Loader from "@/components/Loader";
 import { logger } from "@/utils/devLogger";
 import CheckoutSkeleton from "@/components/ui/skeletons/CheckoutSkeleton";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import BillingAndShipping from "./BillingAndShipping";
 import CartAndPayment from "./CartAndPayment";
 import { toast } from "react-toastify";
@@ -66,7 +66,7 @@ const CheckoutPageWrapper = () => {
                 },
                 paymentMethodCreation: "manual", // Required for createPaymentMethod with PaymentElement
                 // Configure payment methods at the Elements level
-                paymentMethodTypes: ["card", "link"], // Allow card and link payments
+                paymentMethodTypes: ["card"], // Allow card payments only (Link disabled)
             }}
         >
             <CheckoutPageContent />
@@ -106,13 +106,57 @@ const CheckoutPageContent = () => {
     const [submitting, setSubmitting] = useState(false);
     const [cartItems, setCartItems] = useState();
     const [isProcessingUrlParams, setIsProcessingUrlParams] = useState(false);
-    const [savedCards, setSavedCards] = useState([]);
-    const [selectedCard, setSelectedCard] = useState(null);
-    const [isLoadingSavedCards, setIsLoadingSavedCards] = useState(false);
 
     // Stripe Elements state (for embedded payment form)
     const [stripeElements, setStripeElements] = useState(null);
     const [stripeReady, setStripeReady] = useState(false);
+    
+    // Stripe saved card state
+    const [selectedSavedCard, setSelectedSavedCard] = useState(null);
+    const [isStripeReady, setIsStripeReady] = useState(false);
+    const [isStripeComplete, setIsStripeComplete] = useState(false);
+    const [stripeValidationError, setStripeValidationError] = useState("");
+    
+    // Handle saved card selection
+    const handleSavedCardSelect = useCallback((card) => {
+        setSelectedSavedCard(card);
+        // When a saved card is selected, payment is considered valid
+        if (card) {
+            setIsStripeReady(true);
+            setIsStripeComplete(true);
+            setStripeValidationError("");
+        }
+    }, []);
+    
+    // Stripe payment handler registration
+    const stripeHelpersRef = useRef({
+        createPaymentMethod: null,
+        handleNextAction: null,
+        isReady: false,
+        isComplete: false,
+    });
+    
+    const registerStripePaymentHandler = useCallback((helpers = {}) => {
+        stripeHelpersRef.current = helpers;
+    }, []);
+    
+    const handleStripePaymentReady = useCallback((ready) => {
+        const isReady = !!ready;
+        setIsStripeReady(isReady);
+        if (isReady) {
+            setStripeValidationError("");
+        } else {
+            setIsStripeComplete(false);
+        }
+    }, []);
+    
+    const handleStripePaymentChange = useCallback((complete) => {
+        setIsStripeComplete(!!complete);
+    }, []);
+    
+    const handleStripePaymentError = useCallback((message) => {
+        setStripeValidationError(message || "");
+    }, []);
 
     // Initialize checkout validation hook
     const {
@@ -2375,25 +2419,18 @@ const CheckoutPageContent = () => {
                     setFormData={setFormData}
                     formData={formData}
                     handleSubmit={handleSubmit}
-                    cardNumber={cardNumber}
                     isUpdatingShipping={isUpdatingShipping}
-                    setCardNumber={setCardNumber}
-                    expiry={expiry}
-                    setExpiry={setExpiry}
-                    cvc={cvc}
-                    setCvc={setCvc}
-                    cardType={cardType}
-                    setCardType={setCardType}
                     isEdFlow={isEdFlow}
-                    savedCards={savedCards}
-                    setSavedCards={setSavedCards}
-                    selectedCard={selectedCard}
-                    setSelectedCard={setSelectedCard}
-                    isLoadingSavedCards={isLoadingSavedCards}
                     ageValidationFailed={ageValidationFailed}
                     isPaymentValid={isPaymentValid}
                     paymentValidationMessage={paymentValidationMessage}
-                    onStripeReady={setStripeElements}
+                    onStripePaymentReady={handleStripePaymentReady}
+                    onStripePaymentChange={handleStripePaymentChange}
+                    onStripePaymentError={handleStripePaymentError}
+                    registerStripePaymentHandler={registerStripePaymentHandler}
+                    isStripePaymentActive={true}
+                    onSavedCardSelect={handleSavedCardSelect}
+                    selectedSavedCard={selectedSavedCard}
                 />
             </div>
 
