@@ -24,13 +24,13 @@ const PAYMENT_ELEMENT_OPTIONS = {
     googlePay: "auto", // Enable Google Pay if available
     cashapp: "never", // Disable Cash App Pay
     amazonPay: "never", // Disable Amazon Pay
-    link: "auto", // Enable Link payment method
+    link: "never", // Disable Stripe Link
   },
 };
 
-export default function StripeCardInput({ onReady, onChange, customerData }) {
-  // Create options with customer data if provided
-  const elementOptions = {
+export default function StripeCardInput({ onReady, onChange, onError, customerData, paymentElementOptions }) {
+  // Use provided options or fallback to default
+  const elementOptions = paymentElementOptions || {
     ...PAYMENT_ELEMENT_OPTIONS,
     ...(customerData && {
       defaultValues: {
@@ -49,6 +49,7 @@ export default function StripeCardInput({ onReady, onChange, customerData }) {
         options={elementOptions}
         onReady={onReady}
         onChange={onChange}
+        onError={onError}
       />
 
       <style jsx global>{`
