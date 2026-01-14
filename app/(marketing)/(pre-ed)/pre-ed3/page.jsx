@@ -1,17 +1,36 @@
-import { redirect } from "next/navigation";
-import { getVariantCount } from "@/lib/constants/preEd3Variants";
+import FaqsSection from "@/components/FaqsSection";
+import HowRockyWorks from "@/components/HowRockyWorks";
+import EdHeroSection from "@/components/PreLanders/HeroSection";
+import ReviewsSection from "@/components/ReviewsSection";
+import Section from "@/components/utils/Section";
+import { SexualHealthFaqs } from "@/components/PreLanders/data/SexualHealthFaqs";
 
-/**
- * A/B Testing Redirect Handler for /pre-ed3
- *
- * This page randomly redirects users to one of 6 variation pages
- * on each visit. The redirect happens server-side for optimal performance.
- */
 export default function PreEd3() {
-  // Generate random number between 1 and 6 (inclusive)
-  const variantCount = getVariantCount();
-  const randomVariant = Math.floor(Math.random() * variantCount) + 1;
+  return (
+    <main>
+      <EdHeroSection
+        desktopBgImage="/ed-prelander-5/prelander-background.png"
+        mobileBgImage="/ed-prelander-5/ed.png"
+        title="Make her fall in love even more"
+        subTitle="Digital Healthcare for men without the wait time or stigma. Trusted by 350K+ Canadians."
+        btnText="Get Started →"
+        quizHref="/ed-pre-consultation-quiz"
+      ></EdHeroSection>
+      <Section bg={"bg-[#FFFFFF]"}>
+        <HowRockyWorks />
+      </Section>
 
-  // Redirect to the randomly selected variation
-  redirect(`/pre-ed3/v${randomVariant}`);
+      <Section bg={"bg-[#F5F4EF]"}>
+        <ReviewsSection />
+      </Section>
+      <Section>
+        <FaqsSection
+          faqs={SexualHealthFaqs}
+          title="Your Questions, Answered"
+          name="Meet Rocky"
+          subtitle="Frequently asked questions"
+        />
+      </Section>
+    </main>
+  );
 }
