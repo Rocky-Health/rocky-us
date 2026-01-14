@@ -375,6 +375,13 @@ const Form = ({
       setLoading(false);
       return false;
     }
+    // Check if phone number is all zeros
+    const digitsOnly = mergedUserData.phone.replace(/\D/g, "");
+    if (digitsOnly.length > 0 && /^0+$/.test(digitsOnly)) {
+      toast.error("Please enter a valid phone number");
+      setLoading(false);
+      return false;
+    }
     if (!mergedUserData.dateOfBirth) {
       toast.error("Date of birth is required");
       setLoading(false);

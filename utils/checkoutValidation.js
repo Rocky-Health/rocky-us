@@ -115,6 +115,19 @@ export const validateField = (fieldType, value, country = "CA") => {
     };
   }
 
+  // Special handling for phone numbers - check if all digits are zeros
+  if (fieldType === "phone") {
+    // Extract all digits from the phone number
+    const digitsOnly = trimmedValue.replace(/\D/g, "");
+    // Check if all digits are zeros
+    if (digitsOnly.length > 0 && /^0+$/.test(digitsOnly)) {
+      return {
+        isValid: false,
+        message: "Please enter a valid phone number",
+      };
+    }
+  }
+
   return { isValid: true, message: "" };
 };
 
