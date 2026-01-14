@@ -3,7 +3,6 @@ import { cookies } from "next/headers";
 import Stripe from "stripe";
 import axios from "axios";
 import { logger } from "@/utils/devLogger";
-import { validateSessionForAPI } from "@/utils/sessionValidator";
 
 const BASE_URL = process.env.BASE_URL;
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
@@ -153,12 +152,6 @@ async function getStripeCustomerId(cookieStore, userId, authToken) {
 export async function GET() {
   try {
     const cookieStore = await cookies();
-
-    // Validate session for authenticated users
-    const sessionError = await validateSessionForAPI(cookieStore, NextResponse);
-    if (sessionError) {
-      return sessionError;
-    }
 
     const authToken = cookieStore.get("authToken");
     const userId = cookieStore.get("userId");
@@ -313,12 +306,6 @@ export async function DELETE(req) {
   try {
     const cookieStore = await cookies();
 
-    // Validate session
-    const sessionError = await validateSessionForAPI(cookieStore, NextResponse);
-    if (sessionError) {
-      return sessionError;
-    }
-
     const authToken = cookieStore.get("authToken");
     const userId = cookieStore.get("userId");
 
@@ -410,12 +397,6 @@ export async function DELETE(req) {
 export async function PATCH(req) {
   try {
     const cookieStore = await cookies();
-
-    // Validate session
-    const sessionError = await validateSessionForAPI(cookieStore, NextResponse);
-    if (sessionError) {
-      return sessionError;
-    }
 
     const authToken = cookieStore.get("authToken");
     const userId = cookieStore.get("userId");
