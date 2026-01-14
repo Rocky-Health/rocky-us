@@ -115,12 +115,37 @@ export const validateField = (fieldType, value, country = "CA") => {
     };
   }
 
-  // Special handling for phone numbers - check if all digits are zeros
-  if (fieldType === "phone") {
+  // Special handling for phone numbers - comprehensive validation
+  if (fieldType === "phone" && rule.pattern) {
     // Extract all digits from the phone number
     const digitsOnly = trimmedValue.replace(/\D/g, "");
+
+    // Check if phone number has digits
+    if (digitsOnly.length === 0) {
+      return {
+        isValid: false,
+        message: "Please enter a valid phone number",
+      };
+    }
+
+    // Check if phone number has less than 10 digits (Canadian format requires 10 digits)
+    if (digitsOnly.length < 10) {
+      return {
+        isValid: false,
+        message: "Please enter a valid phone number",
+      };
+    }
+
     // Check if all digits are zeros
-    if (digitsOnly.length > 0 && /^0+$/.test(digitsOnly)) {
+    if (/^0+$/.test(digitsOnly)) {
+      return {
+        isValid: false,
+        message: "Please enter a valid phone number",
+      };
+    }
+
+    // Limit to 10 digits for Canadian phone numbers
+    if (digitsOnly.length > 10) {
       return {
         isValid: false,
         message: "Please enter a valid phone number",
