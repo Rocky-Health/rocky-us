@@ -29,7 +29,6 @@ const CheckboxQuestion = ({
             }`}
             onClick={() => onToggle(option.id, option)}
           >
-           
             <div className="flex-1">
               <span className="text-[14px] md:text-[16px] font-medium leading-[140%] tracking-[0%] text-black">
                 {option.label}
@@ -40,7 +39,7 @@ const CheckboxQuestion = ({
                 </div>
               )}
             </div>
-             <div
+            <div
               className={`w-5 h-5 border rounded flex items-center justify-center ${
                 selectedValues.includes(option.id)
                   ? "border-[#A7885A] bg-[#A7885A]"
@@ -72,24 +71,22 @@ const CheckboxQuestion = ({
       {/* Privacy text - WL style */}
       <div className="text-[10px] my-6 text-[#00000059] text-left font-[400] leading-[140%] tracking-[0%]">
         We respect your privacy. All of your information is securely stored on
-        our HIPPA Compliant server.
+        our HIPAA Compliant server.
       </div>
 
       {config.showSignIn && <SignInLink className="mt-1" />}
 
-
-      
-        <div className="sticky bottom-0 py-4 bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.8)_37.51%,#FFFFFF_63.04%)]">
-          <button
-            onClick={handleContinue}
-            disabled={!isValid}
-            className={` w-full mt-6 py-3 h-[52px]  rounded-full font-medium ${isValid ? 'bg-black text-white' : 'bg-[#E3E3E3] text-black'}`}
-          >
-            Continue
-          </button>
-        </div>
-      
-
+      <div className="sticky bottom-0 py-4 bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.8)_37.51%,#FFFFFF_63.04%)]">
+        <button
+          onClick={handleContinue}
+          disabled={!isValid}
+          className={` w-full mt-6 py-3 h-[52px]  rounded-full font-medium ${
+            isValid ? "bg-black text-white" : "bg-[#E3E3E3] text-black"
+          }`}
+        >
+          Continue
+        </button>
+      </div>
     </>
   );
 };

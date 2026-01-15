@@ -116,7 +116,7 @@ export const quizConfig = {
         },
       ],
       privacyNote:
-        "We respect your privacy. All of your information is securely stored on our HIPPA Compliant server.",
+        "We respect your privacy. All of your information is securely stored on our HIPAA Compliant server.",
       required: true,
     },
 
@@ -311,7 +311,7 @@ export const quizConfig = {
       titleCenter: true,
       title: `<p style="color:#A0693B; text-align:center; line-height: 140%;font-size:16px">We’re almost done!</p><p class="text-center text-[26px] headers-font mb-[24px]">Let us know your details</p>`,
       privacyNote:
-        "We respect your privacy. All of your information is securely stored on our HIPPA Compliant server.",
+        "We respect your privacy. All of your information is securely stored on our HIPAA Compliant server.",
       fields: [
         {
           id: "firstName",
@@ -336,7 +336,7 @@ export const quizConfig = {
       titleCenter: true,
       title: `<p style="color:#A0693B; text-align:center; line-height: 140%;font-size:16px">Finally,</p><p class="text-center text-[26px] headers-font mb-[24px]">How can we reach you, if needed?</p>`,
       privacyNote:
-        "We respect your privacy. All of your information is securely stored on our HIPPA Compliant server.",
+        "We respect your privacy. All of your information is securely stored on our HIPAA Compliant server.",
       fields: [
         {
           id: "phone",

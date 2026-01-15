@@ -1,8 +1,7 @@
-
 "use client";
 
 import React, { useState, useEffect } from "react";
-const Counter = ({ seconds = 3, texts = [], title , onAction}) => {
+const Counter = ({ seconds = 3, texts = [], title, onAction }) => {
   const [visibleTextIndex, setVisibleTextIndex] = useState(0);
   const [count, setCount] = useState(seconds);
 
@@ -14,7 +13,7 @@ const Counter = ({ seconds = 3, texts = [], title , onAction}) => {
   }, []);
 
   useEffect(() => {
-    if (count <= 0 && typeof onAction === 'function') {
+    if (count <= 0 && typeof onAction === "function") {
       const timeout = setTimeout(() => {
         onAction("showPopup", "EmailPopUp");
       }, 500); // 500ms delay
@@ -37,7 +36,8 @@ const Counter = ({ seconds = 3, texts = [], title , onAction}) => {
   const strokeWidth = 8;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
-  const progress = count > 0 ? ((seconds - count) / seconds) * circumference : circumference;
+  const progress =
+    count > 0 ? ((seconds - count) / seconds) * circumference : circumference;
 
   return (
     <div>
@@ -115,9 +115,9 @@ const Counter = ({ seconds = 3, texts = [], title , onAction}) => {
         </>
       )}
 
-
       <p className="text-[10px] text-[#00000059] leading-[140%] mt-[40px]">
-        We respect your privacy. All of your information is securely stored on our HIPPA Compliant server.
+        We respect your privacy. All of your information is securely stored on
+        our HIPAA Compliant server.
       </p>
     </div>
   );
