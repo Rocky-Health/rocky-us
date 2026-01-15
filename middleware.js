@@ -28,6 +28,16 @@ export function middleware(req) {
       return NextResponse.redirect(new URL(`/blog/${slug}`, req.url));
     }
 
+    // Redirect compounded weight loss product pages to homepage
+    const restrictedProductSlugs = [
+      "/product/compounded-tirzepatide",
+      "/product/compounded-terzepatide", // Handle typo variant
+      "/product/compounded-semaglutide",
+    ];
+    if (restrictedProductSlugs.includes(pathname)) {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+
     // Check if the path is blocked (hashed in navbar)
     if (isBlockedRoute(pathname)) {
       const blockedUrl = new URL("/blocked", req.url);
