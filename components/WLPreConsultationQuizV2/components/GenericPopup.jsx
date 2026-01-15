@@ -341,7 +341,7 @@ const GenericPopup = ({
                 <>
                   <div className="text-[10px] leading-[140%] font-medium text-[#BABABA] mt-2 mb-24">
                     We respect your privacy. All of your information is securely
-                    stored on our HIPPA Compliant server.
+                    stored on our HIPAA Compliant server.
                   </div>
                 </>
               )}
