@@ -6,7 +6,7 @@
       "description": "(tirzepatide) Vial",
       "price": "399.00",
       "details": "",
-      "url": "/wl/compounded.jpeg",
+      "url": "https://mycdn.myrocky.com/wp-content/uploads/20260115220421/Tirzepatide.png",
       "isDefault": true,
       "supplyAvailable": true
     },
@@ -16,7 +16,7 @@
       "description": "(semaglutide) Vial",
       "price": "299.00",
       "details": "",
-      "url": "/wl/semagulatide.jpeg",
+      "url": "https://mycdn.myrocky.com/wp-content/uploads/20260115220418/Semaglutide.png",
       "supplyAvailable": true
     },
     "OZEMPIC": {
