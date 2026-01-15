@@ -21,7 +21,7 @@ export const quizConfig = {
       },
       outcome: {
         recommended: WLProducts.RYBELSUS,
-        alternatives: [WLProducts.OZEMPIC, WLProducts.WEGOVY, WLProducts.RYBELSUS],
+        alternatives: [WLProducts.COMPOUNDED_TIRZEPATIDE, WLProducts.COMPOUNDED_SEMAGLUTIDE, WLProducts.OZEMPIC, WLProducts.WEGOVY, WLProducts.RYBELSUS],
       },
     },
     {
@@ -29,15 +29,15 @@ export const quizConfig = {
         bmi: (bmi) => bmi >= 27,
       },
       outcome: {
-        recommended: WLProducts.OZEMPIC,
-        alternatives: [WLProducts.WEGOVY, WLProducts.MOUNJARO, WLProducts.RYBELSUS],
+        recommended: WLProducts.COMPOUNDED_TIRZEPATIDE,
+        alternatives: [WLProducts.COMPOUNDED_SEMAGLUTIDE, WLProducts.OZEMPIC, WLProducts.MOUNJARO, WLProducts.WEGOVY, WLProducts.RYBELSUS],
       },
     },
     {
       conditions: {}, // Default case
       outcome: {
-        recommended: WLProducts.OZEMPIC,
-        alternatives: [WLProducts.WEGOVY, WLProducts.MOUNJARO, WLProducts.RYBELSUS],
+        recommended: WLProducts.COMPOUNDED_TIRZEPATIDE,
+        alternatives: [WLProducts.COMPOUNDED_SEMAGLUTIDE, WLProducts.OZEMPIC, WLProducts.MOUNJARO, WLProducts.WEGOVY, WLProducts.RYBELSUS],
       },
     },
   ],

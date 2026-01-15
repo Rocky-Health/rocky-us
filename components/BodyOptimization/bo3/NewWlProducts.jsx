@@ -1,7 +1,7 @@
 "use client";
 
 import NewProductCard from "@/components/BodyOptimization/bo3/NewProductCard";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import ScrollArrows from "@/components/ScrollArrows";
 import { FaCheck } from "react-icons/fa6";
 const products = [
@@ -48,13 +48,13 @@ const WlProducts = ({ CardBtnColor = null, productsVisible = true }) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   // Helper function to get card width
-  const getCardWidth = () => {
+  const getCardWidth = useCallback(() => {
     return typeof window !== "undefined" && window.innerWidth >= 768
       ? 272 + 16 // md:gap-4 (16px) - adjust based on your card width
       : 272 + 8; // gap-2 (8px) - adjust based on your card width
-  };
+  }, []);
 
-  const handleScroll = () => {
+  const handleScroll = useCallback(() => {
     if (!scrollContainerRef.current) return;
 
     const container = scrollContainerRef.current;
@@ -65,7 +65,7 @@ const WlProducts = ({ CardBtnColor = null, productsVisible = true }) => {
     const maxIndex = Math.max(0, products.length - 1);
 
     setActiveIndex(Math.min(Math.max(0, index), maxIndex));
-  };
+  }, [getCardWidth]);
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -77,7 +77,7 @@ const WlProducts = ({ CardBtnColor = null, productsVisible = true }) => {
     return () => {
       container.removeEventListener("scroll", handleScroll);
     };
-  }, [productsVisible]);
+  }, [handleScroll, productsVisible]);
 
   return (
     <div>

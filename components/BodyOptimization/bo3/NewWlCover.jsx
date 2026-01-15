@@ -66,7 +66,7 @@ const NewWlCover = ({ btnColor = null }) => {
               <sup>2</sup>
             </p>
             <div className=" md:mb-[122px]  mb-4 w-full mx-auto">
-              <NewProudPartner section bg="bg-[#F4F3EF] mx-auto" />
+              <NewProudPartner section={true} bg="bg-[#F4F3EF] mx-auto" />
             </div>
           </div>
         </div>
@@ -77,7 +77,7 @@ const NewWlCover = ({ btnColor = null }) => {
       {/* Desktop Image */}
       <div className="md:block hidden  absolute  z-0 bottom-0 right-0 h-[365px] md:h-full w-full ">
         <CustomImage
-          src="https://myrocky.b-cdn.net/WP%20Images/bo3/new/HeroV1Desk.jpg"
+          src="https://myrocky.b-cdn.net/WP%20Images/bo3/new/HeroV1Desk.webp"
           alt="Hero1Desk"
           fill
           className="desktop-image-hero object-cover  "
@@ -85,7 +85,7 @@ const NewWlCover = ({ btnColor = null }) => {
       </div>
       <div className="md:hidden block absolute bottom-0 left-0 h-[348px]  w-full ">
         <CustomImage
-          src="https://myrocky.b-cdn.net/WP%20Images/bo3/new/HeroV1Mob.jpg"
+          src="https://myrocky.b-cdn.net/WP%20Images/bo3/new/HeroV1Mob.webp"
           alt="HeroV1Mob"
           fill
           className="mobile-image-hero object-cover   "

@@ -25,14 +25,12 @@ const SkincareProductCard = ({
     <>
       <div
         className={`bg-[#FFFFFF] flex flex-col gap-2 rounded-2xl p-6 
-          ${
-            isSelected
-              ? "border  drop-shadow-lg"
-              : "border border-transparent drop-shadow-lg"
+          ${isSelected
+            ? "border  drop-shadow-lg"
+            : "border border-transparent drop-shadow-lg"
           } 
           cursor-pointer transition-all duration-200 ease-in-out 
-          hover:shadow-xl hover:scale-[1.01] ${
-            product.supplyAvailable ? "" : "opacity-75"
+          hover:shadow-xl hover:scale-[1.01] ${product.supplyAvailable ? "" : "opacity-75"
           }`}
         onClick={() => product.supplyAvailable && onSelect && onSelect(product)}
       >
@@ -100,11 +98,16 @@ const SkincareProductCard = ({
           </p>
         )}
 
-        <div className="flex flex-wrap gap-2">
-          <div className="inline-flex items-center max-w-max text-[12px] font-normal leading-[140%] bg-[#FBF9F7] border border-[#E2E2E1] px-2 rounded-full py-1">Reduces cravings</div>
-          <div className="inline-flex items-center max-w-max text-[12px] font-normal leading-[140%] bg-[#FBF9F7] border border-[#E2E2E1] px-2 rounded-full py-1">Helps regulate blood sugar levels</div>
-          <div className="inline-flex items-center max-w-max text-[12px] font-normal leading-[140%] bg-[#FBF9F7] border border-[#E2E2E1] px-2 rounded-full py-1">Helps maintain feelings of fullness</div>
-        </div>
+        {/* Show badges for non-compounded products, spacer for compounded products to maintain consistent height */}
+        {product.id !== "650264" && product.id !== "650260" ? (
+          <div className="flex flex-wrap gap-2">
+            <div className="inline-flex items-center max-w-max text-[12px] font-normal leading-[140%] bg-[#FBF9F7] border border-[#E2E2E1] px-2 rounded-full py-1">Reduces cravings</div>
+            <div className="inline-flex items-center max-w-max text-[12px] font-normal leading-[140%] bg-[#FBF9F7] border border-[#E2E2E1] px-2 rounded-full py-1">Helps regulate blood sugar levels</div>
+            <div className="inline-flex items-center max-w-max text-[12px] font-normal leading-[140%] bg-[#FBF9F7] border border-[#E2E2E1] px-2 rounded-full py-1">Helps maintain feelings of fullness</div>
+          </div>
+        ) : (
+          <div className={product.id === "650260" ? "h-[80px]" : "h-[52px]"}></div>
+        )}
 
       </div>
 

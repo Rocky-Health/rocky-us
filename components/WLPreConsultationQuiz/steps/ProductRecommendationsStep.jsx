@@ -18,12 +18,12 @@ const ProductRecommendationsStep = ({
   );
 
   useEffect(() => {
-    setSelectedProduct(products.OZEMPIC);
-  }, [products.OZEMPIC]);
+    setSelectedProduct(products.COMPOUNDED_TIRZEPATIDE);
+  }, [products.COMPOUNDED_TIRZEPATIDE]);
 
   const handleShowMoreOptions = () => {
     if (showMoreOptions) {
-      setSelectedProduct(products.OZEMPIC);
+      setSelectedProduct(products.COMPOUNDED_TIRZEPATIDE);
     }
     setShowMoreOptions(!showMoreOptions);
   };
@@ -52,29 +52,34 @@ const ProductRecommendationsStep = ({
 
         <div className="mb-6">
           <WLProductCard
-            product={products.OZEMPIC}
+            product={products.COMPOUNDED_TIRZEPATIDE}
             isRecommended={true}
             onSelect={(product) => setSelectedProduct(product)}
-            isSelected={selectedProduct?.id === products.OZEMPIC.id}
+            isSelected={selectedProduct?.id === products.COMPOUNDED_TIRZEPATIDE.id}
           />
         </div>
 
         {showMoreOptions && (
           <div className="space-y-4 mb-6">
-            {/* <WLProductCard
+            <WLProductCard
+              product={products.COMPOUNDED_SEMAGLUTIDE}
+              onSelect={(product) => setSelectedProduct(product)}
+              isSelected={selectedProduct?.id === products.COMPOUNDED_SEMAGLUTIDE.id}
+            />
+            <WLProductCard
               product={products.OZEMPIC}
               onSelect={(product) => setSelectedProduct(product)}
               isSelected={selectedProduct?.id === products.OZEMPIC.id}
-            /> */}
-            <WLProductCard
-              product={products.WEGOVY}
-              onSelect={(product) => setSelectedProduct(product)}
-              isSelected={selectedProduct?.id === products.WEGOVY.id}
             />
             <WLProductCard
               product={products.MOUNJARO}
               onSelect={(product) => setSelectedProduct(product)}
               isSelected={selectedProduct?.id === products.MOUNJARO.id}
+            />
+            <WLProductCard
+              product={products.WEGOVY}
+              onSelect={(product) => setSelectedProduct(product)}
+              isSelected={selectedProduct?.id === products.WEGOVY.id}
             />
             <WLProductCard
               product={products.RYBELSUS}

@@ -1,4 +1,23 @@
 const WLProducts = {
+  COMPOUNDED_TIRZEPATIDE: {
+    id: "650264",
+    name: "Compounded Tirzepatide",
+    description: "(tirzepatide) injection",
+    price: "$399",
+    details: "",
+    url: "/wl/compounded.jpeg",
+    isDefault: true,
+    supplyAvailable: true,
+  },
+  COMPOUNDED_SEMAGLUTIDE: {
+    id: "650260",
+    name: "Compounded Semaglutide",
+    description: "(semaglutide) injection",
+    price: "$299",
+    details: "",
+    url: "/wl/semagulatide.jpeg",
+    supplyAvailable: true,
+  },
   OZEMPIC: {
     id: "142976",
     name: "Ozempic",
@@ -7,7 +26,6 @@ const WLProducts = {
     details:
       "A once-weekly injectable GLP-1 medication with weight loss benefits.",
     url: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/ozempic/ozempic_2x.webp",
-    isDefault: true,
     supplyAvailable: true,
   },
   MOUNJARO: {
