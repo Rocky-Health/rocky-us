@@ -1,7 +1,7 @@
 "use client";
 
 import NewProductCard from "@/components/BodyOptimization/bo3/NewProductCard";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import ScrollArrows from "@/components/ScrollArrows";
 import { FaCheck } from "react-icons/fa6";
 const products = [
@@ -45,6 +45,39 @@ const products = [
 
 const WlProducts = ({ CardBtnColor = null, productsVisible = true }) => {
   const scrollContainerRef = useRef(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  // Helper function to get card width
+  const getCardWidth = () => {
+    return typeof window !== "undefined" && window.innerWidth >= 768
+      ? 272 + 16 // md:gap-4 (16px) - adjust based on your card width
+      : 272 + 8; // gap-2 (8px) - adjust based on your card width
+  };
+
+  const handleScroll = () => {
+    if (!scrollContainerRef.current) return;
+
+    const container = scrollContainerRef.current;
+    const { scrollLeft } = container;
+
+    const cardWidth = getCardWidth();
+    const index = Math.round(scrollLeft / cardWidth);
+    const maxIndex = Math.max(0, products.length - 1);
+
+    setActiveIndex(Math.min(Math.max(0, index), maxIndex));
+  };
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    container.addEventListener("scroll", handleScroll);
+    handleScroll(); // initialize
+
+    return () => {
+      container.removeEventListener("scroll", handleScroll);
+    };
+  }, [productsVisible]);
 
   return (
     <div>
@@ -88,6 +121,18 @@ const WlProducts = ({ CardBtnColor = null, productsVisible = true }) => {
                 <NewProductCard product={product} btnColor={CardBtnColor} />
               </div>
             ))}
+          </div>
+          {/* Mobile Scroll Indicator */}
+          <div className="flex justify-center items-center gap-2 mt-4 md:hidden">
+            <div className="relative w-20 h-2 bg-[#EFEFEA] rounded-full overflow-hidden">
+              <div
+                className="absolute top-0 left-0 h-full bg-black rounded-full transition-all duration-300 ease-out"
+                style={{
+                  width: `${100 / products.length}%`,
+                  transform: `translateX(${activeIndex * 100}%)`,
+                }}
+              />
+            </div>
           </div>
         </div>
       )}

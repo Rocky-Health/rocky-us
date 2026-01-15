@@ -1,5 +1,3 @@
-import RockyInTheNews from "@/components/RockyInTheNews";
-import ReviewsSection from "@/components/ReviewsSection";
 import Section from "@/components/utils/Section";
 import WlFaqsSection from "@/components/BodyOptimization/WlFaqsSection";
 import NewMoneyBack from "@/components/BodyOptimization/bo3/NewMoneyBack";
@@ -8,6 +6,8 @@ import NewHealthSolutions from "@/components/BodyOptimization/bo3/NewHealthSolut
 import NewEnhancesWellnessJourney from "@/components/BodyOptimization/bo3/NewEnhancesWellnessJourney";
 import NewWlProducts from "@/components/BodyOptimization/bo3/NewWlProducts";
 import NewWlCover from "@/components/BodyOptimization/bo3/NewWlCover";
+import NewReviewsSection from "@/components/BodyOptimization/bo3/NewReviewsSection";
+import NewRockyInTheNews from "@/components/BodyOptimization/bo3/NewRockyInTheNews";
 
 export const metadata = {
   robots: {
@@ -28,12 +28,12 @@ export default async function BO3Page() {
       <Section>
         <NewEnhancesWellnessJourney />
       </Section>
-      <RockyInTheNews />
+      <NewRockyInTheNews />
       <Section>
         <NewHealthSolutions btnColor="bg-[forestgreen]" />
       </Section>
       <Section bg={"bg-[#F5F4EF]"}>
-        <ReviewsSection />
+        <NewReviewsSection />
       </Section>
       <Section className="bg-[#fff]">
         <NewPersonalizedTreatment />
