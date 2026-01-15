@@ -19,6 +19,18 @@ import {
 import { refreshCartNonceClient } from "./nonceManager";
 
 /**
+ * Helper function to clean and parse price strings
+ * Handles prices with currency symbols like "$399" or "399.00"
+ */
+function parsePrice(price) {
+  if (typeof price === 'number') return price;
+  if (!price) return 0;
+  // Remove all non-numeric characters except decimal point
+  const cleanPrice = String(price).replace(/[^0-9.]/g, '');
+  return parseFloat(cleanPrice) || 0;
+}
+
+/**
  * Add products directly to cart for any flow type
  * @param {Object} mainProduct - Main product data
  * @param {Array} addons - Array of addon products
@@ -194,7 +206,7 @@ async function handleUnauthenticatedFlow(
 
     // Prepare and add main product to cart
     if (mainProduct) {
-      const priceInDollars = parseFloat(mainProduct.price) || 0;
+      const priceInDollars = parsePrice(mainProduct.price);
       const priceInCents = priceInDollars * 100;
 
       const mainProductData = {
@@ -215,9 +227,7 @@ async function handleUnauthenticatedFlow(
     // Add addon products to cart
     if (addons && addons.length > 0) {
       for (const addon of addons) {
-        const addonPriceInDollars = parseFloat(
-          addon.price || addon.dataPrice || 0
-        );
+        const addonPriceInDollars = parsePrice(addon.price || addon.dataPrice);
         const addonPriceInCents = addonPriceInDollars * 100;
 
         // Build variation data for addon
@@ -385,7 +395,7 @@ async function handleUnauthenticatedEarlyAddition(
 
     // Prepare main product for cartService
     // Convert price from dollars to cents (flow config files use dollars)
-    const priceInDollars = parseFloat(mainProduct.price) || 0;
+    const priceInDollars = parsePrice(mainProduct.price);
     const priceInCents = priceInDollars * 100;
 
     const mainProductData = {
