@@ -20,7 +20,9 @@ const RadioQuestion = ({ config, userData, onSelect }) => {
         {config.options.map((option, key) => (
           <button
             key={option.id}
-            className={`w-full text-left ${config.options.length -1 == key ? 'mb-60' : ''} px-4 py-4 md:py-4 border-[1px] rounded-lg flex items-center gap-3 ${
+            className={`w-full text-left ${
+              config.options.length - 1 == key ? "mb-60" : ""
+            } px-4 py-4 md:py-4 border-[1px] rounded-lg flex items-center gap-3 ${
               selected === option.id
                 ? "border-[#A7885A] bg-[#FFFBF7]"
                 : "border-[#E2E2E1]"
@@ -52,15 +54,15 @@ const RadioQuestion = ({ config, userData, onSelect }) => {
           </button>
         ))}
 
-         {config.showSignIn && <SignInLink className="!mt-[30px]" />}
+        {config.showSignIn && <SignInLink className="!mt-[30px]" />}
 
         {/* Privacy text - WL style */}
         <div className="text-[10px] my-6  text-[#00000059] text-left font-[400] leading-[140%] tracking-[0%] mb-64">
           We respect your privacy. All of your information is securely stored on
-          our HIPPA Compliant server.
+          our HIPAA Compliant server.
         </div>
       </div>
-      
+
       <StickyButton
         text="Continue"
         onClick={() => {
