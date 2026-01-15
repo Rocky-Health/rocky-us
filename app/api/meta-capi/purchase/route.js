@@ -8,6 +8,33 @@ const BASE_URL = process.env.BASE_URL;
 const CONSUMER_KEY = process.env.CONSUMER_KEY;
 const CONSUMER_SECRET = process.env.CONSUMER_SECRET;
 
+const resolveEventTime = (payload, orderData) => {
+  const candidates = [
+    payload?.time_of_purchase_iso,
+    orderData?.date_paid_gmt,
+    orderData?.date_paid,
+    orderData?.date_created_gmt,
+    orderData?.date_created,
+    orderData?.date_completed
+  ];
+  const chosen = candidates.find((d) => Number.isFinite(Date.parse(d)));
+  if (chosen) {
+    return Math.floor(Date.parse(chosen) / 1000);
+  }
+  return Math.floor(Date.now() / 1000);
+};
+
+const isRetryableStatus = (status) => status === 429 || (status >= 500 && status < 600);
+
+const isRetryableError = (error) => {
+  const code = error?.code || error?.cause?.code || '';
+  if (['ETIMEDOUT', 'ECONNRESET', 'EAI_AGAIN', 'ENOTFOUND', 'ECONNREFUSED'].includes(code)) {
+    return true;
+  }
+  const message = (error?.message || '').toLowerCase();
+  return message.includes('timeout') || message.includes('network') || message.includes('fetch failed');
+};
+
 /**
  * Fetch complete order from WooCommerce if needed
  */
@@ -162,7 +189,8 @@ export async function POST(req) {
       currency, 
       content_ids, 
       num_items, 
-      order_data 
+      order_data,
+      meta_params
     } = payload;
 
     // Validate gateway
@@ -261,7 +289,8 @@ export async function POST(req) {
     const countryHash = hashSHA256(country);
     const ge = gender ? hashSHA256(gender) : '';
     const db = dob ? hashSHA256(dob) : '';
-    const external_id = order_data.customer_id ? hashSHA256(order_data.customer_id.toString()) : '';
+    const externalIdSource = payload.customer_id_canonical || payload.customer_id || order_data.customer_id;
+    const external_id = externalIdSource ? hashSHA256(externalIdSource.toString()) : '';
 
     // Client Info
     const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
@@ -269,13 +298,16 @@ export async function POST(req) {
     const userAgent = req.headers.get('user-agent') || '';
 
     // Process Meta parameters (fbp, fbc)
-    const metaParams = await processMetaParameters(req);
+    const metaParams = await processMetaParameters(req, meta_params || {});
 
     // Build event_source_url
     const eventSourceUrl = `https://myrocky.com/checkout/order-received/${order_id}`;
 
     // Generate stable event_id for deduplication
     const eventId = `purchase_${order_id}_${gateway}`;
+
+    const resolvedCurrency = currency || order_data?.currency || 'USD';
+    const eventTime = resolveEventTime(payload, order_data);
 
     // Build user_data object
     const userData = {
@@ -303,7 +335,7 @@ export async function POST(req) {
     // Build custom_data object
     const customData = {
       value: parseFloat(value),
-      currency: currency || 'USD',
+      currency: resolvedCurrency,
       content_ids: content_ids || [],
       content_type: 'item',
       num_items: num_items || 0,
@@ -320,7 +352,7 @@ export async function POST(req) {
     // Build Meta CAPI event payload
     const eventPayload = {
       event_name: gatewayConfig.customEventName, // Cryptic event name (e.g., RKY_TNT)
-      event_time: Math.floor(Date.now() / 1000),
+      event_time: eventTime,
       event_id: eventId,
       event_source_url: eventSourceUrl,
       action_source: 'website',
@@ -328,14 +360,28 @@ export async function POST(req) {
       custom_data: customData
     };
 
+    const matchKeys = {
+      has_email: !!userData.em?.length,
+      has_phone: !!userData.ph?.length,
+      has_external_id: !!userData.external_id?.length,
+      has_fbp: !!userData.fbp,
+      has_fbc: !!userData.fbc,
+      has_name: !!userData.fn?.length || !!userData.ln?.length,
+      has_location: !!userData.ct?.length || !!userData.st?.length || !!userData.zp?.length,
+      has_country: !!userData.country?.length,
+      has_gender: !!userData.ge?.length,
+      has_dob: !!userData.db?.length
+    };
+
     console.log(`[Meta CAPI] Sending event for order ${order_id} to ${gateway}:`, {
       pixel_id: gatewayConfig.pixelId,
       event_name: eventPayload.event_name,
+      event_id: eventPayload.event_id,
+      action_source: eventPayload.action_source,
+      event_time: eventPayload.event_time,
       value: eventPayload.custom_data.value,
-      has_fbp: !!userData.fbp,
-      has_fbc: !!userData.fbc,
-      has_gender: !!ge,
-      has_dob: !!db
+      currency: eventPayload.custom_data.currency,
+      match_keys: matchKeys
     });
 
     // Send to Meta Graph API
@@ -356,14 +402,17 @@ export async function POST(req) {
 
         if (!response.ok) {
           const text = await response.text();
+          const retryable = isRetryableStatus(response.status);
           console.error(`[Meta CAPI] HTTP Error ${gateway} (attempt ${attempt}):`, {
+            event_id: eventId,
             status: response.status,
             statusText: response.statusText,
-            body: text
+            body: text,
+            retryable
           });
           
-          // Retry once on failure
-          if (attempt === 1) {
+          // Retry once on transient failures only
+          if (attempt === 1 && retryable) {
             console.log(`[Meta CAPI] Retrying ${gateway}...`);
             await new Promise(resolve => setTimeout(resolve, 1000));
             return sendEvent(2);
@@ -396,7 +445,7 @@ export async function POST(req) {
           fbtrace_id: data.fbtrace_id
         });
       } catch (error) {
-        if (attempt === 1) {
+        if (attempt === 1 && isRetryableError(error)) {
           console.log(`[Meta CAPI] Retrying ${gateway} after error...`);
           await new Promise(resolve => setTimeout(resolve, 1000));
           return sendEvent(2);
