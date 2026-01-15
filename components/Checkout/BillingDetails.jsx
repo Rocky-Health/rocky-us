@@ -5,6 +5,7 @@ import PostCanadaAddressAutocomplete from "./PostCanada/PostCanadaAddressAutocom
 import { checkAgeRestriction } from "@/utils/ageValidation";
 import { logger } from "@/utils/devLogger";
 import { US_STATES_WITH_CODES, PHASE_1_STATES } from "@/lib/constants/usStates";
+import { validateField } from "@/utils/checkoutValidation";
 
 const BillingDetails = ({
   formData,
@@ -25,6 +26,7 @@ const BillingDetails = ({
   const addressSelectedRef = useRef(false);
   const previousStateRef = useRef(formData.billing_address.state);
   const isInitialMount = useRef(true);
+  const [phoneError, setPhoneError] = useState("");
 
   useEffect(() => {
     if (isInitialMount.current) {
@@ -47,7 +49,11 @@ const BillingDetails = ({
     } else {
       previousStateRef.current = formData.billing_address.state;
     }
-  }, [formData.billing_address.state, formData.billing_address.address_1, onProvinceChange]);
+  }, [
+    formData.billing_address.state,
+    formData.billing_address.address_1,
+    onProvinceChange,
+  ]);
   // Handle date change in the date picker with real-time age validation
   const handleDateChange = (value) => {
     logger.log("handleDateChange called with value:", value);
@@ -104,6 +110,75 @@ const BillingDetails = ({
       }
     } else {
       logger.log("Date not complete or no cart items, skipping validation");
+    }
+  };
+
+  // Format phone number to (XXX) XXX-XXXX format
+  const formatPhoneNumber = (value) => {
+    if (!value || typeof value !== "string") {
+      return "";
+    }
+
+    // Remove all non-digit characters
+    const phoneNumber = value.replace(/\D/g, "");
+
+    // Limit to 10 digits (US phone number format)
+    const limitedDigits = phoneNumber.slice(0, 10);
+
+    // Format as (XXX) XXX-XXXX
+    if (limitedDigits.length === 0) {
+      return "";
+    } else if (limitedDigits.length <= 3) {
+      return `(${limitedDigits}`;
+    } else if (limitedDigits.length <= 6) {
+      return `(${limitedDigits.slice(0, 3)}) ${limitedDigits.slice(3)}`;
+    } else {
+      return `(${limitedDigits.slice(0, 3)}) ${limitedDigits.slice(
+        3,
+        6
+      )}-${limitedDigits.slice(6, 10)}`;
+    }
+  };
+
+  // Handle phone number change with validation
+  const handlePhoneChange = (e) => {
+    // Use formatPhoneNumber (single source of truth)
+    const formattedPhoneNumber = formatPhoneNumber(e.target.value);
+
+    // Update form data
+    handleBillingAddressChange({
+      target: {
+        name: "phone",
+        value: formattedPhoneNumber,
+      },
+    });
+
+    // Validate dynamically as user types using checkoutValidation
+    const digitsOnly = formattedPhoneNumber.replace(/\D/g, "");
+    if (digitsOnly.length >= 10) {
+      // Only validate if we have enough digits (complete phone number)
+      const validation = validateField("phone", formattedPhoneNumber);
+      if (!validation.isValid) {
+        setPhoneError(validation.message);
+      } else {
+        setPhoneError("");
+      }
+    } else if (phoneError && digitsOnly.length < 10) {
+      // Clear error if user is still typing and hasn't reached 10 digits yet
+      setPhoneError("");
+    }
+  };
+
+  // Handle phone blur (when user leaves the field)
+  const handlePhoneBlur = () => {
+    if (formData.billing_address.phone) {
+      // Use checkoutValidation to validate
+      const validation = validateField("phone", formData.billing_address.phone);
+      if (!validation.isValid) {
+        setPhoneError(validation.message);
+      } else {
+        setPhoneError("");
+      }
     }
   };
 
@@ -230,8 +305,9 @@ const BillingDetails = ({
               id="state"
               name="state"
               disabled={isUpdatingShipping}
-              className={`w-full bg-white rounded-[8px] border border-solid border-[#E2E2E1] px-[16px] h-[44px] focus:outline-none focus:border-gray-500 appearance-none ${isUpdatingShipping ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+              className={`w-full bg-white rounded-[8px] border border-solid border-[#E2E2E1] px-[16px] h-[44px] focus:outline-none focus:border-gray-500 appearance-none ${
+                isUpdatingShipping ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
               <option value="" disabled="">
                 Select your state
@@ -307,9 +383,12 @@ const BillingDetails = ({
           title="Phone Number"
           name="phone"
           value={formData.billing_address.phone}
-          placeholder="Enter your phone number"
+          placeholder="(XXX) XXX-XXXX"
           required
-          onChange={handleBillingAddressChange}
+          onChange={handlePhoneChange}
+          onBlur={handlePhoneBlur}
+          error={phoneError}
+          maxLength={14}
         />
       </div>
       <div className="mb-4">
