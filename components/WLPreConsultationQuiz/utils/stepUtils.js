@@ -83,12 +83,12 @@ export const determineRecommendedProduct = (bmi, weightDuration, PRODUCTS) => {
     return null;
   }
 
-  let recommended = PRODUCTS.OZEMPIC;
-  let alternatives = [PRODUCTS.WEGOVY, PRODUCTS.MOUNJARO];
+  let recommended = PRODUCTS.COMPOUNDED_TIRZEPATIDE;
+  let alternatives = [PRODUCTS.COMPOUNDED_SEMAGLUTIDE, PRODUCTS.OZEMPIC, PRODUCTS.MOUNJARO, PRODUCTS.WEGOVY];
 
   if (weightDuration === "less-than-6") {
     recommended = PRODUCTS.RYBELSUS;
-    alternatives = [PRODUCTS.OZEMPIC, PRODUCTS.WEGOVY];
+    alternatives = [PRODUCTS.COMPOUNDED_TIRZEPATIDE, PRODUCTS.COMPOUNDED_SEMAGLUTIDE, PRODUCTS.OZEMPIC, PRODUCTS.WEGOVY];
   }
 
   return {

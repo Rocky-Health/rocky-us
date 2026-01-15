@@ -1,5 +1,24 @@
 {
   "wlProducts": {
+    "COMPOUNDED_TIRZEPATIDE": {
+      "id": "650264",
+      "name": "Compounded Tirzepatide",
+      "description": "(tirzepatide) injection",
+      "price": "399.00",
+      "details": "",
+      "url": "/wl/compounded.jpeg",
+      "isDefault": true,
+      "supplyAvailable": true
+    },
+    "COMPOUNDED_SEMAGLUTIDE": {
+      "id": "650260",
+      "name": "Compounded Semaglutide",
+      "description": "(semaglutide) injection",
+      "price": "299.00",
+      "details": "",
+      "url": "/wl/semagulatide.jpeg",
+      "supplyAvailable": true
+    },
     "OZEMPIC": {
       "id": "142976",
       "name": "Ozempic",
@@ -7,7 +26,6 @@
       "price": "1310.00",
       "details": "A once-weekly injectable GLP-1 medication with weight loss benefits.",
       "url": "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/ozempic/ozempic_2x.webp",
-      "isDefault": true,
       "supplyAvailable": true
     },
     "MOUNJARO": {
@@ -38,6 +56,6 @@
       "supplyAvailable": true
     }
   },
-  "defaultProduct": "OZEMPIC",
-  "availableProducts": ["OZEMPIC", "MOUNJARO", "WEGOVY", "RYBELSUS"]
+  "defaultProduct": "COMPOUNDED_TIRZEPATIDE",
+  "availableProducts": ["COMPOUNDED_TIRZEPATIDE", "COMPOUNDED_SEMAGLUTIDE", "OZEMPIC", "MOUNJARO", "WEGOVY", "RYBELSUS"]
 }
