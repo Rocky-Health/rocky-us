@@ -1,7 +1,7 @@
 "use client";
 
 import AccordionList from "@/components/AccordionList";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import CustomContainImage from "@/components/utils/CustomContainImage";
 
 const accordionData = [
@@ -49,13 +49,13 @@ const EnhancesWellnessJourney = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   // Helper function to get card width
-  const getCardWidth = () => {
+  const getCardWidth = useCallback(() => {
     return typeof window !== "undefined" && window.innerWidth >= 768
       ? 320 + 16 // md:gap-4 (16px)
       : 280 + 8; // gap-2 (8px) for mobile
-  };
+  }, []);
 
-  const handleScroll = () => {
+  const handleScroll = useCallback(() => {
     if (!scrollContainerRef.current) return;
 
     const container = scrollContainerRef.current;
@@ -66,7 +66,7 @@ const EnhancesWellnessJourney = () => {
     const maxIndex = Math.max(0, accordionData.length - 1);
 
     setActiveIndex(Math.min(Math.max(0, index), maxIndex));
-  };
+  }, [getCardWidth]);
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -78,7 +78,7 @@ const EnhancesWellnessJourney = () => {
     return () => {
       container.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [handleScroll]);
 
   return (
     <>
