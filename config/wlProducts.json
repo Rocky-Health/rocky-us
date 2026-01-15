@@ -1,9 +1,9 @@
 {
   "wlProducts": {
     "COMPOUNDED_TIRZEPATIDE": {
-      "id": "650264",
+      "id": "489523",
       "name": "Compounded Tirzepatide",
-      "description": "(tirzepatide) injection",
+      "description": "(tirzepatide) Vial",
       "price": "399.00",
       "details": "",
       "url": "/wl/compounded.jpeg",
@@ -11,9 +11,9 @@
       "supplyAvailable": true
     },
     "COMPOUNDED_SEMAGLUTIDE": {
-      "id": "650260",
+      "id": "489526",
       "name": "Compounded Semaglutide",
-      "description": "(semaglutide) injection",
+      "description": "(semaglutide) Vial",
       "price": "299.00",
       "details": "",
       "url": "/wl/semagulatide.jpeg",
