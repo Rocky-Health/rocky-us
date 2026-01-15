@@ -11,18 +11,24 @@ const CartAndPayment = ({
   setFormData,
   formData,
   handleSubmit,
+  cardNumber,
+  setCardNumber,
+  expiry,
+  setExpiry,
+  cvc,
+  setCvc,
+  cardType,
+  setCardType,
+  savedCards,
+  setSavedCards,
+  selectedCard,
+  setSelectedCard,
+  isLoadingSavedCards,
   isUpdatingShipping,
   ageValidationFailed,
   isPaymentValid,
   paymentValidationMessage,
-  onStripePaymentReady,
-  onStripePaymentChange,
-  onStripePaymentError,
-  registerStripePaymentHandler,
-  isStripePaymentActive,
-  // Stripe saved cards props
-  onSavedCardSelect,
-  selectedSavedCard,
+  onStripeReady, // NEW: Callback for Stripe Elements
 }) => {
   return (
     <div className="bg-[#f7f7f7] h-full justify-self-start w-full px-4 mt-8 lg:mt-0 lg:pl-[80px] lg:pt-[50px] pb-10 overflow-x-hidden">
@@ -43,13 +49,7 @@ const CartAndPayment = ({
       <Payment
         setFormData={setFormData}
         formData={formData}
-        onStripePaymentReady={onStripePaymentReady}
-        onStripePaymentChange={onStripePaymentChange}
-        onStripePaymentError={onStripePaymentError}
-        registerStripePaymentHandler={registerStripePaymentHandler}
-        isStripePaymentActive={isStripePaymentActive}
-        onSavedCardSelect={onSavedCardSelect}
-        selectedSavedCard={selectedSavedCard}
+        onStripeReady={onStripeReady}
       />
       <button
         onClick={handleSubmit}
