@@ -10,6 +10,8 @@ import Loader from "@/components/Loader";
 
 // Weight loss product IDs that require consultation
 const WEIGHT_LOSS_PRODUCT_IDS = [
+  "489523", // Compounded Tirzepatide
+  "489526", // Compounded Semaglutide
   //"490537", // ORAL_SEMAGLUTIDE
   "142975", // OZEMPIC
   "160468", // MOUNJARO

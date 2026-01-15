@@ -1,8 +1,8 @@
 const WLProducts = {
   COMPOUNDED_TIRZEPATIDE: {
-    id: "650266",
+    id: "489523",
     name: "Compounded Tirzepatide",
-    description: "(tirzepatide) injection",
+    description: "(tirzepatide) Vial",
     price: "$399",
     details: "",
     url: "/wl/compounded.jpeg",
@@ -10,9 +10,9 @@ const WLProducts = {
     supplyAvailable: true,
   },
   COMPOUNDED_SEMAGLUTIDE: {
-    id: "650261",
+    id: "489526",
     name: "Compounded Semaglutide",
-    description: "(semaglutide) injection",
+    description: "(semaglutide) Vial",
     price: "$299",
     details: "",
     url: "/wl/semagulatide.jpeg",
