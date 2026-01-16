@@ -5,7 +5,7 @@ const WLProducts = {
     description: "(tirzepatide) Vial",
     price: "$399",
     details: "",
-    url: "https://mycdn.myrocky.com/wp-content/uploads/20260115220421/Tirzepatide.png",
+    url: "/products/Tirzepatide-Vial.jpg",
     isDefault: true,
     supplyAvailable: true,
   },
@@ -15,7 +15,7 @@ const WLProducts = {
     description: "(semaglutide) Vial",
     price: "$299",
     details: "",
-    url: "https://mycdn.myrocky.com/wp-content/uploads/20260115220418/Semaglutide.png",
+    url: "/products/Semaglutide-Vial.jpg",
     supplyAvailable: true,
   },
   OZEMPIC: {
