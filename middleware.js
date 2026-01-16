@@ -137,10 +137,13 @@ export function middleware(req) {
       return NextResponse.redirect(new URL("/", req.url));
     }
 
-    // Case 3: If user is not authenticated and trying to access protected routes, redirect to login
+    // Case 3: If user is not authenticated and trying to access protected routes, redirect to register
     if (!authToken && !isLoginPage && shouldProtectRoute(pathname)) {
-      // Create login URL
+      // Create login URL with register view
       const loginUrl = new URL("/login-register", req.nextUrl.origin);
+
+      // Set viewshow to register for all consultations and flows
+      loginUrl.searchParams.set("viewshow", "register");
 
       // Preserve all query parameters in the redirect_to URL
       const redirectUrl = new URL(req.nextUrl.pathname, req.nextUrl.origin);
