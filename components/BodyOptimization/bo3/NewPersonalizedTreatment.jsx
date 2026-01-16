@@ -7,7 +7,7 @@ const PersonalizedTreatment = () => {
     <ImageWithList
       image="https://myrocky.b-cdn.net/WP%20Images/bo3/new/PersonalizedWeightLoss.jpg"
       imagePosition="left"
-      mobileImagePosition="bottom"
+      mobileImagePosition="top"
     >
       {/* Heading */}
       <div className="w-full">
