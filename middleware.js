@@ -28,6 +28,16 @@ export function middleware(req) {
       return NextResponse.redirect(new URL(`/blog/${slug}`, req.url));
     }
 
+    // Redirect compounded weight loss product pages to homepage
+    const restrictedProductSlugs = [
+      "/product/compounded-tirzepatide",
+      "/product/compounded-terzepatide", // Handle typo variant
+      "/product/compounded-semaglutide",
+    ];
+    if (restrictedProductSlugs.includes(pathname)) {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+
     // Check if the path is blocked (hashed in navbar)
     if (isBlockedRoute(pathname)) {
       const blockedUrl = new URL("/blocked", req.url);
@@ -127,10 +137,13 @@ export function middleware(req) {
       return NextResponse.redirect(new URL("/", req.url));
     }
 
-    // Case 3: If user is not authenticated and trying to access protected routes, redirect to login
+    // Case 3: If user is not authenticated and trying to access protected routes, redirect to register
     if (!authToken && !isLoginPage && shouldProtectRoute(pathname)) {
-      // Create login URL
+      // Create login URL with register view
       const loginUrl = new URL("/login-register", req.nextUrl.origin);
+
+      // Set viewshow to register for all consultations and flows
+      loginUrl.searchParams.set("viewshow", "register");
 
       // Preserve all query parameters in the redirect_to URL
       const redirectUrl = new URL(req.nextUrl.pathname, req.nextUrl.origin);
