@@ -4,7 +4,7 @@ const WLProducts = {
     name: "Compounded Tirzepatide",
     description: "(tirzepatide) Vial",
     price: "$399",
-    details: "",
+    details: "Tirzepatide is the generic version of Mounjaro. It is a personalized treatment to help reduce appetite and keep you fuller for longer",
     url: "https://mycdn.myrocky.com/wp-content/uploads/20260115220421/Tirzepatide.png",
     isDefault: true,
     supplyAvailable: true,
@@ -24,7 +24,7 @@ const WLProducts = {
     description: "(semaglutide) injection",
     price: "$1310",
     details:
-      "A once-weekly injectable GLP-1 medication with weight loss benefits.",
+      "Ozempic is the brand name for Semaglutide which is a FDA-approved medication. It helps reduce appetite and keeps you feeling fuller for longer",
     url: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/ozempic/ozempic_2x.webp",
     supplyAvailable: true,
   },
@@ -44,7 +44,7 @@ const WLProducts = {
     description: "(semaglutide) injection",
     price: "$1770",
     details:
-      "A high-dose GLP-1 injection approved for chronic weight management.",
+      "Wegovy is the brand name for semaglutide, an FDA-approved medication prescribed at a higher dose. It helps reduce appetite and keeps you feeling fuller for longer.",
     url: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/wegovy/wegovy_2x.webp",
     supplyAvailable: true,
   },
@@ -54,7 +54,7 @@ const WLProducts = {
     description: "(semaglutide) tablets",
     price: "$1310",
     details:
-      "The first oral GLP-1 tablet designed to support modest weight loss.",
+      "Rybelsus is the brand name for semaglutide, an FDA-approved oral medication. It helps reduce appetite and keeps you feeling fuller for longer.",
     url: "/products/rybelsus.png",
     supplyAvailable: true,
   },
