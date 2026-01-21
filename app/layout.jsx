@@ -17,6 +17,7 @@ import GlobalQuebecPopup from "@/components/GlobalQuebecPopup";
 import ZendeskWidget from "@/components/Layout/ZendeskWidget";
 import GoogleOAuthProvider from "@/components/Layout/GoogleOAuthProvider";
 import MetaCookieInitializer from "@/components/Layout/MetaCookieInitializer";
+import FBPixelLoader from "@/components/FBPixelLoader";
 import { Suspense } from "react";
 
 // Layout will use client-side path detection to avoid forcing dynamic rendering
@@ -165,6 +166,7 @@ export default function RootLayout({ children }) {
           <MetaCookieInitializer />
         </Suspense>
         <LoadingOverlay />
+        <FBPixelLoader />
         {/* <CronHitHandler /> */}
         <GoogleOAuthProvider>
           <Navbar className="navbar-main" />
