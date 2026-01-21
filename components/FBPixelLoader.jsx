@@ -9,7 +9,7 @@ export default function FBPixelLoader() {
   let pixelId = "";
   if (pathname?.startsWith("/pre-ed")) {
     pixelId = "522677764108011"; // ED Pixel ID
-  } else if (pathname?.startsWith("/pre-wl")) {
+  } else if (pathname?.startsWith("/bo") || pathname?.startsWith("/pre-wl")) {
     pixelId = "1451450365779499"; // WL Pixel ID
   }
 
