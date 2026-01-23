@@ -55,7 +55,7 @@ const BMICalculatorStep = ({
     <div className="w-full h-full flex flex-col">
       <div className="w-full md:w-[520px] mx-auto flex-grow pb-24">
         <div className="mb-6">
-          <label className="block mb-2">Your height is:</label>
+          <label className="block mb-2">How tall are you?</label>
           <div className="flex items-center mb-4 gap-2">
             <input
               type="number"
@@ -80,43 +80,7 @@ const BMICalculatorStep = ({
                 }));
               }}
             />
-            <button
-              className="min-w-[60px] h-[60px] p-3 text-2xl border border-gray-300 rounded-md flex items-center justify-center"
-              onClick={() => {
-                setUserData((prev) => ({
-                  ...prev,
-                  height: {
-                    ...prev.height,
-                    feet: Math.max(0, (parseInt(heightFeet) || 0) - 1),
-                    inches: heightInches,
-                  },
-                  weight: weightPounds,
-                }));
-              }}
-              type="button"
-            >
-              −
-            </button>
-            <button
-              className="min-w-[60px] h-[60px] p-3 text-2xl border border-gray-300 rounded-md flex items-center justify-center"
-              onClick={() => {
-                setUserData((prev) => ({
-                  ...prev,
-                  height: {
-                    ...prev.height,
-                    feet: (parseInt(heightFeet) || 0) + 1,
-                    inches: heightInches,
-                  },
-                  weight: weightPounds,
-                }));
-              }}
-              type="button"
-            >
-              +
-            </button>
-          </div>
 
-          <div className="flex items-center">
             <input
               type="number"
               min="0"
@@ -140,45 +104,12 @@ const BMICalculatorStep = ({
                 }));
               }}
             />
-            <button
-              className="min-w-[60px] h-[60px] p-3 text-2xl border border-gray-300 rounded-md flex items-center justify-center"
-              onClick={() => {
-                setUserData((prev) => ({
-                  ...prev,
-                  height: {
-                    ...prev.height,
-                    feet: heightFeet,
-                    inches: Math.max(0, (parseInt(heightInches) || 0) - 1),
-                  },
-                  weight: weightPounds,
-                }));
-              }}
-              type="button"
-            >
-              −
-            </button>
-            <button
-              className="min-w-[60px] h-[60px] p-3 text-2xl border border-gray-300 rounded-md flex items-center justify-center ml-2"
-              onClick={() => {
-                setUserData((prev) => ({
-                  ...prev,
-                  height: {
-                    ...prev.height,
-                    feet: heightFeet,
-                    inches: Math.min(11, (parseInt(heightInches) || 0) + 1),
-                  },
-                  weight: weightPounds,
-                }));
-              }}
-              type="button"
-            >
-              +
-            </button>
+           
           </div>
         </div>
 
         <div className="mb-6">
-          <label className="block mb-2">Your weight is:</label>
+          <label className="block mb-2">How much do you currently weigh?  </label>
           <input
             type="number"
             className="h-[60px] w-full p-3 border border-gray-300 rounded-md"
