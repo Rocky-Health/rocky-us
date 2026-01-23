@@ -175,7 +175,7 @@ const WeightLossResultPasswordPopup = ({
                   <input
                     type={showPassword ? "text" : "password"}
                     className="w-full border border-[#E5E5E5] rounded-lg px-4 py-4 text-[14px] focus:outline-none focus:border-black pr-12"
-                    placeholder="Enter Password"
+                    placeholder="Create Password"
                     value={password}
                     onChange={(e) => {
                       setPassword(e.target.value);
