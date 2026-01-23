@@ -53,7 +53,7 @@ const BMICalculatorStep = ({
 
   return (
     <div className="w-full h-full flex flex-col">
-      <div className="w-full md:w-[520px] mx-auto flex-grow pb-24">
+      <div className="w-full md:w-[520px] mx-auto flex-grow pb-32">
         <div className="mb-6">
           <label className="block mb-2">How tall are you?</label>
           <div className="flex items-center mb-4 gap-2">
@@ -140,8 +140,8 @@ const BMICalculatorStep = ({
         <PrivacyText />
       </div>
 
-      <div className="fixed bottom-0 left-0 w-full px-4 py-4 bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.8)_37.51%,#FFFFFF_63.04%)]">
-        <div className="w-full max-w-md mx-auto bg-white">
+      <div className="fixed bottom-0 left-0 w-full px-4 pb-4 flex items-center justify-center z-50 bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.8)_37.51%,#FFFFFF_63.04%)] backdrop-blur-sm">
+        <div className="w-[335px] md:w-[520px] max-w-xl">
           {/* Eligibility message */}
           {!bmi ||
             (!isEligible && (

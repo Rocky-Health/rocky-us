@@ -4,7 +4,7 @@ import { logger } from "@/utils/devLogger";
 import Link from "next/link";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import { usePassword } from "../contexts/PasswordContext";
+import { usePassword } from "@/components/WLPreConsultationQuizV2/contexts/PasswordContext";
 
 const WeightLossResultPasswordPopup = ({
   onSubmit,
@@ -21,6 +21,7 @@ const WeightLossResultPasswordPopup = ({
   const [showPasswordSection, setShowPasswordSection] = useState(false);
   const [emailTouched, setEmailTouched] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [emailExists, setEmailExists] = useState(false);
   // Password validation
   const isValidPassword = (pwd) => {
     return true;
@@ -49,6 +50,27 @@ const WeightLossResultPasswordPopup = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const checkEmailExists = async (emailToCheck) => {
+    if (!isValidEmail(emailToCheck)) return;
+    
+    try {
+      const res = await fetch("/api/check-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: emailToCheck }),
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setEmailExists(data.registered === true);
+      }
+    } catch (error) {
+      console.error("Error checking email:", error);
+      // Default to false if check fails
+      setEmailExists(false);
+    }
+  };
 
   const TryLogin = async ({ email, password }) => {
     // attempt login
@@ -154,6 +176,7 @@ const WeightLossResultPasswordPopup = ({
                   if (!emailTouched) setEmailTouched(true);
                   if (String(email || "").trim().length > 0) {
                     setShowPasswordSection(true);
+                    checkEmailExists(email);
                   }
                 }}
                 aria-invalid={emailTouched && !isValidEmail(email)}
@@ -169,13 +192,13 @@ const WeightLossResultPasswordPopup = ({
             {showPasswordSection && (
               <div>
                 <label className="block text-[14px] font-medium mb-2">
-                  Password
+                  {emailExists ? "Enter your password to log in" : "Create a Password"}
                 </label>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
                     className="w-full border border-[#E5E5E5] rounded-lg px-4 py-4 text-[14px] focus:outline-none focus:border-black pr-12"
-                    placeholder="Create Password"
+                    placeholder={emailExists ? "Password" : "Must be at least 8 characters"}
                     value={password}
                     onChange={(e) => {
                       setPassword(e.target.value);

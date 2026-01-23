@@ -28,7 +28,7 @@ const SelectQuestion = ({
 
   return (
     <>
-      <div className="w-full">
+      <div className="w-full pb-32">
         <label className="text-[14px] mb-[8px] font-medium leading-[140%]">
           {config.label}
         </label>

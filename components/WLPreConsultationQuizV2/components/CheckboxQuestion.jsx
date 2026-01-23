@@ -18,7 +18,7 @@ const CheckboxQuestion = ({
 
   return (
     <>
-      <div className="space-y-4">
+      <div className="space-y-4 pb-10">
         {config.options.map((option) => (
           <button
             key={option.id}
@@ -76,16 +76,18 @@ const CheckboxQuestion = ({
 
       {config.showSignIn && <SignInLink className="mt-1" />}
 
-      <div className="sticky bottom-0 py-4 bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.8)_37.51%,#FFFFFF_63.04%)]">
-        <button
-          onClick={handleContinue}
-          disabled={!isValid}
-          className={` w-full mt-6 py-3 h-[52px]  rounded-full font-medium ${
-            isValid ? "bg-black text-white" : "bg-[#E3E3E3] text-black"
-          }`}
-        >
-          Continue
-        </button>
+      <div className="fixed bottom-0 left-0 w-full px-4 pb-4 flex items-center justify-center z-50 bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.8)_37.51%,#FFFFFF_63.04%)] backdrop-blur-sm">
+        <div className="w-[335px] md:w-[520px] max-w-xl">
+          <button
+            onClick={handleContinue}
+            disabled={!isValid}
+            className={` w-full py-3 h-[52px]  rounded-full font-medium ${
+              isValid ? "bg-black text-white" : "bg-[#E3E3E3] text-black"
+            }`}
+          >
+            Continue
+          </button>
+        </div>
       </div>
     </>
   );

@@ -16,7 +16,7 @@ const RadioQuestion = ({ config, userData, onSelect }) => {
 
   return (
     <>
-      <div className="space-y-4 pb-24">
+      <div className="space-y-4 pb-32">
         {config.options.map((option, key) => (
           <button
             key={option.id}

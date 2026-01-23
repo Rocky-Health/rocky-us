@@ -847,7 +847,7 @@ const Form = ({
       `}</style>
 
       <form
-        className="flex flex-col gap-1 w-full min-h-screen pb-28"
+        className="flex flex-col gap-1 w-full pb-24"
         onSubmit={(e) => {
           e.preventDefault();
           handleContinue();

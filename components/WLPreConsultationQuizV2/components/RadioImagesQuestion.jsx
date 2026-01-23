@@ -30,7 +30,7 @@ const RadioImagesQuestion = ({
 
   return (
     <>
-      <div className="grid grid-cols-3 ">
+      <div className="grid grid-cols-3 pb-32">
         {config.options.map((option) => (
           <button
             key={option.id}
