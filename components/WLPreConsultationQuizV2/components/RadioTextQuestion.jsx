@@ -15,7 +15,7 @@ const RadioTextQuestion = ({
 
   return (
     <>
-      <div className="space-y-4">
+      <div className="space-y-4 pb-32">
         {config.options.map((option) => (
           <button
             key={option.id}

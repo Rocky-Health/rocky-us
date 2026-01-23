@@ -229,7 +229,7 @@ const GenericRecommendationStep = ({
   }
 
   return (
-    <div className="w-full md:w-[520px] mx-auto px-5 md:px-0 flex flex-col min-h-screen relative">
+    <div className="w-full md:w-[520px] mx-auto px-5 md:px-0 flex flex-col min-h-screen relative pb-32">
       {/* Full-screen loading overlay */}
       {isCheckoutLoading && (
         <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black bg-opacity-30">
@@ -432,29 +432,31 @@ const GenericRecommendationStep = ({
       </div>
 
       {/* Continue Button */}
-      <div className="sticky bottom-0 py-4 z-30 bg-white">
-        {/* Show more/less options button */}
-        {showAlternatives && alternatives && alternatives.length > 0 && (
+      <div className="fixed bottom-0 left-0 w-full px-4 pb-4 flex items-center justify-center z-50 bg-white">
+        <div className="w-[335px] md:w-[520px] max-w-xl flex flex-col gap-3">
+          {/* Show more/less options button */}
+          {showAlternatives && alternatives && alternatives.length > 0 && (
+            <button
+              onClick={handleShowMoreOptions}
+              className="w-full py-3 px-8 rounded-full border border-gray-300 text-black font-medium bg-transparent"
+            >
+              {showMoreOptions ? "Show less options" : "Show more options"}
+            </button>
+          )}
           <button
-            onClick={handleShowMoreOptions}
-            className="w-full py-3 px-8 rounded-full border border-gray-300 text-black font-medium bg-transparent mb-4"
+            className={`w-full py-3 rounded-full font-medium ${
+              isContinueEnabled
+                ? "bg-black text-white"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
+            onClick={isContinueEnabled ? handleCheckout : null}
+            disabled={!isContinueEnabled || isCheckoutLoading}
           >
-            {showMoreOptions ? "Show less options" : "Show more options"}
+            {isCheckoutLoading
+              ? "Processing..."
+              : `Proceed - ${selectedProduct?.price || ""} →`}
           </button>
-        )}
-        <button
-          className={`w-full py-3 rounded-full font-medium ${
-            isContinueEnabled
-              ? "bg-black text-white"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
-          }`}
-          onClick={isContinueEnabled ? handleCheckout : null}
-          disabled={!isContinueEnabled || isCheckoutLoading}
-        >
-          {isCheckoutLoading
-            ? "Processing..."
-            : `Proceed - ${selectedProduct?.price || ""} →`}
-        </button>
+        </div>
       </div>
     </div>
   );
