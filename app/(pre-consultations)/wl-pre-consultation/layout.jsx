@@ -79,6 +79,14 @@ export default function WLPreQuestionnaireLayout({ children }) {
         #launcher {
           display: none !important;
         }
+          iframe[title="Close message"] {
+          display: none !important;
+        }
+
+
+        iframe[title="Message from company"] {
+          display: none !important;
+        }
       `}</style>
       
       {children}
