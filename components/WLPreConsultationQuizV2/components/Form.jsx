@@ -118,6 +118,63 @@ const Form = ({
     };
   }, []);
 
+  // Detect autofilled inputs and sync with state
+  useEffect(() => {
+    const checkAutofill = () => {
+      const inputs = document.querySelectorAll('input, select, textarea');
+      const updates = {};
+      let hasUpdates = false;
+
+      inputs.forEach((input) => {
+        const name = input.name || input.id;
+        if (!name) return;
+
+        // Check if field exists in config
+        const field = config.fields.find(f => f.id === name);
+        if (!field) return;
+
+        // Get current value from DOM
+        const domValue = input.value;
+        const stateValue = fieldsState[name];
+
+        // If DOM has value but state doesn't, update state
+        if (domValue && !stateValue) {
+          updates[name] = domValue;
+          hasUpdates = true;
+        }
+      });
+
+      if (hasUpdates) {
+        setFieldsState(prev => ({ ...prev, ...updates }));
+        // Mark updated fields as completed
+        setCompletedFields(prev => {
+          const newCompleted = { ...prev };
+          Object.keys(updates).forEach(key => {
+            newCompleted[key] = true;
+          });
+          return newCompleted;
+        });
+      }
+    };
+
+    // Check immediately after mount
+    const timer = setTimeout(checkAutofill, 100);
+
+    // Listen for autofill animation (webkit browsers)
+    const handleAnimationStart = (e) => {
+      if (e.animationName === 'onAutoFillStart') {
+        checkAutofill();
+      }
+    };
+
+    document.addEventListener('animationstart', handleAnimationStart, true);
+
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('animationstart', handleAnimationStart, true);
+    };
+  }, [config.fields, fieldsState]);
+
   // Toggle handler for checkbox fields
   const handleCheckboxToggle = (field, optionId) => {
     setFieldsState((prev) => {
@@ -369,13 +426,13 @@ const Form = ({
       return false;
     }
 
-    // Step 2 validation (phone, dob, state)
+    // Step 2 validation (phone, dob, province)
     if (!mergedUserData.phone) {
       toast.error("Phone number is required");
       setLoading(false);
       return false;
     }
-    // Check if phone number is all zeros
+    // Check if phone number contains only zeros
     const digitsOnly = mergedUserData.phone.replace(/\D/g, "");
     if (digitsOnly.length > 0 && /^0+$/.test(digitsOnly)) {
       toast.error("Please enter a valid phone number");
@@ -387,8 +444,8 @@ const Form = ({
       setLoading(false);
       return false;
     }
-    if (!mergedUserData.state) {
-      toast.error("State is required");
+    if (!mergedUserData.province) {
+      toast.error("Province is required");
       setLoading(false);
       return false;
     }
@@ -398,10 +455,10 @@ const Form = ({
     if (formattedDOB && formattedDOB.includes("/")) {
       const parts = formattedDOB.split("/");
       if (parts.length === 3) {
-        formattedDOB = `${parts[2]}-${parts[0].padStart(
+        formattedDOB = `${parts[2]}-${parts[1].padStart(
           2,
           "0"
-        )}-${parts[1].padStart(2, "0")}`;
+        )}-${parts[0].padStart(2, "0")}`;
       }
     }
 
@@ -436,7 +493,7 @@ const Form = ({
           password: mergedUserData.password,
           phone: mergedUserData.phone,
           date_of_birth: formattedDOB,
-          province: mergedUserData.state,
+          province: mergedUserData.province,
           gender: mergedUserData.gender,
           register_step: 2,
         }),
@@ -447,7 +504,7 @@ const Form = ({
         setLoading(false);
         return false;
       }
-      toast.success(data2.message || "Registration successful!");
+      //toast.success(data2.message || "Registration successful!");
       setLoading(false);
       return true;
     } catch (err) {
@@ -779,6 +836,16 @@ const Form = ({
         </div>
       )}
 
+      <style jsx>{`
+        input:-webkit-autofill {
+          animation-name: onAutoFillStart;
+        }
+        @keyframes onAutoFillStart {
+          from { opacity: 0.99; }
+          to { opacity: 1; }
+        }
+      `}</style>
+
       <form
         className="flex flex-col gap-1 w-full min-h-screen pb-28"
         onSubmit={(e) => {
@@ -870,6 +937,8 @@ const Form = ({
                   </div>
                 ) : field.type === "select" && Array.isArray(field.options) ? (
                   <select
+                    name={field.id}
+                    id={field.id}
                     className="w-full h-[60px] border border-[#E5E5E5] rounded-lg px-4 py-3 text-[16px] focus:outline-none focus:border-black"
                     value={fieldsState[field.id] ?? ""}
                     onChange={(e) => handleChange(field.id, e.target.value)}
@@ -916,7 +985,10 @@ const Form = ({
                 ) : (
                   <>
                     <input
+                      name={field.id}
+                      id={field.id}
                       type={field.type}
+                      autoComplete={field.type === "email" ? "email" : field.type === "tel" ? "tel" : field.id === "firstName" ? "given-name" : field.id === "lastName" ? "family-name" : field.id === "password" ? "new-password" : "on"}
                       className={`w-full h-[60px] border rounded-lg px-4 py-3 text-[16px] focus:outline-none transition-colors ${
                         field.type === "email" &&
                         fieldsState[field.id] &&
