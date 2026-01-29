@@ -274,13 +274,13 @@ export const quizConfig = {
 
 
     9: {
-      id: "state",
+      id: "province",
       type: "select",
       passIf: "authenticate",
       title: "First, let’s make sure we have licensed providers in your area.",
       subtitle:
         "Weight loss medications are prescribed online and delivered to your door.",
-      field: "state",
+      field: "province",
       required: true,
       label: "State",
       options: [
