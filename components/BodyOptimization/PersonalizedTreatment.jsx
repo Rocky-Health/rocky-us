@@ -2,7 +2,7 @@ import ImageWithList from "@/components/ImageWithList";
 import Link from "next/link";
 import { FaArrowRightLong } from "react-icons/fa6";
 
-const PersonalizedTreatment = () => {
+const PersonalizedTreatment = ({ consultationHref = "/wl-pre-consultation/" }) => {
   return (
     <ImageWithList
       image="https://myrocky.b-cdn.net/WP%20Images/Weight%20Loss/Personalized.webp"
@@ -28,7 +28,7 @@ const PersonalizedTreatment = () => {
         {/* Button */}
         <div className="">
           <Link
-            href="/wl-pre-consultation/"
+            href={consultationHref}
             className="h-11 md:px-[24px] py-3 md:py-[11.5px] rounded-[64px] flex items-center space-x-2 transition justify-center w-full md:w-fit  bg-black text-white hover:bg-gray-800"
           >
             <span className="text-[14px] leading-[19.6px] md:leading-[21px] font-[500] md:font-[400]">

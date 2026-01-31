@@ -1,7 +1,7 @@
 import Link from "next/link";
 import CustomImage from "../utils/CustomImage";
 
-const ProductCard = ({ product, btnColor = null }) => {
+const ProductCard = ({ product, btnColor = null, consultationHref = "/wl-pre-consultation" }) => {
   return (
     <div className="relative rounded-[16px] overflow-hidden min-w-[284px] h-[400px] border border-solid border-[#E2E2E1] bg-white shadow-md">
       <div className="relative overflow-hidden w-full h-full">
@@ -33,7 +33,7 @@ const ProductCard = ({ product, btnColor = null }) => {
       </div>
       <div className="flex gap-2 w-full justify-center items-center absolute bottom-5">
         <Link
-          href="/wl-pre-consultation"
+          href={consultationHref}
           prefetch={true}
           className={`${
             btnColor || "bg-black"

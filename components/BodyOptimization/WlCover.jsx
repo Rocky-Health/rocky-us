@@ -36,12 +36,18 @@ const wlCoverData = {
   ],
 };
 
-const WlCover = ({ btnColor = null, subtitle = null }) => {
+const WlCover = ({ btnColor = null, subtitle = null, consultationHref = "/wl-pre-consultation/" }) => {
   if (btnColor) wlCoverData.buttons[0].color = btnColor;
   const data = subtitle ? { ...wlCoverData, subtitle } : wlCoverData;
+  // Create a new buttons array with the consultationHref
+  const buttons = data.buttons.map(button => ({
+    ...button,
+    href: consultationHref
+  }));
+  const dataWithHref = { ...data, buttons };
   return (
     <>
-      <PageCover data={data} items={items} />
+      <PageCover data={dataWithHref} items={items} />
     </>
   );
 };
