@@ -26,7 +26,7 @@ const accordionData = [
   },
 ];
 
-const HealthSolutions = ({ btnColor = null }) => {
+const HealthSolutions = ({ btnColor = null, consultationHref = "/wl-pre-consultation/" }) => {
   const [openIndex, setOpenIndex] = useState(null);
 
   const handleToggle = (index) => {
@@ -43,7 +43,7 @@ const HealthSolutions = ({ btnColor = null }) => {
         Health Solutions That <br /> Work with Your Body
       </h1>
       <p className="py-6 md:py-0 md:mb-[18px] text-xl text-[#535353] lg:text-[#000000A6] font-medium lg:font-normal leading-6 lg:leading-[30px] tracking-[-1px] md:tracking-[0]">
-        It’s not magic, it’s metabolic science. Access GLP-1s and treatments
+        It's not magic, it's metabolic science. Access GLP-1s and treatments
         tailored to your unique goals, body and lifestyle, with all the support
         you need.
       </p>
@@ -92,7 +92,7 @@ const HealthSolutions = ({ btnColor = null }) => {
       {/* Button */}
       <div>
         <Link
-          href="/wl-pre-consultation/"
+          href={consultationHref}
           className={` ${
             btnColor || "bg-black"
           }  h-11 md:px-[24px] py-3 md:py-[11.5px] rounded-[64px] flex items-center space-x-2 transition justify-center w-full md:w-fit  text-white hover:bg-gray-800`}
