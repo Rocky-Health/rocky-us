@@ -82,6 +82,9 @@ export default function NewBOWLConsultationQuiz({
       "l-604_6-textarea": "",
       617: "",
       "l-617_1-textarea": "",
+      "l-617_1": "",
+      "l-617_2": "",
+      "l-617_3": "",
       618_1: "",
       618_2: "",
       618_3: "",
@@ -195,6 +198,12 @@ export default function NewBOWLConsultationQuiz({
   const [showVeryHighBpWarning, setShowVeryHighBpWarning] = useState(false);
   const [showUnknownBpWarning, setShowUnknownBpWarning] = useState(false);
   const [bpWarningAcknowledged, setBpWarningAcknowledged] = useState(false);
+  const [
+    showNoAppointmentAcknowledgement,
+    setShowNoAppointmentAcknowledgement,
+  ] = useState(false);
+  const [noAppointmentAcknowledged, setNoAppointmentAcknowledged] =
+    useState(false);
   const [buttonState, setButtonState] = useState({
     visible: false,
     disabled: false,
@@ -203,8 +212,6 @@ export default function NewBOWLConsultationQuiz({
   const [question1ButtonVisible, setQuestion1ButtonVisible] = useState(true);
   const fileInputRef = useRef(null);
   const frontPhotoInputRef = useRef(null);
-  // Ref to track latest id/token/entrykey to ensure we always update the same questionnaire
-  const questionnaireRef = useRef({ id: "", token: "", entrykey: "" });
   const sidePhotoInputRef = useRef(null);
 
   useEffect(() => {
@@ -333,11 +340,6 @@ export default function NewBOWLConsultationQuiz({
         try {
           const parsed = JSON.parse(storedForm);
           if (parsed.id || parsed.token || parsed.entrykey) {
-            questionnaireRef.current = {
-              id: parsed.id || "",
-              token: parsed.token || "",
-              entrykey: parsed.entrykey || "",
-            };
             setFormData((prev) => ({
               ...prev,
               id: parsed.id || prev.id || "",
@@ -346,7 +348,7 @@ export default function NewBOWLConsultationQuiz({
             }));
           }
         } catch (e) {
-          logger.error("Error loading stored questionnaire refs:", e);
+          logger.error("Error loading stored questionnaire data:", e);
         }
       }
     } catch (error) {
@@ -533,6 +535,9 @@ export default function NewBOWLConsultationQuiz({
         618_1: formData["618_1"],
         618_2: formData["618_2"],
         618_3: formData["618_3"],
+        "l-617_1": formData["l-617_1"],
+        "l-617_2": formData["l-617_2"],
+        "l-617_3": formData["l-617_3"],
       },
       25: { photo_id_acknowledged: photoIdAcknowledged ? "1" : "" },
       26: { 196: formData["196"] },
@@ -770,6 +775,9 @@ export default function NewBOWLConsultationQuiz({
         618_1: formData["618_1"],
         618_2: formData["618_2"],
         618_3: formData["618_3"],
+        "l-617_1": formData["l-617_1"],
+        "l-617_2": formData["l-617_2"],
+        "l-617_3": formData["l-617_3"],
       },
       25: { photo_id_acknowledged: photoIdAcknowledged ? "1" : "" },
       26: { 196: formData["196"] },
@@ -800,7 +808,6 @@ export default function NewBOWLConsultationQuiz({
       let dataToSubmit;
 
       if (specificData) {
-        // Merge specific data with cumulative data (same approach as WeightConsultationQuiz)
         const cumulativeData = collectCumulativeData();
 
         const textareaFields = {};
@@ -814,17 +821,9 @@ export default function NewBOWLConsultationQuiz({
           }
         });
 
-        const mergedData = { ...cumulativeData };
-        Object.entries(specificData).forEach(([key, value]) => {
-          if (value !== undefined && value !== null && value !== "") {
-            mergedData[key] = value;
-          } else if (!(key in cumulativeData)) {
-            mergedData[key] = value;
-          }
-        });
-
         dataToSubmit = {
-          ...mergedData,
+          ...cumulativeData,
+          ...specificData,
           ...textareaFields,
         };
         delete dataToSubmit._ui;
@@ -834,7 +833,6 @@ export default function NewBOWLConsultationQuiz({
         delete dataToSubmit._ui;
         delete dataToSubmit[".ui"];
       }
-      
       const logTextareaFields = (data) => {
         const textareaFields = Object.entries(data)
           .filter(([key]) => key.includes("-textarea"))
@@ -847,26 +845,18 @@ export default function NewBOWLConsultationQuiz({
           logger.log("Submitting textarea fields:", textareaFields);
         }
       };
-      
-      // Always use the latest formData values for id, token, entrykey
-      // This ensures we update the same questionnaire entry, not create new ones
-      // Use ref as fallback to ensure we have the latest values even if state hasn't updated yet
-      const currentId = formData.id || questionnaireRef.current.id || "";
-      const currentToken = formData.token || questionnaireRef.current.token || "";
-      const currentEntrykey = formData.entrykey || questionnaireRef.current.entrykey || "";
-
       const completeData = {
         ...dataToSubmit,
         form_id: 6,
         action: "wl_questionnaire_data_upload",
-        entrykey: currentEntrykey,
-        id: currentId,
-        token: currentToken,
+        entrykey: formData.entrykey || "",
+        id: formData.id || "",
+        token: formData.token || "",
         stage: dataToSubmit.stage || "consultation-before-checkout",
         page_step: currentPage,
         completion_state: dataToSubmit.completion_state || "Partial",
         completion_percentage: dataToSubmit.completion_percentage || progress,
-        source_site: "https://myrocky.ca",
+        source_site: "https://myrocky.com",
       };
 
       logTextareaFields(completeData);
@@ -884,22 +874,12 @@ export default function NewBOWLConsultationQuiz({
       }
 
       const data = await response.json();
-      
-      // Update formData with response data - this ensures subsequent submissions
-      // will use the same id/token/entrykey to UPDATE the questionnaire, not create new ones
       setFormData((prev) => {
         const updated = {
           ...prev,
           id: data.id || prev.id || "",
           token: data.token || prev.token || "",
           entrykey: data.entrykey || prev.entrykey || "",
-        };
-
-        // Update ref immediately so it's available for next submission
-        questionnaireRef.current = {
-          id: updated.id,
-          token: updated.token,
-          entrykey: updated.entrykey,
         };
 
         updateLocalStorage(updated);
@@ -909,7 +889,7 @@ export default function NewBOWLConsultationQuiz({
 
       return data;
     } catch (error) {
-      logger.error("Error submitting form data:", error);
+      logger.error("Error submitting form:", error);
       return null;
     }
   };
@@ -1446,10 +1426,138 @@ export default function NewBOWLConsultationQuiz({
 
   const handleBookAppointmentSelect = (option) => {
     clearError();
-    setFormData((prev) => ({ ...prev, 619: option }));
-    updateFormDataAndStorage({ 619: option });
-    queueFormSubmission({ 619: option });
-    setTimeout(() => moveToNextSlideWithoutValidation(), 10);
+
+    if (option === "Clinician") {
+      option = "Doctor";
+    }
+
+    let updates = {
+      619: option,
+    };
+    if (option === "Pharmacist" || option === "Doctor") {
+      updates["618_1"] = "";
+      updates["618_2"] = "";
+      updates["618_3"] = "";
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      ...updates,
+    }));
+
+    updateFormDataAndStorage(updates);
+    queueFormSubmission({ ...formData, ...updates });
+
+    if (option === "Doctor" || option === "Pharmacist") {
+      setTimeout(() => {
+        moveToNextSlideWithoutValidation();
+      }, 10);
+    } else if (option === "No") {
+      setShowNoAppointmentAcknowledgement(true);
+      setNoAppointmentAcknowledged(false);
+    }
+  };
+
+  const handleNoAppointmentAcknowledgement = (e) => {
+    const isChecked = e.target.checked;
+    setNoAppointmentAcknowledged(isChecked);
+
+    const updates = {
+      "618_1": isChecked ? "1" : "",
+      "618_2": isChecked
+        ? "I hereby understand and consent to the above waiver"
+        : "",
+      "618_3": isChecked ? "33" : "",
+    };
+
+    const updatedData = {
+      ...formData,
+      ...updates,
+    };
+
+    setFormData((prev) => ({ ...prev, ...updates }));
+    updateFormDataAndStorage(updatedData);
+
+    queueFormSubmission(updates);
+  };
+
+  const handleRequestAppointmentInstead = () => {
+    setShowNoAppointmentAcknowledgement(false);
+
+    const updates = {
+      619: "Clinician",
+      "618_1": "",
+      "618_2": "",
+      "618_3": "",
+    };
+
+    setFormData((prev) => ({
+      ...prev,
+      ...updates,
+    }));
+
+    updateFormDataAndStorage({
+      ...formData,
+      ...updates,
+    });
+
+    queueFormSubmission(updates);
+
+    setTimeout(() => {
+      moveToNextSlideWithoutValidation();
+    }, 10);
+  };
+
+  const handleNoAppointmentContinue = (proceed = true) => {
+    if (!proceed) {
+      setShowNoAppointmentAcknowledgement(false);
+      setNoAppointmentAcknowledged(false);
+
+      const updates = {
+        619: "",
+        "618_1": "",
+        "618_2": "",
+        "618_3": "",
+      };
+
+      setFormData((prev) => ({
+        ...prev,
+        ...updates,
+      }));
+
+      updateFormDataAndStorage({
+        ...formData,
+        ...updates,
+      });
+
+      queueFormSubmission(updates);
+      return;
+    }
+
+    if (!noAppointmentAcknowledged) return;
+    setShowNoAppointmentAcknowledgement(false);
+
+    const updates = {
+      "l-617_1": "1",
+      "l-617_2": "I hereby understand and consent to the above waiver",
+      "l-617_3": "33",
+    };
+
+    setFormData((prev) => ({
+      ...prev,
+      ...updates,
+    }));
+
+    updateFormDataAndStorage({
+      ...formData,
+      ...updates,
+    });
+
+    queueFormSubmission(updates);
+
+    setTimeout(() => {
+      moveToNextSlideWithoutValidation();
+    }, 10);
   };
 
   const handlePhotoIdAcknowledgement = (e) => {
@@ -2065,6 +2173,10 @@ export default function NewBOWLConsultationQuiz({
     }
     if (currentPage === 24 && !formData["619"]) {
       return showError("Please make a selection");
+    }
+    if (currentPage === 24 && formData["619"] === "No" && !formData["618_1"]) {
+      setShowNoAppointmentAcknowledgement(true);
+      return false;
     }
     if (currentPage === 25 && !photoIdAcknowledged) {
       return showError("Please acknowledge that you will upload your photo ID");
@@ -4036,6 +4148,29 @@ export default function NewBOWLConsultationQuiz({
         showCheckbox={false}
         backgroundColor="bg-[#F5F4EF]"
         currentPage={currentPage}
+      />
+      {/* No Appointment Acknowledgement Popup */}
+      <WarningPopup
+        isOpen={showNoAppointmentAcknowledgement}
+        onClose={handleNoAppointmentContinue}
+        title="Acknowledgement"
+        message="I hereby acknowledge that by foregoing an appointment with a licensed physician or pharmacist, it is my sole responsibility to ensure I am aware of how to appropriately use the medication requested, furthermore I hereby confirm that I am aware of any potential side effects that may occur through the use of the aforementioned medication and hereby confirm that I do not have any medical questions to ask. I will ensure I have read the relevant product page and FAQ prior to use of the prescribed medication. Should I have any questions to ask, I am aware of how to contact the clinical team at Rocky or get a hold of my primary care provider."
+        isAcknowledged={noAppointmentAcknowledged}
+        onAcknowledge={handleNoAppointmentAcknowledgement}
+        backgroundColor="bg-[#F5F4EF]"
+        additionalContent={null}
+        buttonText="OK"
+        currentPage={currentPage}
+        afterButtonContent={
+          <p className="mt-4 text-center font-medium text-md text-[#000000]">
+            <button
+              onClick={handleRequestAppointmentInstead}
+              className="underline hover:text-gray-900"
+            >
+              I would like to request the appointment instead
+            </button>
+          </p>
+        }
       />
     </div>
   );
