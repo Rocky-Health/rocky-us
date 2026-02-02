@@ -19,9 +19,9 @@ import Link from "next/link";
 
 // Pages 1-5: Migrated pre-quiz questions (moved to start)
 // Pages 6-27: Standard WL questionnaire questions (22 pages)
-// Page 28: Thank you page
-// Total: 28 pages
-const TOTAL_PAGES = 28;
+// Page 32: Thank you page
+// Total: 32 pages (added allergic reaction question, pen injector question, side effects question, and personalized dose question)
+const TOTAL_PAGES = 32;
 
 export default function NewBOWLConsultationQuiz({
   pn,
@@ -139,6 +139,24 @@ export default function NewBOWLConsultationQuiz({
       "l-613_7-textarea": "",
       "l-613_10-textarea": "",
       "l-613_11-textarea": "",
+      "621_1": "",
+      "621_2": "",
+      "621_3": "",
+      "621_4": "",
+      "622_1": "",
+      "622_2": "",
+      "622_3": "",
+      "622_4": "",
+      "624_1": "",
+      "624_2": "",
+      "624_3": "",
+      "624_4": "",
+      "624_5": "",
+      "624_6": "",
+      "623_1": "",
+      "623_2": "",
+      "623_3": "",
+      "623_4": "",
       614: "",
       "l-614_1-textarea": "",
       "615_1": "",
@@ -519,8 +537,34 @@ export default function NewBOWLConsultationQuiz({
         "l-613_10-textarea": formData["l-613_10-textarea"],
         "l-613_11-textarea": formData["l-613_11-textarea"],
       },
-      21: { 614: formData["614"], "l-614_1-textarea": formData["l-614_1-textarea"] },
+      21: {
+        "621_1": formData["621_1"],
+        "621_2": formData["621_2"],
+        "621_3": formData["621_3"],
+        "621_4": formData["621_4"],
+      },
       22: {
+        "622_1": formData["622_1"],
+        "622_2": formData["622_2"],
+        "622_3": formData["622_3"],
+        "622_4": formData["622_4"],
+      },
+      23: {
+        "624_1": formData["624_1"],
+        "624_2": formData["624_2"],
+        "624_3": formData["624_3"],
+        "624_4": formData["624_4"],
+        "624_5": formData["624_5"],
+        "624_6": formData["624_6"],
+      },
+      24: {
+        "623_1": formData["623_1"],
+        "623_2": formData["623_2"],
+        "623_3": formData["623_3"],
+        "623_4": formData["623_4"],
+      },
+      25: { 614: formData["614"], "l-614_1-textarea": formData["l-614_1-textarea"] },
+      26: {
         "615_1": formData["615_1"],
         "615_2": formData["615_2"],
         "615_3": formData["615_3"],
@@ -529,8 +573,8 @@ export default function NewBOWLConsultationQuiz({
         "l-615_2-textarea": formData["l-615_2-textarea"],
         "l-615_3-textarea": formData["l-615_3-textarea"],
       },
-      23: { 616: formData["616"], "l-616_1-textarea": formData["l-616_1-textarea"] },
-      24: {
+      27: { 616: formData["616"], "l-616_1-textarea": formData["l-616_1-textarea"] },
+      28: {
         619: formData["619"],
         618_1: formData["618_1"],
         618_2: formData["618_2"],
@@ -539,9 +583,9 @@ export default function NewBOWLConsultationQuiz({
         "l-617_2": formData["l-617_2"],
         "l-617_3": formData["l-617_3"],
       },
-      25: { photo_id_acknowledged: photoIdAcknowledged ? "1" : "" },
-      26: { 196: formData["196"] },
-      27: {
+      29: { photo_id_acknowledged: photoIdAcknowledged ? "1" : "" },
+      30: { 196: formData["196"] },
+      31: {
         // Body photos
         197: formData["197"],
         198: formData["198"],
@@ -759,8 +803,34 @@ export default function NewBOWLConsultationQuiz({
         "l-613_10-textarea": formData["l-613_10-textarea"],
         "l-613_11-textarea": formData["l-613_11-textarea"],
       },
-      21: { 614: formData["614"], "l-614_1-textarea": formData["l-614_1-textarea"] },
+      21: {
+        "621_1": formData["621_1"],
+        "621_2": formData["621_2"],
+        "621_3": formData["621_3"],
+        "621_4": formData["621_4"],
+      },
       22: {
+        "622_1": formData["622_1"],
+        "622_2": formData["622_2"],
+        "622_3": formData["622_3"],
+        "622_4": formData["622_4"],
+      },
+      23: {
+        "624_1": formData["624_1"],
+        "624_2": formData["624_2"],
+        "624_3": formData["624_3"],
+        "624_4": formData["624_4"],
+        "624_5": formData["624_5"],
+        "624_6": formData["624_6"],
+      },
+      24: {
+        "623_1": formData["623_1"],
+        "623_2": formData["623_2"],
+        "623_3": formData["623_3"],
+        "623_4": formData["623_4"],
+      },
+      25: { 614: formData["614"], "l-614_1-textarea": formData["l-614_1-textarea"] },
+      26: {
         "615_1": formData["615_1"],
         "615_2": formData["615_2"],
         "615_3": formData["615_3"],
@@ -769,8 +839,8 @@ export default function NewBOWLConsultationQuiz({
         "l-615_2-textarea": formData["l-615_2-textarea"],
         "l-615_3-textarea": formData["l-615_3-textarea"],
       },
-      23: { 616: formData["616"], "l-616_1-textarea": formData["l-616_1-textarea"] },
-      24: {
+      27: { 616: formData["616"], "l-616_1-textarea": formData["l-616_1-textarea"] },
+      28: {
         619: formData["619"],
         618_1: formData["618_1"],
         618_2: formData["618_2"],
@@ -779,9 +849,9 @@ export default function NewBOWLConsultationQuiz({
         "l-617_2": formData["l-617_2"],
         "l-617_3": formData["l-617_3"],
       },
-      25: { photo_id_acknowledged: photoIdAcknowledged ? "1" : "" },
-      26: { 196: formData["196"] },
-      27: {
+      29: { photo_id_acknowledged: photoIdAcknowledged ? "1" : "" },
+      30: { 196: formData["196"] },
+      31: {
         // Body photos
         197: formData["197"],
         198: formData["198"],
@@ -1415,6 +1485,87 @@ export default function NewBOWLConsultationQuiz({
     }
     setFormData(newFormData);
     updateLocalStorage(newFormData);
+  };
+
+  const handleSideEffectsSelect624 = (optionId) => {
+    clearError();
+    const sideEffectsMap = {
+      "624_1": "Nausea, vomiting, diarrhea, or other GI symptoms",
+      "624_2": "Abdominal pain or cramping",
+      "624_3": "Fatigue or low energy",
+      "624_4": "Dizziness",
+      "624_5": "Other side effects that made dose increases difficult",
+      "624_6": "No, I tolerate dose increases normally",
+    };
+
+    const actualValue = sideEffectsMap[optionId] || "";
+    const newFormData = { ...formData };
+
+    if (newFormData[optionId]) {
+      newFormData[optionId] = "";
+    } else {
+      newFormData[optionId] = actualValue;
+
+      if (optionId === "624_6") {
+        for (let i = 1; i <= 5; i++) {
+          const key = `624_${i}`;
+          newFormData[key] = "";
+        }
+      } else {
+        newFormData["624_6"] = "";
+      }
+    }
+
+    setFormData(newFormData);
+    updateLocalStorage(newFormData);
+
+    const continueButton = formRef.current?.querySelector(
+      ".quiz-continue-button"
+    );
+    if (continueButton) {
+      continueButton.style.visibility = "";
+    }
+  };
+
+  const handleGLP1AllergySelect = (optionId, textValue, questionPrefix) => {
+    clearError();
+    const newFormData = { ...formData };
+    const isNoOrUnsure = optionId.endsWith("_3") || optionId.endsWith("_4");
+    
+    if (isNoOrUnsure) {
+      if (newFormData[optionId]) {
+        newFormData[optionId] = "";
+      } else {
+        for (let i = 1; i <= 4; i++) {
+          newFormData[`${questionPrefix}_${i}`] = "";
+        }
+        newFormData[optionId] = textValue;
+      }
+    } else {
+      if (newFormData[optionId]) {
+        newFormData[optionId] = "";
+      } else {
+        newFormData[`${questionPrefix}_3`] = "";
+        newFormData[`${questionPrefix}_4`] = "";
+        newFormData[optionId] = textValue;
+      }
+    }
+
+    setFormData(newFormData);
+    updateLocalStorage(newFormData);
+
+    const hasSelection = newFormData[`${questionPrefix}_1`] || 
+                        newFormData[`${questionPrefix}_2`] || 
+                        newFormData[`${questionPrefix}_3`] || 
+                        newFormData[`${questionPrefix}_4`];
+
+    setButtonState((state) => ({
+      ...state,
+      visible: true,
+      disabled: !hasSelection,
+    }));
+
+    queueFormSubmission(newFormData);
   };
 
   const handleHealthcareQuestionsSelect = (option) => {
@@ -2134,7 +2285,57 @@ export default function NewBOWLConsultationQuiz({
         return showError("Please specify your other medical conditions");
       }
     }
+    if (currentPage === 21) {
+      const hasSelection =
+        formData["621_1"] ||
+        formData["621_2"] ||
+        formData["621_3"] ||
+        formData["621_4"];
+      if (!hasSelection) {
+        return showError("Please select at least one option");
+      }
+    }
     if (currentPage === 22) {
+      const hasSelection =
+        formData["622_1"] ||
+        formData["622_2"] ||
+        formData["622_3"] ||
+        formData["622_4"];
+      if (!hasSelection) {
+        return showError("Please select at least one option");
+      }
+    }
+    if (currentPage === 23) {
+      const hasSelection =
+        formData["624_1"] ||
+        formData["624_2"] ||
+        formData["624_3"] ||
+        formData["624_4"] ||
+        formData["624_5"] ||
+        formData["624_6"];
+      if (!hasSelection) {
+        return showError("Please select at least one option");
+      }
+    }
+    if (currentPage === 24) {
+      const hasSelection =
+        formData["623_1"] ||
+        formData["623_2"] ||
+        formData["623_3"] ||
+        formData["623_4"];
+      if (!hasSelection) {
+        return showError("Please select at least one option");
+      }
+    }
+    if (currentPage === 25) {
+      if (!formData["614"]) {
+        return showError("Please select an option");
+      }
+      if (formData["614"] === "Yes" && !formData["l-614_1-textarea"]?.trim()) {
+        return showError("Please specify your allergies");
+      }
+    }
+    if (currentPage === 26) {
       const hasSelection =
         formData["615_1"] ||
         formData["615_2"] ||
@@ -2155,15 +2356,7 @@ export default function NewBOWLConsultationQuiz({
         return showError("Please list the recreational drugs you use");
       }
     }
-    if (currentPage === 21) {
-      if (!formData["614"]) {
-        return showError("Please select an option");
-      }
-      if (formData["614"] === "Yes" && !formData["l-614_1-textarea"]?.trim()) {
-        return showError("Please specify your allergies");
-      }
-    }
-    if (currentPage === 23) {
+    if (currentPage === 27) {
       if (!formData["616"]) {
         return showError("Please select an option");
       }
@@ -2171,20 +2364,20 @@ export default function NewBOWLConsultationQuiz({
         return showError("Please enter your questions");
       }
     }
-    if (currentPage === 24 && !formData["619"]) {
+    if (currentPage === 26 && !formData["619"]) {
       return showError("Please make a selection");
     }
-    if (currentPage === 24 && formData["619"] === "No" && !formData["618_1"]) {
+    if (currentPage === 26 && formData["619"] === "No" && !formData["618_1"]) {
       setShowNoAppointmentAcknowledgement(true);
       return false;
     }
-    if (currentPage === 25 && !photoIdAcknowledged) {
+    if (currentPage === 27 && !photoIdAcknowledged) {
       return showError("Please acknowledge that you will upload your photo ID");
     }
-    if (currentPage === 26 && !photoIdFile && !formData["196"]) {
+    if (currentPage === 28 && !photoIdFile && !formData["196"]) {
       return showError("Please upload your photo ID to continue");
     }
-    if (currentPage === 27) {
+    if (currentPage === 29) {
       if (!frontPhotoFile && !formData["197"]) {
         return showError("Please upload a front view photo");
       }
@@ -2200,7 +2393,7 @@ export default function NewBOWLConsultationQuiz({
   const handleContinueClick = () => {
     clearError();
     if (isValidated()) {
-      if (currentPage === 25) {
+      if (currentPage === 26) {
         const currentPageData = collectCurrentPageData();
         const updates = {
           ...currentPageData,
@@ -2214,7 +2407,7 @@ export default function NewBOWLConsultationQuiz({
         return;
       }
 
-      if (currentPage === 26) {
+      if (currentPage === 27) {
         if (photoIdFile || formData["196"]) {
           verifyCustomerAndProceed();
           return;
@@ -2224,7 +2417,7 @@ export default function NewBOWLConsultationQuiz({
         }
       }
 
-      if (currentPage === 27) {
+      if (currentPage === 29) {
         handleBodyPhotosUpload();
         return;
       }
@@ -2443,11 +2636,45 @@ export default function NewBOWLConsultationQuiz({
         return true;
       }
       if (currentPage === 21) {
+        const hasSelection =
+          formData["621_1"] ||
+          formData["621_2"] ||
+          formData["621_3"] ||
+          formData["621_4"];
+        return hasSelection;
+      }
+      if (currentPage === 22) {
+        const hasSelection =
+          formData["622_1"] ||
+          formData["622_2"] ||
+          formData["622_3"] ||
+          formData["622_4"];
+        return hasSelection;
+      }
+      if (currentPage === 23) {
+        const hasSelection =
+          formData["624_1"] ||
+          formData["624_2"] ||
+          formData["624_3"] ||
+          formData["624_4"] ||
+          formData["624_5"] ||
+          formData["624_6"];
+        return hasSelection;
+      }
+      if (currentPage === 24) {
+        const hasSelection =
+          formData["623_1"] ||
+          formData["623_2"] ||
+          formData["623_3"] ||
+          formData["623_4"];
+        return hasSelection;
+      }
+      if (currentPage === 25) {
         if (!formData["614"]) return false;
         if (formData["614"] === "Yes" && !formData["l-614_1-textarea"]?.trim()) return false;
         return true;
       }
-      if (currentPage === 22) {
+      if (currentPage === 26) {
         const hasSelection =
           formData["615_1"] ||
           formData["615_2"] ||
@@ -2466,17 +2693,17 @@ export default function NewBOWLConsultationQuiz({
 
         return true;
       }
-      if (currentPage === 23) {
+      if (currentPage === 25) {
         if (!formData["616"]) return false;
         if (formData["616"] === "Yes" && !formData["l-616_1-textarea"]?.trim()) {
           return false;
         }
         return true;
       }
-      if (currentPage === 24) return !!formData["619"];
-      if (currentPage === 25) return photoIdAcknowledged;
-      if (currentPage === 26) return !!(photoIdFile || formData["196"]);
-      if (currentPage === 27) {
+      if (currentPage === 26) return !!formData["619"];
+      if (currentPage === 27) return photoIdAcknowledged;
+      if (currentPage === 28) return !!(photoIdFile || formData["196"]);
+      if (currentPage === 29) {
         // Show continue button on body photos page when both photos are selected
         return !!(frontPhotoFile && sidePhotoFile);
       }
@@ -2489,8 +2716,8 @@ export default function NewBOWLConsultationQuiz({
     const continueButton = formRef.current?.querySelector(".quiz-continue-button");
     if (continueButton) {
       continueButton.style.display = "block";
-      // For page 26 (Photo ID upload), always show the button (it will be disabled if no photo)
-      if (currentPage === 26) {
+      // For page 28 (Photo ID upload), always show the button (it will be disabled if no photo)
+      if (currentPage === 28) {
         continueButton.style.visibility = "visible";
       } else {
         if (currentPage === 1) {
@@ -2501,12 +2728,12 @@ export default function NewBOWLConsultationQuiz({
       }
     }
 
-    if (currentPage === 25) {
+    if (currentPage === 27) {
       if (continueButton) {
         continueButton.disabled = !photoIdAcknowledged;
         continueButton.style.opacity = photoIdAcknowledged ? "1" : "0.5";
       }
-    } else if (currentPage === 26) {
+    } else if (currentPage === 28) {
       const isReady = (photoIdFile && !isUploading) || !!formData["196"];
       if (continueButton) {
         continueButton.disabled = !isReady;
@@ -2518,8 +2745,8 @@ export default function NewBOWLConsultationQuiz({
         disabled: !isReady,
         opacity: isReady ? 1 : 0.5,
       });
-    } else if (currentPage === 27) {
-      // For page 27, show continue button when both photos are selected
+    } else if (currentPage === 29) {
+      // For page 29, show continue button when both photos are selected
       const bothPhotosSelected = !!(frontPhotoFile && sidePhotoFile);
       setButtonState({
         visible: bothPhotosSelected,
@@ -2535,9 +2762,9 @@ export default function NewBOWLConsultationQuiz({
     }
   }, [currentPage, formData, photoIdAcknowledged, photoIdFile, frontPhotoFile, sidePhotoFile, isClient, isUploadingPhotos, isUploading]);
 
-  // Handle photo ID acknowledgment page (page 25) - hide continue button initially
+  // Handle photo ID acknowledgment page (page 27) - hide continue button initially
   useEffect(() => {
-    if (currentPage === 25) {
+    if (currentPage === 27) {
       const continueButton = document.querySelector(".quiz-continue-button");
       if (continueButton) {
         continueButton.style.visibility = "hidden";
@@ -2607,7 +2834,7 @@ export default function NewBOWLConsultationQuiz({
 
   return (
     <div className="flex flex-col min-h-screen bg-white subheaders-font font-medium">
-      {currentPage !== 28 && (
+      {currentPage !== 29 && (
         <>
       <QuestionnaireNavbar
         onBackClick={moveToPreviousSlide}
@@ -2619,8 +2846,8 @@ export default function NewBOWLConsultationQuiz({
       )}
 
       <div className="flex-1" ref={formRef}>
-        {/* Quiz Pages 1-27 - Inside constrained wrapper */}
-        {currentPage !== 28 && (
+        {/* Quiz Pages 1-28 - Inside constrained wrapper */}
+        {currentPage !== 29 && (
           <div className="quiz-page-wrapper relative md:container md:w-[768px] mx-auto bg-[#FFFFFF]">
             <div className="relative min-h-[400px] flex items-start md:w-[520px] mx-auto px-5 md:px-0 md:mb-16">
               <AnimatePresence mode="wait">
@@ -3498,12 +3725,238 @@ export default function NewBOWLConsultationQuiz({
                 </QuestionLayout>
               )}
 
-              {/* Page 21: Do you have any known allergies */}
+              {/* Page 21: Have you ever had an allergic reaction to GLP-1 medications */}
               {currentPage === 21 && (
+                <QuestionLayout
+                  title="Have you ever had an allergic reaction, sensitivity, or intolerance to any ingredient in approved GLP-1 medications?"
+                  currentPage={currentPage}
+                  pageNo={21}
+                  questionId="621"
+                  inputType="checkbox"
+                >
+                  <div className="flex flex-col w-full gap-2">
+                    {[
+                      {
+                        id: "621_1",
+                        value: "Yes, reaction or intolerance to an ingredient/excipient",
+                        optionValue: "1",
+                      },
+                      {
+                        id: "621_2",
+                        value: "Yes, issues with the injector pen device",
+                        optionValue: "2",
+                      },
+                      {
+                        id: "621_3",
+                        value: "No",
+                        optionValue: "3",
+                      },
+                      {
+                        id: "621_4",
+                        value: "Unsure",
+                        optionValue: "4",
+                      },
+                    ].map((option) => {
+                      const isChecked = !!formData[option.id];
+                      
+                      return (
+                        <div
+                          key={option.id}
+                          className="option-container"
+                        >
+                          <QuestionOption
+                            id={option.id}
+                            name={option.id}
+                            value={option.value}
+                            checked={isChecked}
+                            onChange={() =>
+                              handleGLP1AllergySelect(option.id, option.value, "621")
+                            }
+                            type="checkbox"
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </QuestionLayout>
+              )}
+
+              {/* Page 22: Do you have difficulty using the standard pen-injector devices */}
+              {currentPage === 22 && (
+                <QuestionLayout
+                  title="Do you have difficulty using the standard pen-injector devices?"
+                  currentPage={currentPage}
+                  pageNo={22}
+                  questionId="622"
+                  inputType="checkbox"
+                >
+                  <div className="flex flex-col w-full gap-2">
+                    {[
+                      {
+                        id: "622_1",
+                        value: "Yes, due to dexterity, vision, or functional limitations",
+                        optionValue: "1",
+                      },
+                      {
+                        id: "622_2",
+                        value: "Yes, I require a different delivery format for safe use",
+                        optionValue: "2",
+                      },
+                      {
+                        id: "622_3",
+                        value: "No",
+                        optionValue: "3",
+                      },
+                      {
+                        id: "622_4",
+                        value: "Unsure",
+                        optionValue: "4",
+                      },
+                    ].map((option) => {
+                      const isChecked = !!formData[option.id];
+                      
+                      return (
+                        <div
+                          key={option.id}
+                          className="option-container"
+                        >
+                          <QuestionOption
+                            id={option.id}
+                            name={option.id}
+                            value={option.value}
+                            checked={isChecked}
+                            onChange={() =>
+                              handleGLP1AllergySelect(option.id, option.value, "622")
+                            }
+                            type="checkbox"
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </QuestionLayout>
+              )}
+
+              {/* Page 23: Have you previously experienced side effects */}
+              {currentPage === 23 && (
+                <QuestionLayout
+                  title="Have you previously experienced side effects when starting or increasing doses of weight-loss or similar medications?"
+                  currentPage={currentPage}
+                  pageNo={23}
+                  questionId="624"
+                  inputType="checkbox"
+                >
+                  <div className="flex flex-col w-full gap-2">
+                    {[
+                      {
+                        id: "624_1",
+                        value: "Nausea, vomiting, diarrhea, or other GI symptoms",
+                      },
+                      {
+                        id: "624_2",
+                        value: "Abdominal pain or cramping",
+                      },
+                      {
+                        id: "624_3",
+                        value: "Fatigue or low energy",
+                      },
+                      {
+                        id: "624_4",
+                        value: "Dizziness",
+                      },
+                      {
+                        id: "624_5",
+                        value: "Other side effects that made dose increases difficult",
+                      },
+                      {
+                        id: "624_6",
+                        value: "No, I tolerate dose increases normally",
+                        isNoneOption: true,
+                      },
+                    ].map((option) => (
+                      <div
+                        key={option.id}
+                        className="option-container"
+                      >
+                        <QuestionOption
+                          id={option.id}
+                          name={option.id}
+                          value={option.value}
+                          checked={!!formData[option.id]}
+                          onChange={() =>
+                            handleSideEffectsSelect624(option.id)
+                          }
+                          type="checkbox"
+                          isNoneOption={option.isNoneOption}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </QuestionLayout>
+              )}
+
+              {/* Page 24: Would a personalized dose help */}
+              {currentPage === 24 && (
+                <QuestionLayout
+                  title="Would a personalized dose or smaller dose increments help you better tolerate treatment?"
+                  currentPage={currentPage}
+                  pageNo={24}
+                  questionId="623"
+                  inputType="checkbox"
+                >
+                  <div className="flex flex-col w-full gap-2">
+                    {[
+                      {
+                        id: "623_1",
+                        value: "Yes, I have difficulty with the standard dose steps",
+                        optionValue: "1",
+                      },
+                      {
+                        id: "623_2",
+                        value: "Yes, I need smaller or more gradual titration than commercial pens provide",
+                        optionValue: "2",
+                      },
+                      {
+                        id: "623_3",
+                        value: "No",
+                        optionValue: "3",
+                      },
+                      {
+                        id: "623_4",
+                        value: "Unsure",
+                        optionValue: "4",
+                      },
+                    ].map((option) => {
+                      const isChecked = !!formData[option.id];
+                      
+                      return (
+                        <div
+                          key={option.id}
+                          className="option-container"
+                        >
+                          <QuestionOption
+                            id={option.id}
+                            name={option.id}
+                            value={option.value}
+                            checked={isChecked}
+                            onChange={() =>
+                              handleGLP1AllergySelect(option.id, option.value, "623")
+                            }
+                            type="checkbox"
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </QuestionLayout>
+              )}
+
+              {/* Page 25: Do you have any known allergies */}
+              {currentPage === 25 && (
                 <QuestionLayout
                   title="Do you have any known allergies?"
                   currentPage={currentPage}
-                  pageNo={21}
+                  pageNo={25}
                   questionId="614"
                 >
                   <div className="flex flex-col w-full gap-2">
@@ -3542,12 +3995,12 @@ export default function NewBOWLConsultationQuiz({
                 </QuestionLayout>
               )}
 
-              {/* Page 22: Tell us about your lifestyle */}
-              {currentPage === 22 && (
+              {/* Page 23: Tell us about your lifestyle */}
+              {currentPage === 23 && (
                 <QuestionLayout
                   title="Tell us about your lifestyle."
                   currentPage={currentPage}
-                  pageNo={22}
+                  pageNo={23}
                   questionId="615"
                   inputType="checkbox"
                 >
@@ -3612,12 +4065,12 @@ export default function NewBOWLConsultationQuiz({
                 </QuestionLayout>
               )}
 
-              {/* Page 23: Do you have any questions for the healthcare team */}
-              {currentPage === 23 && (
+              {/* Page 25: Do you have any questions for the healthcare team */}
+              {currentPage === 25 && (
                 <QuestionLayout
                   title="Do you have any questions for the healthcare team?"
                   currentPage={currentPage}
-                  pageNo={23}
+                  pageNo={25}
                   questionId="616"
                 >
                   <div className="flex flex-col w-full gap-2">
@@ -3658,12 +4111,12 @@ export default function NewBOWLConsultationQuiz({
                 </QuestionLayout>
               )}
 
-              {/* Page 24: Would you like to book an appointment */}
-              {currentPage === 24 && (
+              {/* Page 26: Would you like to book an appointment */}
+              {currentPage === 26 && (
                 <QuestionLayout
                   title="Would you like to book an appointment with our health care team?"
                   currentPage={currentPage}
-                  pageNo={24}
+                  pageNo={26}
                   questionId="619"
                 >
                   {[
@@ -3687,12 +4140,12 @@ export default function NewBOWLConsultationQuiz({
                 </QuestionLayout>
               )}
 
-              {/* Page 25: Upload Photo ID */}
-              {currentPage === 25 && (
+              {/* Page 27: Upload Photo ID */}
+              {currentPage === 27 && (
                 <QuestionLayout
                   title="Upload Photo ID"
                   currentPage={currentPage}
-                  pageNo={25}
+                  pageNo={27}
                   questionId="photo_id_acknowledgment"
                   inputType="checkbox"
                 >
@@ -3736,8 +4189,8 @@ export default function NewBOWLConsultationQuiz({
                 </QuestionLayout>
               )}
 
-              {/* Page 26: Upload Photo ID File */}
-              {currentPage === 26 && (
+              {/* Page 28: Upload Photo ID File */}
+              {currentPage === 28 && (
                 <motion.div
                   key={currentPage}
                   variants={slideVariants}
@@ -3835,8 +4288,8 @@ export default function NewBOWLConsultationQuiz({
                 </motion.div>
               )}
 
-              {/* Page 27: Please provide full body images */}
-              {currentPage === 27 && (
+              {/* Page 29: Please provide full body images */}
+              {currentPage === 29 && (
                 <QuestionLayout
                   title="Please provide full body images: Front and side views."
                   subtitle="Your body should be clearly visible"
@@ -3958,7 +4411,7 @@ export default function NewBOWLConsultationQuiz({
                   >
                     {isUploadingPhotos
                       ? `Uploading... ${Math.round((uploadProgress.front + uploadProgress.side) / 2)}%`
-                      : currentPage === 27
+                      : currentPage === 29
                       ? "Upload and Continue"
                       : "Continue"}
                   </button>
@@ -3968,7 +4421,7 @@ export default function NewBOWLConsultationQuiz({
         )}
 
         {/* Thank You Page - Page 28 - OUTSIDE wrapper for full width */}
-        {currentPage === 28 && formData.completion_state === "Full" && (
+        {currentPage === 29 && formData.completion_state === "Full" && (
               <div className="relative min-h-screen w-full bg-[#F5F4EF] overflow-hidden flex flex-col">
                 <div className="absolute inset-0 hidden md:block">
                   <img
