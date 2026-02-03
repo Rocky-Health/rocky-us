@@ -590,6 +590,7 @@ export default function NewBOWLConsultationQuiz({
         197: formData["197"],
         198: formData["198"],
       },
+      32: {}, // Thank you page
     };
 
     let cumulativeData = {};
@@ -856,6 +857,7 @@ export default function NewBOWLConsultationQuiz({
         197: formData["197"],
         198: formData["198"],
       },
+      32: {}, // Thank you page
     };
 
     const pageData = pageDataMap[currentPage] || {};
@@ -1821,10 +1823,6 @@ export default function NewBOWLConsultationQuiz({
       setFormData(updatedData);
       updateLocalStorage(updatedData);
 
-      setCurrentPage(26);
-      const newProgress = Math.ceil((26 / 28) * 100);
-      setProgress(Math.max(0, newProgress));
-
       setIsUploading(false);
 
       setTimeout(() => {
@@ -1842,13 +1840,14 @@ export default function NewBOWLConsultationQuiz({
 
   const verifyCustomerAndProceed = async () => {
     if (formData["196"] && !photoIdFile) {
+      // Photo already uploaded, navigate to body photos page
       const updatedData = updateFormDataAndStorage({
-        page_step: currentPage + 1,
+        page_step: 31,
       });
       queueFormSubmission(updatedData);
-      setTimeout(() => {
-        moveToNextSlideWithoutValidation();
-      }, 100);
+      setIsMovingForward(true);
+      setCurrentPage(31);
+      setProgress(Math.ceil((31 / TOTAL_PAGES) * 100));
       return;
     }
 
@@ -1863,23 +1862,21 @@ export default function NewBOWLConsultationQuiz({
 
       const uploadedS3Url = await handlePhotoIdUpload();
 
-      const cumulativeData = collectCumulativeData();
+      // Only queue submission of the photo ID URL, don't re-submit all data
+      queueFormSubmission({ 196: uploadedS3Url });
 
-      const completeSubmissionData = {
-        ...cumulativeData,
-        196: uploadedS3Url,
-        completion_state: "Partial",
-        stage: "photo-id-upload",
-      };
-
-      await submitFormData(completeSubmissionData).catch((error) => {
-        logger.error("Error submitting form data:", error);
+      // Navigate to next page (body photos upload - page 31) after successful upload
+      setIsMovingForward(true);
+      setCurrentPage(31);
+      setFormData((prev) => {
+        const updated = {
+          ...prev,
+          page_step: 31,
+        };
+        updateLocalStorage(updated);
+        return updated;
       });
-
-      // Navigate to next page after successful upload and submission
-      setTimeout(() => {
-        moveToNextSlideWithoutValidation();
-      }, 100);
+      setProgress(Math.ceil((31 / TOTAL_PAGES) * 100));
     } catch (error) {
       logger.error("Photo upload error:", error);
       
@@ -2090,6 +2087,7 @@ export default function NewBOWLConsultationQuiz({
         }
       );
 
+      // Update formData with photo URLs
       const updatedData = {
         ...formData,
         197: frontS3Url,
@@ -2097,23 +2095,29 @@ export default function NewBOWLConsultationQuiz({
         completion_percentage: 100,
         completion_state: "Full",
         stage: "body-photos-upload",
+        page_step: 32,
       };
 
       setFormData(updatedData);
       updateLocalStorage(updatedData);
-      queueFormSubmission(updatedData);
+      
+      // Only queue the new photo URLs, not all form data
+      queueFormSubmission({ 
+        197: frontS3Url, 
+        198: sideS3Url,
+        completion_percentage: 100,
+        completion_state: "Full",
+        stage: "body-photos-upload",
+      });
 
       const frontLabel = document.querySelector("label[for=front_photo_upload]");
       const sideLabel = document.querySelector("label[for=side_photo_upload]");
       if (frontLabel) frontLabel.style.borderColor = "green";
       if (sideLabel) sideLabel.style.borderColor = "green";
 
-      setCurrentPage(28);
+      setIsMovingForward(true);
+      setCurrentPage(32);
       setProgress(100);
-      setFormData((prev) => ({
-        ...prev,
-        page_step: 28,
-      }));
       setUploadSuccess(true);
     } catch (error) {
       logger.error("Error uploading photos:", error);
@@ -2364,20 +2368,20 @@ export default function NewBOWLConsultationQuiz({
         return showError("Please enter your questions");
       }
     }
-    if (currentPage === 26 && !formData["619"]) {
+    if (currentPage === 28 && !formData["619"]) {
       return showError("Please make a selection");
     }
-    if (currentPage === 26 && formData["619"] === "No" && !formData["618_1"]) {
+    if (currentPage === 28 && formData["619"] === "No" && !formData["618_1"]) {
       setShowNoAppointmentAcknowledgement(true);
       return false;
     }
-    if (currentPage === 27 && !photoIdAcknowledged) {
+    if (currentPage === 29 && !photoIdAcknowledged) {
       return showError("Please acknowledge that you will upload your photo ID");
     }
-    if (currentPage === 28 && !photoIdFile && !formData["196"]) {
+    if (currentPage === 30 && !photoIdFile && !formData["196"]) {
       return showError("Please upload your photo ID to continue");
     }
-    if (currentPage === 29) {
+    if (currentPage === 31) {
       if (!frontPhotoFile && !formData["197"]) {
         return showError("Please upload a front view photo");
       }
@@ -2393,7 +2397,7 @@ export default function NewBOWLConsultationQuiz({
   const handleContinueClick = () => {
     clearError();
     if (isValidated()) {
-      if (currentPage === 26) {
+      if (currentPage === 28) {
         const currentPageData = collectCurrentPageData();
         const updates = {
           ...currentPageData,
@@ -2407,7 +2411,7 @@ export default function NewBOWLConsultationQuiz({
         return;
       }
 
-      if (currentPage === 27) {
+      if (currentPage === 30) {
         if (photoIdFile || formData["196"]) {
           verifyCustomerAndProceed();
           return;
@@ -2417,7 +2421,7 @@ export default function NewBOWLConsultationQuiz({
         }
       }
 
-      if (currentPage === 29) {
+      if (currentPage === 31) {
         handleBodyPhotosUpload();
         return;
       }
@@ -2693,17 +2697,17 @@ export default function NewBOWLConsultationQuiz({
 
         return true;
       }
-      if (currentPage === 25) {
+      if (currentPage === 27) {
         if (!formData["616"]) return false;
         if (formData["616"] === "Yes" && !formData["l-616_1-textarea"]?.trim()) {
           return false;
         }
         return true;
       }
-      if (currentPage === 26) return !!formData["619"];
-      if (currentPage === 27) return photoIdAcknowledged;
-      if (currentPage === 28) return !!(photoIdFile || formData["196"]);
-      if (currentPage === 29) {
+      if (currentPage === 28) return !!formData["619"];
+      if (currentPage === 29) return photoIdAcknowledged;
+      if (currentPage === 30) return !!(photoIdFile || formData["196"]);
+      if (currentPage === 31) {
         // Show continue button on body photos page when both photos are selected
         return !!(frontPhotoFile && sidePhotoFile);
       }
@@ -2716,8 +2720,8 @@ export default function NewBOWLConsultationQuiz({
     const continueButton = formRef.current?.querySelector(".quiz-continue-button");
     if (continueButton) {
       continueButton.style.display = "block";
-      // For page 28 (Photo ID upload), always show the button (it will be disabled if no photo)
-      if (currentPage === 28) {
+      // For page 30 (Photo ID upload), always show the button (it will be disabled if no photo)
+      if (currentPage === 30) {
         continueButton.style.visibility = "visible";
       } else {
         if (currentPage === 1) {
@@ -2728,12 +2732,12 @@ export default function NewBOWLConsultationQuiz({
       }
     }
 
-    if (currentPage === 27) {
+    if (currentPage === 29) {
       if (continueButton) {
         continueButton.disabled = !photoIdAcknowledged;
         continueButton.style.opacity = photoIdAcknowledged ? "1" : "0.5";
       }
-    } else if (currentPage === 28) {
+    } else if (currentPage === 30) {
       const isReady = (photoIdFile && !isUploading) || !!formData["196"];
       if (continueButton) {
         continueButton.disabled = !isReady;
@@ -2745,8 +2749,8 @@ export default function NewBOWLConsultationQuiz({
         disabled: !isReady,
         opacity: isReady ? 1 : 0.5,
       });
-    } else if (currentPage === 29) {
-      // For page 29, show continue button when both photos are selected
+    } else if (currentPage === 31) {
+      // For page 31, show continue button when both photos are selected
       const bothPhotosSelected = !!(frontPhotoFile && sidePhotoFile);
       setButtonState({
         visible: bothPhotosSelected,
@@ -2762,9 +2766,9 @@ export default function NewBOWLConsultationQuiz({
     }
   }, [currentPage, formData, photoIdAcknowledged, photoIdFile, frontPhotoFile, sidePhotoFile, isClient, isUploadingPhotos, isUploading]);
 
-  // Handle photo ID acknowledgment page (page 27) - hide continue button initially
+  // Handle photo ID acknowledgment page (page 29) - hide continue button initially
   useEffect(() => {
-    if (currentPage === 27) {
+    if (currentPage === 29) {
       const continueButton = document.querySelector(".quiz-continue-button");
       if (continueButton) {
         continueButton.style.visibility = "hidden";
@@ -2834,7 +2838,7 @@ export default function NewBOWLConsultationQuiz({
 
   return (
     <div className="flex flex-col min-h-screen bg-white subheaders-font font-medium">
-      {currentPage !== 29 && (
+      {currentPage !== 32 && (
         <>
       <QuestionnaireNavbar
         onBackClick={moveToPreviousSlide}
@@ -2846,8 +2850,8 @@ export default function NewBOWLConsultationQuiz({
       )}
 
       <div className="flex-1" ref={formRef}>
-        {/* Quiz Pages 1-28 - Inside constrained wrapper */}
-        {currentPage !== 29 && (
+        {/* Quiz Pages 1-31 - Inside constrained wrapper */}
+        {currentPage !== 32 && (
           <div className="quiz-page-wrapper relative md:container md:w-[768px] mx-auto bg-[#FFFFFF]">
             <div className="relative min-h-[400px] flex items-start md:w-[520px] mx-auto px-5 md:px-0 md:mb-16">
               <AnimatePresence mode="wait">
@@ -3995,12 +3999,12 @@ export default function NewBOWLConsultationQuiz({
                 </QuestionLayout>
               )}
 
-              {/* Page 23: Tell us about your lifestyle */}
-              {currentPage === 23 && (
+              {/* Page 26: Tell us about your lifestyle */}
+              {currentPage === 26 && (
                 <QuestionLayout
                   title="Tell us about your lifestyle."
                   currentPage={currentPage}
-                  pageNo={23}
+                  pageNo={26}
                   questionId="615"
                   inputType="checkbox"
                 >
@@ -4065,12 +4069,12 @@ export default function NewBOWLConsultationQuiz({
                 </QuestionLayout>
               )}
 
-              {/* Page 25: Do you have any questions for the healthcare team */}
-              {currentPage === 25 && (
+              {/* Page 27: Do you have any questions for the healthcare team */}
+              {currentPage === 27 && (
                 <QuestionLayout
                   title="Do you have any questions for the healthcare team?"
                   currentPage={currentPage}
-                  pageNo={25}
+                  pageNo={27}
                   questionId="616"
                 >
                   <div className="flex flex-col w-full gap-2">
@@ -4111,12 +4115,12 @@ export default function NewBOWLConsultationQuiz({
                 </QuestionLayout>
               )}
 
-              {/* Page 26: Would you like to book an appointment */}
-              {currentPage === 26 && (
+              {/* Page 28: Would you like to book an appointment */}
+              {currentPage === 28 && (
                 <QuestionLayout
                   title="Would you like to book an appointment with our health care team?"
                   currentPage={currentPage}
-                  pageNo={26}
+                  pageNo={28}
                   questionId="619"
                 >
                   {[
@@ -4140,12 +4144,12 @@ export default function NewBOWLConsultationQuiz({
                 </QuestionLayout>
               )}
 
-              {/* Page 27: Upload Photo ID */}
-              {currentPage === 27 && (
+              {/* Page 29: Upload Photo ID */}
+              {currentPage === 29 && (
                 <QuestionLayout
                   title="Upload Photo ID"
                   currentPage={currentPage}
-                  pageNo={27}
+                  pageNo={29}
                   questionId="photo_id_acknowledgment"
                   inputType="checkbox"
                 >
@@ -4189,16 +4193,9 @@ export default function NewBOWLConsultationQuiz({
                 </QuestionLayout>
               )}
 
-              {/* Page 28: Upload Photo ID File */}
-              {currentPage === 28 && (
-                <motion.div
-                  key={currentPage}
-                  variants={slideVariants}
-                  initial={isMovingForward ? "hiddenRight" : "hiddenLeft"}
-                  animate="visible"
-                  exit={isMovingForward ? "exitRight" : "exitLeft"}
-                  className="w-full"
-                >
+              {/* Page 30: Upload Photo ID File */}
+              {currentPage === 30 && (
+                <div className="w-full">
                   <div className="px-4 pt-6 pb-4">
                     <h1 className="text-3xl text-center text-[#AE7E56] font-bold mb-6">
                       Upload Photo ID
@@ -4285,16 +4282,16 @@ export default function NewBOWLConsultationQuiz({
                       value={formData["196"] || ""}
                     />
                   </div>
-                </motion.div>
+                </div>
               )}
 
-              {/* Page 29: Please provide full body images */}
-              {currentPage === 29 && (
+              {/* Page 31: Please provide full body images */}
+              {currentPage === 31 && (
                 <QuestionLayout
                   title="Please provide full body images: Front and side views."
                   subtitle="Your body should be clearly visible"
                   currentPage={currentPage}
-                  pageNo={27}
+                  pageNo={31}
                   questionId="body_photos"
                   inputType="upload"
                 >
@@ -4411,7 +4408,7 @@ export default function NewBOWLConsultationQuiz({
                   >
                     {isUploadingPhotos
                       ? `Uploading... ${Math.round((uploadProgress.front + uploadProgress.side) / 2)}%`
-                      : currentPage === 29
+                      : currentPage === 31
                       ? "Upload and Continue"
                       : "Continue"}
                   </button>
@@ -4420,8 +4417,8 @@ export default function NewBOWLConsultationQuiz({
           </div>
         )}
 
-        {/* Thank You Page - Page 28 - OUTSIDE wrapper for full width */}
-        {currentPage === 29 && formData.completion_state === "Full" && (
+        {/* Thank You Page - Page 32 - OUTSIDE wrapper for full width */}
+        {currentPage === 32 && formData.completion_state === "Full" && (
               <div className="relative min-h-screen w-full bg-[#F5F4EF] overflow-hidden flex flex-col">
                 <div className="absolute inset-0 hidden md:block">
                   <img
