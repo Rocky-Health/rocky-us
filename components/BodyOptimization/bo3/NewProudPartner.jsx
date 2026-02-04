@@ -56,14 +56,14 @@ const ProudPartner = ({ section = false, bg = "bg-white" }) => {
               className="object-contain"
             />
           </div>
-          {/* <div className={`relative overflow-hidden ${argonautsLogoSize}`}>
+          <div className={`relative overflow-hidden ${argonautsLogoSize}`}>
             <CustomContainImage
               src="https://myrocky.b-cdn.net/partner-2.png"
               alt="Toronto Argonauts"
               fill
               className="object-contain"
             />
-          </div> */}
+          </div>
         </div>
       </div>
     </div>

@@ -42,7 +42,7 @@ const products = [
   },
 ];
 
-const WlProducts = ({ CardBtnColor = null, productsVisible = true }) => {
+const WlProducts = ({ CardBtnColor = null, productsVisible = true, consultationHref = "/wl-pre-consultation" }) => {
   const scrollContainerRef = useRef(null);
 
   return (
@@ -82,6 +82,7 @@ const WlProducts = ({ CardBtnColor = null, productsVisible = true }) => {
                     key={index}
                     product={product}
                     btnColor={CardBtnColor}
+                    consultationHref={consultationHref}
                   />
                 ))}
               </div>

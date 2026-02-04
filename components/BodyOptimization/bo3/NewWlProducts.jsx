@@ -43,7 +43,7 @@ const products = [
   },
 ];
 
-const WlProducts = ({ CardBtnColor = null, productsVisible = true }) => {
+const WlProducts = ({ CardBtnColor = null, productsVisible = true, consultationHref = "/wl-pre-consultation" }) => {
   const scrollContainerRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -118,7 +118,7 @@ const WlProducts = ({ CardBtnColor = null, productsVisible = true }) => {
           >
             {products.map((product, index) => (
               <div key={index} className="flex-shrink-0 snap-start">
-                <NewProductCard product={product} btnColor={CardBtnColor} />
+                <NewProductCard product={product} btnColor={CardBtnColor} consultationHref={consultationHref} />
               </div>
             ))}
           </div>

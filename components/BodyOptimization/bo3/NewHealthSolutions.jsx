@@ -22,7 +22,7 @@ const accordionData = [
   },
 ];
 
-const HealthSolutions = ({ btnColor = null }) => {
+const HealthSolutions = ({ btnColor = null, consultationHref = "/wl-pre-consultation/" }) => {
   const [openIndex, setOpenIndex] = useState(0);
 
   const handleToggle = (index) => {
@@ -89,7 +89,7 @@ const HealthSolutions = ({ btnColor = null }) => {
           {/* Button */}
           <div className="w-full md:w-[240px] mb-5 md:mb-0">
             <Link
-              href="/wl-pre-consultation/"
+              href={consultationHref}
               className={`flex h-[48px] px-8 items-center justify-center gap-2 w-full md:w-[240px] rounded-[64px] transition text-white hover:bg-gray-800  bg-[#013D3D]`}
             >
               <span className="poppins-font text-[#FFF] text-[16px] leading-[140%] not-italic">

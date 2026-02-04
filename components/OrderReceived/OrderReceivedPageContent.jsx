@@ -224,6 +224,21 @@ const OrderReceivedContent = ({ userId }) => {
   const wlFlow = searchParams.get("wl-flow");
   const hairFlow = searchParams.get("hair-flow");
   const smokingFlow = searchParams.get("smoking-flow");
+  
+  // Check localStorage once on mount to determine if this is a BO flow
+  const [isNewBOFlow, setIsNewBOFlow] = useState(false);
+  useEffect(() => {
+    if (typeof window !== "undefined" && wlFlow === "1") {
+      try {
+        const preqizData = localStorage.getItem("new-bo-preqiz-data");
+        const essentialConsul = localStorage.getItem("new-bo-essential-consul");
+        setIsNewBOFlow(!!(preqizData || essentialConsul));
+      } catch (e) {
+        // Ignore errors
+        setIsNewBOFlow(false);
+      }
+    }
+  }, [wlFlow]);
 
   // Determine if we should redirect and where to
   const shouldRedirect =
@@ -248,7 +263,9 @@ const OrderReceivedContent = ({ userId }) => {
     let basePath = "";
     if (mhFlow === "1") basePath = "/mh-quiz";
     if (edFlow === "1") basePath = "/ed-consultation-quiz";
-    if (wlFlow === "1") basePath = "/wl-consultation";
+    if (wlFlow === "1") {
+      basePath = isNewBOFlow ? "/new-bo-wl-consultation" : "/wl-consultation";
+    }
     if (hairFlow === "1") basePath = "/hair-main-questionnaire";
     if (smokingFlow === "1") basePath = "/smoking-consultation/?checked-out=1";
 
@@ -321,6 +338,8 @@ const OrderReceivedContent = ({ userId }) => {
     questionnaireCheckComplete,
     edFlow,
     hairFlow,
+    wlFlow,
+    isNewBOFlow,
   ]);
 
   // Handle the countdown timer
