@@ -925,9 +925,9 @@ export default function NewBOWLConsultationQuiz({
         id: formData.id || "",
         token: formData.token || "",
         stage: dataToSubmit.stage || "consultation-before-checkout",
-        page_step: currentPage,
-        completion_state: dataToSubmit.completion_state || "Partial",
-        completion_percentage: dataToSubmit.completion_percentage || progress,
+        page_step: dataToSubmit.page_step || currentPage,
+        completion_state: (dataToSubmit.completion_state && dataToSubmit.completion_state !== "") ? dataToSubmit.completion_state : "Partial",
+        completion_percentage: dataToSubmit.completion_percentage !== undefined && dataToSubmit.completion_percentage !== null ? dataToSubmit.completion_percentage : progress,
         source_site: "https://myrocky.com",
       };
 
@@ -2108,6 +2108,7 @@ export default function NewBOWLConsultationQuiz({
         completion_percentage: 100,
         completion_state: "Full",
         stage: "body-photos-upload",
+        page_step: 32,
       });
 
       const frontLabel = document.querySelector("label[for=front_photo_upload]");
@@ -4158,10 +4159,10 @@ export default function NewBOWLConsultationQuiz({
                       Please note this step is mandatory. If you are unable to
                       complete at this time, email your ID to{" "}
                       <a
-                        href="mailto:clinicadmin@myrocky.ca"
+                        href="mailto:clinicadmin@myrocky.com"
                         className="underline"
                       >
-                        clinicadmin@myrocky.ca
+                        clinicadmin@myrocky.com
                       </a>
                       .
                     </p>
