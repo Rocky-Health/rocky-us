@@ -7,7 +7,10 @@ import CustomImage from "@/components/utils/CustomImage";
 import NewHighlightV2 from "@/components/BodyOptimization/bo3/NewHighlightV2";
 import NewProudPartner from "@/components/BodyOptimization/bo3/NewProudPartner";
 
-const NewWlCover = ({ btnColor = null, consultationHref = "/wl-pre-consultation/" }) => {
+const NewWlCover = ({
+  btnColor = null,
+  consultationHref = "/wl-pre-consultation/",
+}) => {
   return (
     <section className="w-ful relative bg-[#F4F3EF] h-[875px] md:h-auto mx-auto max-w-[1440px]">
       <div className=" flex md:items-center pt-6  px-5 md:px-0 max-w-[1200px] mx-auto relative">
@@ -16,7 +19,7 @@ const NewWlCover = ({ btnColor = null, consultationHref = "/wl-pre-consultation/
           style={{ zIndex: 6 }}
         >
           <p className="text-black poppins-font text-[14px] md:text-[16px] font-[400] leading-[100%] flex items-center gap-2 md:mb-2 mb-[13px] md:mt-[83px]">
-            Trusted by 350,000+ Canadians
+            Trusted by 350,000+ Users
             <FaCanadianMapleLeaf className="text-[#FF0000] w-4 h-4" />
           </p>
           <h1 className="tagline-hero text-[36px] md:text-[54px] leading-[115%] tracking-[-0.72px] md:tracking-[-1.08px] text-black mb-4 md:mb-8 capitalize headers-font md:max-w-[552px]">
