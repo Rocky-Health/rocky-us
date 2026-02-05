@@ -3,8 +3,7 @@ import CustomImage from '@/components/utils/CustomImage';
 import BrimaryButton from '@/components/ui/buttons/BrimaryButton';
 import { FaCheck } from 'react-icons/fa6';
 
-const ComprehensiveProgram = () => {
-  const consultationHref = "/wl-pre-consultation/";
+const ComprehensiveProgram = ({ consultationHref = "/wl-offer-pre-consultation/" }) => {
 
   const features = [
     {

@@ -2,8 +2,7 @@ import React from 'react';
 import CustomImage from '@/components/utils/CustomImage';
 import BrimaryButton from '@/components/ui/buttons/BrimaryButton';
 
-const HowItWorks = () => {
-  const consultationHref = "/wl-pre-consultation/";
+const HowItWorks = ({ consultationHref = "/wl-offer-pre-consultation/" }) => {
 
   const steps = [
     {

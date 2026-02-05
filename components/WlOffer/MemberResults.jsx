@@ -31,8 +31,7 @@ const members = [
     { image: "https://myrocky.b-cdn.net/WP%20Images/wl-offer/Before-After-22.jpg" },
 ];
 
-const MemberResults = () => {
-  const consultationHref = "/wl-pre-consultation/";
+const MemberResults = ({ consultationHref = "/wl-offer-pre-consultation/" }) => {
   const scrollContainerRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
 

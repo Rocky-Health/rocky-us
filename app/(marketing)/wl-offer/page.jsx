@@ -14,7 +14,7 @@ import WlOfferHero from '@/components/WlOffer/WlOfferHero'
 
 
 const page = () => {
-  const consultationHref = "/wl-pre-consultation/";
+  const consultationHref = "/wl-offer-pre-consultation/";
   return (
       <main>
           <WlOfferHero consultationHref={consultationHref} />
@@ -22,10 +22,10 @@ const page = () => {
         <NewWlProducts CardBtnColor="bg-[forestgreen]" consultationHref={consultationHref} />
       </Section>
       <Section >
-        <ComprehensiveProgram />
+        <ComprehensiveProgram consultationHref={consultationHref} />
       </Section>
       <section className="bg-[#F0EEEA] py-14 md:py-24 w-full overflow-hidden">
-        <MemberResults />
+        <MemberResults consultationHref={consultationHref} />
       </section>
       <Section >
         <ExclusiveFeatures />
@@ -33,14 +33,14 @@ const page = () => {
     
       
       <Section bg={"bg-[#F0EEEA]"}>
-        <UnmatchedResults />
+        <UnmatchedResults consultationHref={consultationHref} />
       </Section>
       <Section>
         <DoctorTrustedSolutions />
       </Section>
       
       <Section bg={"bg-[#F0EEEA]"}>
-        <HowItWorks />
+        <HowItWorks consultationHref={consultationHref} />
       </Section>
       <Section bg={"bg-[#F0EEEA]"}>
         <MoneyBack />
