@@ -1,0 +1,195 @@
+import { wooApiGet } from "@/lib/woocommerce";
+import axios from "axios";
+import { logger } from "@/utils/devLogger";
+import { cities } from "@/lib/constants/cities";
+
+const BASE_SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  process.env.BASE_URL?.replace(/\/$/, "") ||
+  "https://www.myrocky.com";
+
+// Static routes – main pages, policies, and landing pages
+const staticRoutes = [
+  { url: "", priority: 1.0, changeFrequency: "daily" },
+  { url: "/about-us", priority: 0.8, changeFrequency: "monthly" },
+  { url: "/contact-us", priority: 0.8, changeFrequency: "monthly" },
+  { url: "/assistance-center", priority: 0.7, changeFrequency: "monthly" },
+  { url: "/help-center", priority: 0.7, changeFrequency: "monthly" },
+  { url: "/how-it-works", priority: 0.8, changeFrequency: "monthly" },
+  { url: "/faqs", priority: 0.7, changeFrequency: "monthly" },
+  { url: "/privacy-policy", priority: 0.5, changeFrequency: "yearly" },
+  { url: "/terms-of-use", priority: 0.5, changeFrequency: "yearly" },
+  { url: "/reviews", priority: 0.7, changeFrequency: "weekly" },
+  { url: "/blog", priority: 0.9, changeFrequency: "daily" },
+  { url: "/blog/all", priority: 0.8, changeFrequency: "daily" },
+  { url: "/cart", priority: 0.6, changeFrequency: "always" },
+  { url: "/search", priority: 0.6, changeFrequency: "always" },
+  { url: "/product-faq", priority: 0.6, changeFrequency: "monthly" },
+  { url: "/body-optimization", priority: 0.8, changeFrequency: "monthly" },
+  { url: "/body-optimization-trim", priority: 0.7, changeFrequency: "monthly" },
+  { url: "/chewalis", priority: 0.7, changeFrequency: "monthly" },
+  { url: "/ed", priority: 0.8, changeFrequency: "monthly" },
+  { url: "/hair", priority: 0.8, changeFrequency: "monthly" },
+  { url: "/hair-products", priority: 0.8, changeFrequency: "monthly" },
+  { url: "/hairloss", priority: 0.8, changeFrequency: "monthly" },
+  { url: "/mental-health", priority: 0.8, changeFrequency: "monthly" },
+  { url: "/merch", priority: 0.7, changeFrequency: "monthly" },
+  { url: "/podcast", priority: 0.7, changeFrequency: "weekly" },
+  { url: "/sex", priority: 0.8, changeFrequency: "monthly" },
+  { url: "/service-coverage", priority: 0.7, changeFrequency: "monthly" },
+  { url: "/service-across-canada", priority: 0.8, changeFrequency: "monthly" },
+  { url: "/zonnic", priority: 0.7, changeFrequency: "monthly" },
+  { url: "/my-rocky-combo-pack", priority: 0.7, changeFrequency: "monthly" },
+];
+
+// Service cities – dynamic routes from constants
+const serviceCityRoutes = (cities || []).map((city) => ({
+  url: `/service-across-canada/${city.slug}`,
+  priority: 0.7,
+  changeFrequency: "monthly",
+}));
+
+async function getAllProducts() {
+  const products = [];
+  let page = 1;
+  const perPage = 100;
+
+  try {
+    while (true) {
+      const response = await wooApiGet("products", {
+        status: "publish",
+        per_page: perPage,
+        page,
+        _fields: "slug,date_modified",
+      });
+
+      if (!response.ok) {
+        logger.error(
+          "[Sitemap] WooCommerce products fetch failed:",
+          response.status
+        );
+        break;
+      }
+
+      const data = await response.json();
+      if (!Array.isArray(data) || data.length === 0) break;
+
+      products.push(...data);
+
+      const totalPages = response.headers.get("x-wp-totalpages");
+      if (!totalPages || page >= parseInt(totalPages, 10)) break;
+      page++;
+    }
+  } catch (error) {
+    logger.error("[Sitemap] Error fetching products:", error.message);
+  }
+
+  return products;
+}
+
+async function getAllBlogPosts() {
+  const posts = [];
+  let page = 1;
+  const perPage = 100;
+
+  const baseUrl = process.env.BASE_URL?.replace(/\/$/, "");
+  if (!baseUrl || !process.env.ADMIN_TOKEN) {
+    logger.error("[Sitemap] BASE_URL or ADMIN_TOKEN not configured for blogs");
+    return posts;
+  }
+
+  try {
+    while (true) {
+      const { data, headers } = await axios.get(
+        `${baseUrl}/wp-json/wp/v2/posts`,
+        {
+          params: {
+            per_page: perPage,
+            page,
+            status: "publish",
+            _fields: "slug,modified",
+          },
+          headers: {
+            Authorization: process.env.ADMIN_TOKEN,
+          },
+          timeout: 15000,
+        }
+      );
+
+      if (!Array.isArray(data) || data.length === 0) break;
+      posts.push(...data);
+
+      const totalPages =
+        headers["x-wp-totalpages"] || headers["X-WP-TotalPages"] || "1";
+      if (page >= parseInt(totalPages, 10)) break;
+      page++;
+    }
+  } catch (error) {
+    logger.error("[Sitemap] Error fetching blog posts:", error.message);
+  }
+
+  return posts;
+}
+
+export default async function sitemap() {
+  const currentDate = new Date().toISOString();
+
+  const sitemapEntries = [];
+
+  // 1) Static routes
+  for (const route of staticRoutes) {
+    sitemapEntries.push({
+      url: `${BASE_SITE_URL}${route.url || "/"}`,
+      lastModified: currentDate,
+      changeFrequency: route.changeFrequency,
+      priority: route.priority,
+    });
+  }
+
+  // 2) Service city routes
+  for (const route of serviceCityRoutes) {
+    sitemapEntries.push({
+      url: `${BASE_SITE_URL}${route.url}`,
+      lastModified: currentDate,
+      changeFrequency: route.changeFrequency,
+      priority: route.priority,
+    });
+  }
+
+  // 3) Product URLs (WooCommerce)
+  try {
+    const products = await getAllProducts();
+    for (const product of products) {
+      if (product?.slug) {
+        sitemapEntries.push({
+          url: `${BASE_SITE_URL}/product/${product.slug}`,
+          lastModified:
+            product.date_modified || product.date_created || currentDate,
+          changeFrequency: "weekly",
+          priority: 0.8,
+        });
+      }
+    }
+  } catch (error) {
+    logger.error("[Sitemap] Failed to add products:", error.message);
+  }
+
+  // 4) Blog post URLs (WordPress)
+  try {
+    const blogs = await getAllBlogPosts();
+    for (const blog of blogs) {
+      if (blog?.slug) {
+        sitemapEntries.push({
+          url: `${BASE_SITE_URL}/blog/${blog.slug}`,
+          lastModified: blog.modified || blog.date || currentDate,
+          changeFrequency: "monthly",
+          priority: 0.7,
+        });
+      }
+    }
+  } catch (error) {
+    logger.error("[Sitemap] Failed to add blog posts:", error.message);
+  }
+
+  return sitemapEntries;
+}
