@@ -1,8 +1,7 @@
 import React from 'react';
 import BrimaryButton from '@/components/ui/buttons/BrimaryButton';
 
-const UnmatchedResults = () => {
-  const consultationHref = "/wl-pre-consultation/";
+const UnmatchedResults = ({ consultationHref = "/wl-offer-pre-consultation/" }) => {
 
   const statistics = [
     {
