@@ -47,8 +47,33 @@ export default function BOWeightQuestionnaireLayout({ children }) {
           padding-bottom: 0 !important;
           margin-bottom: 0 !important;
         }
-        #launcher {
+        /* Zendesk Widget - Hide all elements completely */
+        #launcher,
+        #messenger,
+        .zE-launcher,
+        .zE-messenger,
+        .zendesk-widget,
+        .zendesk-chat,
+        iframe[title*="Zendesk"],
+        iframe[title*="Messenger"],
+        iframe[title*="Close message"],
+        iframe[title*="Message from company"],
+        iframe[id*="zendesk"],
+        iframe[id*="messenger"],
+        div[id*="zendesk"],
+        div[id*="messenger"],
+        div[class*="zendesk"],
+        div[class*="zE"],
+        button[aria-label*="Zendesk"],
+        button[aria-label*="Close"],
+        button[title*="Close"],
+        button[title*="Zendesk"],
+        a[aria-label*="Zendesk"],
+        a[aria-label*="Close"] {
           display: none !important;
+          visibility: hidden !important;
+          opacity: 0 !important;
+          pointer-events: none !important;
         }
       `}</style>
       {children}
