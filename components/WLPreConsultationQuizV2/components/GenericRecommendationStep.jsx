@@ -47,11 +47,22 @@ const GenericRecommendationStep = ({
   );
 
   useEffect(() => {
-    // Auto-select the recommended product
-    if (recommended && !selectedProduct) {
+    if (!recommended) return;
+
+    if (!selectedProduct) {
+      // Auto-select the recommended product
       setSelectedProduct(recommended);
+    } else {
+      // Refresh cached selectedProduct with current data (e.g. updated prices)
+      const allProducts = [recommended, ...(alternatives || [])];
+      const freshProduct = allProducts.find(
+        (p) => String(p.id) === String(selectedProduct.id)
+      );
+      if (freshProduct && freshProduct.price !== selectedProduct.price) {
+        setSelectedProduct(freshProduct);
+      }
     }
-  }, [recommended, setSelectedProduct]);
+  }, [recommended, alternatives, setSelectedProduct]);
 
   // Track when an alternative product is selected
   useEffect(() => {
