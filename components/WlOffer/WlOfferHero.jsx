@@ -40,7 +40,7 @@ const WlOfferHero = ({ consultationHref = "/wl-pre-consultation/" }) => {
           </h1>
 
           {/* Offer Details */}
-          <p className=" text-[#000] text-[14px] font-[400] leading-[140%] mb-6 md:mb-10 max-w-2xl">
+          <p className="font-poppins text-[#000] text-[14px] font-[400] leading-[140%] mb-6 md:mb-10 max-w-[311px] md:max-w-2xl">
             For a limited time, subscribe for 3 months and only pay for 2.
             <br className="hidden md:block"/>
             You'll be completely satisfied, or we'll fully refund you.

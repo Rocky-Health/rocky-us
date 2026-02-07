@@ -1,15 +1,15 @@
 import { WLProducts } from "../../data/PreConsultationProductsData";
 
-// Segmented Compounded Semaglutide product for wl-offer flow
-const COMPOUNDED_SEMAGLUTIDE_SEGMENTED = {
-    id: "489778",
-    name: "Compounded Semaglutide",
-    description: "(semaglutide) Vial",
-    price: "$299",
-    details: "Semaglutide is the generic version of Ozempic. It is a personalized treatment to help reduce appetite and keep you fuller for longer",
-    url: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/ozempic/Semaglutide.jpg",
-    supplyAvailable: true,
-};
+// // Segmented Compounded Semaglutide product for wl-offer flow
+// const COMPOUNDED_SEMAGLUTIDE_SEGMENTED = {
+//     id: "489778",
+//     name: "Compounded Semaglutide",
+//     description: "(semaglutide) Vial",
+//     price: "$299",
+//     details: "Semaglutide is the generic version of Ozempic. It is a personalized treatment to help reduce appetite and keep you fuller for longer",
+//     url: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/ozempic/Semaglutide.jpg",
+//     supplyAvailable: true,
+// };
 
 // Configuration for wl-offer-pre-consultation flow
 // This is isolated from other quiz configs to allow custom features
@@ -32,8 +32,8 @@ export const wlOfferConfig = {
                 weightDuration: "less-than-6",
             },
             outcome: {
-                recommended: COMPOUNDED_SEMAGLUTIDE_SEGMENTED,
-                alternatives: [WLProducts.COMPOUNDED_TIRZEPATIDE, WLProducts.COMPOUNDED_SEMAGLUTIDE, WLProducts.OZEMPIC, WLProducts.WEGOVY, WLProducts.RYBELSUS],
+                recommended: WLProducts.COMPOUNDED_SEMAGLUTIDE,
+                alternatives: [WLProducts.COMPOUNDED_TIRZEPATIDE, WLProducts.OZEMPIC, WLProducts.WEGOVY, WLProducts.RYBELSUS],
             },
         },
         {
@@ -41,15 +41,15 @@ export const wlOfferConfig = {
                 bmi: (bmi) => bmi >= 27,
             },
             outcome: {
-                recommended: COMPOUNDED_SEMAGLUTIDE_SEGMENTED,
-                alternatives: [WLProducts.COMPOUNDED_TIRZEPATIDE, WLProducts.COMPOUNDED_SEMAGLUTIDE, WLProducts.OZEMPIC, WLProducts.MOUNJARO, WLProducts.WEGOVY, WLProducts.RYBELSUS],
+                recommended: WLProducts.COMPOUNDED_SEMAGLUTIDE,
+                alternatives: [WLProducts.COMPOUNDED_TIRZEPATIDE, WLProducts.OZEMPIC, WLProducts.MOUNJARO, WLProducts.WEGOVY, WLProducts.RYBELSUS],
             },
         },
         {
             conditions: {}, // Default case
             outcome: {
-                recommended: COMPOUNDED_SEMAGLUTIDE_SEGMENTED,
-                alternatives: [WLProducts.COMPOUNDED_TIRZEPATIDE, WLProducts.COMPOUNDED_SEMAGLUTIDE, WLProducts.OZEMPIC, WLProducts.MOUNJARO, WLProducts.WEGOVY, WLProducts.RYBELSUS],
+                recommended: WLProducts.COMPOUNDED_SEMAGLUTIDE,
+                alternatives: [WLProducts.COMPOUNDED_TIRZEPATIDE, WLProducts.OZEMPIC, WLProducts.MOUNJARO, WLProducts.WEGOVY, WLProducts.RYBELSUS],
             },
         },
     ],
