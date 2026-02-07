@@ -30,7 +30,7 @@ const products = [
   },
   {
     name: "Rybelsus",
-    image: "/wl-offer/Rybelsus.jpg",
+    image: "https://myrocky.b-cdn.net/WP%20Images/wl-offer/rybelsus.jpg",
     supplyStatus: "Limited supply",
     ingredient: "Semaglutide",
     prescription: false,

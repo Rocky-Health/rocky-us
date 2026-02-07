@@ -38,26 +38,29 @@ const UnmatchedResults = ({ consultationHref = "/wl-offer-pre-consultation/" }) 
       </p>
 
       {/* Statistics Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 mb-12 md:w-[972px] md:h-[195px] md:mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-[97px] mb-12 md:w-[972px] md:h-[195px] md:mx-auto">
         {statistics.map((stat, index) => (
-          <div key={index} className="text-center">
-            {/* Separator line for mobile (except first) */}
+          <div key={index} className="text-center md:relative">
+            {/* Separator line - horizontal on mobile, vertical on desktop (except first) */}
             {index > 0 && (
-              <div className="md:hidden border-t border-gray-200 mb-8 -mt-4"></div>
+              <>
+                <div className="md:hidden border-t border-[#D8D8D7] mb-8 -mt-4"></div>
+                <div className="hidden md:block absolute -left-[48.5px] top-0 bottom-0 w-px bg-[#D8D8D7]"></div>
+              </>
             )}
             
             {/* Value */}
-            <div className="text-[40px] md:text-[64px] md:font-[550] headers-font text-[#AE7E56] mb-2 tracking-[-0.8px] md:tracking-[-1.28px] leading-none">
+            <div className="text-[40px] md:text-[64px]  md:font-[550] headers-font text-[#AE7E56] mb-2 tracking-[-0.8px] md:tracking-[-1.28px] leading-none">
               {stat.value}
             </div>
             
             {/* Title */}
-            <h3 className="text-[22px] md:text-[24px]  md:font-medium text-[#212121] mb-3 tracking-[-0.44px] md:tracking-[-0.48px] leading-none capitalize">
+            <h3 className="text-center text-[22px] md:text-[24px] font-semibold md:font-medium text-[#212121] mb-3 tracking-[-0.44px] md:tracking-[-0.48px] leading-normal capitalize poppins-font">
               {stat.title}
             </h3>
             
             {/* Description */}
-            <p className="text-[14px] md:text-[16px] font-normal text-[#212121]  tracking-[-0.28px] md:tracking-[-0.32px]">
+            <p className="text-center text-[14px] md:text-[16px] font-normal text-[#212121] tracking-[-0.28px] md:tracking-[-0.32px] leading-normal poppins-font">
               {stat.description}
             </p>
           </div>

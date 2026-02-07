@@ -79,8 +79,8 @@ const ExclusiveFeatures = () => {
       {/* Headline */}
       <div className="text-center mb-6">
         <h2 className="w-full md:max-w-[820px] text-[32px] md:text-[48px] md:font-[550] leading-[115%] md:leading-none tracking-[-0.64px] md:tracking-[-0.96px] capitalize headers-font mx-auto">
-          <span className="text-[#AE7E56]">Exclusive Features To</span>{' '}
-          <span className="text-black">Support Your Health & Weight Loss Journey</span>
+          <span className="text-[#AE7E56]">Exclusive Features </span>{' '}
+          <span className="text-black">To Support Your Health & Weight Loss Journey</span>
         </h2>
       </div>
 
@@ -96,11 +96,11 @@ const ExclusiveFeatures = () => {
           return (
             <div
               key={index}
-              className="bg-[#F5F4EF] rounded-2xl p-6 flex flex-col md:w-[584px] md:h-[192px]"
+              className="bg-[#F5F4EF] rounded-2xl p-6 flex flex-col md:w-[584px] md:h-[216px]"
             >
               {/* Icon and Integration Note */}
               <div className="flex items-start justify-between mb-6">
-                <div className="w-8 h-8 flex items-center justify-center">
+                <div className="w-8 h-8 flex items-center justify-center max-h-[32px]">
                   {IconComponent && (
                     <IconComponent className="w-full h-full text-black" />
                   )}
@@ -120,7 +120,7 @@ const ExclusiveFeatures = () => {
               </h3>
 
               {/* Description */}
-              <p className="text-sm md:text-base text-black leading-relaxed flex-grow">
+              <p className="text-base font-normal text-[#000] leading-normal flex-grow md:max-w-[570px]">
                 {feature.description}
               </p>
             </div>
