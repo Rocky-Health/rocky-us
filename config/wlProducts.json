@@ -4,17 +4,17 @@
       "id": "489523",
       "name": "Compounded Tirzepatide",
       "description": "(tirzepatide) Vial",
-      "price": "399.00",
+      "price": "249.00",
       "details": "Tirzepatide is the generic version of Mounjaro. It is a personalized treatment to help reduce appetite and keep you fuller for longer",
       "url": "https://mycdn.myrocky.com/wp-content/uploads/20260115220421/Tirzepatide.png",
       "isDefault": true,
       "supplyAvailable": true
     },
     "COMPOUNDED_SEMAGLUTIDE": {
-      "id": "489526",
+      "id": "489798",
       "name": "Compounded Semaglutide",
       "description": "(semaglutide) Vial",
-      "price": "299.00",
+      "price": "149.00",
       "details": "Semaglutide is the generic version of Ozempic. It is a personalized treatment to help reduce appetite and keep you fuller for longer",
       "url": "https://mycdn.myrocky.com/wp-content/uploads/20260115220418/Semaglutide.png",
       "supplyAvailable": true
