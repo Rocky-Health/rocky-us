@@ -9,7 +9,7 @@ const DoctorTrustedSolutionsCards = [
   {
     title: "Doctor-Trusted Treatment Plans",
     titleHighlight: "Treatment Plans",
-    description: "360 care, completely personalized for you.",
+    description: "°360 care, completely personalized for you.",
     desktopImage: "/wl-offer/Doctor-Trusted-Treatment-Plans-Desktop.jpg",
     mobileImage: "/wl-offer/Doctor-Trusted-Treatment-Plans-Mobile.jpg",
   },

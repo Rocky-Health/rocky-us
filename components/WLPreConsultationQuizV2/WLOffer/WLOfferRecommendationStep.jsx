@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { logger } from "@/utils/devLogger";
 import Variations from "../components/Variations";
 import { useRouter } from "next/navigation";
-import { wlFlowAddToCart } from "@/utils/flowCartHandler";
+import { wlFlowAddToCart, addToCartDirectly } from "@/utils/flowCartHandler";
 import CustomImage from "@/components/utils/CustomImage";
 import { addRequiredConsultation } from "@/utils/requiredConsultation";
 import Loader from "@/components/Loader";
@@ -149,44 +149,57 @@ const WLOfferRecommendationStep = ({
       setIsCheckoutLoading(true);
 
       logger.log("Selected Product ->", selectedProduct);
-      // Prepare the main product for checkout
-      const mainProductForCheckout = {
-        id: selectedProduct.id,
-        name: selectedProduct.name,
-        price: selectedProduct.price,
-        quantity: 1,
-        isSubscription: selectedProduct.isSubscription || false,
-      };
-
-      // Add required consultation for main product if needed
-      if (WEIGHT_LOSS_PRODUCT_IDS.includes(String(selectedProduct.id))) {
-        addRequiredConsultation(selectedProduct.id, "wl-flow");
-      }
-
-      // Prepare addons array - add bonus product if default product (489778) is selected
+      
+      // Check if this is the special offer product (489798)
+      // If so, only add the offer product (489780) instead of the selected product
+      let mainProductForCheckout;
       const addons = [];
-      if (String(selectedProduct.id) === "489778") {
-        // Add [GLP-1] Buy 2 Get 1 Free (489780) as bonus product
-        const bonusProduct = {
+      let useWlFlow = true;
+      
+      if (String(selectedProduct.id) === "489798") {
+        // Replace with offer product instead of adding the selected product
+        mainProductForCheckout = {
           id: "489780",
           name: "[GLP-1] Buy 2 Get 1 Free",
           quantity: 1,
+          isSubscription: false,
         };
-        addons.push(bonusProduct);
-        logger.log("🛒 Adding bonus product for segmented Compounded Semaglutide:", bonusProduct);
+        useWlFlow = false; // Use ED flow to avoid adding Body Optimization Program
+        logger.log("🛒 Adding only offer product (489780) for Compounded Semaglutide selection - using ED flow to skip consultation");
+      } else {
+        // Normal flow: add the selected product
+        mainProductForCheckout = {
+          id: selectedProduct.id,
+          name: selectedProduct.name,
+          price: selectedProduct.price,
+          quantity: 1,
+          isSubscription: selectedProduct.isSubscription || false,
+        };
+        
+        // Add required consultation for main product if needed
+        if (WEIGHT_LOSS_PRODUCT_IDS.includes(String(selectedProduct.id))) {
+          addRequiredConsultation(selectedProduct.id, "wl-flow");
+        }
       }
 
       logger.log(
         "🛒 Starting WL Offer direct cart addition:",
         mainProductForCheckout,
         "with addons:",
-        addons
+        addons,
+        "Flow type:",
+        useWlFlow ? "wl" : "ed"
       );
 
-      // Use the new direct cart handler for WL flow with addons
-      const result = await wlFlowAddToCart(mainProductForCheckout, addons, {
-        requireConsultation: true,
-      });
+      // Use appropriate cart handler based on product type
+      const result = useWlFlow
+        ? await wlFlowAddToCart(mainProductForCheckout, addons, {
+            requireConsultation: true,
+          })
+        : await addToCartDirectly(mainProductForCheckout, addons, "ed", {
+            requireConsultation: false,
+            preserveExistingCart: false,
+          });
 
       if (result.success) {
         logger.log(

@@ -28,9 +28,9 @@ const NewProductCard = ({ product, btnColor = null, consultationHref = "/wl-pre-
             </span>
           )}
         </h3>
-        <div className="flex flex-row gap-2">
+        <div className="flex md:flex-row gap-2 w-fit  flex-col">
           <div
-            className={`flex h-6 px-2 items-center justify-center gap-[6px] rounded ${
+            className={`flex h-6 px-2 items-center justify-center  rounded  gap-x-[6px] ${
               product.supplyStatus.toLowerCase().includes("limited")
                 ? "border border-orange-500 bg-white"
                 : "border border-[#34A853] bg-white"
@@ -39,14 +39,14 @@ const NewProductCard = ({ product, btnColor = null, consultationHref = "/wl-pre-
             {product.supplyStatus.toLowerCase().includes("limited") ? (
               <span className="w-2 h-2 rounded-full bg-orange-500"></span>
             ) : (
-              <span className="w-2 h-2 rounded-full bg-[#34A853]"></span>
+              <span className="w-2 h-2 rounded-full bg-[#34A853]"></span> 
             )}
-            <span className="poppins-font text-[#000] text-[12px] font-[400] leading-[140%] not-italic">
+            <span className="poppins-font text-[#000] text-[12px] font-[400] leading-[140%] not-italic w-fit whitespace-nowrap">
               {product.supplyStatus}
             </span>
           </div>
-          <div className="flex h-6 px-2 items-center justify-center gap-[6px] rounded border border-gray-300 bg-white">
-            <span className="poppins-font text-[#000] text-[12px] font-[400] leading-[140%] not-italic">
+          <div className="flex h-6 px-2 items-center md:justify-center justify-start  rounded border border-gray-300 bg-white w-fit">
+            <span className="poppins-font text-[#000] text-[12px] font-[400] leading-[140%] not-italic whitespace-nowrap">
               {product.ingredient}
             </span>
           </div>

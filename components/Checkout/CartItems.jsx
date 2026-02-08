@@ -29,6 +29,9 @@ const CartItem = ({ item }) => {
   const isOralSemaglutide = item.id === 490537 || item.product_id === 490537;
   const isSubscriptionWithFallback = isSubscription || isOralSemaglutide;
 
+  // Check if this is the special offer product [GLP-1] Buy 2 Get 1 Free
+  const isOfferProduct = item.id === 489780 || item.product_id === 489780;
+
   let supply = "";
   if (
     subscription &&
@@ -65,7 +68,7 @@ const CartItem = ({ item }) => {
             `(${item.variation[0]?.value})`}
         </h5>
 
-        {item.name != "Body Optimization Program" && (
+        {item.name != "Body Optimization Program" && !isOfferProduct && (
           <p className="text-[12px]">
             {currencySymbol}
             {formatPrice(itemPrice)} /{" "}
@@ -93,6 +96,49 @@ const CartItem = ({ item }) => {
             </span>
           </p>
         )}
+        {isOfferProduct && (
+          <p className="text-[12px]">
+            {currencySymbol}
+            {formatPrice(itemPrice)} / <span className="text-[12px] font-normal">every 3 months</span>
+          </p>
+        )}
+        {isOfferProduct && (
+          <div className="flex flex-col mt-3 gap-3">
+            <div className="flex justify-between items-start gap-4">
+              <div className="flex flex-col">
+                <p className="text-[14px] font-[400] text-[#212121]">
+                  Medication (3 months)
+                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-[14px] line-through text-gray-400">$547.00</span>
+                  <span className="text-[14px] font-[600] text-[#212121]">$397.00</span>
+                </div>
+              </div>
+              <span className="text-[11px] font-[600] text-green-700 bg-green-100 px-2 py-1 rounded whitespace-nowrap">
+                SAVE $150
+              </span>
+            </div>
+            
+            <div className="flex justify-between items-start gap-4">
+              <div className="flex flex-col">
+                <p className="text-[14px] font-[400] text-[#212121]">
+                  Provider Consultations (3 months)
+                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-[14px] line-through text-gray-400">$297.00</span>
+                  <span className="text-[14px] font-[600] text-[#212121]">$200.00</span>
+                </div>
+              </div>
+              <span className="text-[11px] font-[600] text-green-700 bg-green-100 px-2 py-1 rounded whitespace-nowrap">
+                SAVE $97
+              </span>
+            </div>
+            
+            <p className="text-gray-500 mt-1 font-normal text-[12px]">
+              Pause Or Cancel Anytime
+            </p>
+          </div>
+        )}
         {item.name === "Body Optimization Program" && (
           <div className="flex flex-col">
             <p className="text-sm md:text-base font-[500] text-[#212121] underline text-nowrap">
@@ -112,7 +158,7 @@ const CartItem = ({ item }) => {
           </div>
         )}
         <p className="text-gray-500 mt-1 font-thin text-[12px]">
-          {isSubscriptionWithFallback && "Pause Or Cancel Anytime"}
+          {isSubscriptionWithFallback && !isOfferProduct && "Pause Or Cancel Anytime"}
         </p>
       </div>
     </div>

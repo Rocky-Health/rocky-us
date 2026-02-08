@@ -21,7 +21,7 @@ const page = () => {
           <Section bg={"  md:pt-[96px] border-b border-[rgba(216,216,215,1)]"}>
         <NewWlProducts CardBtnColor="bg-[forestgreen]" consultationHref={consultationHref} />
       </Section>
-      <Section >
+      <Section bg={"pb-[0px] md:pb-[20px] "}>
         <ComprehensiveProgram consultationHref={consultationHref} />
       </Section>
       <section className="bg-[#F0EEEA] py-14 md:py-24 w-full overflow-hidden">

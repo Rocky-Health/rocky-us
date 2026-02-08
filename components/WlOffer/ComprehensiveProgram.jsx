@@ -63,14 +63,9 @@ const ComprehensiveProgram = ({ consultationHref = "/wl-offer-pre-consultation/"
       `}} />
       {/* Headline */}
       <div className="text-center mb-6 md:mb-8">
-        <h2 className="text-[32px] md:text-[48px] lg:text-[56px] font-[550] leading-[115%] tracking-tight headers-font mb-4">
-          <span 
-            className="text-[#AE7E56] text-center text-[32px] font-[600] leading-[115%] tracking-[-0.64px] capitalize headers-font"
-
-          > 
-            A comprehensive GLP-1 program
-          </span>
-          {` `}
+        <h2 className="text-[32px] md:text-[48px] font-[600] md:font-[550] leading-[115%] tracking-[-0.64px] md:tracking-[-0.96px] capitalize headers-font mb-4 mx-auto md:max-w-[760px]">
+          <span className="text-[#AE7E56]">A comprehensive GLP-1 program</span>
+          <br className="hidden md:block" />
           <span className="text-black">With Unmatched Results</span>
         </h2>
         <p 
@@ -151,7 +146,7 @@ const ComprehensiveProgram = ({ consultationHref = "/wl-offer-pre-consultation/"
               </h3>
 
               {/* Bullet Points */}
-              <ul className="space-y-3">
+              <ul className="space-y-2">
                 {feature.bullets.map((bullet, bulletIndex) => (
                   <li key={bulletIndex} className="flex items-start gap-3">
                     <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[#AE7E56] text-white flex-shrink-0 mt-0.5">
