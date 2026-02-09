@@ -52,6 +52,19 @@ const TagIcon = () => (
   </svg>
 );
 
+const PrescriptionIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <g clipPath="url(#clip0_18969_6811)">
+      <path d="M15 7.5H9V6H15V7.5ZM12 21H4.5V18H6V16.5H4.5V12.75H6V11.25H4.5V7.5H6V6H4.5V3H18V15.75H19.5V3C19.5 2.175 18.825 1.5 18 1.5H4.5C3.675 1.5 3 2.175 3 3V6H1.5V7.5H3V11.25H1.5V12.75H3V16.5H1.5V18H3V21C3 21.825 3.675 22.5 4.5 22.5H12V21ZM15 11.25H9V12.75H15V11.25ZM17.25 20.4L15.3 18.45L14.25 19.5L17.25 22.5L22.5 17.25L21.45 16.2L17.25 20.4Z" fill="black"/>
+    </g>
+    <defs>
+      <clipPath id="clip0_18969_6811">
+        <rect width="24" height="24" fill="white"/>
+      </clipPath>
+    </defs>
+  </svg>
+);
+
 const ShieldIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
     <g clipPath="url(#clip0_18969_6818)">
@@ -84,7 +97,7 @@ const KeyFeatures = () => {
       text: "Honest Pricing."
     },
     {
-      icon: TagIcon,
+      icon: PrescriptionIcon,
       text: "400,000+ Prescriptions Written."
     },
     {
