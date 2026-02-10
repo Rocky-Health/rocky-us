@@ -9,7 +9,6 @@ export const layoutExemptRoutes = [
   "/ed-pre-consultation-quiz",
   "/wl-pre-consultation",
   "/wl-offer-pre-consultation",
-  "/bo-pre-consultation",
   "/ed-consultation-quiz",
   "/hair-pre-consultation-quiz", // Added hair pre-consultation quiz
   "/hair-main-questionnaire", // Added hair main questionnaire
