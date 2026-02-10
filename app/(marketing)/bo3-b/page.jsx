@@ -17,7 +17,7 @@ export const metadata = {
 };
 
 export default async function BO3Page() {
-  const consultationHref = "/bo-pre-consultation/";
+  const consultationHref = "/wl-pre-consultation/";
   return (
     <main>
       <section className=" bg-[#F4F3EF]">
