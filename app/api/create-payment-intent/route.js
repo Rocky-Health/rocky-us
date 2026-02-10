@@ -36,6 +36,26 @@ export async function POST(req) {
       );
     }
 
+    // Stripe minimum amount requirement: $0.50 USD (50 cents)
+    const MINIMUM_AMOUNT_CENTS = 50; 
+    if (amount < MINIMUM_AMOUNT_CENTS) {
+      logger.warn(
+        `Amount too small for Stripe: ${amount} cents (minimum: ${MINIMUM_AMOUNT_CENTS} cents / $0.50 USD)`
+      );
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Payment amount must be at least $0.50 USD. Current amount: $${(amount / 100).toFixed(2)}`,
+          details: {
+            amount_cents: amount,
+            minimum_cents: MINIMUM_AMOUNT_CENTS,
+            message: "Stripe requires a minimum charge of $0.50 USD",
+          },
+        },
+        { status: 400 }
+      );
+    }
+
     if (!paymentMethodId) {
       return NextResponse.json(
         { success: false, error: "Payment method is required" },
