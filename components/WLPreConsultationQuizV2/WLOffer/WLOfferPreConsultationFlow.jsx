@@ -3,7 +3,7 @@
 import { logger } from "@/utils/devLogger";
 import { useWLOfferFlow } from "./hooks/useWLOfferFlow";
 import { wlOfferConfig } from "./config/wlOfferConfig";
-import GenericPopup from "../BOSimplified/components/GenericPopup"; // Reuse popup component
+import WLOfferGenericPopup from "./WLOfferGenericPopup"; // Use dedicated popup component for wl-offer flow
 import { PasswordProvider } from "../contexts/PasswordContext";
 import QuizStepRenderer from "./QuizStepRenderer";
 
@@ -75,6 +75,7 @@ const WLOfferPreConsultationFlow = () => {
     handleAction,
     closePopup,
     handleRecommendationContinue,
+    isAddingToCart,
   } = useWLOfferFlow();
 
   // Ensure hooks run in the same order on every render
@@ -106,7 +107,7 @@ const WLOfferPreConsultationFlow = () => {
   if (activePopup && (activePopupConfig?.asPage ?? true)) {
     return (
       <PasswordProvider>
-        <GenericPopup
+        <WLOfferGenericPopup
           isOpen={!!activePopup}
           onClose={closePopup}
           popupConfig={activePopupConfig}
@@ -115,6 +116,7 @@ const WLOfferPreConsultationFlow = () => {
           currentPage={currentStep}
           progressBar={progressPercent}
           setUserData={setUserData}
+          isAddingToCart={isAddingToCart}
         />
       </PasswordProvider>
     );
@@ -128,12 +130,10 @@ const WLOfferPreConsultationFlow = () => {
         </div>
         {/* QuestionnaireNavbar */}
         <QuestionnaireNavbar onBackClick={handleBack} currentPage={currentStep} />
-        {/* Progress Bar - Hide for recommendation step */}
-        {currentStep !== 3 && (
-          <div className="pt-4 pb-6">
-            <ProgressBar progress={progressPercent || 100} />
-          </div>
-        )}
+        {/* Progress Bar */}
+        <div className="pt-4 pb-6">
+          <ProgressBar progress={progressPercent || 100} />
+        </div>
 
         {/* Main content */}
         <div className="flex-1">
@@ -150,7 +150,7 @@ const WLOfferPreConsultationFlow = () => {
         </div>
 
         {/* Generic popup */}
-        <GenericPopup
+        <WLOfferGenericPopup
           isOpen={!!activePopup}
           onClose={closePopup}
           popupConfig={activePopupConfig}
@@ -159,6 +159,7 @@ const WLOfferPreConsultationFlow = () => {
           currentPage={currentStep}
           progressBar={progressPercent}
           setUserData={setUserData}
+          isAddingToCart={isAddingToCart}
         />
       </div>
     </PasswordProvider>

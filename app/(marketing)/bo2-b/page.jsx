@@ -12,7 +12,7 @@ import WlFaqsSection from "@/components/BodyOptimization/WlFaqsSection";
 import WlProducts from "@/components/BodyOptimization/WlProducts";
 
 export default async function BO2() {
-  const consultationHref = "/bo-pre-consultation/";
+  const consultationHref = "/wl-pre-consultation/";
   return (
     <main>
       <CoverSection>
