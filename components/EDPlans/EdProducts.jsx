@@ -244,21 +244,21 @@ const viagraProduct = {
     "quarterly-supply": [
       {
         count: 12,
-        genericPrice: 96.00,
+        genericPrice: 57.60,
         brandPrice: 1380,
         variationId: "235",
         brandVariationId: "1430",
       },
       {
         count: 24,
-        genericPrice: 192.00,
+        genericPrice: 115.20,
         brandPrice: 2760,
         variationId: "236",
         brandVariationId: "1431",
       },
       {
         count: 36,
-        genericPrice: 288.00,
+        genericPrice: 172.80,
         brandPrice: 4140,
         variationId: "237",
         brandVariationId: "1432",
