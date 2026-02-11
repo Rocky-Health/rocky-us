@@ -3,7 +3,7 @@ import { useWLOfferStepNavigation } from "./useWLOfferStepNavigation";
 import { useWLOfferQuizData } from "./useWLOfferQuizData";
 import { wlOfferConfig } from "../config/wlOfferConfig";
 import { logger } from "@/utils/devLogger";
-import { addToCartDirectly } from "@/utils/flowCartHandler";
+import { addItemToCart } from "@/lib/cart/cartService";
 
 export const useWLOfferFlow = () => {
     const [isAddingToCart, setIsAddingToCart] = useState(false);
@@ -35,46 +35,37 @@ export const useWLOfferFlow = () => {
             logger.log("[WLOffer] Redirecting to checkout with offer product");
 
             // Offer product: [GLP-1] Buy 2 Get 1 Free (ID: 489780)
-            const offerProduct = {
-                id: "489780",
-                name: "[GLP-1] Buy 2 Get 1 Free",
+            // Add as normal product (not ed or wl flow)
+            const offerProductData = {
+                productId: "489780",
                 quantity: 1,
-                isSubscription: false,
+                name: "[GLP-1] Buy 2 Get 1 Free",
+                price: 0, // Price will be fetched from product data
+                product_type: "simple",
+                variation: [],
             };
 
-            logger.log("🛒 Adding offer product (489780) to cart - using ED flow to skip consultation");
+            logger.log("🛒 Adding offer product (489780) to cart as normal product");
 
-            // Use ED flow to avoid adding Body Optimization Program
-            const result = await addToCartDirectly(offerProduct, [], "ed", {
-                requireConsultation: false,
-                preserveExistingCart: false,
-            });
+            // Add product to cart as normal product (not flow-specific)
+            await addItemToCart(offerProductData);
 
-            if (result.success) {
-                logger.log(
-                    "✅ WL Offer cart addition successful, redirecting to:",
-                    result.redirectUrl
-                );
+            logger.log("✅ WL Offer product added to cart successfully");
 
-                // Clear all localStorage keys used in WL flow before redirecting
-                try {
-                    if (typeof window !== "undefined" && window.localStorage) {
-                        localStorage.removeItem("wl_flow2_quiz_data");
-                        logger.log("✓ Cleared WL flow localStorage key before redirect");
-                    }
-                } catch (e) {
-                    logger.error("Error clearing localStorage:", e);
+            // Clear all localStorage keys used in WL flow before redirecting
+            try {
+                if (typeof window !== "undefined" && window.localStorage) {
+                    localStorage.removeItem("wl_flow2_quiz_data");
+                    logger.log("✓ Cleared WL flow localStorage key before redirect");
                 }
+            } catch (e) {
+                logger.error("Error clearing localStorage:", e);
+            }
 
-                // Redirect to checkout
-                if (typeof window !== "undefined" && result.redirectUrl) {
-                    window.location.href = result.redirectUrl;
-                    return;
-                }
-            } else {
-                logger.error("❌ WL Offer cart addition failed:", result.error);
-                alert("There was an issue processing your checkout. Please try again.");
-                setIsAddingToCart(false);
+            // Redirect to checkout (normal checkout, no flow parameters)
+            if (typeof window !== "undefined") {
+                window.location.href = "/checkout";
+                return;
             }
         } catch (error) {
             logger.error("Error during WL Offer checkout redirect:", error);
