@@ -270,6 +270,128 @@ const HeroSection = ({ onOpenMenu }) => {
                   </Link>
                 ))}
               </div>
+
+              {/* Services Grid */}
+              <div className="grid-cols-1 md:grid-cols-7 gap-4 md:gap-6 mb-12 md:hidden grid">
+                <Link
+                  href={services[0].link}
+                  onClick={handleServiceClick}
+                  className={`group relative bg-[#F5F5F5] rounded-[20px] md:rounded-[24px] overflow-hidden hover:shadow-lg transition-shadow duration-300 h-[163px] md:h-[280px] `}
+                >
+                  <div
+                    className="absolute inset-0 bg-cover bg-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-[20px] md:rounded-[24px]"
+                    style={{
+                      backgroundImage:
+                        "url('https://myrocky.b-cdn.net/WP%20Images/Global%20Images/card_bg.png')",
+                    }}
+                    aria-hidden
+                  />
+                  {/* Background Image */}
+                  <CustomImage
+                    src={services[0].image}
+                    alt={services[0].title}
+                    width={services[0].width}
+                    height={services[0].height}
+                    className={`object-cover absolute bottom-0 right-0 w-[${services[0].mobile_width}px]`}
+                  />
+
+                  <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-transparent "></div>
+
+                  {/* Content - Top positioned */}
+                  <div className="absolute subheader-font top-[16px] left-[16px] md:top-[24px] md:left-[24px] ">
+                    <CardTitle
+                      blackText={services[0].blackText}
+                      accentText={services[0].accentText}
+                    />
+                  </div>
+
+                  {/* Arrow Icon - Bottom Right */}
+                  <div className="absolute bottom-6 left-6 ">
+                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-md">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M4 10H16M16 10L10 4M16 10L10 16"
+                          stroke="black"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </Link>
+
+                <div className="grid grid-cols-2  gap-4 w-full">
+                  {services.map((service, index) => {
+                    if (index === 0) return null;
+                    return (
+                      <Link
+                        key={index}
+                        href={service.link}
+                        onClick={handleServiceClick}
+                        className={`group relative bg-[#F5F5F5] rounded-[20px] md:rounded-[24px] overflow-hidden hover:shadow-lg transition-shadow duration-300 h-[200px] ${
+                          index % 3 === 0 ? "md:col-span-3" : "md:col-span-2"
+                        }`}
+                      >
+                        <div
+                          className="absolute inset-0 bg-cover bg-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-[20px] md:rounded-[24px]"
+                          style={{
+                            backgroundImage:
+                              "url('https://myrocky.b-cdn.net/WP%20Images/Global%20Images/card_bg.png')",
+                          }}
+                          aria-hidden
+                        />
+                        {/* Background Image */}
+                        <CustomImage
+                          src={service.image}
+                          alt={service.title}
+                          width={service.width}
+                          height={service.height}
+                          className={`object-cover absolute bottom-0 right-0 w-[${service.mobile_width}px]`}
+                        />
+
+                        <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-transparent "></div>
+
+                        {/* Content - Top positioned */}
+                        <div className="absolute subheader-font top-[16px] left-[16px] md:top-[24px] md:left-[24px] ">
+                          <CardTitle
+                            blackText={service.blackText}
+                            accentText={service.accentText}
+                            className="flex flex-col gap-1"
+                          />
+                        </div>
+
+                        {/* Arrow Icon - Bottom Right */}
+                        <div className="absolute bottom-6 left-6 ">
+                          <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-md">
+                            <svg
+                              width="20"
+                              height="20"
+                              viewBox="0 0 20 20"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M4 10H16M16 10L10 4M16 10L10 16"
+                                stroke="black"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </>
         )}
