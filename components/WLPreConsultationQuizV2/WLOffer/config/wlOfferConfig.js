@@ -72,35 +72,24 @@ export const wlOfferConfig = {
             type: "popup",
             // This will be handled by popup system
         },
-        // Step 3: Product Recommendations
-        3: {
-            id: "productRecommendations",
-            type: "recommendation",
-            title: "Recommended for you",
-            field: "selectedProduct",
-            required: true,
-        },
     },
 
     // Navigation configuration
     navigation: {
         1: 2, // BMI Calculator -> Your Weight Popup
-        2: 3, // Your Weight Popup -> Product Recommendations
-        3: 4, // Product Recommendations -> Complete (goes to checkout)
+        2: "checkout", // Your Weight Popup -> Direct to checkout
     },
 
     // Progress mapping
     progressMap: {
-        1: 25, // BMI Calculator
-        2: 50, // Your Weight Popup
-        3: 100, // Product Recommendations
+        1: 50, // BMI Calculator
+        2: 100, // Your Weight Popup (final step)
     },
 
     // Step titles
     stepTitles: {
         1: "Height & Weight",
         2: "Your Weight",
-        3: "Product Recommendations",
     },
 
     // Popup configurations
@@ -143,8 +132,7 @@ export const wlOfferConfig = {
             buttons: [
                 {
                     label: "Continue",
-                    action: "navigate",
-                    payload: 3, // Go to product recommendations step
+                    action: "redirectToCheckout", // Redirect directly to checkout
                     primary: true,
                 },
             ],
