@@ -1,9 +1,6 @@
 import React from "react";
 import { wlOfferConfig } from "./config/wlOfferConfig";
 import GenericQuestionStep from "../components/GenericQuestionStep";
-import WLOfferRecommendationStep from "./WLOfferRecommendationStep";
-import SkincareProductCard from "../components/SkincareProductCard";
-import { getProductRecommendation } from "../utils/recommendationEngine";
 
 const QuizStepRenderer = ({
   currentStep,
@@ -16,25 +13,6 @@ const QuizStepRenderer = ({
   handleRecommendationContinue,
 }) => {
   const stepConfig = wlOfferConfig.steps[currentStep];
-
-  // Handle recommendation step (step 3) - using isolated WLOfferRecommendationStep
-  if (currentStep === 3) {
-    const recommendation = getProductRecommendation(
-      userData,
-      wlOfferConfig.recommendationRules
-    );
-
-    return (
-      <WLOfferRecommendationStep
-        {...recommendation}
-        selectedProduct={selectedProduct}
-        setSelectedProduct={setSelectedProduct}
-        onContinue={handleRecommendationContinue}
-        ProductCard={SkincareProductCard}
-        showAlternatives={true}
-      />
-    );
-  }
 
   // Handle completion or invalid step
   if (!stepConfig) {
