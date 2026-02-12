@@ -454,15 +454,15 @@ const GenericRecommendationStep = ({
             </div> */}
             <div className="flex-grow">
                 {/* Title */}
-                <h2 className="text-2xl font-semibold text-[#000000] mt-6 mb-2 text-center">
-                    Your treatment plan
+                <h2 className="text-[30px] font-[400] text-[#000000] mt-6 mb-8 text-center">
+                    Choose your treatment
                 </h2>
-                <h3 className="text-sm w-fit mx-auto font-[500] leading-[140%] tracking-[-2%] text-black mb-6 text-center bg-[#F0EEEA] p-2 rounded-lg">
+                {/* <h3 className="text-sm w-fit mx-auto font-[500] leading-[140%] tracking-[-2%] text-black mb-6 text-center bg-[#F0EEEA] p-2 rounded-lg">
                     {selectedProduct?.name}
-                </h3>
+                </h3> */}
 
                 {/* Recommended Product */}
-                <div className="mb-6 grid sm:grid-cols-2 grid-cols-1 gap-4">
+                <div className="mb-8 grid grid-cols-2 sm:gap-4 gap-2">
                     <ProductCard
                         product={recommended}
                         variations={variations}
@@ -580,7 +580,28 @@ const GenericRecommendationStep = ({
                 )} */}
 
                 {/* Privacy text */}
-                <PrivacyText />
+                {/* <PrivacyText /> */}
+
+                {/* Not sure which one is best? card */}
+                <div className="flex items-center gap-4 p-4 rounded-2xl bg-[#F5F5F5] shadow-sm overflow-hidden">
+                    <div className="flex-shrink-0 w-[90px] h-[60px] rounded-xl overflow-hidden">
+                        <CustomImage
+                            src="https://myrocky.b-cdn.net/WP%20Images/Global%20Images/wl/wl_not_sure.png"
+                            width="90"
+                            height="60"
+                            className="w-full h-full object-cover"
+                        />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <div className="font-[500] sm:text-[16px] text-[14px] leading-[140%] tracking-[-2%] text-[#000] mb-1">
+                            Not sure which one is best?
+                        </div>
+                        <div className="sm:text-[14px] text-[12px] font-[400] leading-[140%] tracking-[-2%] text-[#000] ">
+                            You can review your options with a clinician after
+                            checkout
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {/* Continue Button */}
