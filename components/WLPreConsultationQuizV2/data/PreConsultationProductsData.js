@@ -73,8 +73,7 @@ const WLProducts = {
     COMPOUNDED_TIRZEPATIDE: {
         id: "489523",
         name: "Compounded Tirzepatide",
-        description:
-            "Meet with a provider to discuss your personalized care plan.",
+        description: "Advanced dual-action medication for stronger outcomes",
         price: "$249",
         details:
             "Tirzepatide is the generic version of Mounjaro. It is a personalized treatment to help reduce appetite and keep you fuller for longer",
@@ -85,12 +84,19 @@ const WLProducts = {
             "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/wl/Compounded Tirzepatide (GLP-1-GIP) - Popup.jpg",
         benefits: WL_PRODUCT_BENEFITS_DEFAULT,
         importantInfo: "All doses - No other fees",
+        label: "Maximum Results",
+        ingredient: "GLP-1/GIP",
+        tags: [
+            "Dual-hormone mechanism for enhanced results",
+            "Enhanced results vs other injectables",
+            "Enhanced results vs other injectables",
+        ],
     },
     COMPOUNDED_SEMAGLUTIDE: {
         id: "489798",
         name: "Compounded Semaglutide",
         description:
-            "Meet with a provider to discuss your personalized care plan.",
+            "Designed  for higher weight-loss dosing & less side effects",
         price: "$149",
         details:
             "Semaglutide is the generic version of Ozempic. It is a personalized treatment to help reduce appetite and keep you fuller for longer",
@@ -100,11 +106,18 @@ const WLProducts = {
         supplyAvailable: true,
         benefits: WL_PRODUCT_BENEFITS_DEFAULT,
         importantInfo: "All doses - No other fees",
+        label: "Lowest-Cost",
+        ingredient: "GLP-1",
+        tags: [
+            "Same active ingredient as Ozempic",
+            "Dose optimized for weight loss",
+            "Preferred by patients focused on maximizing results",
+        ],
     },
     OZEMPIC: {
         id: "142976",
         name: "Ozempic",
-        description: "Prescription access - Medications included",
+        description: "Name Brand Semaglutide Injection",
         price: "$1310",
         details:
             "Ozempic is the brand name for Semaglutide which is a FDA-approved medication. It helps reduce appetite and keeps you feeling fuller for longer",
@@ -117,11 +130,13 @@ const WLProducts = {
         benefits: WL_PRODUCT_BENEFITS_DEFAULT,
         importantInfo:
             "MyRocky does not guarantee that patient will receive a prescription of any specific medication, including Ozempic, Mounjaro, Wegovy  or Rybelsus. All medical decisions are made at the discretion of the healthcare provider",
+        ingredient: "GLP-1",
+        tags: ["Same active ingredient as Wegovy", "Strong appetite control"],
     },
     MOUNJARO: {
         id: "160469",
         name: "Mounjaro",
-        description: "Prescription access - Medications included",
+        description: "Name Brand Tirzepatide Injection",
         price: "$1410",
         details:
             "Mounjaro® is the brand name for Tirzepatide which is a FDA approved drug. It helps reduce appetite and keeps you feeling fuller for longer.",
@@ -133,11 +148,16 @@ const WLProducts = {
         benefits: WL_PRODUCT_BENEFITS_DEFAULT,
         importantInfo:
             "MyRocky does not guarantee that patient will receive a prescription of any specific medication, including Ozempic, Mounjaro, Wegovy  or Rybelsus. All medical decisions are made at the discretion of the healthcare provider",
+        ingredient: "GLP-1/GIP",
+        tags: [
+            "Dual-hormone mechanism for enhanced results",
+            "Enhanced results vs other injectables",
+        ],
     },
     WEGOVY: {
         id: "276274",
         name: "Wegovy",
-        description: "Prescription access - Medications included",
+        description: "Name Brand Semaglutide Injection",
         price: "$1770",
         details:
             "Wegovy is the brand name for semaglutide, an FDA-approved medication prescribed at a higher dose. It helps reduce appetite and keeps you feeling fuller for longer.",
@@ -149,11 +169,13 @@ const WLProducts = {
         benefits: WL_PRODUCT_BENEFITS_DEFAULT,
         importantInfo:
             "MyRocky does not guarantee that patient will receive a prescription of any specific medication, including Ozempic, Mounjaro, Wegovy  or Rybelsus. All medical decisions are made at the discretion of the healthcare provider",
+        ingredient: "GLP-1",
+        tags: ["Same active ingredient as Ozempic", "Strong appetite control"],
     },
     RYBELSUS: {
         id: "369795",
         name: "Rybelsus",
-        description: "Prescription access - Medications included",
+        description: "Name Brand Oral Semaglutide Pill",
         price: "$1310",
         details:
             "Rybelsus is the brand name for semaglutide, an FDA-approved oral medication. It helps reduce appetite and keeps you feeling fuller for longer.",
@@ -166,6 +188,11 @@ const WLProducts = {
         benefits: WL_PRODUCT_BENEFITS_DEFAULT,
         importantInfo:
             "MyRocky does not guarantee that patient will receive a prescription of any specific medication, including Ozempic, Mounjaro, Wegovy  or Rybelsus. All medical decisions are made at the discretion of the healthcare provider",
+        ingredient: "GLP-1",
+        tags: [
+            "Mild weight loss effect compared to injectables",
+            "Best suited for patients who are needle-averse",
+        ],
     },
 };
 

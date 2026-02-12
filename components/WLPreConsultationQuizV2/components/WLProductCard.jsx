@@ -67,27 +67,33 @@ const WLProductCard = ({ product, onSelect, isSelected }) => {
                     <div className="absolute inset-0 hidden bg-[#80684b] rounded-t-2xl text-[#FFFFFF] text-sm">
                         Product Image
                     </div>
-                    <div className="absolute md:top-3 top-2 md:left-3 left-1 flex md:items-center items-start md:flex-row flex-col gap-2 md:h-auto h-[90%] md:justify-start justify-between">
+                    <div className="absolute md:top-3 top-2 md:left-3 left-1 flex md:items-center items-start md:flex-row flex-col gap-2 md:h-auto h-[90%] md:w-[90%] justify-between">
                         {displayPrice && (
                             <span className=" bg-[#FFFFFFCC] text-[#000000] rounded-md py-[4px] px-[8px] font-[500] text-xs tracking-[-2%] leading-[140%]">
                                 {displayPrice}
                             </span>
                         )}
-                        {product.limitedSupply && (
+                        {/* {product.limitedSupply && (
                             <span className=" bg-[#FFFFFFCC] text-[#000000] rounded-md py-[4px] px-[8px] font-[500] text-xs tracking-[-2%] leading-[140%] flex items-center gap-1">
                                 <span className="w-1.5 h-1.5 mb-0.5 rounded-full bg-[#E37400]"></span>
                                 <span className="">Limited supply</span>
                             </span>
-                        )}
+                        )} */}
+                        {product.label ? (
+                            <span className=" bg-[#FFFFFFCC] text-[#000000] rounded-md py-[4px] px-[8px] font-[500] sm:text-xs text-[10px] sm:tracking-[-2%] tracking-[-3%] leading-[140%] flex items-center gap-1 self-end">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#78CD7F] animate-pulse"></span>
+                                <span className="">{product.label}</span>
+                            </span>
+                        ) : null}
                     </div>
                 </div>
 
                 {/* Bottom section: product info */}
                 <div
-                    className={`px-3 py-4 rounded-b-2xl flex flex-col grow gap-2 transition-all duration-300 border ${isSelected ? "bg-[#AE7E56] border-[#AE7E56]" : "bg-[#F0EEEA] border-[#E2E2E1]"}`}
+                    className={`px-3 py-4 rounded-b-2xl flex flex-col grow  transition-all duration-300 border ${isSelected ? "bg-[#AE7E56] border-[#AE7E56]" : "bg-[#F0EEEA] border-[#E2E2E1]"}`}
                 >
                     <h2
-                        className={`text-[18px] font-[500] leading-[140%] md:grow-0 grow tracking-[-2%] mb-1 ${isSelected ? "text-white" : "text-[#000000]"}`}
+                        className={`text-[16px] font-[500] leading-[140%]  tracking-[-2%] ${isSelected ? "text-white" : "text-[#000000]"}`}
                     >
                         {product.name}
                         {product.isPrescription && (
@@ -97,30 +103,28 @@ const WLProductCard = ({ product, onSelect, isSelected }) => {
                         )}
                     </h2>
                     <p
-                        className={`text-sm font-[400] leading-[140%] tracking-[0%] transition-all duration-300 grow ${isSelected ? "text-[#FFFFFFBF]" : "text-[#000000A6]"}`}
+                        className={`text-[12px] font-[400] leading-[140%] md:grow-0 grow  ${isSelected ? "text-white" : "text-[#000000]"}`}
+                    >
+                        ({product.ingredient})
+                    </p>
+                    <p
+                        className={`text-sm font-[400] leading-[140%] tracking-[0%] transition-all my-3 duration-300  ${isSelected ? "text-[#FFFFFF]" : "text-[#000000]"} subheaders-font`}
                     >
                         {shortDescription}
                     </p>
 
-                    <div className="flex flex-wrap gap-2">
-                        <div
-                            className={`inline-flex items-center max-w-max text-[12px] font-normal leading-[140%] ${isSelected ? "bg-[#C19571] border-[#C19571] text-white" : "bg-[#FBF9F7] border-[#E2E2E1] text-[#000000]"} transition-all duration-300 border  px-2 rounded-full py-1`}
-                        >
-                            Reduces cravings
-                        </div>
-                        <div
-                            className={`inline-flex items-center max-w-max text-[12px] font-normal leading-[140%] ${isSelected ? "bg-[#C19571] border-[#C19571] text-white" : "bg-[#FBF9F7] border-[#E2E2E1] text-[#000000]"} transition-all duration-300 border  px-2 rounded-full py-1`}
-                        >
-                            Helps regulate blood sugar levels
-                        </div>
-                        <div
-                            className={`inline-flex items-center max-w-max text-[12px] font-normal leading-[140%] ${isSelected ? "bg-[#C19571] border-[#C19571] text-white" : "bg-[#FBF9F7] border-[#E2E2E1] text-[#000000]"} transition-all duration-300 border  px-2 rounded-full py-1`}
-                        >
-                            Helps maintain feelings of fullness
-                        </div>
-                    </div>
+                    <ul className="flex flex-col gap-1.5 grow  list-inside list-disc ">
+                        {product.tags?.map((tag, index) => (
+                            <li
+                                key={index}
+                                className={`flex gap-2  w-full text-[12px] font-[200] subheaders-font leading-[140%] ${isSelected ? " text-[#F0EEEA]" : " text-[#000000] "} transition-all duration-300  px-1  `}
+                            >
+                                <span className="">•</span> {tag}
+                            </li>
+                        ))}
+                    </ul>
 
-                    <button
+                    {/* <button
                         type="button"
                         className={`text-sm  underline font-[500] w-fit mt-4 hover:no-underline  transition-all duration-300 focus:border-none focus:outline-none focus-visible:ring-0 focus-visible:border-none focus-visible:outline-none focus-visible:shadow-none ${isSelected ? "text-[#FFFFFF]" : "text-[#000000]"}`}
                         onClick={(e) => {
@@ -129,7 +133,7 @@ const WLProductCard = ({ product, onSelect, isSelected }) => {
                         }}
                     >
                         Learn more
-                    </button>
+                    </button> */}
                 </div>
             </div>
 
