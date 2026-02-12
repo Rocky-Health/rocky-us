@@ -117,7 +117,7 @@ const WLProductCard = ({ product, onSelect, isSelected }) => {
                         {product.tags?.map((tag, index) => (
                             <li
                                 key={index}
-                                className={`flex gap-2  w-full text-[12px] font-[200] subheaders-font leading-[140%] ${isSelected ? " text-[#F0EEEA]" : " text-[#000000]"} transition-all duration-300  px-1 `}
+                                className={`flex gap-2  w-full text-[12px] font-[200] subheaders-font leading-[140%] ${isSelected ? " text-[#F0EEEA]" : " text-[#000000] "} transition-all duration-300  px-1  `}
                             >
                                 <span className="">•</span> {tag}
                             </li>
