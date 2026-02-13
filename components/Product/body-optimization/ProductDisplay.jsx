@@ -54,9 +54,10 @@ const ProductDisplay = ({ product, productSlug }) => {
 
               <p className="text-lg font-medium mb-4">${productPrice}</p>
 
-              <p className="text-base mb-6 text-[#212121]">
-                {productDescription}
-              </p>
+              <div
+                className="text-base mb-6 text-[#212121]"
+                dangerouslySetInnerHTML={{ __html: productDescription }}
+              ></div>
               {!isRybelsus && (
                 <ul className="flex flex-col gap-2">
                   <li className="flex items-start gap-2">
@@ -111,7 +112,7 @@ ProductDisplay.propTypes = {
     images: PropTypes.arrayOf(
       PropTypes.shape({
         src: PropTypes.string,
-      })
+      }),
     ),
     image: PropTypes.string,
     name: PropTypes.string,
