@@ -12,6 +12,7 @@ import {
   trackTikTokSearch,
 } from "@/utils/tiktokEvents";
 import { trackNorthbeamPurchase } from "@/utils/northbeamEvents";
+import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
 import { hashEmail, hashPhone } from "./hash";
 import { mapOrderToEcommerce } from "./mappers";
 
@@ -184,6 +185,17 @@ export const analyticsService = {
 
       // Track TikTok event
       trackTikTokInitiateCheckout(cartItems, additionalData, true);
+
+      // Diagnostic: fire before checkout redirect for GTM Tag Assistant validation
+      try {
+        safePush({
+          event: "rk_before_checkout_redirect",
+          rk_session_id: getOrCreateSessionId(),
+          checkout_url: hasWindow() ? `${window.location.origin}/checkout` : "/checkout",
+        });
+      } catch (_) {
+        // non-fatal diagnostic
+      }
     } catch (error) {
       logger.error("[Analytics] Error tracking begin_checkout:", error);
     }
