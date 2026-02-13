@@ -165,9 +165,9 @@ const HomeFaqs = [
       "Track your order by logging into the Rocky platform. You’ll be able to check order status and manage your treatment.",
   },
   {
-    question: "How can I contact Rocky for support?",
+    question: "How can I contact Customer Support?",
     answer:
-      "For support, message us through the portal, email the appropriate department, or call +1 (416) 900-1444 (Mon–Fri, 6 PM–8 PM EST)",
+      "For support, message us through the portal, email the appropriate department. <a href='/contact-us' class='underline text-black'>Contact Us</a>",
   },
   {
     question: "What is the name and address of our affiliate partner pharmacy?",
