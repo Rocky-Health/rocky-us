@@ -56,7 +56,7 @@ const ProductDisplay = ({ product, productSlug }) => {
 
               <div
                 className="text-base mb-6 text-[#212121]"
-                dangerouslySetInnerHTML={productDescription}
+                dangerouslySetInnerHTML={{ __html: productDescription }}
               ></div>
               {!isRybelsus && (
                 <ul className="flex flex-col gap-2">
