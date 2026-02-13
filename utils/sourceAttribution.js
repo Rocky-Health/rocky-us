@@ -15,9 +15,12 @@ const STORAGE_KEYS = {
   CAMPAIGN: "traffic_campaign",
   CONTENT: "traffic_content",
   TERM: "traffic_term",
+  UTM_ID: "traffic_utm_id",
   CLICK_ID: "traffic_click_id",
   CLICK_ID_TYPE: "traffic_click_id_type",
   AWIN_AWC: "awin_awc",
+  GBRAID: "traffic_gbraid",
+  WBRAID: "traffic_wbraid",
   REFERRER: "traffic_referrer",
   LANDING_PAGE: "traffic_landing_page",
   FIRST_TOUCH_TIME: "traffic_first_touch",
@@ -126,6 +129,8 @@ const detectClickIdType = (paramName) => {
   const clickIdMap = {
     fbclid: "Facebook",
     gclid: "Google Ads",
+    gbraid: "Google Ads",
+    wbraid: "Google Ads",
     ttclid: "TikTok",
     msclkid: "Microsoft Ads",
     twclid: "Twitter",
@@ -217,10 +222,19 @@ export const captureAttribution = () => {
       setCookie(STORAGE_KEYS.TERM, utmTerm);
     }
 
+    // Capture utm_id (Google Ads campaign-level identifier)
+    const utmId = params.get("utm_id");
+    if (utmId) {
+      setInStorage(STORAGE_KEYS.UTM_ID, utmId);
+      setCookie(STORAGE_KEYS.UTM_ID, utmId);
+    }
+
     // Capture click IDs (platform-specific tracking IDs)
     const clickIdParams = [
       "fbclid",
       "gclid",
+      "gbraid",
+      "wbraid",
       "ttclid",
       "msclkid",
       "twclid",
@@ -242,6 +256,19 @@ export const captureAttribution = () => {
         }
         break; // Use first found click ID
       }
+    }
+
+    // Capture gbraid/wbraid individually (Google cookieless click IDs)
+    // These are stored separately because the loop above only keeps the first match
+    const gbraid = params.get("gbraid");
+    if (gbraid) {
+      setInStorage(STORAGE_KEYS.GBRAID, gbraid);
+      setCookie(STORAGE_KEYS.GBRAID, gbraid);
+    }
+    const wbraid = params.get("wbraid");
+    if (wbraid) {
+      setInStorage(STORAGE_KEYS.WBRAID, wbraid);
+      setCookie(STORAGE_KEYS.WBRAID, wbraid);
     }
 
     // Capture AWIN affiliate tracking
@@ -309,6 +336,12 @@ export const getAttributionData = () => {
   const lastTouchTime =
     readCookie(STORAGE_KEYS.LAST_TOUCH_TIME) ||
     getFromStorage(STORAGE_KEYS.LAST_TOUCH_TIME);
+  const utmId =
+    readCookie(STORAGE_KEYS.UTM_ID) || getFromStorage(STORAGE_KEYS.UTM_ID);
+  const gbraid =
+    readCookie(STORAGE_KEYS.GBRAID) || getFromStorage(STORAGE_KEYS.GBRAID);
+  const wbraid =
+    readCookie(STORAGE_KEYS.WBRAID) || getFromStorage(STORAGE_KEYS.WBRAID);
 
   return {
     source,
@@ -316,9 +349,12 @@ export const getAttributionData = () => {
     campaign,
     content,
     term,
+    utmId,
     clickId,
     clickIdType,
     awinAwc,
+    gbraid,
+    wbraid,
     referrer,
     landingPage,
     firstTouchTime,

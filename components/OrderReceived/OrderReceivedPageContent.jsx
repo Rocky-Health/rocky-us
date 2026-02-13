@@ -9,6 +9,7 @@ import Link from "next/link";
 import { FaArrowRight } from "react-icons/fa";
 import CustomImage from "../utils/CustomImage";
 import { analyticsService } from "@/utils/analytics/analyticsService";
+import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
 import { formatPrice } from "@/utils/priceFormatter";
 
 // AWIN API configuration
@@ -382,6 +383,17 @@ const OrderReceivedContent = ({ userId }) => {
         if (data && data.id) {
           // Short delay to ensure GTM is ready
           setTimeout(() => {
+            // Diagnostic: confirm GTM is present on order-received page
+            try {
+              safePush({
+                event: "rk_after_checkout_return",
+                rk_session_id: getOrCreateSessionId(),
+                rk_order_id: String(data.id || ""),
+              });
+            } catch (_) {
+              // non-fatal diagnostic
+            }
+
             // Unified analytics purchase event (GA4 + Attentive hashes)
             analyticsService.trackPurchase(data);
             try {

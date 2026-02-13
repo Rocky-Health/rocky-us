@@ -1,10 +1,49 @@
 import { logger } from "@/utils/devLogger";
+import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
 
 /**
  * TikTok Events Utility
  * Handles TikTok Ads tracking events based on TikTok's standard events
  * Reference: https://ads.tiktok.com/help/article/standard-events-parameters
  */
+
+/**
+ * Map native TikTok event names to GTM-friendly dataLayer event names
+ */
+const TIKTOK_DL_EVENT_MAP = {
+  ViewContent: "tiktok_view_content",
+  AddToCart: "tiktok_add_to_cart",
+  InitiateCheckout: "tiktok_initiate_checkout",
+  Purchase: "tiktok_purchase",
+  Search: "tiktok_search",
+  CompleteRegistration: "tiktok_complete_registration",
+  SubmitForm: "tiktok_submit_form",
+  Contact: "tiktok_contact",
+};
+
+/**
+ * Mirror a TikTok event to window.dataLayer for GTM visibility.
+ * This does NOT alter the existing ttq.track behavior.
+ * @param {string} nativeName - The native TikTok event name
+ * @param {Object} eventData - The event data passed to ttq.track
+ * @param {Object} [extra] - Optional extra fields (e.g. event_id for Purchase)
+ */
+const mirrorToDataLayer = (nativeName, eventData, extra = {}) => {
+  try {
+    const dlEventName = TIKTOK_DL_EVENT_MAP[nativeName] || `tiktok_${nativeName.toLowerCase()}`;
+    const sessionId = getOrCreateSessionId();
+
+    safePush({
+      event: dlEventName,
+      tiktok_event_name: nativeName,
+      tiktok_event_data: { ...eventData },
+      rk_session_id: sessionId,
+      ...extra,
+    });
+  } catch (_) {
+    // never let mirroring break main tracking
+  }
+};
 
 /**
  * Initialize TikTok pixel and dataLayer
@@ -20,8 +59,9 @@ const initializeTikTokPixel = () => {
  * @param {string} eventName - The TikTok event name (e.g., 'AddToCart', 'Purchase')
  * @param {Object} eventData - The event data object
  * @param {boolean} debug - Whether to log debug information
+ * @param {Object} [mirrorExtra] - Optional extra fields for the dataLayer mirror push
  */
-export const trackTikTokEvent = (eventName, eventData = {}, debug = true) => {
+export const trackTikTokEvent = (eventName, eventData = {}, debug = true, mirrorExtra = {}) => {
   // Skip if running on server
   if (typeof window === "undefined") return;
 
@@ -32,8 +72,11 @@ export const trackTikTokEvent = (eventName, eventData = {}, debug = true) => {
       logger.log(`[TikTok] Tracking event: ${eventName}`, eventData);
     }
 
-    // Track the event with TikTok pixel
+    // Track the event with TikTok pixel (existing behavior — unchanged)
     window.ttq.track(eventName, eventData);
+
+    // Mirror to dataLayer for GTM visibility
+    mirrorToDataLayer(eventName, eventData, mirrorExtra);
 
     if (debug) {
       logger.log(`[TikTok] ✅ Event "${eventName}" tracked successfully`);
@@ -157,7 +200,9 @@ export const trackTikTokPurchase = (
     ...additionalData,
   };
 
-  trackTikTokEvent("Purchase", eventData, debug);
+  // Include event_id in the dataLayer mirror for Purchase deduplication
+  const purchaseEventId = `purchase_${order.id || "na"}_${Date.now()}`;
+  trackTikTokEvent("Purchase", eventData, debug, { event_id: purchaseEventId });
 };
 
 /**
