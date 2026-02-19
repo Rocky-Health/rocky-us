@@ -25,7 +25,7 @@ export const normalizeEmail = (email) => {
  * @param {string} defaultCountry
  * @returns {string}
  */
-export const normalizePhoneToE164 = (phone, defaultCountry = "CA") => {
+export const normalizePhoneToE164 = (phone, defaultCountry = "US") => {
   if (!phone || typeof phone !== "string") return "";
 
   const trimmed = phone.trim();
@@ -98,7 +98,7 @@ export const hashEmail = async (email) => {
  * @param {string} defaultCountry
  * @returns {Promise<string>}
  */
-export const hashPhone = async (phone, defaultCountry = "CA") => {
+export const hashPhone = async (phone, defaultCountry = "US") => {
   const normalized = normalizePhoneToE164(phone, defaultCountry);
   if (!normalized) return "";
   return sha256Hex(normalized);
