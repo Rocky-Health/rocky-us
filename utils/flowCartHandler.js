@@ -366,7 +366,7 @@ function formatCartDataForDisplay(cartServiceData) {
     totals: {
       total_items: (cartServiceData.total_price || 0).toString(),
       total_price: (cartServiceData.total_price || 0).toString(),
-      currency_code: "CAD",
+      currency_code: "USD",
       currency_symbol: "$",
       currency_minor_unit: 2,
       currency_decimal_separator: ".",

@@ -237,7 +237,7 @@ export const trackNorthbeamPurchase = async (
           ),
           customer_id_canonical: String(customerIdOverride || ""),
           time_of_purchase: canonicalTimeIso, // Ensure proper ISO format
-          currency: order.currency || "CAD",
+          currency: order.currency || "USD",
           purchase_total: parseFloat(order.total) || 0, // Keep in dollars, not cents
           tax: parseFloat(order.total_tax) || 0, // Keep in dollars, not cents
           shipping_cost: parseFloat(order.shipping_total) || 0,
@@ -382,7 +382,7 @@ export const formatNorthbeamOrderData = async (order) => {
     order_id: order.id.toString(),
     customer_id: String(order.customer_id || order.billing?.email || ""), // Ensure customer_id is a string
     time_of_purchase: new Date(order.date_created || new Date()).toISOString(), // Ensure proper ISO format
-    currency: order.currency || "CAD",
+    currency: order.currency || "USD",
     purchase_total: parseFloat(order.total) || 0, // Keep in dollars, not cents
     tax: parseFloat(order.total_tax) || 0, // Keep in dollars, not cents
     shipping_cost: parseFloat(order.shipping_total) || 0,

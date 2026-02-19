@@ -237,7 +237,7 @@ export const trackViewItem = (product, additionalData = {}, debug = true) => {
   const item = formatGA4Item(product);
 
   const ecommerceData = {
-    currency: "CAD",
+    currency: "USD",
     value: item.price,
     items: [item],
   };
@@ -265,7 +265,7 @@ export const trackAddToCart = (
   const item = formatGA4Item(product, quantity);
 
   const ecommerceData = {
-    currency: "CAD",
+    currency: "USD",
     value: item.price * quantity,
     items: [item],
   };
@@ -293,7 +293,7 @@ export const trackRemoveFromCart = (
   const item = formatGA4Item(product, quantity);
 
   const ecommerceData = {
-    currency: "CAD",
+    currency: "USD",
     value: item.price * quantity,
     items: [item],
   };
@@ -326,7 +326,7 @@ export const trackViewCart = (
   );
 
   const ecommerceData = {
-    currency: "CAD",
+    currency: "USD",
     value: totalValue,
     items: items,
   };
@@ -354,7 +354,7 @@ export const trackBeginCheckout = (
   );
 
   const ecommerceData = {
-    currency: "CAD",
+    currency: "USD",
     value: totalValue,
     items: items,
   };

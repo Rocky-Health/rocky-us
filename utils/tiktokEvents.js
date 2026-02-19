@@ -38,6 +38,7 @@ const mirrorToDataLayer = (nativeName, eventData, extra = {}) => {
       tiktok_event_name: nativeName,
       tiktok_event_data: { ...eventData },
       rk_session_id: sessionId,
+      ...eventData,
       ...extra,
     });
   } catch (_) {
@@ -96,14 +97,21 @@ export const formatTikTokEventData = (product, quantity = 1) => {
   const price = parseFloat(product.price) || 0;
   const value = price * quantity;
 
+  const categories = product.categories || [];
+  const contentCategory = categories
+    .map((c) => (typeof c === "string" ? c : c?.name || ""))
+    .filter(Boolean)
+    .join(", ");
+
   return {
     content_type: "product",
     content_ids: [product.sku || product.id?.toString() || ""],
     content_name: product.name || "",
+    content_category: contentCategory,
     quantity: quantity,
     price: price,
     value: value,
-    currency: "CAD",
+    currency: "USD",
     description: product.short_description || product.name || "",
   };
 };
@@ -141,6 +149,7 @@ export const trackTikTokInitiateCheckout = (
   debug = true
 ) => {
   const content_ids = [];
+  const categorySet = new Set();
   let totalValue = 0;
   let totalQuantity = 0;
 
@@ -152,14 +161,20 @@ export const trackTikTokInitiateCheckout = (
     content_ids.push(product.sku || product.id?.toString() || "");
     totalValue += price * qty;
     totalQuantity += qty;
+
+    (product.categories || []).forEach((c) => {
+      const name = typeof c === "string" ? c : c?.name;
+      if (name) categorySet.add(name);
+    });
   });
 
   const eventData = {
     content_type: "product",
     content_ids: content_ids,
+    content_category: [...categorySet].join(", "),
     quantity: totalQuantity,
     value: totalValue,
-    currency: "CAD",
+    currency: "USD",
     ...additionalData,
   };
 
@@ -180,29 +195,44 @@ export const trackTikTokPurchase = (
   if (!order || !order.id) return;
 
   const content_ids = [];
+  const categorySet = new Set();
   let totalQuantity = 0;
 
-  // Extract product IDs and quantities from order line items
   if (order.line_items && Array.isArray(order.line_items)) {
     order.line_items.forEach((item) => {
       content_ids.push(item.sku || item.product_id?.toString() || "");
       totalQuantity += parseInt(item.quantity) || 1;
+      (item.categories || []).forEach((c) => {
+        const name = typeof c === "string" ? c : c?.name;
+        if (name) categorySet.add(name);
+      });
     });
   }
 
+  const purchaseEventId = `purchase_${order.id || "na"}_${Date.now()}`;
+
   const eventData = {
+    event_id: purchaseEventId,
     content_type: "product",
     content_ids: content_ids,
+    content_category: [...categorySet].join(", "),
     quantity: totalQuantity,
     value: parseFloat(order.total) || 0,
-    currency: order.currency || "CAD",
+    currency: order.currency || "USD",
     description: `Order #${order.id}`,
-    ...additionalData,
+    order_data: additionalData.order_data || {},
+    time_of_purchase_iso: additionalData.time_of_purchase_iso || "",
+    customer_id: additionalData.customer_id || "",
+    customer_id_canonical: additionalData.customer_id_canonical || "",
   };
 
-  // Include event_id in the dataLayer mirror for Purchase deduplication
-  const purchaseEventId = `purchase_${order.id || "na"}_${Date.now()}`;
-  trackTikTokEvent("Purchase", eventData, debug, { event_id: purchaseEventId });
+  trackTikTokEvent("Purchase", eventData, debug, {
+    event_id: purchaseEventId,
+    order_data: eventData.order_data,
+    time_of_purchase_iso: eventData.time_of_purchase_iso,
+    customer_id: eventData.customer_id,
+    customer_id_canonical: eventData.customer_id_canonical,
+  });
 };
 
 /**

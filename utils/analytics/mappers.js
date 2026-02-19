@@ -67,7 +67,7 @@ export const mapOrderToEcommerce = async (order) => {
     value: parseFloat(order?.total) || 0,
     tax: parseFloat(order?.total_tax) || 0,
     shipping: parseFloat(order?.shipping_total) || 0,
-    currency: order?.currency || "CAD",
+    currency: order?.currency || "USD",
     coupon: order?.coupon_lines?.map((c) => c.code).join(", ") || "",
     payment_type: order?.payment_method_title || "Visa",
     shipping_tier: order?.shipping_lines?.[0]?.method_title || "Express",
