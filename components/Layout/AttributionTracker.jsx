@@ -7,8 +7,32 @@ import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
 import { logger } from "@/utils/devLogger";
 
 /**
+ * Derive a human-readable source name for the dataLayer.
+ * Priority: clickIDs > AWIN > UTM source > referrer domain > "Direct"
+ */
+const deriveDataLayerSourceName = (fields) => {
+  if (fields.gclid || fields.gbraid || fields.wbraid) return "Google Ads";
+  if (fields.fbclid) return "Facebook";
+  if (fields.ttclid) return "TikTok";
+  if (fields.msclkid) return "Microsoft Ads";
+  if (fields.li_fat_id) return "LinkedIn";
+  if (fields.twclid) return "Twitter";
+  if (fields.awin_awc) return "AWIN";
+  if (fields.utm_source) {
+    const s = fields.utm_source.toLowerCase();
+    if (s.includes("google")) return "Google Ads";
+    if (s.includes("facebook") || s.includes("fb") || s.includes("instagram") || s.includes("ig")) return "Facebook";
+    if (s.includes("tiktok")) return "TikTok";
+    if (s.includes("bing") || s.includes("microsoft")) return "Microsoft Ads";
+    return fields.utm_source;
+  }
+  if (fields.referrer_domain) return fields.referrer_domain;
+  return "Direct";
+};
+
+/**
  * Push attribution data to dataLayer for GTM visibility.
- * Fires a structured "source_data_captured" event and flattened rk_-prefixed variables.
+ * Fires a structured "source_data_captured" event and flattened persistent variables.
  * Safe to call on every route change — GTM picks up the latest values.
  */
 const pushAttributionToDataLayer = () => {
@@ -17,8 +41,8 @@ const pushAttributionToDataLayer = () => {
   try {
     const data = getAttributionData();
     const sessionId = getOrCreateSessionId();
+    const capturedAt = new Date().toISOString();
 
-    // Derive referrer_domain from stored referrer
     let referrerDomain = "";
     if (data.referrer) {
       try {
@@ -26,65 +50,61 @@ const pushAttributionToDataLayer = () => {
       } catch (_) {}
     }
 
-    // Derive landing_page as path+query (strip origin from full URL)
     let landingPagePath = data.landingPage || "";
     if (landingPagePath) {
       try {
         const lpUrl = new URL(landingPagePath);
         landingPagePath = lpUrl.pathname + lpUrl.search;
-      } catch (_) {
-        // keep as-is
-      }
+      } catch (_) {}
     }
 
-    // Read individual click IDs from current URL for freshness
-    // (these may also be in storage; prefer URL if present)
     const urlParams = new URLSearchParams(window.location.search);
 
-    // Structured event push
+    const gclid = urlParams.get("gclid") || (data.clickIdType === "Google Ads" ? data.clickId : "") || "";
+    const fbclid = urlParams.get("fbclid") || (data.clickIdType === "Facebook" ? data.clickId : "") || "";
+    const ttclid = urlParams.get("ttclid") || (data.clickIdType === "TikTok" ? data.clickId : "") || "";
+    const msclkid = urlParams.get("msclkid") || (data.clickIdType === "Microsoft Ads" ? data.clickId : "") || "";
+    const li_fat_id = urlParams.get("li_fat_id") || (data.clickIdType === "LinkedIn" ? data.clickId : "") || "";
+    const twclid = urlParams.get("twclid") || (data.clickIdType === "Twitter" ? data.clickId : "") || "";
+    const gbraid = data.gbraid || urlParams.get("gbraid") || "";
+    const wbraid = data.wbraid || urlParams.get("wbraid") || "";
+    const awin_awc = data.awinAwc || "";
+    const awin_channel = awin_awc ? "aw" : "other";
+
+    const fields = {
+      awin_awc,
+      awin_channel,
+      utm_source: data.source || "",
+      utm_medium: data.medium || "",
+      utm_campaign: data.campaign || "",
+      utm_term: data.term || "",
+      utm_content: data.content || "",
+      utm_id: data.utmId || "",
+      referrer: data.referrer || "",
+      referrer_domain: referrerDomain,
+      landing_page: landingPagePath,
+      gclid,
+      fbclid,
+      msclkid,
+      ttclid,
+      li_fat_id,
+      twclid,
+      gbraid,
+      wbraid,
+      session_id: sessionId,
+      captured_at: capturedAt,
+    };
+
+    fields.source_name = deriveDataLayerSourceName(fields);
+
+    // Push 1: structured event
     safePush({
       event: "source_data_captured",
-      source_attribution: {
-        session_id: sessionId,
-        landing_page: landingPagePath,
-        referrer: data.referrer || "",
-        referrer_domain: referrerDomain,
-        utm_source: data.source || "",
-        utm_medium: data.medium || "",
-        utm_campaign: data.campaign || "",
-        utm_term: data.term || "",
-        utm_content: data.content || "",
-        utm_id: data.utmId || "",
-        gclid: urlParams.get("gclid") || (data.clickIdType === "Google Ads" ? data.clickId : "") || "",
-        fbclid: urlParams.get("fbclid") || (data.clickIdType === "Facebook" ? data.clickId : "") || "",
-        ttclid: urlParams.get("ttclid") || (data.clickIdType === "TikTok" ? data.clickId : "") || "",
-        msclkid: urlParams.get("msclkid") || (data.clickIdType === "Microsoft Ads" ? data.clickId : "") || "",
-        awc: data.awinAwc || "",
-        gbraid: data.gbraid || urlParams.get("gbraid") || "",
-        wbraid: data.wbraid || urlParams.get("wbraid") || "",
-      },
+      source_attribution: { ...fields },
     });
 
-    // Flattened variables push (rk_ prefix to avoid collisions)
-    safePush({
-      rk_session_id: sessionId,
-      rk_landing_page: landingPagePath,
-      rk_referrer: data.referrer || "",
-      rk_referrer_domain: referrerDomain,
-      rk_utm_source: data.source || "",
-      rk_utm_medium: data.medium || "",
-      rk_utm_campaign: data.campaign || "",
-      rk_utm_term: data.term || "",
-      rk_utm_content: data.content || "",
-      rk_utm_id: data.utmId || "",
-      rk_gclid: urlParams.get("gclid") || (data.clickIdType === "Google Ads" ? data.clickId : "") || "",
-      rk_fbclid: urlParams.get("fbclid") || (data.clickIdType === "Facebook" ? data.clickId : "") || "",
-      rk_ttclid: urlParams.get("ttclid") || (data.clickIdType === "TikTok" ? data.clickId : "") || "",
-      rk_msclkid: urlParams.get("msclkid") || (data.clickIdType === "Microsoft Ads" ? data.clickId : "") || "",
-      rk_awc: data.awinAwc || "",
-      rk_gbraid: data.gbraid || urlParams.get("gbraid") || "",
-      rk_wbraid: data.wbraid || urlParams.get("wbraid") || "",
-    });
+    // Push 2: flattened persistent GTM variables (no event key)
+    safePush({ ...fields });
 
     logger.log("[Attribution] source_data_captured pushed to dataLayer");
   } catch (error) {
