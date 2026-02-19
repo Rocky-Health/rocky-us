@@ -147,6 +147,11 @@ export default function RootLayout({ children }) {
           `}
         </Script>
         {/* End Microsoft Clarity */}
+        {/* Start Heatmap.com */}
+        <Script id="heatmap-tracking" strategy="afterInteractive">
+          {`(function (h,e,a,t,m,ap) { (h._heatmap_paq = []).push([ 'setTrackerUrl', (h.heatUrl = e) + a]); h.hErrorLogs=h.hErrorLogs || []; ap=t.createElement('script');  ap.src=h.heatUrl+'preprocessor.min.js?sid='+m;  ap.defer=true; t.head.appendChild(ap); ['error', 'unhandledrejection'].forEach(function (ty) {     h.addEventListener(ty, function (et) { h.hErrorLogs.push({ type: ty, event: et }); }); });})(window,'https://dashboard.heatmap.com/','heatmap.php',document,5229);`}
+        </Script>
+        {/* End Heatmap.com */}
       </head>
       <body
         className={`${poppins.variable} ${fellixMedium.variable} ${fellixSemiBold.variable}`}
