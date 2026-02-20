@@ -115,9 +115,9 @@ export const trackGA4EcommerceEvent = (
   additionalData = {},
   debug = true
 ) => {
-  // Clear previous ecommerce object for purchase events per GA4 best practices
+  // Clear previous ecommerce object per GA4 best practices
   try {
-    if (typeof window !== "undefined" && eventName === "purchase") {
+    if (typeof window !== "undefined") {
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({ ecommerce: null });
     }

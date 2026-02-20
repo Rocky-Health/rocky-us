@@ -17,6 +17,8 @@ import {
   isAuthenticated as checkIsAuthenticated,
 } from "@/lib/cart/cartService";
 import { refreshCartNonceClient } from "./nonceManager";
+import { analyticsService } from "@/utils/analytics/analyticsService";
+import { getOrCreateSessionId } from "@/utils/dataLayerHelper";
 
 /**
  * Helper function to clean and parse price strings
@@ -445,6 +447,25 @@ async function handleUnauthenticatedEarlyAddition(
       "✅ Products added to localStorage cart via cartService:",
       cartData
     );
+
+    // Fire add_to_cart analytics event
+    try {
+      const itemId = String(extractProductId(mainProduct) || mainProduct.variationId || "");
+      analyticsService.trackAddToCart(
+        {
+          id: itemId,
+          sku: itemId,
+          name: mainProduct.name || "",
+          price: parsePrice(mainProduct.price),
+          categories: [],
+          attributes: [],
+        },
+        1,
+        { event_id: `add_to_cart_${getOrCreateSessionId()}_${itemId}_${Date.now()}` }
+      );
+    } catch (_) {
+      // non-blocking
+    }
 
     // Return success with cart data for display
     return {
@@ -1138,6 +1159,25 @@ async function handleAuthenticatedEarlyAddition(
 
       // Add flow-specific consultation requirements
       addFlowConsultationRequirements(mainProduct, flowType);
+
+      // Fire add_to_cart analytics event
+      try {
+        const itemId = String(extractProductId(mainProduct) || mainProduct.variationId || "");
+        analyticsService.trackAddToCart(
+          {
+            id: itemId,
+            sku: itemId,
+            name: mainProduct.name || "",
+            price: parsePrice(mainProduct.price),
+            categories: [],
+            attributes: [],
+          },
+          1,
+          { event_id: `add_to_cart_${getOrCreateSessionId()}_${itemId}_${Date.now()}` }
+        );
+      } catch (_) {
+        // non-blocking
+      }
 
       // Generate checkout URL (but don't redirect yet)
       const checkoutUrl = generateFlowCheckoutUrl(flowType, true);
