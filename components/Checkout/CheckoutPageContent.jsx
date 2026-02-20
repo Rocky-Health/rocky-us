@@ -3,7 +3,7 @@
 import Loader from "@/components/Loader";
 import { logger } from "@/utils/devLogger";
 import CheckoutSkeleton from "@/components/ui/skeletons/CheckoutSkeleton";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import BillingAndShipping from "./BillingAndShipping";
 import CartAndPayment from "./CartAndPayment";
 import { toast } from "react-toastify";
@@ -42,6 +42,8 @@ import {
     isRestrictedWlCartItem,
 } from "@/utils/edShippingRestrictions";
 import { getAwinFromUrlOrStorage } from "@/utils/awin";
+import { analyticsService } from "@/utils/analytics/analyticsService";
+import { getOrCreateSessionId } from "@/utils/dataLayerHelper";
 import StripeElementsPayment from "./StripeElementsPayment";
 import { Elements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
@@ -106,6 +108,7 @@ const CheckoutPageContent = () => {
     const [submitting, setSubmitting] = useState(false);
     const [cartItems, setCartItems] = useState();
     const [isProcessingUrlParams, setIsProcessingUrlParams] = useState(false);
+    const beginCheckoutFiredRef = useRef(false);
     const [savedCards, setSavedCards] = useState([]);
     const [selectedCard, setSelectedCard] = useState(null);
     const [isLoadingSavedCards, setIsLoadingSavedCards] = useState(false);
@@ -140,6 +143,39 @@ const CheckoutPageContent = () => {
         clearStoredAddresses,
         fetchProfileData,
     } = useAddressManager();
+
+    useEffect(() => {
+        if (
+            beginCheckoutFiredRef.current ||
+            !cartItems?.items?.length ||
+            window.location.pathname.includes("order-received")
+        ) {
+            return;
+        }
+        beginCheckoutFiredRef.current = true;
+
+        try {
+            const items = cartItems.items.map((item) => ({
+                product: {
+                    id: String(item.id || item.product_id || ""),
+                    sku: String(item.id || item.product_id || ""),
+                    name: item.name || "",
+                    price: parseFloat(item.prices?.price || item.totals?.line_total || 0) / 100,
+                    categories: [],
+                    attributes: [],
+                },
+                quantity: item.quantity || 1,
+            }));
+            const sessionId = getOrCreateSessionId();
+            const cartHash = cartItems.items.map((i) => i.id).sort().join("-");
+            analyticsService.trackBeginCheckout(items, {
+                event_id: `begin_checkout_${sessionId}_${cartHash}_${Date.now()}`,
+            });
+        } catch (_) {
+            // non-blocking
+        }
+    }, [cartItems]);
+
     const [formData, setFormData] = useState({
         additional_fields: [],
         shipping_address: {},
