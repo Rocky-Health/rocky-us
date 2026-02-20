@@ -81,8 +81,8 @@ const HeroSection = ({ onOpenMenu }) => {
 
     {
       name: "The Growth Plan",
-      image: "/home/hair.webp",
-      link: "/my-rocky-combo-pack?#prescription-hair-kit",
+      image: "/home/hair-foam.webp",
+      link: "/product/finasteride-minoxidil-topical-foam",
     },
 
     {
