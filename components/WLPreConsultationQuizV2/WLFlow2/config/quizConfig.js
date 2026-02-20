@@ -21,7 +21,13 @@ export const quizConfig = {
       },
       outcome: {
         recommended: WLProducts.RYBELSUS,
-        alternatives: [WLProducts.COMPOUNDED_TIRZEPATIDE, WLProducts.COMPOUNDED_SEMAGLUTIDE, WLProducts.OZEMPIC, WLProducts.WEGOVY, WLProducts.RYBELSUS],
+        alternatives: [
+          WLProducts.COMPOUNDED_TIRZEPATIDE,
+          WLProducts.COMPOUNDED_SEMAGLUTIDE,
+          WLProducts.OZEMPIC,
+          WLProducts.WEGOVY,
+          WLProducts.RYBELSUS,
+        ],
       },
     },
     {
@@ -30,14 +36,26 @@ export const quizConfig = {
       },
       outcome: {
         recommended: WLProducts.COMPOUNDED_TIRZEPATIDE,
-        alternatives: [WLProducts.COMPOUNDED_SEMAGLUTIDE, WLProducts.OZEMPIC, WLProducts.MOUNJARO, WLProducts.WEGOVY, WLProducts.RYBELSUS],
+        alternatives: [
+          WLProducts.COMPOUNDED_SEMAGLUTIDE,
+          WLProducts.OZEMPIC,
+          WLProducts.MOUNJARO,
+          WLProducts.WEGOVY,
+          WLProducts.RYBELSUS,
+        ],
       },
     },
     {
       conditions: {}, // Default case
       outcome: {
         recommended: WLProducts.COMPOUNDED_TIRZEPATIDE,
-        alternatives: [WLProducts.COMPOUNDED_SEMAGLUTIDE, WLProducts.OZEMPIC, WLProducts.MOUNJARO, WLProducts.WEGOVY, WLProducts.RYBELSUS],
+        alternatives: [
+          WLProducts.COMPOUNDED_SEMAGLUTIDE,
+          WLProducts.OZEMPIC,
+          WLProducts.MOUNJARO,
+          WLProducts.WEGOVY,
+          WLProducts.RYBELSUS,
+        ],
       },
     },
   ],
@@ -119,7 +137,6 @@ export const quizConfig = {
         "We respect your privacy. All of your information is securely stored on our HIPAA Compliant server.",
       required: true,
     },
-
 
     4: {
       id: "pregnantOrbreastfeeding",
@@ -271,8 +288,6 @@ export const quizConfig = {
     //   ],
     // },
 
-
-
     9: {
       id: "province",
       type: "select",
@@ -285,6 +300,7 @@ export const quizConfig = {
       label: "State",
       options: [
         { id: "", label: "Select a state" },
+        { id: "CA", label: "California" },
         { id: "CO", label: "Colorado" },
         { id: "CT", label: "Connecticut" },
         { id: "FL", label: "Florida" },
