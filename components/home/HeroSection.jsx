@@ -80,7 +80,7 @@ const HeroSection = ({ onOpenMenu }) => {
     },
 
     {
-      name: "The Growth Plan",
+      name: "Topical Foam",
       image: "/home/hair-foam.webp",
       link: "/product/finasteride-minoxidil-topical-foam",
     },
