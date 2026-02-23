@@ -10,6 +10,7 @@ import QuizStepRenderer from "./QuizStepRenderer";
 import { useAddItemToCart } from "@/lib/cart/cartHooks";
 import SkincareQuizLoader from "../components/SkincareQuizLoader";
 import StickyQuizContinueButton from "../components/StickyQuizContinueButton";
+import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
 
 const AcneQuiz = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -17,6 +18,14 @@ const AcneQuiz = () => {
   const quizState = useAcneQuiz();
   const [selectedProduct, setSelectedProduct] = useState(null);
   const addItemToCart = useAddItemToCart();
+
+  useQuestionnaireStepTracking({
+    questionnaireId: "acne-quiz",
+    stepId: quizState.stepIndex,
+    stepIndex: quizState.stepIndex,
+    flowId: "skincare",
+    stepType: "quiz",
+  });
 
   useEffect(() => {
     // Show loader briefly while the quiz state is being restored

@@ -17,6 +17,7 @@ import {
   FaCheckCircle,
 } from "react-icons/fa";
 import Loader from "../Loader";
+import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
 const { uploadFileToS3WithProgress } = await import(
   "@/utils/s3/frontend-upload"
 );
@@ -138,6 +139,15 @@ export default function EDConsultationQuiz({
   const isHandlingPopState = useRef(false);
   const [isMovingForward, setIsMovingForward] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+
+  useQuestionnaireStepTracking({
+    questionnaireId: "ed-consultation",
+    stepId: currentPage,
+    stepIndex: currentPage,
+    flowId: "ed",
+    stepType: "quiz",
+  });
+
   const [progress, setProgress] = useState(0);
   const [showPopup, setShowPopup] = useState(false);
   const [showEdStartWarning, setShowEdStartWarning] = useState(false);

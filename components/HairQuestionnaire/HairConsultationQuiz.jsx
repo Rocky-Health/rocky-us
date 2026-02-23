@@ -14,6 +14,7 @@ import hairQuestionList from "./hairQuestion";
 import Logo from "../Navbar/Logo";
 import DOBInput from "../shared/DOBInput";
 import Link from "next/link";
+import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
 
 const { uploadFileToS3WithProgress } = await import(
   "@/utils/s3/frontend-upload"
@@ -40,6 +41,15 @@ export default function HairConsultationQuiz({
   const [isSyncing, setIsSyncing] = useState(false);
   const [isMovingForward, setIsMovingForward] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+
+  useQuestionnaireStepTracking({
+    questionnaireId: "hair-consultation",
+    stepId: currentPage,
+    stepIndex: currentPage,
+    flowId: "hair",
+    stepType: "quiz",
+  });
+
   const [progress, setProgress] = useState(10);
   const [showPopup, setShowPopup] = useState(false);
   const [showUnder18Popup, setShowUnder18Popup] = useState(false);

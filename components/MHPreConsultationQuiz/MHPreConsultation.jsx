@@ -9,10 +9,20 @@ import { WarningPopup } from "../EdQuestionnaire/WarningPopup";
 import { mhFlowAddToCart } from "@/utils/flowCartHandler";
 import Image from "next/image";
 import DOBInput from "../shared/DOBInput";
+import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
 
 const MHPreConsultation = () => {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
+
+  useQuestionnaireStepTracking({
+    questionnaireId: "mh-pre-consultation",
+    stepId: currentPage,
+    stepIndex: currentPage,
+    flowId: "mental-health",
+    stepType: "pre-consultation",
+  });
+
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
   const [showExitPopup, setShowExitPopup] = useState(false);
   const [dateOfBirth, setDateOfBirth] = useState("");
