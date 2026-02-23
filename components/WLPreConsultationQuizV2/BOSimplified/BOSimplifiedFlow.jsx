@@ -8,8 +8,11 @@ import { PasswordProvider } from "../contexts/PasswordContext";
 import QuizStepRenderer from "./QuizStepRenderer";
 
 import { useEffect } from "react";
+import { toast } from "react-toastify";
 import QuestionnaireNavbar from "../components/QuestionnaireNavbar";
 import { ProgressBar } from "@/components/EdQuestionnaire/ProgressBar";
+
+const COUPON_STORAGE_KEY = "pending_coupon_code";
 
 const getPopupConfigWithChosenValue = (popupKey, userData) => {
   if (popupKey === "potentialWeightLoss") {
@@ -76,6 +79,22 @@ const BOSimplifiedFlow = () => {
     closePopup,
     handleRecommendationContinue,
   } = useBOSimplifiedFlow();
+
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const coupon = params.get("apply_coupon");
+      if (coupon && coupon.trim()) {
+        localStorage.setItem(COUPON_STORAGE_KEY, coupon.trim());
+        toast.success(
+          "$100 Discount Code Auto-Applied For You in Checkout For The Next 60 Minutes",
+          { autoClose: 8000 }
+        );
+      }
+    } catch (e) {
+      logger.error("Error capturing coupon from URL:", e);
+    }
+  }, []);
 
   // Ensure hooks run in the same order on every render
   useEffect(() => {
