@@ -1,20 +1,6 @@
 import { Suspense } from "react";
 import { cookies } from "next/headers";
-import HowRockyWorks from "@/components/HowRockyWorks";
-
-import HomeCover from "@/components/HomePage/HomeCover";
-import CoverSection from "@/components/utils/CoverSection";
-import Section from "@/components/utils/Section";
-import DoctorTrustedSolutions from "@/components/HomePage/DoctorTrustedSolutions";
-import HomeProducts from "@/components/HomePage/HomeProducts";
-import HomeFaqsSection from "@/components/HomePage/HomeFaqsSection";
-import TeamSection from "@/components/TeamSection";
-import RockyBlog from "@/components/RockyBlog";
-import ReviewsSection from "@/components/ReviewsSection";
-
-import FeaturesNotAnimated from "@/components/FeaturesNotAnimated";
-import ProudPartnerLine from "@/components/ProudPartnerLine";
-import RockyInTheNews from "@/components/Product/body-optimization/RockyInTheNews";
+import CouponCapture from "@/components/utils/CouponCapture";
 import HomePageClient from "@/components/home/HomePageClient";
 
 async function HomeContent() {
@@ -229,6 +215,7 @@ async function HomeContent() {
 
   return (
     <>
+      <CouponCapture />
       <HomePageClient
         menuItems={menuItems}
         token={token}

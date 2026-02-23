@@ -105,9 +105,25 @@ const getPopupConfigWithChosenValue = (popupKey, userData) => {
   return quizConfig.popups[popupKey] || null;
 };
 
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
+import { toast } from "react-toastify";
 import QuestionnaireNavbar from "../components/QuestionnaireNavbar";
 import { ProgressBar } from "@/components/EdQuestionnaire/ProgressBar";
+import { useAutoApplyCoupon } from "@/lib/hooks/useAutoApplyCoupon";
+
+function CouponToast() {
+  const captured = useAutoApplyCoupon();
+
+  useEffect(() => {
+    if (!captured) return;
+    toast.success(
+      "$100 Discount Code Auto-Applied For You in Checkout For The Next 60 Minutes",
+      { autoClose: 8000 }
+    );
+  }, [captured]);
+
+  return null;
+}
 
 const WLFlowTwo = () => {
   const {
@@ -159,6 +175,9 @@ const WLFlowTwo = () => {
 
   return (
     <PasswordProvider>
+      <Suspense fallback={null}>
+        <CouponToast />
+      </Suspense>
       <div className="min-h-screen">
         <div className="bg-black text-white text-[14px] leading-[140%] font-medium items-center text-center p-2">
           Lose Weight or Your Money Back
