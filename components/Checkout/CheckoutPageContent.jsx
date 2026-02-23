@@ -47,6 +47,11 @@ import { Elements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { useAddressManager } from "@/lib/hooks/useAddressManager";
 import { debugAddressData } from "@/utils/addressDebugger";
+import {
+    useAutoApplyCoupon,
+    getPendingCouponCode,
+    clearPendingCouponCode,
+} from "@/lib/hooks/useAutoApplyCoupon";
 
 // Load Stripe outside component to avoid recreating on every render
 const stripePromise = loadStripe(
@@ -78,6 +83,7 @@ const CheckoutPageContent = () => {
     const stripe = useStripe(); // Get the Stripe instance from context
     const router = useRouter();
     const searchParams = useSearchParams();
+    useAutoApplyCoupon();
     const isEdFlow = searchParams.get("ed-flow") === "1";
     const isSmokingFlow = searchParams.get("smoking-flow") === "1";
     const onboardingAddToCart = searchParams.get("onboarding-add-to-cart");
@@ -1165,18 +1171,46 @@ const CheckoutPageContent = () => {
                     }
                 }
 
-                // STEP 2: Load profile data AFTER cart completes to override cart data
-                // This ensures logged-in users always see their latest profile data
-                // logger.log("=== LOADING PROFILE DATA ===");
-                // await fetchUserProfile();
-                // logger.log("=== PROFILE DATA LOADED ===");
+                // STEP 2: Auto-apply pending coupon from localStorage (or URL)
+                const pendingCoupon =
+                    searchParams.get("apply_coupon") ||
+                    getPendingCouponCode();
+                if (pendingCoupon) {
+                    try {
+                        logger.log(
+                            `Auto-applying pending coupon: ${pendingCoupon}`
+                        );
+                        const couponRes = await fetch("/api/coupons", {
+                            headers: { "Content-Type": "application/json" },
+                            method: "POST",
+                            body: JSON.stringify({ code: pendingCoupon }),
+                        });
+                        const couponData = await couponRes.json();
 
-                // STEP 3: Profile data is already fetched and merged in fetchCartItems
-                // No need to call populateAddressData again as it would use stale formData state
-                // The profile data merging happens inside fetchCartItems before setFormData is called
+                        if (couponData.error) {
+                            toast.error(
+                                `Coupon "${pendingCoupon}" could not be applied.`
+                            );
+                        } else {
+                            setCartItems(couponData);
+                            toast.success(
+                                `Coupon "${pendingCoupon}" applied!`
+                            );
+                        }
+                    } catch (couponErr) {
+                        logger.error(
+                            "Error auto-applying coupon:",
+                            couponErr
+                        );
+                        toast.error("Failed to apply coupon.");
+                    } finally {
+                        clearPendingCouponCode();
+                    }
+                }
+
                 logger.log("=== ADDRESS DATA ALREADY POPULATED IN FETCHCARTITEMS ===");
 
-                // STEP 4: Load saved cards (doesn't affect form data)
+                // STEP 3: Load saved cards (doesn't affect form data)
                 await fetchSavedCards();
             } catch (error) {
                 logger.error("Error loading checkout data:", error);
