@@ -28,10 +28,20 @@ import ProductRecommendationsStep from "./steps/ProductRecommendationsStep";
 // Import Popup Components
 import WarningPopupWrapper from "./popups/WarningPopupWrapper";
 import CrossSellPopupWrapper from "./popups/CrossSellPopupWrapper";
+import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
 
 const WeightQuestionnaire = () => {
   // Core navigation state
   const [currentPage, setCurrentPage] = useState(1);
+
+  useQuestionnaireStepTracking({
+    questionnaireId: "wl-pre-consultation-v1",
+    stepId: currentPage,
+    stepIndex: currentPage,
+    flowId: "weight-loss",
+    stepType: "pre-consultation",
+  });
+
   const [progressPercent, setProgressPercent] = useState(20);
 
   // Products data

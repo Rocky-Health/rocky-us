@@ -16,6 +16,7 @@ import QuestionnaireNavbar from "../EdQuestionnaire/QuestionnaireNavbar";
 import { ProgressBar } from "../EdQuestionnaire/ProgressBar";
 import Logo from "../Navbar/Logo";
 import Link from "next/link";
+import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
 
 // Pages 1-5: Migrated pre-quiz questions (moved to start)
 // Pages 6-27: Standard WL questionnaire questions (22 pages)
@@ -193,6 +194,15 @@ export default function NewBOWLConsultationQuiz({
   const router = useRouter();
   const formRef = useRef(null);
   const [currentPage, setCurrentPage] = useState(1);
+
+  useQuestionnaireStepTracking({
+    questionnaireId: "bo-weight-consultation",
+    stepId: currentPage,
+    stepIndex: currentPage,
+    flowId: "weight-loss",
+    stepType: "quiz",
+  });
+
   const [progress, setProgress] = useState(0);
   const [formData, setFormData] = useState(getInitialFormData());
   const [isClient, setIsClient] = useState(false);

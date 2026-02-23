@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import QuestionnaireNavbar from "../EdQuestionnaire/QuestionnaireNavbar";
 import { ProgressBar } from "../EdQuestionnaire/ProgressBar";
 import { WarningPopup } from "../EdQuestionnaire/WarningPopup";
+import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
 const { uploadFileToS3WithProgress } = await import(
   "@/utils/s3/frontend-upload"
 );
@@ -31,6 +32,15 @@ export default function ZonnicConsultationQuiz({
   const [showNameDifferencePopup, setShowNameDifferencePopup] = useState(false);
   const [isMovingForward, setIsMovingForward] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
+
+  useQuestionnaireStepTracking({
+    questionnaireId: "zonnic-consultation",
+    stepId: currentPage,
+    stepIndex: currentPage,
+    flowId: "smoking",
+    stepType: "quiz",
+  });
+
   const [progress, setProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);

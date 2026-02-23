@@ -27,10 +27,20 @@ import {
     varietyPackProduct,
 } from "./productData";
 import FaqsSection from "../FaqsSection";
+import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
 
 const EDPreConsultationQuiz = () => {
     const router = useRouter();
     const [currentPage, setCurrentPage] = useState(1);
+
+    useQuestionnaireStepTracking({
+        questionnaireId: "ed-pre-consultation",
+        stepId: currentPage,
+        stepIndex: currentPage,
+        flowId: "ed",
+        stepType: "pre-consultation",
+    });
+
     const [answers, setAnswers] = useState({});
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
