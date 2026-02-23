@@ -7,6 +7,7 @@ import GenericPopup from "../components/GenericPopup";
 import { PasswordProvider } from "../contexts/PasswordContext";
 
 import QuizStepRenderer from "./QuizStepRenderer";
+import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
 
 const getPopupConfigWithChosenValue = (popupKey, userData) => {
   if (popupKey === "YourGoalIs") {
@@ -126,6 +127,14 @@ const WLFlowTwo = () => {
     closePopup,
     handleRecommendationContinue,
   } = useWLFlowTwo();
+
+  useQuestionnaireStepTracking({
+    questionnaireId: "wl-flow-two",
+    stepId: currentStep,
+    stepIndex: currentStep,
+    flowId: "weight-loss",
+    stepType: "pre-consultation",
+  });
 
   const [couponBanner, setCouponBanner] = useState(false);
 

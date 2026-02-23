@@ -13,12 +13,22 @@ import DOBInput from "../shared/DOBInput";
 import { addToCartDirectly } from "../../utils/flowCartHandler";
 import { getConsultationProduct } from "../../utils/hairProductsConfig";
 import ProductRecommendationCard from "./ProductRecommendationCard";
+import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
 
 const HairPreConsultationQuiz = () => {
   // Next.js router for navigation
   const router = useRouter();
 
   const [currentPage, setCurrentPage] = useState(1);
+
+  useQuestionnaireStepTracking({
+    questionnaireId: "hair-pre-consultation",
+    stepId: currentPage,
+    stepIndex: currentPage,
+    flowId: "hair",
+    stepType: "pre-consultation",
+  });
+
   const [answers, setAnswers] = useState({});
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);

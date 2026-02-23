@@ -6,6 +6,7 @@ import { boSimplifiedConfig } from "./config/boSimplifiedConfig";
 import GenericPopup from "./components/GenericPopup"; // Use separate GenericPopup for BO
 import { PasswordProvider } from "../contexts/PasswordContext";
 import QuizStepRenderer from "./QuizStepRenderer";
+import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
 
 import { useEffect } from "react";
 import { toast } from "react-toastify";
@@ -79,6 +80,14 @@ const BOSimplifiedFlow = () => {
     closePopup,
     handleRecommendationContinue,
   } = useBOSimplifiedFlow();
+
+  useQuestionnaireStepTracking({
+    questionnaireId: "bo-simplified",
+    stepId: currentStep,
+    stepIndex: currentStep,
+    flowId: "weight-loss",
+    stepType: "pre-consultation",
+  });
 
   useEffect(() => {
     try {

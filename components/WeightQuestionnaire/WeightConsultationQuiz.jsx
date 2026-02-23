@@ -13,6 +13,7 @@ import { ProgressBar } from "../EdQuestionnaire/ProgressBar";
 import Logo from "../Navbar/Logo";
 import Link from "next/link";
 import BMICalculatorStep from "../WLPreConsultationQuiz/steps/BMICalculatorStep";
+import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
 
 const SINGLE_CHOICE_PAGES = [1, 2, 3, 7, 10, 11, 12, 14];
 
@@ -199,6 +200,15 @@ export default function WeightLossConsultationQuiz({
   const [photoIdFile, setPhotoIdFile] = useState(null);
   const [isMovingForward, setIsMovingForward] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+
+  useQuestionnaireStepTracking({
+    questionnaireId: "weight-consultation",
+    stepId: currentPage,
+    stepIndex: currentPage,
+    flowId: "weight-loss",
+    stepType: "quiz",
+  });
+
   const [progress, setProgress] = useState(0);
   const [photoIdAcknowledged, setPhotoIdAcknowledged] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
