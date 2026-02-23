@@ -155,10 +155,17 @@ const WLFlowTwo = () => {
     return activePopup; // assume object
   })();
 
+  const couponToastEl = (
+    <Suspense fallback={null}>
+      <CouponToast />
+    </Suspense>
+  );
+
   // Only short-circuit the whole flow when the popup is intended to be a full page
   if (activePopup && (activePopupConfig?.asPage ?? true)) {
     return (
       <PasswordProvider>
+        {couponToastEl}
         <GenericPopup
           isOpen={!!activePopup}
           onClose={closePopup}
@@ -175,9 +182,7 @@ const WLFlowTwo = () => {
 
   return (
     <PasswordProvider>
-      <Suspense fallback={null}>
-        <CouponToast />
-      </Suspense>
+      {couponToastEl}
       <div className="min-h-screen">
         <div className="bg-black text-white text-[14px] leading-[140%] font-medium items-center text-center p-2">
           Lose Weight or Your Money Back
