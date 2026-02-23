@@ -105,25 +105,12 @@ const getPopupConfigWithChosenValue = (popupKey, userData) => {
   return quizConfig.popups[popupKey] || null;
 };
 
-import { useEffect, Suspense } from "react";
+import { useEffect } from "react";
 import { toast } from "react-toastify";
 import QuestionnaireNavbar from "../components/QuestionnaireNavbar";
 import { ProgressBar } from "@/components/EdQuestionnaire/ProgressBar";
-import { useAutoApplyCoupon } from "@/lib/hooks/useAutoApplyCoupon";
 
-function CouponToast() {
-  const captured = useAutoApplyCoupon();
-
-  useEffect(() => {
-    if (!captured) return;
-    toast.success(
-      "$100 Discount Code Auto-Applied For You in Checkout For The Next 60 Minutes",
-      { autoClose: 8000 }
-    );
-  }, [captured]);
-
-  return null;
-}
+const COUPON_STORAGE_KEY = "pending_coupon_code";
 
 const WLFlowTwo = () => {
   const {
@@ -141,6 +128,22 @@ const WLFlowTwo = () => {
     handleRecommendationContinue,
   } = useWLFlowTwo();
 
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const coupon = params.get("apply_coupon");
+      if (coupon && coupon.trim()) {
+        localStorage.setItem(COUPON_STORAGE_KEY, coupon.trim());
+        toast.success(
+          "$100 Discount Code Auto-Applied For You in Checkout For The Next 60 Minutes",
+          { autoClose: 8000 }
+        );
+      }
+    } catch (e) {
+      logger.error("Error capturing coupon from URL:", e);
+    }
+  }, []);
+
   // Ensure hooks run in the same order on every render: place effects immediately after hooks
   useEffect(() => {
     logger.log("[WLFlowTwo] Current step changed:", currentStep);
@@ -155,17 +158,10 @@ const WLFlowTwo = () => {
     return activePopup; // assume object
   })();
 
-  const couponToastEl = (
-    <Suspense fallback={null}>
-      <CouponToast />
-    </Suspense>
-  );
-
   // Only short-circuit the whole flow when the popup is intended to be a full page
   if (activePopup && (activePopupConfig?.asPage ?? true)) {
     return (
       <PasswordProvider>
-        {couponToastEl}
         <GenericPopup
           isOpen={!!activePopup}
           onClose={closePopup}
@@ -182,7 +178,6 @@ const WLFlowTwo = () => {
 
   return (
     <PasswordProvider>
-      {couponToastEl}
       <div className="min-h-screen">
         <div className="bg-black text-white text-[14px] leading-[140%] font-medium items-center text-center p-2">
           Lose Weight or Your Money Back
