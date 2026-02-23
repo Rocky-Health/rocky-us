@@ -91,7 +91,7 @@ export async function POST(req) {
     const taxAmount = toMoney(order.total_tax);
     const shippingAmount = toMoney(order.shipping_total);
     const subtotalAmount = Math.max(0, totalAmount - taxAmount - shippingAmount);
-    const currencyCode = order.currency || "CAD";
+    const currencyCode = order.currency || "USD";
     const orderReference = order.number || order.id.toString();
 
     // Determine commission group NEWCUST/EXISTING with fallback DEFAULT
@@ -287,7 +287,7 @@ export async function GET(req) {
       const taxAmount = toMoney(order.total_tax);
       const shippingAmount = toMoney(order.shipping_total);
       const subtotalAmount = Math.max(0, totalAmount - taxAmount - shippingAmount);
-      const currencyCode = order.currency || "CAD";
+      const currencyCode = order.currency || "USD";
       const orderReference = order.number || order.id.toString();
 
       let commissionGroup = "DEFAULT";
@@ -337,7 +337,7 @@ export async function GET(req) {
       // Build server-side sread.php URL mirroring client fallback parameters when possible
       const merchant = searchParams.get("merchant") || process.env.AWIN_MERCHANT_ID || "101159";
       const amount = searchParams.get("amount") || "0.00";
-      const currency = searchParams.get("cr") || searchParams.get("currency") || "CAD";
+      const currency = searchParams.get("cr") || searchParams.get("currency") || "USD";
       const orderRef = searchParams.get("ref") || searchParams.get("orderRef") || "";
       const parts = searchParams.get("parts") || `DEFAULT:${amount}`;
       const voucher = searchParams.get("vc") || searchParams.get("voucher") || "";

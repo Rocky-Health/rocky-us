@@ -1,10 +1,50 @@
 import { logger } from "@/utils/devLogger";
+import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
 
 /**
  * TikTok Events Utility
  * Handles TikTok Ads tracking events based on TikTok's standard events
  * Reference: https://ads.tiktok.com/help/article/standard-events-parameters
  */
+
+/**
+ * Map native TikTok event names to GTM-friendly dataLayer event names
+ */
+const TIKTOK_DL_EVENT_MAP = {
+  ViewContent: "tiktok_view_content",
+  AddToCart: "tiktok_add_to_cart",
+  InitiateCheckout: "tiktok_initiate_checkout",
+  Purchase: "tiktok_purchase",
+  Search: "tiktok_search",
+  CompleteRegistration: "tiktok_complete_registration",
+  SubmitForm: "tiktok_submit_form",
+  Contact: "tiktok_contact",
+};
+
+/**
+ * Mirror a TikTok event to window.dataLayer for GTM visibility.
+ * This does NOT alter the existing ttq.track behavior.
+ * @param {string} nativeName - The native TikTok event name
+ * @param {Object} eventData - The event data passed to ttq.track
+ * @param {Object} [extra] - Optional extra fields (e.g. event_id for Purchase)
+ */
+const mirrorToDataLayer = (nativeName, eventData, extra = {}) => {
+  try {
+    const dlEventName = TIKTOK_DL_EVENT_MAP[nativeName] || `tiktok_${nativeName.toLowerCase()}`;
+    const sessionId = getOrCreateSessionId();
+
+    safePush({
+      event: dlEventName,
+      tiktok_event_name: nativeName,
+      tiktok_event_data: { ...eventData },
+      rk_session_id: sessionId,
+      ...eventData,
+      ...extra,
+    });
+  } catch (_) {
+    // never let mirroring break main tracking
+  }
+};
 
 /**
  * Initialize TikTok pixel and dataLayer
@@ -20,8 +60,9 @@ const initializeTikTokPixel = () => {
  * @param {string} eventName - The TikTok event name (e.g., 'AddToCart', 'Purchase')
  * @param {Object} eventData - The event data object
  * @param {boolean} debug - Whether to log debug information
+ * @param {Object} [mirrorExtra] - Optional extra fields for the dataLayer mirror push
  */
-export const trackTikTokEvent = (eventName, eventData = {}, debug = true) => {
+export const trackTikTokEvent = (eventName, eventData = {}, debug = true, mirrorExtra = {}) => {
   // Skip if running on server
   if (typeof window === "undefined") return;
 
@@ -32,8 +73,11 @@ export const trackTikTokEvent = (eventName, eventData = {}, debug = true) => {
       logger.log(`[TikTok] Tracking event: ${eventName}`, eventData);
     }
 
-    // Track the event with TikTok pixel
+    // Track the event with TikTok pixel (existing behavior — unchanged)
     window.ttq.track(eventName, eventData);
+
+    // Mirror to dataLayer for GTM visibility
+    mirrorToDataLayer(eventName, eventData, mirrorExtra);
 
     if (debug) {
       logger.log(`[TikTok] ✅ Event "${eventName}" tracked successfully`);
@@ -53,14 +97,21 @@ export const formatTikTokEventData = (product, quantity = 1) => {
   const price = parseFloat(product.price) || 0;
   const value = price * quantity;
 
+  const categories = product.categories || [];
+  const contentCategory = categories
+    .map((c) => (typeof c === "string" ? c : c?.name || ""))
+    .filter(Boolean)
+    .join(", ");
+
   return {
     content_type: "product",
     content_ids: [product.sku || product.id?.toString() || ""],
     content_name: product.name || "",
+    content_category: contentCategory,
     quantity: quantity,
     price: price,
     value: value,
-    currency: "CAD",
+    currency: "USD",
     description: product.short_description || product.name || "",
   };
 };
@@ -98,6 +149,7 @@ export const trackTikTokInitiateCheckout = (
   debug = true
 ) => {
   const content_ids = [];
+  const categorySet = new Set();
   let totalValue = 0;
   let totalQuantity = 0;
 
@@ -109,14 +161,20 @@ export const trackTikTokInitiateCheckout = (
     content_ids.push(product.sku || product.id?.toString() || "");
     totalValue += price * qty;
     totalQuantity += qty;
+
+    (product.categories || []).forEach((c) => {
+      const name = typeof c === "string" ? c : c?.name;
+      if (name) categorySet.add(name);
+    });
   });
 
   const eventData = {
     content_type: "product",
     content_ids: content_ids,
+    content_category: [...categorySet].join(", "),
     quantity: totalQuantity,
     value: totalValue,
-    currency: "CAD",
+    currency: "USD",
     ...additionalData,
   };
 
@@ -137,27 +195,44 @@ export const trackTikTokPurchase = (
   if (!order || !order.id) return;
 
   const content_ids = [];
+  const categorySet = new Set();
   let totalQuantity = 0;
 
-  // Extract product IDs and quantities from order line items
   if (order.line_items && Array.isArray(order.line_items)) {
     order.line_items.forEach((item) => {
       content_ids.push(item.sku || item.product_id?.toString() || "");
       totalQuantity += parseInt(item.quantity) || 1;
+      (item.categories || []).forEach((c) => {
+        const name = typeof c === "string" ? c : c?.name;
+        if (name) categorySet.add(name);
+      });
     });
   }
 
+  const purchaseEventId = `purchase_${order.id || "na"}_${Date.now()}`;
+
   const eventData = {
+    event_id: purchaseEventId,
     content_type: "product",
     content_ids: content_ids,
+    content_category: [...categorySet].join(", "),
     quantity: totalQuantity,
     value: parseFloat(order.total) || 0,
-    currency: order.currency || "CAD",
+    currency: order.currency || "USD",
     description: `Order #${order.id}`,
-    ...additionalData,
+    order_data: additionalData.order_data || {},
+    time_of_purchase_iso: additionalData.time_of_purchase_iso || "",
+    customer_id: additionalData.customer_id || "",
+    customer_id_canonical: additionalData.customer_id_canonical || "",
   };
 
-  trackTikTokEvent("Purchase", eventData, debug);
+  trackTikTokEvent("Purchase", eventData, debug, {
+    event_id: purchaseEventId,
+    order_data: eventData.order_data,
+    time_of_purchase_iso: eventData.time_of_purchase_iso,
+    customer_id: eventData.customer_id,
+    customer_id_canonical: eventData.customer_id_canonical,
+  });
 };
 
 /**

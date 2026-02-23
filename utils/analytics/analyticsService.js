@@ -12,6 +12,7 @@ import {
   trackTikTokSearch,
 } from "@/utils/tiktokEvents";
 import { trackNorthbeamPurchase } from "@/utils/northbeamEvents";
+import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
 import { hashEmail, hashPhone } from "./hash";
 import { mapOrderToEcommerce } from "./mappers";
 
@@ -67,7 +68,7 @@ export const analyticsService = {
     try {
       const item = formatGA4Item(product, quantity);
       const ecommerce = {
-        currency: "CAD",
+        currency: "USD",
         value:
           (parseFloat(item.price) || 0) * (parseInt(item.quantity, 10) || 1),
         items: [item],
@@ -92,7 +93,7 @@ export const analyticsService = {
     try {
       const item = formatGA4Item(product);
       const ecommerce = {
-        currency: "CAD",
+        currency: "USD",
         value: item.price,
         items: [item],
       };
@@ -117,7 +118,7 @@ export const analyticsService = {
     try {
       const item = formatGA4Item(product, quantity);
       const ecommerce = {
-        currency: "CAD",
+        currency: "USD",
         value: item.price * quantity,
         items: [item],
       };
@@ -148,7 +149,7 @@ export const analyticsService = {
         0
       );
       const ecommerce = {
-        currency: "CAD",
+        currency: "USD",
         value,
         items,
       };
@@ -174,7 +175,7 @@ export const analyticsService = {
         0
       );
       const ecommerce = {
-        currency: "CAD",
+        currency: "USD",
         value,
         items,
       };
@@ -184,6 +185,17 @@ export const analyticsService = {
 
       // Track TikTok event
       trackTikTokInitiateCheckout(cartItems, additionalData, true);
+
+      // Diagnostic: fire before checkout redirect for GTM Tag Assistant validation
+      try {
+        safePush({
+          event: "rk_before_checkout_redirect",
+          rk_session_id: getOrCreateSessionId(),
+          checkout_url: hasWindow() ? `${window.location.origin}/checkout` : "/checkout",
+        });
+      } catch (_) {
+        // non-fatal diagnostic
+      }
     } catch (error) {
       logger.error("[Analytics] Error tracking begin_checkout:", error);
     }

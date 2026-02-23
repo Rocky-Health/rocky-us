@@ -3,7 +3,7 @@
 import Loader from "@/components/Loader";
 import { logger } from "@/utils/devLogger";
 import CheckoutSkeleton from "@/components/ui/skeletons/CheckoutSkeleton";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import BillingAndShipping from "./BillingAndShipping";
 import CartAndPayment from "./CartAndPayment";
 import { toast } from "react-toastify";
@@ -42,6 +42,8 @@ import {
     isRestrictedWlCartItem,
 } from "@/utils/edShippingRestrictions";
 import { getAwinFromUrlOrStorage } from "@/utils/awin";
+import { analyticsService } from "@/utils/analytics/analyticsService";
+import { getOrCreateSessionId } from "@/utils/dataLayerHelper";
 import StripeElementsPayment from "./StripeElementsPayment";
 import { Elements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
@@ -112,6 +114,7 @@ const CheckoutPageContent = () => {
     const [submitting, setSubmitting] = useState(false);
     const [cartItems, setCartItems] = useState();
     const [isProcessingUrlParams, setIsProcessingUrlParams] = useState(false);
+    const beginCheckoutFiredRef = useRef(false);
     const [savedCards, setSavedCards] = useState([]);
     const [selectedCard, setSelectedCard] = useState(null);
     const [isLoadingSavedCards, setIsLoadingSavedCards] = useState(false);
@@ -146,6 +149,39 @@ const CheckoutPageContent = () => {
         clearStoredAddresses,
         fetchProfileData,
     } = useAddressManager();
+
+    useEffect(() => {
+        if (
+            beginCheckoutFiredRef.current ||
+            !cartItems?.items?.length ||
+            window.location.pathname.includes("order-received")
+        ) {
+            return;
+        }
+        beginCheckoutFiredRef.current = true;
+
+        try {
+            const items = cartItems.items.map((item) => ({
+                product: {
+                    id: String(item.id || item.product_id || ""),
+                    sku: String(item.id || item.product_id || ""),
+                    name: item.name || "",
+                    price: parseFloat(item.prices?.price || item.totals?.line_total || 0) / 100,
+                    categories: [],
+                    attributes: [],
+                },
+                quantity: item.quantity || 1,
+            }));
+            const sessionId = getOrCreateSessionId();
+            const cartHash = cartItems.items.map((i) => i.id).sort().join("-");
+            analyticsService.trackBeginCheckout(items, {
+                event_id: `begin_checkout_${sessionId}_${cartHash}_${Date.now()}`,
+            });
+        } catch (_) {
+            // non-blocking
+        }
+    }, [cartItems]);
+
     const [formData, setFormData] = useState({
         additional_fields: [],
         shipping_address: {},
@@ -1417,191 +1453,104 @@ const CheckoutPageContent = () => {
             toast.success("Payment successful!");
 
             // ========================================
-            // ASYNC: Update customer data AFTER payment success (non-blocking)
-            // These updates happen in the background and don't block user flow
+            // ASYNC: Update customer profile in WooCommerce AFTER payment success (non-blocking)
+            // This saves billing/shipping to the WordPress user profile permanently
+            // Runs independently - does NOT depend on cart update
             // ========================================
             (async () => {
                 try {
-                    logger.log("Updating customer data asynchronously (non-blocking)...");
+                    logger.log("Updating customer profile permanently (non-blocking)...");
                     const useShippingAddress =
                         formData.shipping_address.ship_to_different_address;
 
-                    const customerUpdateData = {
-                        billing_address: {
-                            first_name: formData.billing_address.first_name || "",
-                            last_name: formData.billing_address.last_name || "",
-                            company: formData.billing_address.company || "",
-                            address_1: formData.billing_address.address_1 || "",
-                            address_2: formData.billing_address.address_2 || "",
-                            city: formData.billing_address.city || "",
-                            state: formData.billing_address.state || "",
-                            postcode: formData.billing_address.postcode || "",
-                            country: formData.billing_address.country || "US",
-                            email: formData.billing_address.email || "",
-                            phone: formData.billing_address.phone || "",
-                        },
-                        shipping_address: useShippingAddress
-                            ? {
-                                first_name:
-                                    formData.shipping_address.first_name || "",
-                                last_name:
-                                    formData.shipping_address.last_name || "",
-                                company: formData.shipping_address.company || "",
-                                address_1:
-                                    formData.shipping_address.address_1 || "",
-                                address_2:
-                                    formData.shipping_address.address_2 || "",
-                                city: formData.shipping_address.city || "",
-                                state: formData.shipping_address.state || "",
-                                postcode:
-                                    formData.shipping_address.postcode || "",
-                                country:
-                                    formData.shipping_address.country || "US",
-                                phone: formData.shipping_address.phone || "",
-                            }
-                            : {
-                                first_name:
-                                    formData.billing_address.first_name || "",
-                                last_name:
-                                    formData.billing_address.last_name || "",
-                                company: formData.billing_address.company || "",
-                                address_1:
-                                    formData.billing_address.address_1 || "",
-                                address_2:
-                                    formData.billing_address.address_2 || "",
-                                city: formData.billing_address.city || "",
-                                state: formData.billing_address.state || "",
-                                postcode: formData.billing_address.postcode || "",
-                                country: formData.billing_address.country || "US",
-                                phone: formData.billing_address.phone || "",
-                            },
+                    const billingAddress = {
+                        first_name: formData.billing_address.first_name || "",
+                        last_name: formData.billing_address.last_name || "",
+                        company: formData.billing_address.company || "",
+                        address_1: formData.billing_address.address_1 || "",
+                        address_2: formData.billing_address.address_2 || "",
+                        city: formData.billing_address.city || "",
+                        state: formData.billing_address.state || "",
+                        postcode: formData.billing_address.postcode || "",
+                        country: formData.billing_address.country || "US",
+                        email: formData.billing_address.email || "",
+                        phone: formData.billing_address.phone || "",
                     };
 
-                    const updateResponse = await fetch(
-                        "/api/cart/update-customer",
+                    const shippingAddress = useShippingAddress
+                        ? {
+                            first_name: formData.shipping_address.first_name || "",
+                            last_name: formData.shipping_address.last_name || "",
+                            company: formData.shipping_address.company || "",
+                            address_1: formData.shipping_address.address_1 || "",
+                            address_2: formData.shipping_address.address_2 || "",
+                            city: formData.shipping_address.city || "",
+                            state: formData.shipping_address.state || "",
+                            postcode: formData.shipping_address.postcode || "",
+                            country: formData.shipping_address.country || "US",
+                            phone: formData.shipping_address.phone || "",
+                        }
+                        : { ...billingAddress };
+
+                    const profileData = {
+                        billing_address: billingAddress,
+                        shipping_address: shippingAddress,
+                        date_of_birth:
+                            formData.billing_address.date_of_birth ||
+                            formData.date_of_birth ||
+                            "",
+                    };
+
+                    logger.log("Profile update data:", {
+                        billing_city: profileData.billing_address?.city,
+                        billing_state: profileData.billing_address?.state,
+                        billing_postcode: profileData.billing_address?.postcode,
+                        shipping_city: profileData.shipping_address?.city,
+                        date_of_birth: profileData.date_of_birth,
+                        phone: profileData.billing_address?.phone,
+                    });
+
+                    const profileUpdateResponse = await fetch(
+                        "/api/update-customer-profile",
                         {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
                             },
-                            body: JSON.stringify(customerUpdateData),
+                            body: JSON.stringify(profileData),
                         }
                     );
 
-                    const updateResult = await updateResponse.json();
+                    const profileUpdateResult = await profileUpdateResponse.json();
 
-                    if (updateResponse.ok && !updateResult.error) {
-                        logger.log(
-                            "✅ Customer cart data updated successfully (async)"
-                        );
+                    // logger.log("=== PROFILE UPDATE API RESPONSE (async) ===", {
+                    //     status: profileUpdateResponse.status,
+                    //     ok: profileUpdateResponse.ok,
+                    //     success: profileUpdateResult.success,
+                    //     error: profileUpdateResult.error || null,
+                    // });
 
-                        // Also update the customer's permanent profile in WooCommerce
-                        try {
-                            logger.log("Updating customer profile permanently (async)...");
+                    if (profileUpdateResponse.ok && profileUpdateResult.success) {
+                        logger.log("✅ Customer profile updated permanently (async) ✓");
 
-                            // Include date_of_birth in the profile update
-                            const profileData = {
-                                ...customerUpdateData,
-                                date_of_birth:
-                                    formData.billing_address.date_of_birth ||
-                                    formData.date_of_birth ||
-                                    "",
-                            };
-
-                            logger.log("Profile data with DOB:", {
-                                date_of_birth: profileData.date_of_birth,
-                                phone: profileData.billing_address?.phone,
-                            });
-
-                            const profileUpdateResponse = await fetch(
-                                "/api/update-customer-profile",
-                                {
-                                    method: "POST",
-                                    headers: {
-                                        "Content-Type": "application/json",
-                                    },
-                                    body: JSON.stringify(profileData),
-                                }
+                        if (profileUpdateResult.metadata_update) {
+                            logger.log(
+                                "Metadata update status:",
+                                profileUpdateResult.metadata_update
                             );
-
-                            const profileUpdateResult =
-                                await profileUpdateResponse.json();
-
-                            logger.log("=== PROFILE UPDATE API RESPONSE (async) ===", {
-                                status: profileUpdateResponse.status,
-                                ok: profileUpdateResponse.ok,
-                                response: profileUpdateResult,
-                            });
-
-                            if (
-                                profileUpdateResponse.ok &&
-                                profileUpdateResult.success
-                            ) {
-                                logger.log(
-                                    "✅ Customer profile updated permanently (async) ✓"
-                                );
-                                logger.log(
-                                    "Updated customer data:",
-                                    profileUpdateResult.data
-                                );
-
-                                // Check metadata update status
-                                if (profileUpdateResult.metadata_update) {
-                                    logger.log(
-                                        "=== METADATA UPDATE STATUS (async) ===",
-                                        profileUpdateResult.metadata_update
-                                    );
-
-                                    if (
-                                        profileUpdateResult.metadata_update
-                                            .attempted
-                                    ) {
-                                        if (
-                                            profileUpdateResult.metadata_update
-                                                .success
-                                        ) {
-                                            logger.log(
-                                                "✓ User metadata (DOB, phone) updated successfully (async)"
-                                            );
-                                        } else {
-                                            logger.error(
-                                                "✗ User metadata update FAILED (async):",
-                                                profileUpdateResult.metadata_update
-                                                    .error
-                                            );
-                                        }
-                                    } else {
-                                        logger.warn(
-                                            "⚠ Metadata update was not attempted (no DOB or phone provided) (async)"
-                                        );
-                                    }
-                                }
-                            } else {
-                                logger.warn(
-                                    "Failed to update customer profile (async):",
-                                    profileUpdateResult.error
-                                );
-                            }
-                        } catch (profileError) {
-                            logger.error(
-                                "Error updating customer profile (async):",
-                                profileError
-                            );
-                            // Don't throw - these are non-critical operations
                         }
                     } else {
-                        logger.warn(
-                            "Failed to update customer data (async):",
-                            updateResult.error
+                        logger.error(
+                            "❌ Failed to update customer profile (async):",
+                            profileUpdateResult.error || "Unknown error"
                         );
-                        // Don't throw - these are non-critical operations
                     }
-                } catch (error) {
+                } catch (profileError) {
                     logger.error(
-                        "Error updating customer data (async):",
-                        error
+                        "❌ Error updating customer profile (async):",
+                        profileError
                     );
-                    // Don't throw - these are non-critical operations
+                    // Don't throw - non-critical operation
                 }
             })(); // End of async IIFE - fire and forget
 
@@ -2042,7 +1991,6 @@ const CheckoutPageContent = () => {
 
                                 // ========================================
                                 // ASYNC: Update order status (non-blocking)
-                                // Update happens in the background, doesn't block redirect
                                 // ========================================
                                 fetch("/api/update-order-status", {
                                     method: "POST",
@@ -2066,7 +2014,6 @@ const CheckoutPageContent = () => {
                                                 "Failed to update free order status (async):",
                                                 updateResult.error
                                             );
-                                            // Don't block user flow - order was created successfully
                                         }
                                     })
                                     .catch((updateError) => {
@@ -2074,8 +2021,75 @@ const CheckoutPageContent = () => {
                                             "Error updating free order status (async):",
                                             updateError
                                         );
-                                        // Don't block user flow - order was created successfully
                                     });
+
+                                // ========================================
+                                // ASYNC: Update customer profile in WooCommerce (non-blocking)
+                                // ========================================
+                                (async () => {
+                                    try {
+                                        logger.log("Updating customer profile for free order - saved card flow (async)...");
+                                        const useShippingAddress =
+                                            formData.shipping_address.ship_to_different_address;
+
+                                        const billingAddress = {
+                                            first_name: formData.billing_address.first_name || "",
+                                            last_name: formData.billing_address.last_name || "",
+                                            company: formData.billing_address.company || "",
+                                            address_1: formData.billing_address.address_1 || "",
+                                            address_2: formData.billing_address.address_2 || "",
+                                            city: formData.billing_address.city || "",
+                                            state: formData.billing_address.state || "",
+                                            postcode: formData.billing_address.postcode || "",
+                                            country: formData.billing_address.country || "US",
+                                            email: formData.billing_address.email || "",
+                                            phone: formData.billing_address.phone || "",
+                                        };
+
+                                        const shippingAddress = useShippingAddress
+                                            ? {
+                                                first_name: formData.shipping_address.first_name || "",
+                                                last_name: formData.shipping_address.last_name || "",
+                                                company: formData.shipping_address.company || "",
+                                                address_1: formData.shipping_address.address_1 || "",
+                                                address_2: formData.shipping_address.address_2 || "",
+                                                city: formData.shipping_address.city || "",
+                                                state: formData.shipping_address.state || "",
+                                                postcode: formData.shipping_address.postcode || "",
+                                                country: formData.shipping_address.country || "US",
+                                                phone: formData.shipping_address.phone || "",
+                                            }
+                                            : { ...billingAddress };
+
+                                        const profileData = {
+                                            billing_address: billingAddress,
+                                            shipping_address: shippingAddress,
+                                            date_of_birth:
+                                                formData.billing_address.date_of_birth ||
+                                                formData.date_of_birth ||
+                                                "",
+                                        };
+
+                                        const profileUpdateResponse = await fetch(
+                                            "/api/update-customer-profile",
+                                            {
+                                                method: "POST",
+                                                headers: { "Content-Type": "application/json" },
+                                                body: JSON.stringify(profileData),
+                                            }
+                                        );
+
+                                        const profileUpdateResult = await profileUpdateResponse.json();
+
+                                        if (profileUpdateResponse.ok && profileUpdateResult.success) {
+                                            logger.log("✅ Customer profile updated for free order - saved card flow (async)");
+                                        } else {
+                                            logger.error("❌ Failed to update customer profile for free order:", profileUpdateResult.error);
+                                        }
+                                    } catch (profileError) {
+                                        logger.error("❌ Error updating customer profile for free order:", profileError);
+                                    }
+                                })();
 
                                 // Empty cart
                                 try {
@@ -2549,14 +2563,13 @@ const CheckoutPageContent = () => {
 
                         // ========================================
                         // ASYNC: Update order status (non-blocking)
-                        // Update happens in the background, doesn't block redirect
                         // ========================================
                         fetch("/api/update-order-status", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
                                 orderId,
-                                status: "processing", // No payment needed, mark as processing
+                                status: "processing",
                                 paymentMethod: "free_order",
                                 errorMessage:
                                     "Free order - 100% discount applied",
@@ -2571,7 +2584,6 @@ const CheckoutPageContent = () => {
                                         "Failed to update free order status (async):",
                                         updateResult.error
                                     );
-                                    // Don't block user flow - order was created successfully
                                 }
                             })
                             .catch((updateError) => {
@@ -2579,8 +2591,75 @@ const CheckoutPageContent = () => {
                                     "Error updating free order status (async):",
                                     updateError
                                 );
-                                // Don't block user flow - order was created successfully
                             });
+
+                        // ========================================
+                        // ASYNC: Update customer profile in WooCommerce (non-blocking)
+                        // ========================================
+                        (async () => {
+                            try {
+                                logger.log("Updating customer profile for free order (async)...");
+                                const useShippingAddress =
+                                    formData.shipping_address.ship_to_different_address;
+
+                                const billingAddress = {
+                                    first_name: formData.billing_address.first_name || "",
+                                    last_name: formData.billing_address.last_name || "",
+                                    company: formData.billing_address.company || "",
+                                    address_1: formData.billing_address.address_1 || "",
+                                    address_2: formData.billing_address.address_2 || "",
+                                    city: formData.billing_address.city || "",
+                                    state: formData.billing_address.state || "",
+                                    postcode: formData.billing_address.postcode || "",
+                                    country: formData.billing_address.country || "US",
+                                    email: formData.billing_address.email || "",
+                                    phone: formData.billing_address.phone || "",
+                                };
+
+                                const shippingAddress = useShippingAddress
+                                    ? {
+                                        first_name: formData.shipping_address.first_name || "",
+                                        last_name: formData.shipping_address.last_name || "",
+                                        company: formData.shipping_address.company || "",
+                                        address_1: formData.shipping_address.address_1 || "",
+                                        address_2: formData.shipping_address.address_2 || "",
+                                        city: formData.shipping_address.city || "",
+                                        state: formData.shipping_address.state || "",
+                                        postcode: formData.shipping_address.postcode || "",
+                                        country: formData.shipping_address.country || "US",
+                                        phone: formData.shipping_address.phone || "",
+                                    }
+                                    : { ...billingAddress };
+
+                                const profileData = {
+                                    billing_address: billingAddress,
+                                    shipping_address: shippingAddress,
+                                    date_of_birth:
+                                        formData.billing_address.date_of_birth ||
+                                        formData.date_of_birth ||
+                                        "",
+                                };
+
+                                const profileUpdateResponse = await fetch(
+                                    "/api/update-customer-profile",
+                                    {
+                                        method: "POST",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify(profileData),
+                                    }
+                                );
+
+                                const profileUpdateResult = await profileUpdateResponse.json();
+
+                                if (profileUpdateResponse.ok && profileUpdateResult.success) {
+                                    logger.log("✅ Customer profile updated for free order (async)");
+                                } else {
+                                    logger.error("❌ Failed to update customer profile for free order:", profileUpdateResult.error);
+                                }
+                            } catch (profileError) {
+                                logger.error("❌ Error updating customer profile for free order:", profileError);
+                            }
+                        })();
 
                         // Empty cart
                         try {

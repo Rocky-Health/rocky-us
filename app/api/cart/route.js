@@ -254,7 +254,7 @@ export async function DELETE(req) {
       const BODY_OPTIMIZATION_PROGRAM_ID = "148515";
       const WEIGHT_LOSS_PRODUCT_IDS = [
         "489523", // Compounded Tirzepatide
-        "489526", // Compounded Semaglutide
+        "489798", // Compounded Semaglutide
         "142976", // Ozempic
         "160469", // Mounjaro
         "276274", // Wegovy
@@ -294,7 +294,7 @@ export async function DELETE(req) {
       const BODY_OPTIMIZATION_PROGRAM_ID = "148515";
       const WEIGHT_LOSS_PRODUCT_IDS = [
         "489523", // Compounded Tirzepatide
-        "489526", // Compounded Semaglutide
+        "489798", // Compounded Semaglutide
         "142976", // Ozempic
         "160469", // Mounjaro
         "276274", // Wegovy
