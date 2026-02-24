@@ -6,6 +6,8 @@ import BlogSection from "@/components/Podcast/BlogSection";
 import MoreQuestions from "@/components/MoreQuestions";
 import { BlogSectionFallback } from "@/components/Podcast/BlogSectionFallback";
 
+export const dynamic = "force-dynamic";
+
 const Podcasts = () => {
   return (
     <>

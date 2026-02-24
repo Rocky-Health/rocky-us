@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { logger } from "@/utils/devLogger";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { WarningPopup } from "../EdQuestionnaire/WarningPopup";
 import { QuestionLayout } from "../EdQuestionnaire/QuestionLayout";
 import { QuestionOption } from "../EdQuestionnaire/QuestionOption";
@@ -180,7 +180,6 @@ export default function WeightLossConsultationQuiz({
   const fname = nameParts[0] || "";
   const lname = nameParts[1] || "";
   const router = useRouter();
-  const searchParams = useSearchParams();
   const formRef = useRef(null);
 
   const [nameUpdateOption, setNameUpdateOption] = useState("");
@@ -912,7 +911,7 @@ export default function WeightLossConsultationQuiz({
   };
 
   useEffect(() => {
-    if (!searchParams) return;
+    const searchParams = new URLSearchParams(window.location.search);
 
     const orderId = searchParams.get("order-id");
     const purchasedProduct = searchParams.get("purchased_product");
@@ -947,7 +946,7 @@ export default function WeightLossConsultationQuiz({
 
       logger.log("Updated form data with URL parameters:", urlParamUpdates);
     }
-  }, [searchParams]);
+  }, []);
 
   useEffect(() => {
     if (!formRef.current) return;

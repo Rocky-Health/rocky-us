@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { logger } from "@/utils/devLogger";
-import { useSearchParams } from "next/navigation";
 
 // Get storage keys for new BO pre-quiz
 const getStorageKeys = () => {

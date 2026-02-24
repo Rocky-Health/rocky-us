@@ -2,17 +2,7 @@ import { blogService } from "@/components/NewBlogs/services/blogService";
 import { CategoryPage } from "@/components/NewBlogs/CategoryPage";
 import { logger } from "@/utils/devLogger";
 
-export async function generateStaticParams() {
-  try {
-    const categories = await blogService.getBlogCategories();
-    return categories.map((category) => ({
-      slug: category.slug,
-    }));
-  } catch (error) {
-    logger.error("Error generating static params for categories:", error);
-    return [];
-  }
-}
+export const dynamic = "force-dynamic";
 
 export default async function CategoryBlogsPage({ params }) {
   try {
