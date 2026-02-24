@@ -4,6 +4,8 @@ import { blogService } from "@/components/NewBlogs/services/blogService";
 import { MainBlogsPage } from "@/components/NewBlogs";
 import BlogPageSkeleton from "@/components/NewBlogs/components/BlogPageSkeleton";
 
+export const dynamic = "force-dynamic";
+
 async function BlogsContent() {
   try {
     const [blogsData, categories] = await Promise.all([
