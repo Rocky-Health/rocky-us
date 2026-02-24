@@ -1,49 +1,53 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
-let isEDQuizPage = false;
+const SKIP_PATHS = ["/ed-consultation-quiz", "/wl-pre-consultation", "/ed-pre-consultation", "/hair-flow", "/mh-pre-quiz"];
 
 function LoadingBarContent() {
   const [loading, setLoading] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
+  const loadingRef = useRef(false);
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const searchParamsString = searchParams.toString();
+
+  const shouldSkip = SKIP_PATHS.some((p) => pathname.startsWith(p));
 
   useEffect(() => {
-    let timeoutId;
-    let delayLoaderTimeout;
-
-    isEDQuizPage = pathname.startsWith("/ed-consultation-quiz");
-    if (isEDQuizPage) {
+    if (shouldSkip) {
+      setLoading(false);
+      setShowLoader(false);
+      loadingRef.current = false;
       return;
     }
 
-    // Start loading when route changes
-    setLoading(true);
+    let timeoutId;
+    let delayLoaderTimeout;
 
-    // Only show the loading overlay if the transition takes longer than 150ms
-    // This prevents showing the loader for quick navigations to product pages
+    setLoading(true);
+    loadingRef.current = true;
+
     delayLoaderTimeout = setTimeout(() => {
-      if (loading) {
+      if (loadingRef.current) {
         setShowLoader(true);
       }
     }, 150);
 
-    // Hide the loading overlay after a minimal delay
     timeoutId = setTimeout(() => {
       setLoading(false);
       setShowLoader(false);
+      loadingRef.current = false;
     }, 100);
 
     return () => {
       clearTimeout(timeoutId);
       clearTimeout(delayLoaderTimeout);
     };
-  }, [pathname, searchParams]);
+  }, [pathname, searchParamsString, shouldSkip]);
 
-  if (isEDQuizPage) {
+  if (shouldSkip) {
     return null;
   }
 
