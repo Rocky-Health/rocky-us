@@ -128,6 +128,18 @@ const InitialShipping = ({
                         Coupons
                     </p>
                     {cartItems.coupons.map((coupon) => {
+                        const couponDiscount = Number(
+                            coupon.totals?.total_discount ?? 0
+                        );
+                        const cartTotalDiscount = Number(
+                            cartItems?.totals?.total_discount ?? 0
+                        );
+                        const discountAmount =
+                            couponDiscount > 0
+                                ? couponDiscount
+                                : cartItems.coupons.length === 1
+                                ? cartTotalDiscount
+                                : couponDiscount;
                         return (
                             <div
                                 key={coupon.code}
@@ -139,11 +151,7 @@ const InitialShipping = ({
                                 <div className="flex items-center justify-end gap-4">
                                     <p className="leading-[19.6px] text-[#000000] text-sm justify-self-end">
                                         - {currencySymbol}
-                                        {formatPrice(
-                                            Number(
-                                                coupon.totals?.total_discount
-                                            ) / 100
-                                        )}
+                                        {formatPrice(discountAmount / 100)}
                                     </p>
                                     <button
                                         className="justify-self-end"
