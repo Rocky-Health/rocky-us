@@ -54,8 +54,10 @@ const BMICalculatorStep = ({
   return (
     <div className="w-full h-full flex flex-col">
       <div className="w-full md:w-[520px] mx-auto flex-grow pb-32">
-        <div className="mb-6">
-          <label className="block mb-2">How tall are you?</label>
+        <div className="mb-[16px]">
+          <label className="block mb-2 text-[14px] font-medium">
+            How tall are you?
+          </label>
           <div className="flex items-center mb-4 gap-2">
             <input
               type="number"
@@ -104,12 +106,13 @@ const BMICalculatorStep = ({
                 }));
               }}
             />
-           
           </div>
         </div>
 
-        <div className="mb-6">
-          <label className="block mb-2">How much do you currently weigh?  </label>
+        <div className="mb-[16px]">
+          <label className="block mb-2 text-[14px] font-medium">
+            How much do you currently weigh?
+          </label>
           <input
             type="number"
             className="h-[60px] w-full p-3 border border-gray-300 rounded-md"

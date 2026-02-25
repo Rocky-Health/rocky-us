@@ -48,9 +48,7 @@ export const boSimplifiedConfig = {
         1: {
             id: "currentWeight",
             type: "BMICalculator",
-            title: "What is your height and weight?",
-            subtitle:
-                "<span style='color:#B4845A; font-size:16px'>This helps calculate your BMI (Body Mass Index), a general screening tool for body composition.</span>",
+            title: "See how much weight you could lose",
             field: "currentWeight",
             required: true,
             showPopupAfterStep: "potentialWeightLoss", // Show popup after BMI calculation
@@ -61,8 +59,14 @@ export const boSimplifiedConfig = {
             type: "popup",
             // This will be handled by popup system
         },
+
+         2: {
+            id: "RockyLongTerm",
+            type: "popup",
+            // This will be handled by popup system
+        },
         // Step 3: Product Recommendations
-        3: {
+        4: {
             id: "productRecommendations",
             type: "recommendation",
             title: "Recommended for you",
@@ -81,15 +85,17 @@ export const boSimplifiedConfig = {
     // Progress mapping
     progressMap: {
         1: 25, // BMI Calculator
-        2: 50, // Your Weight Popup
-        3: 100, // Product Recommendations
+        2: 50,
+        3: 75, // Your Weight Popup
+        4: 100, // Product Recommendations
     },
 
     // Step titles
     stepTitles: {
         1: "Height & Weight",
         2: "Your Weight",
-        3: "Product Recommendations",
+        3: "Rocky Long-Term",
+        4: "Product Recommendations",
     },
 
     // Popup configurations
@@ -131,12 +137,42 @@ export const boSimplifiedConfig = {
             PrivacyText: true,
             buttons: [
                 {
-                    label: "Continue",
-                    action: "navigate",
-                    payload: 3, // Go to product recommendations step
-                    primary: true,
-                },
+          label: "Continue",
+          action: "openPopup",
+          popupName: "RockyLongTerm",
+          primary: true,
+        },
             ],
         },
+
+
+         RockyLongTerm: {
+                progress: "75",
+                isWL: true,
+                headerStyle:
+                    "headers-font text-[26px]  md:text-[32px] headers-font leading-[120%] mb-[16px] text-center",
+                title: "Rocky creates long-term weight loss",
+                messageStyle:
+                    "text-[14px] md:text-[16px] leading-[140%] mb-[24px] text-center",
+                message:
+                    "Rocky members lose 2-5x more weight than similar programs. Our approach goes beyond just medication — we help you build lasting habits for a healthier life.",
+                image: "/wl-pre-consultation/Weight1.jpg",
+                imageTop: false,
+                imageStyle:
+                    "w-[100%] h-[320px] md:h-[324px] lg:w-[335px] rounded-[32px] mb-4",
+                OnAverageMessage: true,
+                PrivacyText: true,
+                buttons: [
+                    {
+                    label: "Continue",
+                    action: "navigate",
+                    payload: 4, // Go to step 4 (per navigation config)
+                    primary: true,
+                    },
+                ],
+    },
+
+
+
     },
 };
