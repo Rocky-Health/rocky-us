@@ -31,6 +31,8 @@ import {
   PHASE_1_STATES,
   getStateLabel,
 } from "@/lib/constants/usStates";
+import Logo from "../Navbar/Logo";
+import Image from "next/image";
 
 const RegisterContent = ({ setActiveTab, registerRef }) => {
   const router = useRouter();
@@ -80,7 +82,7 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
   const handleCrossSellProducts = async (isFromCrossSell = false) => {
     try {
       logger.log(
-        `Processing flow products after registration. From cross-sell: ${isFromCrossSell}`
+        `Processing flow products after registration. From cross-sell: ${isFromCrossSell}`,
       );
 
       // First, check for new flow products (direct cart approach)
@@ -89,7 +91,7 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
       if (flowProductsResult.success) {
         logger.log(
           "Processed saved flow products after registration:",
-          flowProductsResult
+          flowProductsResult,
         );
         return flowProductsResult.redirectUrl;
       }
@@ -225,7 +227,7 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
         });
 
         toast.error(
-          data.error || "Registration failed. Please check and try again."
+          data.error || "Registration failed. Please check and try again.",
         );
       }
     } catch (err) {
@@ -250,7 +252,7 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
     } else {
       return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(
         3,
-        6
+        6,
       )}-${phoneNumber.slice(6, 10)}`;
     }
   };
@@ -356,7 +358,7 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
         if (hasLocalCartItems) {
           try {
             logger.log(
-              `Starting cart migration process for new registration with ${localCart.items.length} items in local cart...`
+              `Starting cart migration process for new registration with ${localCart.items.length} items in local cart...`,
             );
             setIsMigratingCart(true);
             await migrateLocalCartToServer();
@@ -384,7 +386,7 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
         // Small delay to ensure cart migration has time to complete server-side
         if (migrateSuccess && redirectTo && redirectTo.includes("/checkout")) {
           logger.log(
-            "Waiting for cart migration to complete before checkout redirect..."
+            "Waiting for cart migration to complete before checkout redirect...",
           );
           await new Promise((resolve) => setTimeout(resolve, 1000));
         }
@@ -412,14 +414,14 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
                 const restriction = checkQuebecZonnicRestriction(
                   cartData.items,
                   formData.province,
-                  formData.province
+                  formData.province,
                 );
 
                 if (restriction.blocked) {
                   // Remove Zonnic products from cart
                   const zonnicItems = cartData.items.filter(
                     (item) =>
-                      item.name && item.name.toLowerCase().includes("zonnic")
+                      item.name && item.name.toLowerCase().includes("zonnic"),
                   );
 
                   for (const zonnicItem of zonnicItems) {
@@ -434,12 +436,12 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
                         }),
                       });
                       logger.log(
-                        `Removed Zonnic product ${zonnicItem.name} from cart due to Quebec restriction`
+                        `Removed Zonnic product ${zonnicItem.name} from cart due to Quebec restriction`,
                       );
                     } catch (removeError) {
                       logger.error(
                         "Error removing Zonnic product from cart:",
-                        removeError
+                        removeError,
                       );
                     }
                   }
@@ -448,7 +450,7 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
                   localStorage.setItem("showQuebecPopup", "true");
                   localStorage.setItem(
                     "quebecPopupMessage",
-                    getQuebecRestrictionMessage()
+                    getQuebecRestrictionMessage(),
                   );
                 }
               }
@@ -484,7 +486,7 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
         });
 
         toast.error(
-          data.error || "Registration failed. Please check and try again."
+          data.error || "Registration failed. Please check and try again.",
         );
       }
     } catch (err) {
@@ -518,7 +520,7 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
           <Link
             href={(() => {
               const currentParams = new URLSearchParams(
-                searchParams.toString()
+                searchParams.toString(),
               );
               currentParams.set("viewshow", "login");
               return `/login-register?${currentParams.toString()}`;
@@ -704,7 +706,7 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
                   {ALL_US_STATES.filter(
                     (option) =>
                       option.value === "" ||
-                      PHASE_1_STATES.includes(option.value)
+                      PHASE_1_STATES.includes(option.value),
                   ).map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
@@ -744,8 +746,8 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
                   ? "Processing..."
                   : "Continue"
                 : loading
-                ? "Signing up..."
-                : "Complete Sign Up"}
+                  ? "Signing up..."
+                  : "Complete Sign Up"}
               {!loading && <MdArrowForward className="ml-2" size={20} />}
             </button>
           </div>
@@ -788,8 +790,35 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
 };
 
 export default function Register({ setActiveTab, registerRef }) {
+  const logoContent = (
+    <div className="h-[35px] w-[100px] relative ml-[0]">
+      <Image
+        src="https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp"
+        alt="Rocky Logo"
+        fill
+        className="object-contain"
+      />
+    </div>
+  );
   return (
     <div suppressHydrationWarning>
+      <style jsx global>{`
+        #launcher {
+          display: none !important;
+        }
+        iframe[title="Close message"] {
+          display: none !important;
+        }
+        iframe[title="Message from company"] {
+          display: none !important;
+        }
+      `}</style>
+      <div className="py-4 px-4 max-w-[1140px] mx-auto ">
+        <Link href="/" aria-label="Rocky Homepage">
+          {logoContent}
+        </Link>
+      </div>
+      <hr className="border-gray-300" />
       <Suspense fallback={<Loader />}>
         <RegisterContent
           setActiveTab={setActiveTab}
