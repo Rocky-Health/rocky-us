@@ -40,7 +40,7 @@ const WLProductCard = ({ product, onSelect, isSelected }) => {
   return (
     <>
       <div
-        className={`flex flex-col md:max-w-[270px] rounded-2xl overflow-hidden border border-transparent drop-shadow-md cursor-pointer transition-all duration-300  hover:shadow-xl hover:scale-[1.01] `}
+        className={`flex flex-col md:max-w-[270px]  rounded-2xl overflow-hidden border border-transparent drop-shadow-md cursor-pointer transition-all duration-300  hover:shadow-xl hover:scale-[1.01] `}
         onClick={() => product.supplyAvailable !== false && onSelect?.(product)}
       >
         {/* Top section: image with price tag overlay */}
@@ -72,11 +72,11 @@ const WLProductCard = ({ product, onSelect, isSelected }) => {
               </span>
             )}
             {/* {product.limitedSupply && (
-                            <span className=" bg-[#FFFFFFCC] text-[#000000] rounded-md py-[4px] px-[8px] font-[500] text-xs tracking-[-2%] leading-[140%] flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 mb-0.5 rounded-full bg-[#E37400]"></span>
-                                <span className="">Limited supply</span>
-                            </span>
-                        )} */}
+              <span className=" bg-[#FFFFFFCC] text-[#000000] rounded-md py-[4px] px-[8px] font-[500] text-xs tracking-[-2%] leading-[140%] flex items-center gap-1">
+                <span className="w-1.5 h-1.5 mb-0.5 rounded-full bg-[#E37400]"></span>
+                <span className="">Limited supply</span>
+              </span>
+            )} */}
             {product.label ? (
               <span className=" bg-[#FFFFFFCC] text-[#000000] rounded-md py-[4px] px-[8px] font-[500]  text-[13px] sm:tracking-[-2%] tracking-[-3%] leading-[140%] flex items-center gap-1 self-end">
                 {/* <span className="w-1.5 h-1.5 rounded-full bg-[#78CD7F] animate-pulse"></span> */}
@@ -88,7 +88,7 @@ const WLProductCard = ({ product, onSelect, isSelected }) => {
 
         {/* Bottom section: product info */}
         <div
-          className={`px-3 py-4 rounded-b-2xl flex flex-col grow  transition-all duration-300 border border-[1.5px] bg-[#F0EEEA] ${isSelected ? " border-[#AE7E56]" : " border-[#E2E2E1]"}`}
+          className={`px-3 h-[180px] py-4 rounded-b-2xl flex flex-col grow  transition-all duration-300  ${isSelected ? "border-[1.5px] border-[#AE7E56] bg-white " : "border-[1px] border-[#E2E2E1] bg-[#F9F7F3]"}`}
         >
           <h2
             className={`text-[16px] font-[500] leading-[140%]  tracking-[-2%]`}
@@ -98,13 +98,13 @@ const WLProductCard = ({ product, onSelect, isSelected }) => {
               <span className="text-sm md:text-base align-top">®</span>
             )}
           </h2>
-          {/* <p
-            className={`text-[12px] font-[400] leading-[140%] md:grow-0 grow  ${isSelected ? "text-white" : "text-[#000000]"}`}
+          <p
+            className={`text-[10px] font-[400] leading-[140%] md:grow-0 grow `}
           >
             ({product.ingredient})
-          </p> */}
+          </p>
           <p
-            className={`text-[14px] font-[400] leading-[140%] tracking-[0%] transition-all my-3 duration-300   subheaders-font`}
+            className={`text-[14px]  leading-[140%] tracking-[0%] transition-all my-3 duration-300   subheaders-font ${isSelected ? " font-[500]" : " font-[400] "} `}
           >
             {shortDescription}
           </p>
@@ -114,7 +114,7 @@ const WLProductCard = ({ product, onSelect, isSelected }) => {
               {product.tags?.map((tag, index) => (
                 <li
                   key={index}
-                  className={`flex gap-2  w-full text-[12px] font-[200] subheaders-font leading-[140%] ${isSelected ? " text-[#F0EEEA]" : " text-[#000000] "} transition-all duration-300  px-1  `}
+                  className={`flex gap-2  w-full text-[12px] font-[200]  leading-[140%] ${isSelected ? " text-[#F0EEEA]" : " text-[#000000] "} transition-all duration-300  px-1  `}
                 >
                   <span className="">•</span> {tag}
                 </li>

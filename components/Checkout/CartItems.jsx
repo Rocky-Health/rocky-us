@@ -11,7 +11,7 @@ const CartItems = ({ items }) => {
         </div>
       ))}
 
-      <p className="text-center text-[#6C695C] font-[12px] leading-[140%] my-[16px]">
+      <p className="text-center text-[#6C695C] text-[13px] leading-[140%] my-[16px]">
         Pause or cancel anytime
       </p>
 
@@ -266,7 +266,7 @@ const CartITem2 = ({ item }) => {
 
           {item.name != "Body Optimization Program" && !isOfferProduct && (
             <p className="text-[11px] text-[#6C695C]">
-              <span className="text-[12px] font-normal">
+              <span className=" font-normal">
                 {isSubscriptionWithFallback && intervalText}
                 {!isSubscriptionWithFallback &&
                   item.variation[1] &&
@@ -277,7 +277,7 @@ const CartITem2 = ({ item }) => {
                   )?.value && (
                     <>
                       {" / "}
-                      <span className="text-[12px] font-normal">
+                      <span className=" font-normal">
                         {
                           item.variation.find(
                             (v) =>

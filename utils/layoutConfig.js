@@ -47,6 +47,7 @@ export const layoutExemptRoutes = [
   "/ed-simple-quiz1",
   "/ed-simple-quiz2",
   "/checkout2",
+  "/login-register",
 ];
 
 /**
