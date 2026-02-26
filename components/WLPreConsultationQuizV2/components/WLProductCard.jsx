@@ -40,7 +40,7 @@ const WLProductCard = ({ product, onSelect, isSelected }) => {
   return (
     <>
       <div
-        className={`flex flex-col rounded-2xl overflow-hidden border border-transparent drop-shadow-md cursor-pointer transition-all duration-300  hover:shadow-xl hover:scale-[1.01] `}
+        className={`flex flex-col md:max-w-[270px] rounded-2xl overflow-hidden border border-transparent drop-shadow-md cursor-pointer transition-all duration-300  hover:shadow-xl hover:scale-[1.01] `}
         onClick={() => product.supplyAvailable !== false && onSelect?.(product)}
       >
         {/* Top section: image with price tag overlay */}
@@ -48,7 +48,7 @@ const WLProductCard = ({ product, onSelect, isSelected }) => {
           <img
             src={product.url}
             alt={product.name}
-            className="w-full h-full object-cover"
+            className={`w-full h-full object-cover ${isSelected ? "opacity-100" : "grayscale brightness-90"} transition-opacity duration-300`}
             onError={(e) => {
               e.target.style.display = "none";
               const fallback = e.target.nextElementSibling;
@@ -65,9 +65,9 @@ const WLProductCard = ({ product, onSelect, isSelected }) => {
           <div className="absolute inset-0 hidden bg-[#80684b] rounded-t-2xl text-[#FFFFFF] text-sm">
             Product Image
           </div>
-          <div className="absolute md:top-3 top-2 md:left-3 left-1 flex md:items-center items-start md:flex-row flex-col gap-2 md:h-auto h-[90%] md:w-[90%] justify-between">
+          <div className="absolute md:top-3 top-1 md:left-3 left-[10px] flex md:items-center items-start md:flex-row flex-col gap-2 md:h-auto h-[92%] md:w-[90%] justify-between">
             {displayPrice && (
-              <span className=" bg-[#FFFFFFCC] text-[#000000] rounded-md py-[4px] px-[8px] font-[500] text-xs tracking-[-2%] leading-[140%]">
+              <span className=" bg-[#FFFFFFCC] text-[#000000] rounded-md py-[4px] px-[8px] font-[500] text-[13px] tracking-[-2%] leading-[140%]">
                 {displayPrice}
               </span>
             )}
@@ -78,8 +78,8 @@ const WLProductCard = ({ product, onSelect, isSelected }) => {
                             </span>
                         )} */}
             {product.label ? (
-              <span className=" bg-[#FFFFFFCC] text-[#000000] rounded-md py-[4px] px-[8px] font-[500] sm:text-xs text-[10px] sm:tracking-[-2%] tracking-[-3%] leading-[140%] flex items-center gap-1 self-end">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#78CD7F] animate-pulse"></span>
+              <span className=" bg-[#FFFFFFCC] text-[#000000] rounded-md py-[4px] px-[8px] font-[500]  text-[13px] sm:tracking-[-2%] tracking-[-3%] leading-[140%] flex items-center gap-1 self-end">
+                {/* <span className="w-1.5 h-1.5 rounded-full bg-[#78CD7F] animate-pulse"></span> */}
                 <span className="">{product.label}</span>
               </span>
             ) : null}
@@ -88,10 +88,10 @@ const WLProductCard = ({ product, onSelect, isSelected }) => {
 
         {/* Bottom section: product info */}
         <div
-          className={`px-3 py-4 rounded-b-2xl flex flex-col grow  transition-all duration-300 border ${isSelected ? "bg-[#AE7E56] border-[#AE7E56]" : "bg-[#F0EEEA] border-[#E2E2E1]"}`}
+          className={`px-3 py-4 rounded-b-2xl flex flex-col grow  transition-all duration-300 border border-[1.5px] bg-[#F0EEEA] ${isSelected ? " border-[#AE7E56]" : " border-[#E2E2E1]"}`}
         >
           <h2
-            className={`text-[16px] font-[500] leading-[140%]  tracking-[-2%] ${isSelected ? "text-white" : "text-[#000000]"}`}
+            className={`text-[16px] font-[500] leading-[140%]  tracking-[-2%]`}
           >
             {product.name}
             {product.isPrescription && (
@@ -99,12 +99,12 @@ const WLProductCard = ({ product, onSelect, isSelected }) => {
             )}
           </h2>
           {/* <p
-                        className={`text-[12px] font-[400] leading-[140%] md:grow-0 grow  ${isSelected ? "text-white" : "text-[#000000]"}`}
-                    >
-                        ({product.ingredient})
-                    </p> */}
+            className={`text-[12px] font-[400] leading-[140%] md:grow-0 grow  ${isSelected ? "text-white" : "text-[#000000]"}`}
+          >
+            ({product.ingredient})
+          </p> */}
           <p
-            className={`text-sm font-[400] leading-[140%] tracking-[0%] transition-all my-3 duration-300  ${isSelected ? "text-[#FFFFFF]" : "text-[#000000]"} subheaders-font`}
+            className={`text-[14px] font-[400] leading-[140%] tracking-[0%] transition-all my-3 duration-300   subheaders-font`}
           >
             {shortDescription}
           </p>
@@ -121,17 +121,6 @@ const WLProductCard = ({ product, onSelect, isSelected }) => {
               ))}
             </ul>
           )}
-
-          {/* <button
-                        type="button"
-                        className={`text-sm  underline font-[500] w-fit mt-4 hover:no-underline  transition-all duration-300 focus:border-none focus:outline-none focus-visible:ring-0 focus-visible:border-none focus-visible:outline-none focus-visible:shadow-none ${isSelected ? "text-[#FFFFFF]" : "text-[#000000]"}`}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setShowModal(true);
-                        }}
-                    >
-                        Learn more
-                    </button> */}
         </div>
       </div>
 
