@@ -16,6 +16,7 @@ import Link from "next/link";
 import { migrateLocalCartToServer } from "@/lib/cart/cartService";
 import GoogleSignInButton from "./GoogleSignInButton";
 import CartMigrationOverlay from "@/components/CartMigrationOverlay";
+import Image from "next/image";
 
 const LoginContent = ({ setActiveTab, loginRef }) => {
   const searchParams = useSearchParams();
@@ -64,7 +65,7 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
       if (flowProductsResult.success) {
         logger.log(
           "Processed saved flow products after login:",
-          flowProductsResult
+          flowProductsResult,
         );
         return flowProductsResult.redirectUrl;
       }
@@ -75,7 +76,7 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
       if (savedProducts) {
         logger.log(
           "Converting legacy saved products to direct cart approach:",
-          savedProducts
+          savedProducts,
         );
 
         // Determine the flow type from URL parameters or saved products
@@ -83,31 +84,30 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
           searchParams.get("ed-flow") === "1"
             ? "ed"
             : searchParams.get("wl-flow") === "1"
-            ? "wl"
-            : searchParams.get("hair-flow") === "1"
-            ? "hair"
-            : searchParams.get("mh-flow") === "1"
-            ? "mh"
-            : searchParams.get("skincare-flow") === "1"
-            ? "skincare"
-            : savedProducts.flowType || "ed"; // Use saved flow type or default to "ed"
+              ? "wl"
+              : searchParams.get("hair-flow") === "1"
+                ? "hair"
+                : searchParams.get("mh-flow") === "1"
+                  ? "mh"
+                  : searchParams.get("skincare-flow") === "1"
+                    ? "skincare"
+                    : savedProducts.flowType || "ed"; // Use saved flow type or default to "ed"
 
         logger.log(
           "Using flow type for direct cart addition after login:",
-          flowType
+          flowType,
         );
 
         // Import the appropriate flow function dynamically
-        const { addToCartDirectly } = await import(
-          "../../utils/flowCartHandler"
-        );
+        const { addToCartDirectly } =
+          await import("../../utils/flowCartHandler");
 
         // Convert legacy saved products to direct cart addition
         const result = await addToCartDirectly(
           savedProducts.mainProduct,
           savedProducts.addons || [],
           flowType,
-          { requireConsultation: true }
+          { requireConsultation: true },
         );
 
         // Clear saved products
@@ -178,7 +178,7 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
           data.message ||
             `Welcome back${
               data.userDisplayName ? ", " + data.userDisplayName : ""
-            }!`
+            }!`,
         );
 
         // Migrate any localStorage cart items to the server cart
@@ -223,7 +223,7 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
 
         logger.log(
           "Final redirect path after Google login:",
-          finalRedirectPath
+          finalRedirectPath,
         );
 
         // Add a small delay to ensure the success toast is visible before navigation
@@ -243,7 +243,7 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
     } catch (err) {
       logger.error("Google login exception:", err);
       toast.error(
-        "An error occurred during Google sign-in. Please try again later."
+        "An error occurred during Google sign-in. Please try again later.",
       );
     } finally {
       setSubmitting(false);
@@ -327,7 +327,7 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
         // Small delay to ensure cart migration has time to complete server-side
         if (migrateSuccess && redirectTo && redirectTo.includes("/checkout")) {
           logger.log(
-            "Waiting for cart migration to complete before checkout redirect..."
+            "Waiting for cart migration to complete before checkout redirect...",
           );
           await new Promise((resolve) => setTimeout(resolve, 1000));
         }
@@ -376,7 +376,7 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
                   key.includes("wl-flow") ||
                   key.includes("hair-flow") ||
                   key.includes("mh-flow") ||
-                  key.includes("skincare-flow")
+                  key.includes("skincare-flow"),
               );
 
               // Create a new URLSearchParams for checkout
@@ -388,7 +388,7 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
               redirectPath = `/checkout?${checkoutParams.toString()}`;
               logger.log(
                 "Created checkout URL with flow parameters:",
-                redirectPath
+                redirectPath,
               );
             } else {
               // Default redirect to home
@@ -460,7 +460,7 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
           <a
             href={(() => {
               const currentParams = new URLSearchParams(
-                searchParams.toString()
+                searchParams.toString(),
               );
               currentParams.set("viewshow", "register");
               return `/login-register?${currentParams.toString()}`;
@@ -592,8 +592,24 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
 };
 
 export default function Login({ setActiveTab, loginRef }) {
+  const logoContent = (
+    <div className="h-[35px] w-[100px] relative ml-[0]">
+      <Image
+        src="https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp"
+        alt="Rocky Logo"
+        fill
+        className="object-contain"
+      />
+    </div>
+  );
   return (
     <div suppressHydrationWarning>
+      <div className="py-4 px-4 max-w-[1140px] mx-auto ">
+        <Link href="/" aria-label="Rocky Homepage">
+          {logoContent}
+        </Link>
+      </div>
+      <hr className="border-gray-300" />
       <Suspense fallback={<Loader />}>
         <LoginContent setActiveTab={setActiveTab} loginRef={loginRef} />
       </Suspense>
