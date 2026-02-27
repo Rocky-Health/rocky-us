@@ -9,7 +9,7 @@ const MinimalHeader = ({
 }) => {
   return (
     <div
-      className={`max-w-[1140px] mx-auto flex justify-between items-center ${BorderBottom ? "border-b" : ""}`}
+      className={`max-w-[1140px] mx-auto px-5 flex justify-between items-center ${BorderBottom ? "border-b" : ""}`}
     >
       <Logo />
 
