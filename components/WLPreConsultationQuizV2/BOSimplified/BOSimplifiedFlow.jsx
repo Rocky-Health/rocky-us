@@ -95,15 +95,21 @@ const BOSimplifiedFlow = () => {
 
   useEffect(() => {
     try {
-      const params = new URLSearchParams(window.location.search);
-      const coupon = params.get("apply_coupon");
-      if (coupon && coupon.trim()) {
-        localStorage.setItem(COUPON_STORAGE_KEY, coupon.trim());
-        toast.success(
-          "$100 Discount Code Auto-Applied For You in Checkout For The Next 60 Minutes",
-          { autoClose: 8000 },
-        );
-      }
+      // const params = new URLSearchParams(window.location.search);
+      // const coupon = params.get("apply_coupon");
+      // if (coupon && coupon.trim()) {
+      //   localStorage.setItem(COUPON_STORAGE_KEY, coupon.trim());
+      //   toast.success(
+      //     "$100 Discount Code Auto-Applied For You in Checkout For The Next 60 Minutes",
+      //     { autoClose: 8000 },
+      //   );
+      // }
+
+      localStorage.setItem(COUPON_STORAGE_KEY, "save100");
+      toast.success(
+        "$100 Discount Code Auto-Applied For You in Checkout For The Next 60 Minutes",
+        { autoClose: 8000 },
+      );
     } catch (e) {
       logger.error("Error capturing coupon from URL:", e);
     }
@@ -169,7 +175,7 @@ const BOSimplifiedFlow = () => {
           currentPage={currentStep}
         />
         {/* Progress Bar - Hide for recommendation step */}
-        {currentStep !== 4 && (
+        {currentStep !== 7 && (
           <div className="pt-4 pb-6">
             <ProgressBar progress={progressPercent || 100} />
           </div>
