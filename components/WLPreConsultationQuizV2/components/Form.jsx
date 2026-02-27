@@ -284,7 +284,13 @@ const Form = ({
   };
 
   const handleChange = (id, value) => {
-    setFieldsState((prev) => ({ ...prev, [id]: value }));
+    // Apply signup-style formatting for phone field
+    let nextValue = value;
+    if (id === "phone") {
+      nextValue = formatPhoneNumber(value || "");
+    }
+
+    setFieldsState((prev) => ({ ...prev, [id]: nextValue }));
     
     // Update userData immediately ONLY for fields that control conditional navigation
     // This ensures conditional navigation has the latest value without interfering with other inputs
@@ -317,7 +323,7 @@ const Form = ({
     try {
       const field = config.fields.find((f) => f.id === id);
       if (field && field.conditionalActions) {
-        triggerConditionalActionForField(field, value);
+        triggerConditionalActionForField(field, nextValue);
       }
     } catch (e) {
       logger.error("Error checking conditionalActions in handleChange:", e);
@@ -392,6 +398,32 @@ const Form = ({
   const isValidEmail = (email) => {
     if (!email || typeof email !== "string") return false;
     return /\S+@\S+\.\S+/.test(email.trim());
+  };
+
+  // Helper: format phone number like signup (e.g. (123) 456-7890)
+  const formatPhoneNumber = (value) => {
+    if (!value) return "";
+    const phoneNumber = String(value).replace(/\D/g, "");
+
+    if (phoneNumber.length <= 3) {
+      return `(${phoneNumber}`;
+    } else if (phoneNumber.length <= 6) {
+      return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`;
+    }
+
+    return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(
+      3,
+      6
+    )}-${phoneNumber.slice(6, 10)}`;
+  };
+
+  // Helper: validate phone number like signup
+  const isValidPhone = (phone) => {
+    if (!phone || typeof phone !== "string") return false;
+    const digitsOnly = phone.replace(/\D/g, "");
+    if (digitsOnly.length < 10) return false;
+    if (digitsOnly.length > 0 && /^0+$/.test(digitsOnly)) return false;
+    return true;
   };
 
   // Reusable registration logic for both WLFlow1 and WLFlow2
@@ -699,6 +731,9 @@ const Form = ({
     }
     if (field.type === "email") {
       return value && isValidEmail(value);
+    }
+    if (field.id === "phone") {
+      return isValidPhone(value);
     }
     if (field.type === "checkbox") {
       if (Array.isArray(field.options)) {

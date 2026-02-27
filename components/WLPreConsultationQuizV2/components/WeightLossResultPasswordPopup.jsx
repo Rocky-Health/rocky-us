@@ -53,22 +53,28 @@ const WeightLossResultPasswordPopup = ({
 
   const checkEmailExists = async (emailToCheck) => {
     if (!isValidEmail(emailToCheck)) return;
-    
+
     try {
       const res = await fetch("/api/check-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: emailToCheck }),
       });
-      
+
       if (res.ok) {
         const data = await res.json();
         setEmailExists(data.registered === true);
+      } else {
+        // If check fails, default to \"not existing\" behaviour
+        setEmailExists(false);
       }
     } catch (error) {
       console.error("Error checking email:", error);
       // Default to false if check fails
       setEmailExists(false);
+    } finally {
+      // Only show password field AFTER we've done the check
+      setShowPasswordSection(true);
     }
   };
 
@@ -175,7 +181,8 @@ const WeightLossResultPasswordPopup = ({
                 onBlur={() => {
                   if (!emailTouched) setEmailTouched(true);
                   if (String(email || "").trim().length > 0) {
-                    setShowPasswordSection(true);
+                    // First check if email exists in the database;
+                    // password field will only show AFTER this check finishes.
                     checkEmailExists(email);
                   }
                 }}
