@@ -80,6 +80,12 @@ export default function EDPreQuestionnaireLayout({ children }) {
         #launcher {
           display: none !important;
         }
+        iframe[title="Close message"] {
+          display: none !important;
+        }
+        iframe[title="Message from company"] {
+          display: none !important;
+        }
       `}</style>
       {children}
     </div>
