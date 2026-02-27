@@ -18,8 +18,8 @@ const QuizStepRenderer = ({
 }) => {
   const stepConfig = boSimplifiedConfig.steps[currentStep];
 
-  // Handle recommendation step (step 4)
-  if (currentStep === 4) {
+  // Handle recommendation step (step 7)
+  if (currentStep === 7) {
     const recommendation = getProductRecommendation(
       userData,
       boSimplifiedConfig.recommendationRules,
