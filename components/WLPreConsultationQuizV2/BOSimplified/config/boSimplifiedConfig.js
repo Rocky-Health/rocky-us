@@ -59,8 +59,67 @@ export const boSimplifiedConfig = {
             type: "popup",
             // This will be handled by popup system
         },
-        // Step 3: Basic Info (only shown if not authenticated)
+        // Step 3: Province (only shown if not authenticated)
         3: {
+            id: "province",
+            passIf: "authenticate",
+            type: "select",
+            title: "First, let's make sure we have licensed providers in your area.",
+            subtitle:
+                "Weight loss medications are prescribed online and delivered to your door.",
+            field: "province",
+            required: true,
+            label: "State",
+            privacyNote:
+                "We respect your privacy. All of your information is securely stored on our HIPAA Compliant server.",
+            options: [
+                { id: "", label: "Select a state" },
+                { id: "AZ", label: "Arizona" },
+                { id: "CA", label: "California" },
+                { id: "CO", label: "Colorado" },
+                { id: "CT", label: "Connecticut" },
+                { id: "DE", label: "Delaware" },
+                { id: "FL", label: "Florida" },
+                { id: "GA", label: "Georgia" },
+                { id: "ID", label: "Idaho" },
+                { id: "IL", label: "Illinois" },
+                { id: "IN", label: "Indiana" },
+                { id: "IA", label: "Iowa" },
+                { id: "KY", label: "Kentucky" },
+                { id: "LA", label: "Louisiana" },
+                { id: "ME", label: "Maine" },
+                { id: "MD", label: "Maryland" },
+                { id: "MA", label: "Massachusetts" },
+                { id: "MO", label: "Missouri" },
+                { id: "MT", label: "Montana" },
+                { id: "NE", label: "Nebraska" },
+                { id: "NV", label: "Nevada" },
+                { id: "NH", label: "New Hampshire" },
+                { id: "NJ", label: "New Jersey" },
+                { id: "NM", label: "New Mexico" },
+                { id: "NY", label: "New York" },
+                { id: "NC", label: "North Carolina" },
+                { id: "ND", label: "North Dakota" },
+                { id: "OH", label: "Ohio" },
+                { id: "OK", label: "Oklahoma" },
+                { id: "OR", label: "Oregon" },
+                { id: "PA", label: "Pennsylvania" },
+                { id: "RI", label: "Rhode Island" },
+                { id: "SC", label: "South Carolina" },
+                { id: "SD", label: "South Dakota" },
+                { id: "TN", label: "Tennessee" },
+                { id: "TX", label: "Texas" },
+                { id: "UT", label: "Utah" },
+                { id: "VT", label: "Vermont" },
+                { id: "VA", label: "Virginia" },
+                { id: "WA", label: "Washington" },
+                { id: "WV", label: "West Virginia" },
+                { id: "WI", label: "Wisconsin" },
+                { id: "WY", label: "Wyoming" },
+            ],
+        },
+        // Step 4: Basic Info (only shown if not authenticated)
+        4: {
             id: "basicInfo",
             passIf: "authenticate",
             type: "form",
@@ -96,39 +155,6 @@ export const boSimplifiedConfig = {
             privacyNote:
                 "We respect your privacy. All of your information is securely stored on our HIPAA Compliant server.",
             required: true,
-        },
-        // Step 4: Province (only shown if not authenticated)
-        4: {
-            id: "province",
-            passIf: "authenticate",
-            type: "select",
-            title: "First, let's make sure we have licensed providers in your area.",
-            subtitle:
-                "Weight loss medications are prescribed online and delivered to your door.",
-            field: "province",
-            required: true,
-            label: "State",
-            options: [
-                { id: "", label: "Select a state" },
-                { id: "CA", label: "California" },
-                { id: "CO", label: "Colorado" },
-                { id: "CT", label: "Connecticut" },
-                { id: "FL", label: "Florida" },
-                { id: "ID", label: "Idaho" },
-                { id: "IL", label: "Illinois" },
-                { id: "IA", label: "Iowa" },
-                { id: "KY", label: "Kentucky" },
-                { id: "ME", label: "Maine" },
-                { id: "MD", label: "Maryland" },
-                { id: "MN", label: "Minnesota" },
-                { id: "MT", label: "Montana" },
-                { id: "NE", label: "Nebraska" },
-                { id: "NV", label: "Nevada" },
-                { id: "OK", label: "Oklahoma" },
-                { id: "TX", label: "Texas" },
-                { id: "WA", label: "Washington" },
-                { id: "WY", label: "Wyoming" },
-            ],
         },
         // Step 5: First Information (only shown if not authenticated)
         5: {
@@ -187,9 +213,9 @@ export const boSimplifiedConfig = {
     // Navigation configuration
     navigation: {
         1: 2, // BMI Calculator -> RockyLongTerm Popup
-        2: 3, // RockyLongTerm Popup -> Basic Info (or skip to 7 if authenticated)
-        3: 4, // Basic Info -> Province
-        4: 5, // Province -> First Information
+        2: 3, // RockyLongTerm Popup -> Province (or skip to 7 if authenticated)
+        3: 4, // Province -> Basic Info
+        4: 5, // Basic Info -> First Information
         5: 6, // First Information -> Contact Info
         6: 7, // Contact Info -> Product Recommendations
     },
@@ -198,8 +224,8 @@ export const boSimplifiedConfig = {
     progressMap: {
         1: 14, // BMI Calculator
         2: 28, // RockyLongTerm Popup
-        3: 42, // Basic Info
-        4: 56, // Province
+        3: 42, // Province
+        4: 56, // Basic Info
         5: 70, // First Information
         6: 85, // Contact Info
         7: 100, // Product Recommendations
@@ -209,8 +235,8 @@ export const boSimplifiedConfig = {
     stepTitles: {
         1: "Height & Weight",
         2: "Rocky Long-Term",
-        3: "Your Basic Info",
-        4: "State Selection",
+        3: "State Selection",
+        4: "Your Basic Info",
         5: "Your Details",
         6: "Contact Information",
         7: "Product Recommendations",
