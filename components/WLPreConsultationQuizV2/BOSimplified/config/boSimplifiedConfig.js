@@ -53,20 +53,129 @@ export const boSimplifiedConfig = {
             required: true,
             showPopupAfterStep: "potentialWeightLoss", // Show popup after BMI calculation
         },
-        // Step 2: Your Weight Popup (shown after potential weight loss calculation)
+        // Step 2: RockyLongTerm Popup (shown after potential weight loss calculation)
         2: {
-            id: "yourWeight",
-            type: "popup",
-            // This will be handled by popup system
-        },
-
-         2: {
             id: "RockyLongTerm",
             type: "popup",
             // This will be handled by popup system
         },
-        // Step 3: Product Recommendations
+        // Step 3: Basic Info (only shown if not authenticated)
+        3: {
+            id: "basicInfo",
+            passIf: "authenticate",
+            type: "form",
+            title: "We'll start with the basics",
+            field: "sex",
+            conditionalNavigation: {
+                Male: 5,
+                Female: 5,
+            },
+            fields: [
+                {
+                    id: "sex",
+                    label: "Sex assigned at birth",
+                    type: "radio",
+                    options: [
+                        { value: "Male", label: "Male" },
+                        { value: "Female", label: "Female" },
+                    ],
+                },
+                {
+                    id: "dateOfBirth",
+                    label: "Birth Date",
+                    type: "date",
+                    placeholder: "mm/dd/yyyy",
+                },
+                {
+                    id: "zip_code",
+                    label: "Zip Code",
+                    type: "text",
+                    placeholder: "90210",
+                },
+            ],
+            privacyNote:
+                "We respect your privacy. All of your information is securely stored on our HIPAA Compliant server.",
+            required: true,
+        },
+        // Step 4: Province (only shown if not authenticated)
         4: {
+            id: "province",
+            passIf: "authenticate",
+            type: "select",
+            title: "First, let's make sure we have licensed providers in your area.",
+            subtitle:
+                "Weight loss medications are prescribed online and delivered to your door.",
+            field: "province",
+            required: true,
+            label: "State",
+            options: [
+                { id: "", label: "Select a state" },
+                { id: "CA", label: "California" },
+                { id: "CO", label: "Colorado" },
+                { id: "CT", label: "Connecticut" },
+                { id: "FL", label: "Florida" },
+                { id: "ID", label: "Idaho" },
+                { id: "IL", label: "Illinois" },
+                { id: "IA", label: "Iowa" },
+                { id: "KY", label: "Kentucky" },
+                { id: "ME", label: "Maine" },
+                { id: "MD", label: "Maryland" },
+                { id: "MN", label: "Minnesota" },
+                { id: "MT", label: "Montana" },
+                { id: "NE", label: "Nebraska" },
+                { id: "NV", label: "Nevada" },
+                { id: "OK", label: "Oklahoma" },
+                { id: "TX", label: "Texas" },
+                { id: "WA", label: "Washington" },
+                { id: "WY", label: "Wyoming" },
+            ],
+        },
+        // Step 5: First Information (only shown if not authenticated)
+        5: {
+            id: "firstInformation",
+            passIf: "authenticate",
+            type: "form",
+            titleCenter: true,
+            title: `<p style="color:#A0693B; text-align:center; line-height: 140%;font-size:16px">We're almost done!</p><p class="text-center text-[26px] headers-font mb-[24px]">Let us know your details</p>`,
+            privacyNote:
+                "We respect your privacy. All of your information is securely stored on our HIPAA Compliant server.",
+            fields: [
+                {
+                    id: "firstName",
+                    label: "Name",
+                    type: "text",
+                    placeholder: "Enter Your Name",
+                },
+                {
+                    id: "lastName",
+                    label: "Last Name",
+                    type: "text",
+                    placeholder: "Your Last Name",
+                },
+            ],
+            required: true,
+        },
+        // Step 6: Contact Info (only shown if not authenticated) - This triggers registration
+        6: {
+            id: "contactInfo",
+            passIf: "authenticate",
+            type: "form",
+            titleCenter: true,
+            title: `<p style="color:#A0693B; text-align:center; line-height: 140%;font-size:16px">Finally,</p><p class="text-center text-[26px] headers-font mb-[24px]">How can we reach you, if needed?</p>`,
+            privacyNote:
+                "We respect your privacy. All of your information is securely stored on our HIPAA Compliant server.",
+            fields: [
+                {
+                    id: "phone",
+                    label: "Phone Number",
+                    type: "tel",
+                    placeholder: "Your Phone Number",
+                },
+            ],
+            required: true,
+        },
+        // Step 7: Product Recommendations
+        7: {
             id: "productRecommendations",
             type: "recommendation",
             title: "Recommended for you",
@@ -75,27 +184,36 @@ export const boSimplifiedConfig = {
         },
     },
 
-    // Navigation configuration (simplified)
+    // Navigation configuration
     navigation: {
-        1: 2, // BMI Calculator -> Your Weight Popup
-        2: 3, // Your Weight Popup -> Product Recommendations
-        3: 4, // Product Recommendations -> Complete (goes to checkout)
+        1: 2, // BMI Calculator -> RockyLongTerm Popup
+        2: 3, // RockyLongTerm Popup -> Basic Info (or skip to 7 if authenticated)
+        3: 4, // Basic Info -> Province
+        4: 5, // Province -> First Information
+        5: 6, // First Information -> Contact Info
+        6: 7, // Contact Info -> Product Recommendations
     },
 
     // Progress mapping
     progressMap: {
-        1: 25, // BMI Calculator
-        2: 50,
-        3: 75, // Your Weight Popup
-        4: 100, // Product Recommendations
+        1: 14, // BMI Calculator
+        2: 28, // RockyLongTerm Popup
+        3: 42, // Basic Info
+        4: 56, // Province
+        5: 70, // First Information
+        6: 85, // Contact Info
+        7: 100, // Product Recommendations
     },
 
     // Step titles
     stepTitles: {
         1: "Height & Weight",
-        2: "Your Weight",
-        3: "Rocky Long-Term",
-        4: "Product Recommendations",
+        2: "Rocky Long-Term",
+        3: "Your Basic Info",
+        4: "State Selection",
+        5: "Your Details",
+        6: "Contact Information",
+        7: "Product Recommendations",
     },
 
     // Popup configurations
@@ -114,14 +232,31 @@ export const boSimplifiedConfig = {
             headerStyle:
                 "headers-font text-[26px] md:text-[32px] leading-[120%] mb-[16px]",
             messageStyle: "text-[20px] md:text-[24px] leading-[140%] mb-[24px]",
-            nextPopup: "YourWeightPopup", // Configure which popup to show after counter finishes
+            nextPopup: "EmailPopUp", // Show EmailPopUp after counter (which checks authentication)
+            buttons: [
+                {
+                    label: "Continue",
+                    action: "openPopup",
+                    popupName: "EmailPopUp",
+                    primary: false,
+                    disabled: true,
+                },
+            ],
+        },
+
+        // Email Popup - Shows authentication form if not logged in, or auto-skips if logged in
+        EmailPopUp: {
+            isWL: true,
+            component: "WeightLossResultPasswordPopup",
+            image: "/wl-pre-consultation/lose-20-mob.png",
+            imageStyle: "w-[335px] h-[523px] rounded-[32px] mb-12",
+            imageTop: false,
             buttons: [
                 {
                     label: "Continue",
                     action: "openPopup",
                     popupName: "YourWeightPopup",
-                    primary: false,
-                    disabled: true,
+                    primary: true,
                 },
             ],
         },
@@ -137,42 +272,59 @@ export const boSimplifiedConfig = {
             PrivacyText: true,
             buttons: [
                 {
-          label: "Continue",
-          action: "openPopup",
-          popupName: "RockyLongTerm",
-          primary: true,
-        },
+                    label: "Continue",
+                    action: "openPopup",
+                    popupName: "RockyLongTerm",
+                    primary: true,
+                },
             ],
         },
 
 
-         RockyLongTerm: {
-                progress: "75",
-                isWL: true,
-                headerStyle:
-                    "headers-font text-[26px]  md:text-[32px] headers-font leading-[120%] mb-[16px] text-center",
-                title: "Rocky creates long-term weight loss",
-                messageStyle:
-                    "text-[14px] md:text-[16px] leading-[140%] mb-[24px] text-center",
-                message:
-                    "Rocky members lose 2-5x more weight than similar programs. Our approach goes beyond just medication — we help you build lasting habits for a healthier life.",
-                image: "/wl-pre-consultation/Weight1.jpg",
-                imageTop: false,
-                imageStyle:
-                    "w-[100%] h-[320px] md:h-[324px] lg:w-[335px] rounded-[32px] mb-4",
-                OnAverageMessage: true,
-                PrivacyText: true,
-                buttons: [
-                    {
+        RockyLongTerm: {
+            progress: "75",
+            isWL: true,
+            headerStyle:
+                "headers-font text-[26px]  md:text-[32px] headers-font leading-[120%] mb-[16px] text-center",
+            title: "Rocky creates long-term weight loss",
+            messageStyle:
+                "text-[14px] md:text-[16px] leading-[140%] mb-[24px] text-center",
+            message:
+                "Rocky members lose 2-5x more weight than similar programs. Our approach goes beyond just medication — we help you build lasting habits for a healthier life.",
+            image: "/wl-pre-consultation/Weight1.jpg",
+            imageTop: false,
+            imageStyle:
+                "w-[100%] h-[320px] md:h-[324px] lg:w-[335px] rounded-[32px] mb-4",
+            OnAverageMessage: true,
+            PrivacyText: true,
+            buttons: [
+                {
                     label: "Continue",
                     action: "navigate",
-                    payload: 4, // Go to step 4 (per navigation config)
+                    payload: 3, // Go to step 3 (will skip to 7 if authenticated)
                     primary: true,
-                    },
-                ],
-    },
+                },
+            ],
+        },
 
-
-
+        pregnancy: {
+            isWL: true,
+            asPage: false,
+            headerStyle:
+                "headers-font text-[26px] md:text-[32px] leading-[120%] mb-[16px] text-center",
+            title: "Sorry, you are not eligible for our weight loss program",
+            messageStyle:
+                "text-[14px] md:text-[16px] leading-[140%] mb-[24px] rounded-lg p-[16px]",
+            message: `<center>Based on your answers, GLP-1 therapy through our online program would not be a good fit. Your health is very important to us, and some conditions/medications require more personalized, in-person support to ensure the best and safest care. We recommend you visit your usual doctor.</center>`,
+            image: "/wl-pre-consultation/pregnancy-warning.png",
+            imageStyle: "w-[358px] h-[324px] mb-4",
+            buttons: [
+                {
+                    label: "Close",
+                    action: "close",
+                    primary: true,
+                },
+            ],
+        },
     },
 };

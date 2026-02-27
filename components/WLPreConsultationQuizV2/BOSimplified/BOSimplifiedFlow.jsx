@@ -169,7 +169,7 @@ const BOSimplifiedFlow = () => {
           currentPage={currentStep}
         />
         {/* Progress Bar - Hide for recommendation step */}
-        {currentStep !== 4 && (
+        {currentStep !== 7 && (
           <div className="pt-4 pb-6">
             <ProgressBar progress={progressPercent || 100} />
           </div>
