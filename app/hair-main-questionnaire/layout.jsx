@@ -32,24 +32,31 @@ export default function HairQuestionnaireLayout({ children }) {
         .footer-container {
           display: none !important;
         }
-        
+
         .questionnaire-header {
           display: flex !important;
         }
-        
+
         .questionnaire-footer {
           display: block !important;
         }
-        
+
         body {
           padding-top: 0 !important;
           margin-top: 0 !important;
           padding-bottom: 0 !important;
           margin-bottom: 0 !important;
         }
-          #launcher {
-            display: none !important;
-          }
+
+        #launcher {
+          display: none !important;
+        }
+        iframe[title="Close message"] {
+          display: none !important;
+        }
+        iframe[title="Message from company"] {
+          display: none !important;
+        }
       `}</style>
       {children}
     </div>
