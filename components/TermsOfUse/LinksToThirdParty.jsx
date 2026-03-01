@@ -22,11 +22,11 @@ export default function LinksToThirdParty() {
         loss caused by or in connection with use of or reliance on information
         contained in or provided to Linked Sites. Despite any referrals/leads
         from social media influencers and social media platforms to the Site,
-        Rocky’s Terms and Conditions of Website will apply.
+        MyRocky’s Terms and Conditions of Website will apply.
       </p>
       <p className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9] mb-6">
         You may have arrived to the Sites through a Linked Site, including a
-        Linked Site controlled by a parent, subsidiary or affiliate of Rocky.
+        Linked Site controlled by a parent, subsidiary or affiliate of MyRocky.
         You understand and agree that we are not responsible for the
         information, products or services described on those Linked Sites and
         only these Terms of Use will apply to your use of or access to the

@@ -512,7 +512,7 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
               away from making ED a thing of the past.
             </>
           ) : (
-            "Welcome to Rocky"
+            "Welcome to MyRocky"
           )}
         </h2>
         <h3 className="text-sm text-center font-normal pt-2 tracking-normal">
@@ -794,7 +794,7 @@ export default function Register({ setActiveTab, registerRef }) {
     <div className="h-[35px] w-[100px] relative ml-[0]">
       <Image
         src="https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp"
-        alt="Rocky Logo"
+        alt="MyRocky Logo"
         fill
         className="object-contain"
       />
@@ -814,7 +814,7 @@ export default function Register({ setActiveTab, registerRef }) {
         }
       `}</style>
       <div className="py-4 px-4 max-w-[1140px] mx-auto ">
-        <Link href="/" aria-label="Rocky Homepage">
+        <Link href="/" aria-label="MyRocky Homepage">
           {logoContent}
         </Link>
       </div>

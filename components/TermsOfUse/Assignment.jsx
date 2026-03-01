@@ -6,7 +6,7 @@ export default function Assignment() {
       </div>
       <p className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9] mb-6">
         You may not assign any of your rights under these Terms of Use, and any
-        such attempt will be null and void. Rocky and their affiliates may, in
+        such attempt will be null and void. MyRocky and their affiliates may, in
         their individual discretion, transfer, without further consent or
         notification, all contractual rights and obligations pursuant to these
         Terms of Use if some or all of the business of Ro is transferred to

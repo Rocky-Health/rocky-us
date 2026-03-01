@@ -25,7 +25,7 @@ const EmotionalSupport = () => {
               Your Mental Health Matters:
             </p>
             <p className="text-[20px] leading-[24px] md:leading-[30px] text-[#535353] md:text-[#000000A6] tracking-[-0.02em] md:h[142px] mb-[24px] md:mb-[45px] md:h-[123px] md:w-[551px] subheaders-font md:poppins-font">
-              At Rocky, we deeply value your mental health as a crucial part of
+              At MyRocky, we deeply value your mental health as a crucial part of
               overall well-being. Providing access to the tools and support you
               need when you need them is our top priority. We are here to help
               you.

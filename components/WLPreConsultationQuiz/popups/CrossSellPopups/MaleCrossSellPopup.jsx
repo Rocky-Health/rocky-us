@@ -78,7 +78,7 @@ const maleAddOnProducts = [
     },
     {
         id: "353755", // Dad Hat - CORRECT ID
-        name: "Rocky Essential Cap",
+        name: "MyRocky Essential Cap",
         price: "25",
         imageUrl:
             "https://mycdn.myrocky.com/wp-content/uploads/20250918120236/rocky-hat.png",

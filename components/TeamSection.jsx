@@ -76,7 +76,7 @@ const TeamSection = () => {
           Guided By Top Health Professionals
         </h2>
         <p className="text-lg md:text-xl font-[400] leading-[25.2px] md:leading-[28px] max-w-[737px] ">
-          Rocky Health partners with leading experts to deliver exceptional care
+          MyRocky Health partners with leading experts to deliver exceptional care
           through evidence-based treatment plans that drive results.
         </p>
       </div>

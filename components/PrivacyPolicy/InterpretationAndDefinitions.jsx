@@ -32,7 +32,7 @@ const InterpretationAndDefinitions = () => {
         <div className="text-[16px] mb-4  md:text-[18px] leading-[160%] font-[400]">
           <span className="font-[600] opacity-100 mt-4 mb-4">Company </span>
           (referred to as either “the Company”, “We”, “Us” or “Our” in this
-          Agreement) refers to Rocky Health Inc., 30 Wellington Street West,
+          Agreement) refers to MyRocky Health Inc., 30 Wellington Street West,
           Toronto, Ontario.
         </div>
 
@@ -95,7 +95,7 @@ const InterpretationAndDefinitions = () => {
 
         <div className="text-[16px] mb-4  md:text-[18px] leading-[160%] font-[400]">
           <span className="font-[600] opacity-100 mt-4 mb-4">Website </span>
-          refers to Rocky, accessible from{" "}
+          refers to MyRocky, accessible from{" "}
           <Link
             href="/"
             className="duration-300 hover:text-gray-800 underline "

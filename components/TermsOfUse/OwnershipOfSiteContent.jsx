@@ -5,7 +5,7 @@ export default function OwnershipOfSiteContent() {
         Ownership of site content
       </div>
       <p className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9] mb-6">
-        As between Rocky and you, Rocky is the sole and exclusive owner of all
+        As between MyRocky and you, MyRocky is the sole and exclusive owner of all
         right, title and interest in and to the Sites and their content,
         features and functionality (including, without limitation, all
         information, software, text, displays, images, video, audio, design,
@@ -19,7 +19,7 @@ export default function OwnershipOfSiteContent() {
         permitted through the Sites according to these Terms of Use. Any copy,
         modification, revision, enhancement, adaptation, translation, or
         derivative work of the Sites or Content shall be owned solely and
-        exclusively by Rocky or its licensors, including all intellectual
+        exclusively by MyRocky or its licensors, including all intellectual
         property rights therein. You may not access or use for any commercial
         purposes any part of the Sites or Content.
       </p>

@@ -12,7 +12,7 @@ export default function AccessRightsAndProhibitedUse() {
         non-commercial use and only as permitted under these Terms of Use, the
         Consent to Telehealth, and the Privacy Policy. No other right, title, or
         interest in or to the Sites is transferred to you, and all rights not
-        expressly granted are reserved by Rocky or its licensors. We reserve the
+        expressly granted are reserved by MyRocky or its licensors. We reserve the
         right, in our sole discretion, to deny or suspend use of the Sites or
         Services to anyone for any reason. You agree that you will not, and will
         not attempt to: (a) impersonate any person or entity or otherwise
@@ -31,7 +31,7 @@ export default function AccessRightsAndProhibitedUse() {
         commercially exploit or make available to any third party the Sites,
         Services or related materials in any way; (g) use or access the Sites to
         create or develop competing products or services or for any other
-        purpose that is to Rocky’s detriment or commercial disadvantage; (h)
+        purpose that is to MyRocky’s detriment or commercial disadvantage; (h)
         take any action or use the Sites in any manner which could damage,
         destroy, disrupt, disable, impair, overburden, interfere with, or
         otherwise impede or harm in any manner our Sites or any content, in
@@ -39,7 +39,7 @@ export default function AccessRightsAndProhibitedUse() {
         or attempt to gain unauthorized access to our Sites or any computer
         network; (j) bypass, breach, avoid, remove, deactivate, impair,
         descramble, or otherwise circumvent any security device, protection, or
-        technological measure implemented by Rocky or any of our service
+        technological measure implemented by MyRocky or any of our service
         providers to protect our Sites; (k) remove, delete, alter, or obscure
         any trademarks, specifications, warranties, or disclaimers, or any
         copyright, trademark, patent, or other intellectual property or
@@ -51,7 +51,7 @@ export default function AccessRightsAndProhibitedUse() {
         transmit or otherwise reproduce, transfer, distribute, store,
         disseminate, aggregate, use as a component of or as the basis for a
         database or otherwise use in any form or by any means any data, text,
-        reports, or other materials related to Rocky or third-party content from
+        reports, or other materials related to MyRocky or third-party content from
         the Sites; (n) otherwise use the Sites in any manner that exceeds the
         scope of use granted above; or (o) encourage or enable any other
         individual to do any of the foregoing.

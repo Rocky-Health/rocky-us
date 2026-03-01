@@ -29,7 +29,7 @@ export default function WeightLossLanding() {
         <Link href="/" className="flex justify-center">
           <Image
             src="https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp"
-            alt="Rocky"
+            alt="MyRocky"
             width={80}
             height={30}
             className="mx-auto"
@@ -46,7 +46,7 @@ export default function WeightLossLanding() {
 
       <main className="max-w-4xl mx-auto px-4 py-8 text-center">
         <h1 className="text-lg md:text-4xl font-bold text-gray-800 mb-4">
-          Rocky creates long-term weight loss
+          MyRocky creates long-term weight loss
         </h1>
 
         <p className="text-xs md:text-sm text-[#212121] mb-8 max-w-2xl mx-auto">
@@ -71,7 +71,7 @@ export default function WeightLossLanding() {
         </div>
 
         <p className="text-xs text-gray-500 mb-8">
-          *On average, Rocky members lose 15-25% of their bodyweight in the
+          *On average, MyRocky members lose 15-25% of their bodyweight in the
           first 6 months.
         </p>
 

@@ -38,7 +38,7 @@ const ProudPartnerLine = ({
                     >
                         <CustomContainImage
                             src="https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp"
-                            alt="Rocky Logo"
+                            alt="MyRocky Logo"
                             fill
                         />
                     </div>
