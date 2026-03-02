@@ -24,12 +24,12 @@ const ComparingTable = () => {
     return (
         <div className="w-full bg-white">
             <div className="px-5 md:px-12 py-14 md:py-24 max-w-5xl mx-auto">
-                <p className="block md:hidden text-black text-3xl font-medium mb-6">Why choose Rocky ?</p>
+                <p className="block md:hidden text-black text-3xl font-medium mb-6">Why choose MyRocky ?</p>
                 <div ref={tableRef} className="flex flex-row overflow-x-auto lg:overflow-x-hidden scrollbar-hide">
                     <div className="min-w-[120px] w-1/2 py-5">
                         <div className="h-24 lg:h-32 flex items-center border-b border-black">
                             <span className="text-black font-semibold text-start text-4xl w-full md:block hidden">
-                                Why Choose <br /> Rocky?
+                                Why Choose <br /> MyRocky?
                             </span>
                         </div>
                         {features.map((feature, i) => (
@@ -48,7 +48,7 @@ const ComparingTable = () => {
                         <div className="h-24 lg:h-32 flex items-center justify-center border-b border-black/80">
                             <Image
                                 src="/skin-care/logo.png"
-                                alt="Rocky"
+                                alt="MyRocky"
                                 width={80}
                                 height={80}
                                 className="object-contain"

@@ -16,7 +16,7 @@ const MeetQuality = () => {
             Life, meet quality.
           </p>
           <p className="text-[20px] md:text-[30px] leading-[24px] md:leading-[100%] text-[#000000A6] md:text-[#535353] tracking-[-0.02em] h-[73px] md:h[76px] mb-[24px] md:mb-[40px] md:w-[551px] subheaders-font">
-            Start living a life of convenience, comfort, and control with Rocky.
+            Start living a life of convenience, comfort, and control with MyRocky.
           </p>
         </div>
         {/* Button */}

@@ -5,9 +5,9 @@ export default function ModificationsToTheSites() {
         Modifications to the sites
       </div>
       <p className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9] mb-6">
-        Rocky reserves the right at any time and for any reason to modify, or
+        MyRocky reserves the right at any time and for any reason to modify, or
         temporarily or permanently discontinue, the Sites or Services or any
-        portion thereof, with or without notice. You agree that Rocky shall not
+        portion thereof, with or without notice. You agree that MyRocky shall not
         be liable to you or to any third party for any modification, suspension,
         or discontinuance of the Sites or Services.
       </p>

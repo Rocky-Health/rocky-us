@@ -5,7 +5,7 @@ export default function RockyHealthRefundPolicy() {
       className="mb-10 md:mb-14"
     >
       <div className="text-[22px] md:text-[30px] leading-[115%] tracking-[-0.01em] md:tracking-[-0.02em] mb-4 md:mb-6 headers-font">
-        Rocky Health Inc. & Rocky Health Pharmacy Inc. Refund Policy: {" "}
+        MyRocky Health Inc. & MyRocky Health Pharmacy Inc. Refund Policy: {" "}
       </div>
       <p className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9] mb-6">
         Refunds per our money-back guarantee policy can only be requested during
@@ -48,7 +48,7 @@ export default function RockyHealthRefundPolicy() {
         items from your order may not be eligible for a refund.  
       </p>
       <p className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9] mb-6">
-        Rocky Health Inc. and Rocky Health Pharmacy Inc. reserve the right to
+        MyRocky Health Inc. and MyRocky Health Pharmacy Inc. reserve the right to
         forfeit the guarantee if abuse of our money-back guarantee is
         suspected. {" "}
       </p>
@@ -94,7 +94,7 @@ export default function RockyHealthRefundPolicy() {
           Side effects experienced from either finasteride or minoxidil DO NOT
           qualify for this offer.
         </li>
-        <li>This guarantee can only be redeemed directly with Rocky Health</li>
+        <li>This guarantee can only be redeemed directly with MyRocky Health</li>
         <li>
           equests for refunds must be made in writing after a minimum of 90-days
           from the date medications were delivered, but no longer than 120-days.
@@ -113,7 +113,7 @@ export default function RockyHealthRefundPolicy() {
         </li>
       </ol>
       <p className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9] mb-6">
-        To request a refund, please contact Rocky Health directly at
+        To request a refund, please contact MyRocky Health directly at
         contact@myrocky.com and include the following information:
       </p>
       <ol className="list-decimal text-[16px] md:text-[18px] font-[400] ml-6 md:ml-8 mb-6 space-y-2">

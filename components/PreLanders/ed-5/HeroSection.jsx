@@ -13,7 +13,7 @@ const HeroSection = memo(() => (
     <div className="absolute inset-0 z-0 overflow-hidden">
       <Image
         src="/pre_ed/hero_sec1.png"
-        alt="Rocky treatment package"
+        alt="MyRocky treatment package"
         fill
         className="object-cover object-center"
         priority

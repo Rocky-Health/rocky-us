@@ -132,7 +132,7 @@ const ImpliedConsentContent = () => {
               </li>
               <li className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9]">
                 I give my informed consent to receive medical care and
-                treatment, by telehealth from Providers affiliated with Rocky
+                treatment, by telehealth from Providers affiliated with MyRocky
                 Health USA LLC.
               </li>
               <li className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9]">
@@ -190,7 +190,7 @@ const ImpliedConsentContent = () => {
               </li>
               <li className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9]">
                 I understand that I can have my telehealth record sent to my
-                other health care providers by emailing Rocky Health USA LLC at
+                other health care providers by emailing MyRocky Health USA LLC at
                 contact@myrocky.com and providing my consent along with my
                 health care provider’s name, address, and phone number. .
               </li>
@@ -198,26 +198,26 @@ const ImpliedConsentContent = () => {
                 I understand that a technical failure affecting the Services may
                 result in the loss of my information and/or interrupt my online
                 visit. In addition to any disclaimers that I agreed to by
-                accepting the Terms of Use, I agree to hold Rocky Health USA LLC
+                accepting the Terms of Use, I agree to hold MyRocky Health USA LLC
                 harmless for any loss of information or delay in care resulting
                 from a technical failure.
               </li>
               <li className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9]">
                 I understand that I can withhold or withdraw this consent at any
-                time by emailing Rocky Health USA LLC at contact@myrocky.com
+                time by emailing MyRocky Health USA LLC at contact@myrocky.com
                 with such instruction. Otherwise, this consent will be
                 considered renewed upon each new telehealth consultation with a
                 Provider. Any withdrawal of your consent will be effective upon
                 receipt of written notice to your Providers, except that such
-                withdrawal will not have any effect on any action taken by Rocky
+                withdrawal will not have any effect on any action taken by MyRocky
                 Health USA LLC or your Provider in reliance on this Consent to
                 Telehealth before it received your written notice of withdrawal.
               </li>
               <li className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9]">
-                I agree and authorize Rocky Health USA LLC and my Providers to
+                I agree and authorize MyRocky Health USA LLC and my Providers to
                 collect, use, and share my information, including my identified
                 health information and other information regarding the
-                telehealth exam, as described in Rocky Health USA LLC’s Privacy
+                telehealth exam, as described in MyRocky Health USA LLC’s Privacy
                 Policy and for any other purposes permitted by law, including
                 for treatment, payment, and health care operations purposes.
               </li>
@@ -230,7 +230,7 @@ const ImpliedConsentContent = () => {
               All capitalized terms used in this Consent to Telehealth but not
               defined herein have the meanings assigned to them in the Terms of
               Use. For avoidance of any doubt, the terms “myrocky“, “we“, “us“,
-              or “our” refers to Rocky Health USA LLC and the terms “you” and
+              or “our” refers to MyRocky Health USA LLC and the terms “you” and
               “yours” refer to the person using the Services.
             </p>
           </div>

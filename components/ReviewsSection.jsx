@@ -111,7 +111,7 @@ const ReviewsSection = () => {
         What People Are Saying
       </h2>
       <p className="mt-4 text-lg text-center">
-        Hear from real people who trusted Rocky with their health.
+        Hear from real people who trusted MyRocky with their health.
       </p>
 
       {/* TrustPilot Logos */}

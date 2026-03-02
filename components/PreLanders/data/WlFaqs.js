@@ -12,7 +12,7 @@ export const WlFaqs = [
   {
     question: "What can I expect after I sign up?",
     answer:
-      "Upon completing the initial online consultation, a Rocky Healthcare provider will assess this and determine if you are eligible. Please check your account for messages from your clinician.",
+      "Upon completing the initial online consultation, a MyRocky Healthcare provider will assess this and determine if you are eligible. Please check your account for messages from your clinician.",
   },
   {
     question: "Why do I need a blood test?",
@@ -37,16 +37,16 @@ export const WlFaqs = [
   {
     question: "How do GLP-1s work?",
     answer:
-      "Weight Loss injections available through Rocky belong to the GLP-1 class of medications, mimicking the natural hormone GLP-1. They work by reducing appetite and promoting a feeling of fullness, leading to reduced food intake and weight loss.",
+      "Weight Loss injections available through MyRocky belong to the GLP-1 class of medications, mimicking the natural hormone GLP-1. They work by reducing appetite and promoting a feeling of fullness, leading to reduced food intake and weight loss.",
   },
   {
-    question: "How can I get a GLP-1 prescription at Rocky?",
+    question: "How can I get a GLP-1 prescription at MyRocky?",
     answer:
       'Simply click <a href="/wl-pre-consultation" style="text-decoration: underline;">here</a> and get started today!',
   },
   {
-    question: "Which GLP-1s does Rocky offer?",
+    question: "Which GLP-1s does MyRocky offer?",
     answer:
-      "Rocky provides prescriptions for several GLP-1 medications, including Ozempic, Mounjaro® and Wegovy.",
+      "MyRocky provides prescriptions for several GLP-1 medications, including Ozempic, Mounjaro® and Wegovy.",
   },
 ];

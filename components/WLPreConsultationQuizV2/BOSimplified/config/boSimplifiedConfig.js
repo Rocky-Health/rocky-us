@@ -234,7 +234,7 @@ export const boSimplifiedConfig = {
     // Step titles
     stepTitles: {
         1: "Height & Weight",
-        2: "Rocky Long-Term",
+        2: "MyRocky Long-Term",
         3: "State Selection",
         4: "Your Basic Info",
         5: "Your Details",
@@ -312,11 +312,11 @@ export const boSimplifiedConfig = {
             isWL: true,
             headerStyle:
                 "headers-font text-[26px]  md:text-[32px] headers-font leading-[120%] mb-[16px] text-center",
-            title: "Rocky creates long-term weight loss",
+            title: "MyRocky creates long-term weight loss",
             messageStyle:
                 "text-[14px] md:text-[16px] leading-[140%] mb-[24px] text-center",
             message:
-                "Rocky members lose 2-5x more weight than similar programs. Our approach goes beyond just medication — we help you build lasting habits for a healthier life.",
+                "MyRocky members lose 2-5x more weight than similar programs. Our approach goes beyond just medication — we help you build lasting habits for a healthier life.",
             image: "/wl-pre-consultation/Weight1.jpg",
             imageTop: false,
             imageStyle:

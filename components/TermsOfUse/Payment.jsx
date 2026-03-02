@@ -16,12 +16,12 @@ export default function Payment() {
         You understand and agree that you are responsible for all fees due to
         receive health care services and pharmacy services, including any fees
         charged by the health care organization(s) or provider(s). Your payments
-        to Rocky may include fees charged by health care organization(s) or
+        to MyRocky may include fees charged by health care organization(s) or
         provider(s) for health care services and/or pharmacy services, which
-        Rocky collects on their behalf. In the event that your credit card
-        expires or Rocky, our affiliates, or our third-party payment processors
+        MyRocky collects on their behalf. In the event that your credit card
+        expires or MyRocky, our affiliates, or our third-party payment processors
         are unable to process your payment, you may receive notice for you to
-        provide an alternative payment method. Rocky  and/or provider(s) have no
+        provide an alternative payment method. MyRocky  and/or provider(s) have no
         obligation to provide any health care services or pharmacy services
         unless and until full payment has been received and/or verified.{" "}
       </p>
