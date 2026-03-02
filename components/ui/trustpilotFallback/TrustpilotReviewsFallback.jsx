@@ -40,7 +40,7 @@ const TrustpilotReviewsFallback = () => {
       id: 5,
       title: "Truly reliable and supp...",
       content:
-        "I had a great experience with Rocky Health. They are dependable, quick to respond, and kept everything clear from start to finish.",
+        "I had a great experience with MyRocky Health. They are dependable, quick to respond, and kept everything clear from start to finish.",
       author: "Trent Cathloy",
       rating: 5,
     },
@@ -76,7 +76,7 @@ const TrustpilotReviewsFallback = () => {
           What People Are Saying
         </h2>
         <p className="mt-4 text-lg text-center mb-8">
-          Hear from real people who trusted Rocky with their health.
+          Hear from real people who trusted MyRocky with their health.
         </p>
 
         {/* Trustpilot Header */}

@@ -45,7 +45,7 @@ export const useFormValidation = () => {
 
     if (
       currentSituation ===
-      "I'm currently on medications and want to get it from Rocky"
+      "I'm currently on medications and want to get it from MyRocky"
     ) {
       const hasMedicationName = formData["l-501_1-input"] || formData["l-501-1-input"];
       const hasPrescriberInfo = formData["l-501_1-textarea"] || formData["l-501-1-textarea"];

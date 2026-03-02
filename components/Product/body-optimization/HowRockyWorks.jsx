@@ -18,10 +18,10 @@ const HowRockyWorks = () => {
           {/* Title */}
           <div className="w-full text-center md:text-start md:w-1/3 mb-6 md:mb-0 ">
             <h2 className="text-[32px] text-[#000000] headers-font font-[550]">
-              How Rocky helps you lose weight
+              How MyRocky helps you lose weight
             </h2>
             <p className="text-[#212121] text-sm md:text-base mt-4">
-              Rocky helps you lose weight by offering doctor-trusted,
+              MyRocky helps you lose weight by offering doctor-trusted,
               personalized treatments with fast, discreet delivery and ongoing
               medical support.
             </p>

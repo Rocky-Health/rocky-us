@@ -31,7 +31,7 @@ const HowRockyWorks = ({ cards, title, subtitle }) => {
   return (
     <>
       <h2 className="text-[32px] md:text-5xl font-[550] leading-[36.8px] md:leading-[55.2px] tracking-[-0.01em]  md:tracking-[-0.02em] mb-3 md:mb-4 headers-font">
-        {title || "How Rocky Works"}
+        {title || "How MyRocky Works"}
       </h2>
       <p className="text-base md:text-lg font-[400] leading-[22.4px] md:leading-[25.2px] mb-10 md:mb-14 max-w-[300px] md:max-w-full ">
         {subtitle || "Digital Healthcare without the long wait times"}

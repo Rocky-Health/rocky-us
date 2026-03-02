@@ -25,7 +25,7 @@ const StatisticsSection = memo(() => {
             </h2>
             <p className="text-lg md:text-xl max-w-md">
               of users feel more confident knowing they can perform every time
-              after starting with Rocky.
+              after starting with MyRocky.
             </p>
           </div>
 
@@ -37,7 +37,7 @@ const StatisticsSection = memo(() => {
           </Link>
 
           <p className="text-xs text-white mt-8 max-w-md">
-            *Individual results may vary. Based on survey responses of 74 Rocky
+            *Individual results may vary. Based on survey responses of 74 MyRocky
             treatments users.
           </p>
         </div>

@@ -78,7 +78,7 @@ const SkinCareSection = () => {
                     <div>
                         <p className="text-[24px] md:text-[32px] leading-[115%] font-[450] mb-0 text-left max-w-max lg:max-w-[560px]">
                             <span className="text-[#b77c50] headers-font">
-                                Rocky connects you
+                                MyRocky connects you
                             </span>
                             <span className="text-black headers-font">
                                 {" "}

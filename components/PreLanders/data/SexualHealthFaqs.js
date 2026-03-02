@@ -13,7 +13,7 @@ export const SexualHealthFaqs = [
     },
     {
         question: "What is the most effective medication for ED?",
-        answer: "While both Sildenafil (Viagra) and Tadalafil (Cialis) are equally effective, there are a few differences. Sildenafil (Viagra) can take between 30-60 mins to work after ingestion, but sometimes can be delayed up to 2 hours with its effects lasting an average of 4 hours; food affects its effects. Tadalafil (Cialis), on the other hand, may act faster, last longer and it works regardless of when you had your last meal. With enough information, Rocky can help you find an ED medication and dosage that is right for you. Our platform provides ongoing care from our healthcare providers.",
+        answer: "While both Sildenafil (Viagra) and Tadalafil (Cialis) are equally effective, there are a few differences. Sildenafil (Viagra) can take between 30-60 mins to work after ingestion, but sometimes can be delayed up to 2 hours with its effects lasting an average of 4 hours; food affects its effects. Tadalafil (Cialis), on the other hand, may act faster, last longer and it works regardless of when you had your last meal. With enough information, MyRocky can help you find an ED medication and dosage that is right for you. Our platform provides ongoing care from our healthcare providers.",
     },
     {
         question: "What are the side effects of ED medications?",
@@ -25,7 +25,7 @@ export const SexualHealthFaqs = [
     },
     {
         question: "Are ED medications available OTC?",
-        answer: "In US, erectile dysfunction medications are not available over-the-counter (OTC) and can only be obtained with a prescription. ED medications sold without a prescription are illegal and could potentially result in harm; ED medication in the counterfeit market does not undergo the correct production, testing, and approval and thus is not safe. Rocky provides access to a licensed health care team so you can be certain that you are getting safe and effective care. Through our online platform, you will be guided through a series of medical questions which are then reviewed by a licensed Customer physician. Once the medical questionnaire is reviewed, you will be notified if you have been approved, and if so, the appropriate treatment is delivered to your doorstep.",
+        answer: "In US, erectile dysfunction medications are not available over-the-counter (OTC) and can only be obtained with a prescription. ED medications sold without a prescription are illegal and could potentially result in harm; ED medication in the counterfeit market does not undergo the correct production, testing, and approval and thus is not safe. MyRocky provides access to a licensed health care team so you can be certain that you are getting safe and effective care. Through our online platform, you will be guided through a series of medical questions which are then reviewed by a licensed Customer physician. Once the medical questionnaire is reviewed, you will be notified if you have been approved, and if so, the appropriate treatment is delivered to your doorstep.",
     },
     {
         question: "How can I improve my ED?",

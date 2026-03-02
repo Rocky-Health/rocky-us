@@ -63,7 +63,7 @@ export const mapOrderToEcommerce = async (order) => {
 
   return {
     transaction_id: order?.id?.toString() || "",
-    affiliation: "Rocky",
+    affiliation: "MyRocky",
     value: parseFloat(order?.total) || 0,
     tax: parseFloat(order?.total_tax) || 0,
     shipping: parseFloat(order?.shipping_total) || 0,

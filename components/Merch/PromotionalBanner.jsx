@@ -19,7 +19,7 @@ const PromotionalBanner = () => {
           <div className=" md:h-[584px] md:w-[552px] rounded-2xl">
             <CustomImage
               src="/merch/banner.png"
-              alt="Group of men wearing Rocky apparel"
+              alt="Group of men wearing MyRocky apparel"
               width={552}
               height={584}
             />
@@ -29,7 +29,7 @@ const PromotionalBanner = () => {
           <div className="space-y-8">
             <div>
               <h1 className=" headers-font md:text-5xl font-semibold tracking-[-2%] leading-[115%] text-black mb-4">
-                Own the Rocky Look
+                Own the MyRocky Look
               </h1>
               <p className="md:text-xl font-normal tracking-[-2%] leading-[100%] text-[#000000A6] mb-8">
                 Minimal. Bold. Built for your journey.

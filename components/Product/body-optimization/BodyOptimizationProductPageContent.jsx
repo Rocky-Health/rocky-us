@@ -50,7 +50,7 @@ const BodyOptimizationProductPageContent = ({ clientProps }) => {
       <FaqsSection
         faqs={productFaqs}
         title="Your Questions, Answered"
-        name="Meet Rocky"
+        name="Meet MyRocky"
         subtitle="Frequently asked questions"
         isFirstCardOpen={true}
       />

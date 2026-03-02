@@ -44,24 +44,24 @@ const fellixSemiBold = localFont({
 });
 
 export const metadata = {
-  title: "Rocky - Your Health Partner",
+  title: "MyRocky - Your Health Partner",
   description: "Get professional healthcare advice and treatment online",
   openGraph: {
-    title: "Rocky - Your Health Partner",
+    title: "MyRocky - Your Health Partner",
     description: "Get professional healthcare advice and treatment online",
-    siteName: "Rocky Health",
+    siteName: "MyRocky Health",
     images: [
       {
         url: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp",
         width: 1200,
         height: 630,
-        alt: "Rocky - Your Health Partner",
+        alt: "MyRocky - Your Health Partner",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rocky - Your Health Partner",
+    title: "MyRocky - Your Health Partner",
     description: "Get professional healthcare advice and treatment online",
     images: [
       "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/Rocky.webp",
