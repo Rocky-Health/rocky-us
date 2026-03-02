@@ -6,18 +6,18 @@ export const QUESTION_CONFIGS = {
     pageNo: 1,
     questionId: "501",
     options: [
-      "I’m currently on medications and want to get it from Rocky",
+      "I’m currently on medications and want to get it from MyRocky",
       "I'm currently on medication but want to make a change",
       "I have never been on medication for mental health before",
       "I am not on medication for mental health but have been in the past",
     ],
     showAdditionalInputFor: [
-      "I’m currently on medications and want to get it from Rocky",
+      "I’m currently on medications and want to get it from MyRocky",
       "I am not on medication for mental health but have been in the past",
     ],
     additionalInputPlaceholder: "Please list your current medications",
     medicationsInputFields: {
-      "I’m currently on medications and want to get it from Rocky": [
+      "I’m currently on medications and want to get it from MyRocky": [
         {
           key: "l-501_1-input",
           placeholder: "Please state name and dose of medication",
@@ -33,14 +33,14 @@ export const QUESTION_CONFIGS = {
       ],
     },
     continueToQuestionFor: {
-      "I’m currently on medications and want to get it from Rocky": "509",
+      "I’m currently on medications and want to get it from MyRocky": "509",
       "I'm currently on medication but want to make a change": "502",
       "I am not on medication for mental health but have been in the past":
         "504",
       "I have never been on medication for mental health before": "504",
     },
     addsFunctionFor: {
-      "I’m currently on medications and want to get it from Rocky":
+      "I’m currently on medications and want to get it from MyRocky":
         "choose_509_1",
     },
   },

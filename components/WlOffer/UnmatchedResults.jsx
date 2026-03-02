@@ -7,17 +7,17 @@ const UnmatchedResults = ({ consultationHref = "/wl-offer-pre-consultation/" }) 
     {
       value: "2x",
       title: "Better Results",
-      description: "In 180 days, Rocky members lose up to twice as much weight compared to other programs."
+      description: "In 180 days, MyRocky members lose up to twice as much weight compared to other programs."
     },
     {
       value: "16+ lbs",
       title: "Avg. Weight Loss",
-      description: "Average weight reduction within 90 days of starting Rocky’s program."
+      description: "Average weight reduction within 90 days of starting MyRocky’s program."
     },
     {
       value: "93.7%",
       title: "Success Rate",
-      description: "Percentage of Rocky members achieving clinically meaningful weight loss outcomes."
+      description: "Percentage of MyRocky members achieving clinically meaningful weight loss outcomes."
     }
   ];
 
@@ -26,7 +26,7 @@ const UnmatchedResults = ({ consultationHref = "/wl-offer-pre-consultation/" }) 
       {/* Headline */}
       <div className="text-center mb-6">
         <h2 className="text-[32px] md:text-[48px] md:font-[550] leading-none tracking-[-0.64px] md:tracking-[-0.96px] mb-2 headers-font text-black mx-auto w-[83%] md:max-w-[694px]">
-          Why Is Everyone Switching to Rocky? <span className="text-[32px] md:text-[48px]  md:font-[550] leading-none tracking-[-0.64px] md:tracking-[-0.96px] headers-font text-[#AE7E56]">
+          Why Is Everyone Switching to MyRocky? <span className="text-[32px] md:text-[48px]  md:font-[550] leading-none tracking-[-0.64px] md:tracking-[-0.96px] headers-font text-[#AE7E56]">
             Unmatched Results.
           </span>
         </h2>
@@ -80,7 +80,7 @@ const UnmatchedResults = ({ consultationHref = "/wl-offer-pre-consultation/" }) 
 
       {/* Disclaimer */}
       <p className="text-center text-xs font-normal leading-[140%] mx-auto max-w-[700px] text-[rgba(33,33,33,0.6)] md:text-[rgba(0,0,0,0.6)]">
-        Based on self-reported data from approximately 350,000 Rocky members on a personalized treatment plan, including compounded GLP-1 medications and consultations with medical professionals.
+        Based on self-reported data from approximately 350,000 MyRocky members on a personalized treatment plan, including compounded GLP-1 medications and consultations with medical professionals.
       </p>
     </div>
   );

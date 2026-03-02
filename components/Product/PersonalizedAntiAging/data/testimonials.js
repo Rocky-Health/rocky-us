@@ -11,7 +11,7 @@ export const testimonials = [
   {
     name: "Stephen",
     description:
-      "“At 45, this has become my holy grail for skincare. The improvement in skin elasticity is noticeable and my forehead lines have softened too. Been a user 6 months now and all I can say is that I only wish I found Rocky custom skincare sooner!”",
+      "“At 45, this has become my holy grail for skincare. The improvement in skin elasticity is noticeable and my forehead lines have softened too. Been a user 6 months now and all I can say is that I only wish I found MyRocky custom skincare sooner!”",
     condition: "Anti-Aging",
     Treatment: "Anti- Aging Cream",
     image:

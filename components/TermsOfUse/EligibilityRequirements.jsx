@@ -19,8 +19,8 @@ export default function EligibilityRequirements() {
       </ul>
       <p>
         You understand and agree that satisfying the above requirements does not
-        guarantee that you will receive Services through Rocky. In addition to
-        the above requirements, Rocky and certain affiliated professional
+        guarantee that you will receive Services through MyRocky. In addition to
+        the above requirements, MyRocky and certain affiliated professional
         entities reserve the right to change or include new requirements as
         deemed appropriate in their sole discretion without providing prior
         notice to you.

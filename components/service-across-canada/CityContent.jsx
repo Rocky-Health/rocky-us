@@ -36,7 +36,7 @@ const CityContent = ({ cityInfo, displayCity }) => {
             </h2>
 
             <p className="text-[#000000] text-lg leading-[150%]">
-                Rocky's ED products are available across US in{" "}
+                MyRocky's ED products are available across US in{" "}
                 <Link
                     href="/service-across-canada/toronto"
                     className="text-[#8B4513] underline"

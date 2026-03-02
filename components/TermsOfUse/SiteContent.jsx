@@ -5,7 +5,7 @@ export default function SiteContent() {
         Site content
       </div>
       <p className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9] mb-6">
-        Except for specific communications received from Rocky Health Inc. or
+        Except for specific communications received from MyRocky Health Inc. or
         affiliate health care organizations and providers, none of the Content
         you receive through the Sites should be considered medical advice.
       </p>

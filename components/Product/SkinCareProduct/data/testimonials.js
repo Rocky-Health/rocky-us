@@ -47,7 +47,7 @@ export const testimonials = [
     {
         name: "Alex",
         description:
-            "“My experience with Rocky skincare has been entirely positive. From the moment I enquired, to the care I received, to the results. I’ve never felt so good in my skin.”",
+            "“My experience with MyRocky skincare has been entirely positive. From the moment I enquired, to the care I received, to the results. I’ve never felt so good in my skin.”",
         condition: "Acne",
         Treatment: "Acne Cream",
         image:

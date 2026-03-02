@@ -1185,7 +1185,7 @@ export const createCartUrl = async (
 
     // Special handling for weight loss addons - use their IDs directly
     const wlAddons = {
-      353755: "Rocky Essential Cap", // Essential Cap - CORRECT ID
+      353755: "MyRocky Essential Cap", // Essential Cap - CORRECT ID
       90995: "Essential T-Boost", // Essential T-Boost - CORRECT ID
       323511: "Ovulation Test Kit", // Ovulation Test Kit
       323512: "Perimenopause Test Kit", // Perimenopause Test Kit
@@ -1292,7 +1292,7 @@ export const createCartUrl = async (
 
         // Process WL addons before returning
         const wlAddons = {
-          353755: "Rocky Essential Cap", // Essential Cap - CORRECT ID
+          353755: "MyRocky Essential Cap", // Essential Cap - CORRECT ID
           90995: "Essential T-Boost", // Essential T-Boost - CORRECT ID
           323511: "Ovulation Test Kit", // Ovulation Test Kit
           323512: "Perimenopause Test Kit", // Perimenopause Test Kit
@@ -1444,7 +1444,7 @@ export const createCartUrl = async (
           471638: "Essential Night Boost",
           471652: "Essential Mood Balance",
           471657: "Essential Gut Relief",
-          353755: "Rocky Essential Cap",
+          353755: "MyRocky Essential Cap",
         };
 
         logger.log("Processing hair flow addons:", addons);
@@ -1504,7 +1504,7 @@ export const createCartUrl = async (
       } else if (flowType === "ed") {
         // For ED flow, use direct IDs for addons without API calls
         const edAddons = {
-          353755: "Rocky Essential Cap", // Essential Cap
+          353755: "MyRocky Essential Cap", // Essential Cap
           90995: "Essential T-Boost", // Essential T-Boost (WL version)
           262914: "Essential T-Boost", // Essential T-Boost (ED version)
           471638: "Essential Night Boost", // Essential Night Boost
@@ -1513,7 +1513,7 @@ export const createCartUrl = async (
           276: "Lidocaine Cream", // Lidocaine Cream
           52162: "Lidocaine Spray", // Lidocaine Spray
           13534: "Durex Condoms", // Durex Condoms
-          353755: "Rocky Essential Cap", // Rocky Essential Cap (alternative ID)
+          353755: "MyRocky Essential Cap", // MyRocky Essential Cap (alternative ID)
           323626: "DHM Blend", // DHM Blend
           359245: "DHM Blend", // DHM Blend (alternative ID)
         };
@@ -1672,7 +1672,7 @@ const FALLBACK_PRODUCT_MAPPING = {
   "dhm-blend": "323626",
 
   // Add-on products - WL cross sell (using exact product names)
-  "Rocky Essential Cap": "353755",
+  "MyRocky Essential Cap": "353755",
   "Essential T-Boost": "323579",
   "Ovulation Test Kit": "287538",
   "Perimenopause Test Kit": "287539",

@@ -17,7 +17,7 @@ import Image from "next/image";
  */
 const CustomHeader = ({
   logoUrl = "https://myrocky.com/wp-content/uploads/2022/03/Rocky-Mens-Wellness-copy-4-1-300x120-1.png",
-  logoAlt = "Rocky",
+  logoAlt = "MyRocky",
   logoWidth = 90,
   logoHeight = 50,
   linkUrl = "/",

@@ -240,7 +240,7 @@ const MenuContainer = ({
       {/* Footer */}
       <div className="pt-4 pb-10 px-2 bg-white">
         <p className="font-medium px-[16px] md:px-[32px] text-xs md:text-sm tracking-normal align-middle uppercase py-4 text-[#00000099]">
-          Meet Rocky
+          Meet MyRocky
         </p>
         <ul>
           {meetRockyLinks.map((item, idx) => (

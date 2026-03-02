@@ -375,7 +375,7 @@ export default function MentalHealthQuestionnaire({
 
       if (
         currentSituation ===
-        "I'm currently on medications and want to get it from Rocky"
+        "I'm currently on medications and want to get it from MyRocky"
       ) {
         const hasMedicationName =
           formData["l-501_1-input"] || formData["l-501-1-input"];
@@ -522,7 +522,7 @@ export default function MentalHealthQuestionnaire({
       const selectedOption = formData["501"];
       if (
         selectedOption ===
-        "I’m currently on medications and want to get it from Rocky"
+        "I’m currently on medications and want to get it from MyRocky"
       ) {
         return 9;
       } else if (
@@ -682,7 +682,7 @@ export default function MentalHealthQuestionnaire({
         const currentSituation = value;
         const needsExtraInput =
           currentSituation ===
-            "I'm currently on medications and want to get it from Rocky" ||
+            "I'm currently on medications and want to get it from MyRocky" ||
           currentSituation ===
             "I am not on medication for mental health but have been in the past";
 

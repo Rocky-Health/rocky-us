@@ -27,7 +27,7 @@ export default function PreEd3() {
         <FaqsSection
           faqs={SexualHealthFaqs}
           title="Your Questions, Answered"
-          name="Meet Rocky"
+          name="Meet MyRocky"
           subtitle="Frequently asked questions"
         />
       </Section>
