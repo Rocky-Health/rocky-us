@@ -81,6 +81,7 @@ const CrossSellCartDisplay = ({
       {/* Cart Items */}
       <div className="space-y-0">
         {cartItems.map((item) => {
+          logger.log("item is -> ", item);
           // Check if item is being removed (use new function if available, fallback to old approach)
           const isRemoving = isRemovingItem 
             ? isRemovingItem(item.key) 
@@ -135,12 +136,13 @@ const CrossSellCartDisplay = ({
               <div className="flex items-start gap-4">
                 <div className="flex flex-col items-end justify-start">
                   <p className="font-[500] text-[16px] text-black">
-                    ${formatPrice(item.total)}{" "}
+                   {item.name == "Body Optimization Program"? <span className="text-green-500">FREE</span> : <>
+                    ${formatPrice(item.subtotal)}{" "}
                     <span className="text-[14px] text-gray-500 ml-1">
                       x {item.quantity}
-                    </span>
+                    </span></>}
                   </p>
-                  <p className="text-[12px] text-[#212121] block text-right mt-1">
+                  {item.name != "Body Optimization Program" && <p className="text-[12px] text-[#212121] block text-right mt-1">
                     {(() => {
                       if (
                         item.variation &&
@@ -169,7 +171,7 @@ const CrossSellCartDisplay = ({
                       }
                       return "Pills (Generic)";
                     })()}
-                  </p>
+                  </p>}
                 </div>
 
                 {/* Remove Button */}

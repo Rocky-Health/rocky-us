@@ -379,7 +379,10 @@ const CartItem = ({ item, refreshCart, isLocalCart, allItems }) => {
             item.variation[1] &&
             item.variation[1]?.value}
         </p>
-        <p className="mt-1 text-xs">
+        {item.name === "Body Optimization Program" ? <p className="mt-1 text-xs text-green-500">
+          FREE
+        </p> : <>
+          <p className="mt-1 text-xs">
           {quantity} × {currencySymbol}
           {typeof itemPrice === "number"
             ? formatPrice(itemPrice)
@@ -390,7 +393,7 @@ const CartItem = ({ item, refreshCart, isLocalCart, allItems }) => {
           {typeof itemPrice === "number"
             ? formatPrice(itemPrice * quantity)
             : formatPrice(parseFloat(itemPrice || 0) * quantity)}
-        </p>
+        </p></>}
         {item.name === "Body Optimization Program" && (
           <div className="flex flex-col">
             <p className="text-sm font-[500] text-[#212121] underline text-nowrap">

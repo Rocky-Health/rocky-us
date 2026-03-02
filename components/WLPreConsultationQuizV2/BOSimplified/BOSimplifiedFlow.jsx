@@ -105,11 +105,15 @@ const BOSimplifiedFlow = () => {
       //   );
       // }
 
-      localStorage.setItem(COUPON_STORAGE_KEY, "save100");
-      toast.success(
-        "$100 Discount Code Auto-Applied For You in Checkout For The Next 60 Minutes",
-        { autoClose: 8000 },
-      );
+      // Only show toast once by checking if coupon is already set
+      const existingCoupon = localStorage.getItem(COUPON_STORAGE_KEY);
+      if (existingCoupon !== "save100") {
+        localStorage.setItem(COUPON_STORAGE_KEY, "save100");
+        toast.success(
+          "$100 Discount Code Auto-Applied For You in Checkout For The Next 60 Minutes",
+          { autoClose: 8000 },
+        );
+      }
     } catch (e) {
       logger.error("Error capturing coupon from URL:", e);
     }
