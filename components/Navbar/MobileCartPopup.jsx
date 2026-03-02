@@ -107,6 +107,9 @@ export default function MobileCartPopup({
                       dangerouslySetInnerHTML={{ __html: item.name }}
                     ></span>
                   </div>
+                 {item.name === "Body Optimization Program" ?  <div className="text-green-500 text-sm">
+                    FREE
+                 </div>  : <>
                   <div className="text-[#212121] text-sm">
                     {item.quantity || 1} × $
                     {item.prices?.sale_price
@@ -126,7 +129,7 @@ export default function MobileCartPopup({
                           (item.prices?.regular_price / 100 || item.price) *
                           (item.quantity || 1)
                         )}
-                  </div>
+                  </div></>}
                 </div>
                 <button
                   onClick={async (e) => {

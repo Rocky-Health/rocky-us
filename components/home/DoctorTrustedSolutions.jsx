@@ -4,21 +4,21 @@ import HomeHeading from "./HomeHeading";
 const DoctorTrustedSolutionsCards = [
     {
         DesktopImage:
-            "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/DoctorTrustedSolutionsCards-D-1.webp",
+            "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/DoctorTrustedSolutionsCards-DSA-1.png",
         MobileImage:
-            "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/DoctorTrustedSolutionsCards-M-1.png",
+            "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/DoctorTrustedSolutionsCards-MS-1.png",
     },
     {
         DesktopImage:
-            "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/DoctorTrustedSolutionsCards-D-2.webp",
+            "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/DoctorTrustedSolutionsCards-D-2.svg",
         MobileImage:
-            "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/DoctorTrustedSolutionsCards-M-2.png",
+            "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/DoctorTrustedSolutionsCards-MS-2.png",
     },
     {
         DesktopImage:
-            "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/DoctorTrustedSolutionsCards-D-3.webp",
+            "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/DoctorTrustedSolutionsCards-D-3.svg",
         MobileImage:
-            "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/DoctorTrustedSolutionsCards-M-3.png",
+            "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/DoctorTrustedSolutionsCards-MSA-3.png",
     },
 ];
 const DoctorTrustedSolutions = () => {

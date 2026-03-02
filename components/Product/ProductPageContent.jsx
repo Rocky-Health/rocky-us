@@ -197,7 +197,7 @@ const ProductPageContent = ({ clientProps, faqs }) => {
           buttonLink={consultationLink || "/consultation"}
           buttonLinkProps={{ prefetch: true }}
           imageUrl="https://myrocky.b-cdn.net/WP%20Images/product%20v2/get-p-advice.png"
-          imageAlt="Rocky professional advice"
+          imageAlt="MyRocky professional advice"
         />
       </Section>
 

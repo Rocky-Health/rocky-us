@@ -27,7 +27,7 @@ export default function WlPrelander() {
         <FaqsSection
           faqs={WlFaqs}
           title="Your Questions, Answered"
-          name="Meet Rocky"
+          name="Meet MyRocky"
           subtitle="Frequently asked questions"
         />
       </Section>

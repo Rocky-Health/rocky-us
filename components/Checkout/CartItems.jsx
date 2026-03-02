@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { formatPrice } from "@/utils/priceFormatter";
 import { useState } from "react";
+import { logger } from "@/utils/devLogger";
 
 const CartItems = ({ items }) => {
   return (
@@ -195,7 +196,8 @@ const CartItem = ({ item }) => {
 };
 
 const CartITem2 = ({ item }) => {
-  const itemPrice = item.totals.line_total / 100;
+  logger.log("itemms ->" ,item);
+  const itemPrice = item.totals.line_subtotal / 100;
 
   const currencySymbol = item.prices.currency_symbol || "$"; // Default to $
 
@@ -406,8 +408,9 @@ const CartITem2 = ({ item }) => {
         </div>
       </div>
       <div className="">
-        {currencySymbol}
-        {formatPrice(itemPrice)}
+        { item.name == "Body Optimization Program" ? <>
+          <span className="text-green-500">FREE</span>
+        </> : currencySymbol + formatPrice(itemPrice)}
       </div>
     </div>
   );

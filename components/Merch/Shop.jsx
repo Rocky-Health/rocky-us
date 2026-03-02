@@ -37,7 +37,7 @@ const Shop = () => {
     const products = [
         {
             id: 1,
-            name: "Rocky Essential Tee",
+            name: "MyRocky Essential Tee",
             category: "Shirts",
             image: "/merch/t-shitrt.png",
             badge: "Best Seller",
@@ -51,7 +51,7 @@ const Shop = () => {
             description:
                 "Everyday wear, elevated. Crafted from premium cotton with a clean-cut and refined fit.",
             detailedDescription:
-                "The 100% cotton heavyweight tee. Crafted from 275 GSM combed jersey with signature Rocky embroidery. Milled and handcrafted in US.",
+                "The 100% cotton heavyweight tee. Crafted from 275 GSM combed jersey with signature MyRocky embroidery. Milled and handcrafted in US.",
             material: "100% premium cotton",
             sizes: ["S", "M", "L", "XL"],
             colors: [
@@ -84,7 +84,7 @@ const Shop = () => {
             description:
                 "Complete your look with our shirt and cap combo—stylish and comfortable.",
             detailedDescription:
-                "Premium cotton shirt paired with a classic cap. The shirt features our signature Rocky embroidery while the cap offers adjustable fit for all head sizes.",
+                "Premium cotton shirt paired with a classic cap. The shirt features our signature MyRocky embroidery while the cap offers adjustable fit for all head sizes.",
             material: "100% cotton shirt, 100% polyester cap",
             sizes: ["S", "M", "L", "XL"],
             colors: [
@@ -138,7 +138,7 @@ const Shop = () => {
         },
         {
             id: 4,
-            name: "Rocky's Essential Cap",
+            name: "MyRocky's Essential Cap",
             category: "Caps",
             image: "/merch/cap.png",
             badge: "New",
@@ -150,9 +150,9 @@ const Shop = () => {
             ],
             price: 25,
             description:
-                "Classic baseball cap with embroidered Rocky logo—adjustable fit for everyone.",
+                "Classic baseball cap with embroidered MyRocky logo—adjustable fit for everyone.",
             detailedDescription:
-                "Premium baseball cap featuring our signature Rocky embroidery. Made from high-quality polyester with adjustable snapback closure for the perfect fit.",
+                "Premium baseball cap featuring our signature MyRocky embroidery. Made from high-quality polyester with adjustable snapback closure for the perfect fit.",
             material: "100% polyester",
             sizes: ["One Size"],
             colors: [
@@ -214,9 +214,9 @@ const Shop = () => {
             ],
             price: 34.99,
             description:
-                "Classic polo shirt with embroidered Rocky logo—professional and comfortable.",
+                "Classic polo shirt with embroidered MyRocky logo—professional and comfortable.",
             detailedDescription:
-                "Professional polo shirt crafted from premium pique cotton. Features our signature Rocky embroidery and classic three-button placket for a timeless look.",
+                "Professional polo shirt crafted from premium pique cotton. Features our signature MyRocky embroidery and classic three-button placket for a timeless look.",
             material: "100% pique cotton",
             sizes: ["S", "M", "L", "XL"],
             colors: [
@@ -282,9 +282,9 @@ const Shop = () => {
             ],
             price: 24.99,
             description:
-                "Snapback cap with embroidered Rocky logo—adjustable snap closure for perfect fit.",
+                "Snapback cap with embroidered MyRocky logo—adjustable snap closure for perfect fit.",
             detailedDescription:
-                "Classic snapback cap made from premium cotton twill. Features our signature Rocky embroidery and adjustable snap closure for a custom fit.",
+                "Classic snapback cap made from premium cotton twill. Features our signature MyRocky embroidery and adjustable snap closure for a custom fit.",
             material: "100% cotton twill",
             sizes: ["One Size"],
             colors: [

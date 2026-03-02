@@ -5,24 +5,24 @@ export default function CancellationPolicy() {
         Cancellation Policy
       </div>
       <p className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9] mb-6">
-        Rocky reserves the right to charge a cancellation fee in the amount of
+        MyRocky reserves the right to charge a cancellation fee in the amount of
         $45.00 CAD (hereinafter referred to as the “cancellation fee”) on all
         prescription orders. The cancellation fee shall be automatically billed
         after seven (7) days if user questionnaire or ID verification is
-        incomplete. A failure to respond to any emails from Rocky for more than
+        incomplete. A failure to respond to any emails from MyRocky for more than
         seven (7) days shall also incur the cancellation fee.
       </p>
       <p className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9] mb-6">
-        Rocky reserves the right to charge a cancellation fee in the amount of
+        MyRocky reserves the right to charge a cancellation fee in the amount of
         $60.00 CAD (hereinafter referred to as the “MH cancellation fee”) on all
         mental health services and/or orders. The MH cancellation fee shall be
         automatically billed after seven (7) days if user questionnaire or ID
         verification is incomplete. A failure to respond to any emails or phone
-        call appointments from Rocky for more than seven (7) days shall also
+        call appointments from MyRocky for more than seven (7) days shall also
         incur the MH cancellation fee.
       </p>
       <p className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9] mb-6">
-        Rocky reserves the right to charge a $45.00 CAD cancellation fee
+        MyRocky reserves the right to charge a $45.00 CAD cancellation fee
         (hereinafter referred to as the “WL cancellation fee”) for all weight
         loss services and orders. This fee will be automatically billed after
         seven (7) days if the consultation form or ID has not been submitted or

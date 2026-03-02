@@ -181,7 +181,7 @@ export const formatGA4Item = (product, quantity = 1) => {
   }
 
   // Extract brand from attributes (matches PHP get_attribute('brand'))
-  let brand = "Rocky"; // Default fallback
+  let brand = "MyRocky"; // Default fallback
 
   if (product.attributes) {
     const brandAttr = product.attributes.find(
@@ -196,7 +196,7 @@ export const formatGA4Item = (product, quantity = 1) => {
         brand = brandAttr.terms[0].name;
       } else if (brandAttr.options) {
         brand = Array.isArray(brandAttr.options)
-          ? brandAttr.options[0]?.toString() || "Rocky"
+          ? brandAttr.options[0]?.toString() || "MyRocky"
           : brandAttr.options.toString();
       }
     }
@@ -204,7 +204,7 @@ export const formatGA4Item = (product, quantity = 1) => {
 
   // If no brand found in attributes, check meta_data
   if (
-    brand === "Rocky" &&
+    brand === "MyRocky" &&
     product.meta_data &&
     Array.isArray(product.meta_data)
   ) {

@@ -162,6 +162,17 @@ export function middleware(req) {
       return NextResponse.redirect(new URL("/", req.url));
     }
 
+    // Allow unauthenticated access to pay-for-order links (email payment links)
+    if (
+      pathname.startsWith("/checkout/order-pay/") &&
+      req.nextUrl.searchParams.get("pay_for_order") === "true" &&
+      req.nextUrl.searchParams.get("key")
+    ) {
+      return NextResponse.next({
+        request: { headers: requestHeaders },
+      });
+    }
+
     // Case 3: If user is not authenticated and trying to access protected routes, redirect to register
     if (!authToken && !isLoginPage && shouldProtectRoute(pathname)) {
       // Create login URL with register view

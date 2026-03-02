@@ -5,7 +5,7 @@ export default function Indemnification() {
         Indemnification
       </div>
       <p className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9] mb-6">
-        You agree to indemnify, defend, and hold harmless Rocky, its affiliates
+        You agree to indemnify, defend, and hold harmless MyRocky, its affiliates
         (including without limitation all affiliated professional entities),
         subsidiaries, and their directors, officers, employees, contractors,
         licensors, suppliers, representatives, proprietors, partners,

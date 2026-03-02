@@ -596,7 +596,7 @@ export default function Login({ setActiveTab, loginRef }) {
     <div className="h-[35px] w-[100px] relative ml-[0]">
       <Image
         src="https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp"
-        alt="Rocky Logo"
+        alt="MyRocky Logo"
         fill
         className="object-contain"
       />
@@ -605,7 +605,7 @@ export default function Login({ setActiveTab, loginRef }) {
   return (
     <div suppressHydrationWarning>
       <div className="py-4 px-4 max-w-[1140px] mx-auto ">
-        <Link href="/" aria-label="Rocky Homepage">
+        <Link href="/" aria-label="MyRocky Homepage">
           {logoContent}
         </Link>
       </div>

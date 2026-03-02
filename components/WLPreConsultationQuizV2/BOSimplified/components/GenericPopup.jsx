@@ -2,6 +2,7 @@ import YourWeightPopup from "./YourWeightPopup";
 import React, { useEffect } from "react";
 import CustomImage from "@/components/utils/CustomImage";
 import Counter from "./Counter"; // Use separate Counter for BO2/BO3
+import WeightLossResultPasswordPopup from "../../components/WeightLossResultPasswordPopup";
 import { ProgressBar } from "@/components/EdQuestionnaire/ProgressBar";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -222,6 +223,11 @@ const GenericPopup = ({
                   title={popupConfig.title}
                   onAction={onAction}
                   nextPopup={popupConfig.nextPopup || "YourWeightPopup"}
+                />
+              ) : popupConfig.component === "WeightLossResultPasswordPopup" ? (
+                <WeightLossResultPasswordPopup
+                  onSubmit={onAction}
+                  setUserData={setUserData}
                 />
               ) : popupConfig.component === "YourWeightPopup" ? (
                 <YourWeightPopup

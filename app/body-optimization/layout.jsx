@@ -1,19 +1,19 @@
 export const metadata = {
-  title: "Body Optimization & Weight Management | Rocky",
+  title: "Body Optimization & Weight Management | MyRocky",
   description:
-    "Discover personalized body optimization and weight management solutions with Rocky. Professional healthcare advice and effective treatments delivered across US.",
+    "Discover personalized body optimization and weight management solutions with MyRocky. Professional healthcare advice and effective treatments delivered across US.",
   openGraph: {
-    title: "Body Optimization & Weight Management | Rocky",
+    title: "Body Optimization & Weight Management | MyRocky",
     description:
-      "Discover personalized body optimization and weight management solutions with Rocky. Professional healthcare advice and effective treatments delivered across US.",
+      "Discover personalized body optimization and weight management solutions with MyRocky. Professional healthcare advice and effective treatments delivered across US.",
     images:
       "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp",
   },
   twitter: {
-    card: "Body Optimization & Weight Management | Rocky",
-    title: "Body Optimization & Weight Management | Rocky",
+    card: "Body Optimization & Weight Management | MyRocky",
+    title: "Body Optimization & Weight Management | MyRocky",
     description:
-      "Discover personalized body optimization and weight management solutions with Rocky. Professional healthcare advice and effective treatments delivered across US.",
+      "Discover personalized body optimization and weight management solutions with MyRocky. Professional healthcare advice and effective treatments delivered across US.",
     images:
       "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp",
   },

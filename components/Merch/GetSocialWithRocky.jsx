@@ -2,7 +2,7 @@
 import React from "react";
 import Image from "next/image";
 
-const GetSocialWithRocky = () => {
+const GetSocialWithMyRocky = () => {
   const socialImages = [
     {
       id: 1,
@@ -25,7 +25,7 @@ const GetSocialWithRocky = () => {
     {
       id: 3,
       src: "https://myrocky.b-cdn.net/WP%20Images/merch/new3.webp",
-      alt: "Group of five people wearing black Rocky merchandise",
+      alt: "Group of five people wearing black MyRocky merchandise",
       width: 330,
       height: 470,
       mobileWidth: 250,
@@ -34,7 +34,7 @@ const GetSocialWithRocky = () => {
     {
       id: 4,
       src: "https://myrocky.b-cdn.net/WP%20Images/merch/new4.webp",
-      alt: "Three people in black Rocky merchandise with green plants",
+      alt: "Three people in black MyRocky merchandise with green plants",
       width: 330,
       height: 470,
       mobileWidth: 250,
@@ -66,10 +66,10 @@ const GetSocialWithRocky = () => {
         {/* Header */}
         <div className="max-w-[1200px] mx-auto md:mb-24 px-5 md:px-8 flex md:items-start items-center gap-4 md:gap-0 flex-col md:flex-row md:justify-between justify-center">
           <h2 className="text-center md:text-left md:text-5xl text-[32px]  text-black headers-font leading-[115%] tracking-[-2%]">
-            Get Social With Rocky
+            Get Social With MyRocky
           </h2>
           <div className=" bg-black md:h-[48px] md:w-[161px] h-[55px] w-[189px]  flex items-center justify-center text-white px-6  rounded-[64px] md:text-[16px] text-[20px] font-medium leading-[140%] tracking-[0%]">
-            #RockyMerch
+            #MyRockyMerch
           </div>
         </div>
 
@@ -114,7 +114,7 @@ const GetSocialWithRocky = () => {
           <div className="max-w-[277px] md:max-w-[645px] mx-auto">
             <p className="text-[#000000] md:text-lg text-base font-[400] leading-[115%] tracking-[-2%]">
               Join the community and tag{" "}
-              <span className="font-medium text-[#AE7E56]">#RockyMerch</span>{" "}
+              <span className="font-medium text-[#AE7E56]">#MyRockyMerch</span>{" "}
               for a chance to be featured!
             </p>
           </div>
@@ -124,4 +124,4 @@ const GetSocialWithRocky = () => {
   );
 };
 
-export default GetSocialWithRocky;
+export default GetSocialWithMyRocky;

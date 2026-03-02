@@ -15,7 +15,7 @@ const ChewalisProducts = () => {
           Still prefer Pills?
         </h2>
         <p className="text-[18px] md:text-[20px] leading-[25.2px] md:leading-[30px] font-[400] ">
-          Rocky offers access to a range of ED treatment options to suit your
+          MyRocky offers access to a range of ED treatment options to suit your
           needs.
         </p>
       </div>

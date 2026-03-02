@@ -6,15 +6,15 @@ export default function PharmacyServices() {
       </div>
       <p className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9] mb-6">
         If you receive a prescription as a result of the Services, you may
-        select Rocky Health Pharmacy Inc. (collectively, the “{" "}
-        <b> Rocky Pharmacy </b>”) to ship your prescription. You give us consent
-        to send and disclose to the Rocky Pharmacy all information provided by
+        select MyRocky Health Pharmacy Inc. (collectively, the “{" "}
+        <b> MyRocky Pharmacy </b>”) to ship your prescription. You give us consent
+        to send and disclose to the MyRocky Pharmacy all information provided by
         you, health care records, and other applicable health care information
         and personal information (such as your name, location and demographic
         information) so that you may receive pharmaceutical services.
       </p>
       <p className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9] mb-6">
-        Patients of Rocky Pharmacy will be provided the relevant and appropriate
+        Patients of MyRocky Pharmacy will be provided the relevant and appropriate
         counselling points for new and repeat prescriptions every time the
         pharmacy dispenses the medication. Counselling points shall be provided
         via 4 methods:
@@ -41,7 +41,7 @@ export default function PharmacyServices() {
           sent. 
         </li>
         <li>
-          The patient can call Rocky Pharmacy during the hours in which the
+          The patient can call MyRocky Pharmacy during the hours in which the
           designated manager informs the Ontario College of Pharmacists (“OCP”)
           that there is a pharmacist present. In addition, the patient has an
           online portal in which they can: a. ask any clinical questions and b.
@@ -53,15 +53,15 @@ export default function PharmacyServices() {
         location and availability. All items will be shipped via express tracked
         shipping to ensure the medication arrives safely and in a timely manner.
         Furthermore, unless stated otherwise, prices, shipments and risk of loss
-        are Free on Board (hereinafter referred to as “FOB”) at the Rocky’s
+        are Free on Board (hereinafter referred to as “FOB”) at the MyRocky’s
         facilities. Title and risk of loss pass to Consumer in accordance with
-        the definition of FOB in Incoterms 2010. Rocky Pharmacy will NOT be
+        the definition of FOB in Incoterms 2010. MyRocky Pharmacy will NOT be
         shipping anything that requires maintaining cold chain, or any Schedule
         1 narcotics or controlled substances. 
       </p>
       <p className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9] mb-6">
-        Rocky Pharmacy will be accepting returns in person or shipped at the
-        patient’s cost. Rocky Pharmacy will not be issuing refunds, exchanges or
+        MyRocky Pharmacy will be accepting returns in person or shipped at the
+        patient’s cost. MyRocky Pharmacy will not be issuing refunds, exchanges or
         store credit as we are unable to guarantee the safety, storage, and
         handling of the medication/product once the patient receives it. Returns
         accepted will solely be for the reason to safely dispose of the
@@ -77,7 +77,7 @@ export default function PharmacyServices() {
         <strong>Packaging and fulfillment restrictions</strong>
       </p>
       <p className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9] mb-6">
-        If you select to use Rocky Pharmacy to fulfill any prescriptions
+        If you select to use MyRocky Pharmacy to fulfill any prescriptions
         provided by health care providers through the Services, you acknowledge
         that your medication, if approved, may not be shipped in child-resistant
         packaging and that you must keep it out of the reach of children. You

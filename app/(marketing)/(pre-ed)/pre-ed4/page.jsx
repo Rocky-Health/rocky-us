@@ -27,7 +27,7 @@ export default function edPrelander4() {
                 <FaqsSection
                     faqs={SexualHealthFaqs}
                     title="Your Questions, Answered"
-                    name="Meet Rocky"
+                    name="Meet MyRocky"
                     subtitle="Frequently asked questions"
                 />
             </Section>

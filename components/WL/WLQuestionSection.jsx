@@ -6,7 +6,7 @@ const WLQuestionSection = () => {
     <div className="max-w-[1184px] mx-auto px-5 py-8 md:py-12 sectionWidth:px-0">
       <Image
         src="/ed-prelander-5/rocky-logo.png"
-        alt="Rocky Logo"
+        alt="MyRocky Logo"
         width={81}
         height={30}
         className="mb-3"

@@ -369,10 +369,10 @@ const CartItem = ({ item, setCartItems, allItems }) => {
                   <p className="text-sm md:text-base font-[500] text-[#212121] underline text-nowrap">
                     Monthly membership:
                   </p>
-                  <p className="text-sm md:text-base text-[#212121]">
+                  {/* <p className="text-sm md:text-base text-[#212121]">
                     Initial fee $99 | <br className="hidden md:block" /> Monthly
                     fee $99
-                  </p>
+                  </p> */}
                   <p className="text-sm md:text-base font-[500] text-[#212121] mt-2 underline">
                     Includes:
                   </p>
@@ -412,10 +412,11 @@ const CartItem = ({ item, setCartItems, allItems }) => {
         <div className="text-[14px] font-[500] leading-[19.6px] justify-self-end product-sub-total">
           <span className="woocommerce-Price-amount amount">
             <bdi>
-              <span className="woocommerce-Price-currencySymbol">
+              {item.name == "Body Optimization Program" ? <span className="text-green-500">FREE</span> :
+               <><span className="woocommerce-Price-currencySymbol">
                 {currencySymbol}
               </span>
-              {formatPrice(itemTotalPrice)}
+              {formatPrice(itemTotalPrice)} </>}
             </bdi>
           </span>
         </div>
