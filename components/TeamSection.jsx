@@ -110,7 +110,7 @@ const TeamSection = () => {
                 />
 
                 <p className="text-[16px] md:text-[18px] font-[400] leading-[25.2px] md:leading-[28px] max-w-[737px] tracking-[-0.03em] ">
-                    Rocky Health partners with leading experts to deliver
+                    MyRocky Health partners with leading experts to deliver
                     exceptional care through evidence-based treatment plans that
                     drive results.
                 </p>
