@@ -49,6 +49,7 @@ export const layoutExemptRoutes = [
   "/checkout2",
   "/login-register",
   "/bo4",
+  "/bo5",
 ];
 
 /**

@@ -3,7 +3,7 @@ import Section from "../utils/Section";
 import ProductCard from "./ProductCard";
 import { useRef, useState } from "react";
 
-export default function TreatmentPlans() {
+export default function TreatmentPlans({bg='bg-white'}) {
   const scrollContainerRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const totalBrandProducts = 4; // products[2] to products[5]
@@ -118,7 +118,7 @@ export default function TreatmentPlans() {
     },
   ];
   return (
-    <Section bg={`!px-0`}>
+    <Section bg={`!px-0 ${bg}`}>
       <h2 className="subheaders-font px-5 text-[40px] leading-[115%] tracking-tight font-medium text-center mb-[16px]">
         <span className="text-[#AE7E56]">MyRocky</span> Treatment Plans
       </h2>
@@ -132,7 +132,7 @@ export default function TreatmentPlans() {
       </div>
 
       <h2 className="subheaders-font px-5 text-[48px] leading-[115%] tracking-tight font-medium text-center mb-[16px]">
-        <span className="text-[#AE7E56]">Brand Name GLP-1</span> Treatments
+        <span className="text-[#AE7E56] block">Brand Name GLP-1</span> Treatments
       </h2>
 
       {/* Desktop View */}

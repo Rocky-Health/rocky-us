@@ -15,7 +15,7 @@ const MoreQuestions = ({
       </h1>
       <Link
         href={link || "/faqs"}
-        className={`inline-flex items-center justify-center w-${buttonWidth} py-3 px-4 h-[44px] border border-solid border-[#000000] text-[14px] leading-[19.6px] font-[500] rounded-[64px] text-[#FFFFFF] bg-black hover:bg-gray-800 duration-100`}
+        className={`inline-flex items-center justify-center ${buttonWidth} py-3 px-4 h-[44px] border border-solid border-[#000000] text-[14px] leading-[19.6px] font-[500] rounded-[64px] text-[#FFFFFF] bg-black hover:bg-gray-800 duration-100`}
         prefetch={true}
       >
         <span>{buttonText || "See All FAQs"}</span>
