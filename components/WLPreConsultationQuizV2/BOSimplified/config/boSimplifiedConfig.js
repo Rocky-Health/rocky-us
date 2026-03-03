@@ -123,7 +123,7 @@ export const boSimplifiedConfig = {
             id: "basicInfo",
             passIf: "authenticate",
             type: "form",
-            title: "We'll start with the basics",
+            title: "Let’s start with the basics",
             field: "sex",
             conditionalNavigation: {
                 Male: 5,

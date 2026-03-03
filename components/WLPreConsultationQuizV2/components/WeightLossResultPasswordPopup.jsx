@@ -196,7 +196,8 @@ const WeightLossResultPasswordPopup = ({
                 </p>
               )}
             </div>
-            {showPasswordSection && (
+            {/* Password field — appears only after checkbox is checked AND email request finished */}
+            {agreePrivacy && showPasswordSection && (
               <div>
                 <label className="block text-[14px] font-medium mb-2">
                   {emailExists ? "Enter your password to log in" : "Create a Password"}
@@ -263,47 +264,52 @@ const WeightLossResultPasswordPopup = ({
                     )}
                   </button>
                 </div>
-                {/* <ul className="mt-2 text-[12px] text-black list-disc pl-5">
-                  <li>Password must be at least 8 characters</li>
-                  <li>Include at least one uppercase or number or symbol</li>
-                </ul> */}
+                {!emailExists && (
+                  <ul className="mt-2 text-[12px] text-[#000] list-disc pl-5 space-y-1">
+                    <li>Password must be at least 8 characters</li>
+                    <li>Include at least one uppercase or number or symbol</li>
+                  </ul>
+                )}
               </div>
             )}
 
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="privacy"
-                checked={agreePrivacy}
-                onChange={() => setAgreePrivacy((v) => !v)}
-                className="w-5 h-5 accent-black"
-              />
-              <label htmlFor="privacy" className="text-[12px]">
-                <span className=" font-medium leading-[140%]">
-                  By clicking “Continue” I agree to the{" "}
-                  <Link
-                    href="/terms-of-use"
-                    className="text-[#00000080] font-bold underline"
-                  >
-                    Terms and Conditions
-                  </Link>{" "}
-                  and{" "}
-                  <Link
-                    href="/telehealth-consent"
-                    className="text-[#00000080] font-bold underline"
-                  >
-                    Telehealth Consent
-                  </Link>{" "}
-                  and acknowledge the{" "}
-                  <Link
-                    href="/privacy-policy"
-                    className="text-[#00000080] font-bold underline"
-                  >
-                    Privacy Policy.
-                  </Link>
-                </span>
-              </label>
-            </div>
+            {/* Checkbox — always visible, disappears once checked AND email request finished */}
+            {!(agreePrivacy && showPasswordSection) && (
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="privacy"
+                  checked={agreePrivacy}
+                  onChange={() => setAgreePrivacy((v) => !v)}
+                  className="w-5 h-5 accent-black"
+                />
+                <label htmlFor="privacy" className="text-[12px]">
+                  <span className="font-medium leading-[140%]">
+                    By clicking "Continue" I agree to the{" "}
+                    <Link
+                      href="/terms-of-use"
+                      className="text-[#00000080] font-bold underline"
+                    >
+                      Terms and Conditions
+                    </Link>{" "}
+                    and{" "}
+                    <Link
+                      href="/telehealth-consent"
+                      className="text-[#00000080] font-bold underline"
+                    >
+                      Telehealth Consent
+                    </Link>{" "}
+                    and acknowledge the{" "}
+                    <Link
+                      href="/privacy-policy"
+                      className="text-[#00000080] font-bold underline"
+                    >
+                      Privacy Policy.
+                    </Link>
+                  </span>
+                </label>
+              </div>
+            )}
 
             <button
               type="submit"

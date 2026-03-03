@@ -147,7 +147,8 @@ const HeroSection = ({ onOpenMenu }) => {
                     <div className="">
                         <HeroAnimatedHeading
                             staticText="Online healthcare made "
-                            words={["simple", "convenient", "for you"]}
+                            words={["simple.", "convenient.", "for you."]
+                                }
                         />
                     </div>
 
