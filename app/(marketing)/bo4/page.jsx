@@ -15,6 +15,8 @@ import UnmatchedResults from "@/components/WlOffer/UnmatchedResults";
 import AsSeenOn from "@/components/Bo4/AsSeenOn";
 import DifferentThisTime from "@/components/Bo4/DifferentThisTime";
 import WlFaqs from "@/components/Bo4/WlFaqs";
+import Footer from "@/components/Bo4/Footer";
+
 
 export default function Bo4() {
     const consultationHref = "/wl-pre-consultation/";
@@ -63,6 +65,10 @@ export default function Bo4() {
       <Section bg={`bg-[#F0EEEA]`}>
         <WlFaqs moreQTitle="Convenient, researched, trusted." />
       </Section>
+
+
+
+       <Footer />
     
     </>
   );

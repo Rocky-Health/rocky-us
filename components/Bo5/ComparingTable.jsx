@@ -28,7 +28,7 @@ const ComparingTable = ({
         <div className="flex flex-col justify-start items-start gap-2">
           <div className="w-full text-center md:text-left">
             <span className="text-black  text-[32px] font-[550] tracking-[-1%] leading-[115%]  text-center max-w-[265px] mx-auto">
-              {title}
+             <div dangerouslySetInnerHTML={{ __html: title }}></div>
             </span>
           </div>
           {desc && (
@@ -51,8 +51,8 @@ const ComparingTable = ({
             {/* Empty space to align with other columns */}
             <div className="lg:flex hidden flex-col justify-start items-start gap-2">
               <div className="w-full text-center md:text-left py-[29px]">
-                <span className="text-black font-[550] headers-font text-[48px] leading-[115%] tracking-[-2%]">
-                  {title}
+                <span className="text-black font-[550] headers-font text-[46px] leading-[115%] tracking-[-2%]">
+                  <div dangerouslySetInnerHTML={{ __html: title }}></div>
                 </span>
               </div>
               {desc && (
@@ -67,7 +67,7 @@ const ComparingTable = ({
               key={index}
               className="lg:h-[80px] h-[96px] border-b border-black flex items-center lg:px-[6px]"
             >
-              <div className="text-black text-[14px] md:text-[16px] lg:text-[16px] leading-[120%] font-semi-bold px-2 text-left">
+              <div className="text-black text-[14px] md:text-[16px] lg:text-[16px] leading-[120%] font-semibold text-left">
                 {item}
               </div>
             </div>
@@ -89,21 +89,21 @@ const ComparingTable = ({
               src={img}
               width={125}
               height={125}
-              className="md:w-25 md:h-25 w-[83px] h-[28px] object-contain"
+              className="md:w-[116px] md:h-[40px] w-[83px] h-[28px] object-contain"
             />
           </div>
           {sec_col.map((item, index) => (
             <div
               key={index}
-              className="lg:h-[80px] flex-1 h-[96px] lg:px-2 px-1 border-b border-black/95 flex justify-center md:justify-left items-center"
+              className="lg:h-[80px] flex-1 h-[96px] lg:px-2 px-1 border-b border-black/95 flex  md:justify-left  items-center"
             >
-              <div className="flex flex-col w-full lg:w-auto lg:flex-row items-center justify-center md:justify-left lg:gap-2 gap-1 lg:px-3">
+              <div className="flex flex-col w-full lg:w-auto lg:flex-row items-center justify-center md:justify-left  gap-1 lg:pl-[42px]">
                 {item ? (
                   <>
-                    <FaCheckCircle className="text-[#AE7E56] text-lg md:text-xl" /> <span className="text-[14px] md:text-[16px] font-[500]">{item}</span>
+                    <FaCheckCircle className="text-[#AE7E56] text-lg md:text-xl" /> <span className="text-[14px] md:text-[16px] font-[500] text-center md:text-left">{item}</span>
                   </>
                 ) : (
-                  <><FaRegTimesCircle className="text-black text-lg md:text-xl" /> <span className="text-[14px] md:text-[16px] font-[500]">{item}</span></>
+                  <><FaRegTimesCircle className="text-black text-lg md:text-xl" /> <span className="text-[14px] md:text-[16px] font-[500] text-center md:text-left">{item}</span></>
                 )}
               </div>
             </div>
@@ -131,10 +131,10 @@ const ComparingTable = ({
           {third_col.map((item, index) => (
             <div
               key={index}
-              className="lg:h-[80px] flex-1 h-[96px] lg:px-2 px-1 border-b border-black/95 flex justify-left items-center"
+              className="lg:h-[80px] flex-1 h-[96px] lg:px-2 px-1 border-b border-black/95 flex  md:justify-left  items-center"
             >
-              <div className="flex flex-col w-full lg:w-auto lg:flex-row items-center justify-center lg:gap-2 gap-1 lg:px-3">
-                  <><FaRegTimesCircle className="text-black text-lg md:text-xl" /> <span className="text-[14px] md:text-[16px] font-[500]">{item}</span></>
+              <div className="flex flex-col w-full lg:w-auto lg:flex-row items-center justify-center md:justify-left  gap-1 lg:pl-[42px]">
+                  <><FaRegTimesCircle className="text-black text-lg md:text-xl" /> <span className="text-[14px] md:text-[16px] font-[500] text-center md:text-left">{item}</span></>
               </div>
             </div>
           ))}

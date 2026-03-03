@@ -10,6 +10,8 @@ import MemberResults from "@/components/WlOffer/MemberResults";
 import WlFaqs from "@/components/Bo4/WlFaqs";
 import AsSeenOn from "@/components/Bo4/AsSeenOn";
 import ComparingTable from "@/components/Bo5/ComparingTable";
+import StartYourJourney from "@/components/Bo5/StartYourJourney";
+import Footer from "@/components/Bo4/Footer";
 
 export default function BO5() {
   const consultationHref = "/wl-pre-consultation/";
@@ -35,7 +37,7 @@ export default function BO5() {
       <Section bg={`bg-[#F8F7F3]`}>
         <ComparingTable
         section_bg={`bg-[#F8F7F3]`}
-        title={`The Rocky Difference`}
+        title={`The <span class='text-[#AE7E56]'>Rocky</span> Difference`}
         desc={`Comprehensive care. Consistent results.See how Rocky compares.`}
         sec_title={`Others`}
         img={`https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp`}
@@ -73,9 +75,15 @@ export default function BO5() {
       />
       </Section>
 
+      <Section>
+        <StartYourJourney />
+      </Section>
+
       <Section bg={`bg-[#F0EEEA]`}>
         <WlFaqs moreQTitle="Convenient, researched, trusted." />
       </Section>
+
+      <Footer />
     </>
   );
 }
