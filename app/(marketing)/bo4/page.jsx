@@ -7,7 +7,7 @@ import Trustpilot from "@/components/Navbar/Trustpilot";
 import Section from "@/components/utils/Section";
 
 import ExclusiveFeatures from "@/components/Bo4/ExclusiveFeatures";
-import HowItWorks from "@/components/BO4/HowItWorks";
+import HowItWorks from "@/components/Bo4/HowItWorks";
 import MemberResults from "@/components/WlOffer/MemberResults";
 import MoneyBack from "@/components/WlOffer/MoneyBack";
 import UnmatchedResults from "@/components/WlOffer/UnmatchedResults";
