@@ -30,7 +30,7 @@ const ProductCard = ({ product }) => {
 
       {/* Content */}
       <div
-        className={`p-[16px] ${product.features ? "h-[365px]" : "h-[300px]"}`}
+        className={`p-[16px] min-h-[300px]`}
       >
         {activeIngredient && (
           <p className="text-[14px] font-normal leading-[140%] tracking-normal text-black">
@@ -62,13 +62,13 @@ const ProductCard = ({ product }) => {
             </span>
           </div>
           {product.WLPrograme && (
-            <p className="text-[14px] font-normal leading-[140%] text-black mt-[6px]">
-              + $99/mo Program Membership
+            <p className={`text-[14px] font-normal leading-[140%] text-black mt-[6px] `}>
+              + $99/mo <span className={`${product.features ? 'underline' : ''}`}>Program Membership</span>
             </p>
           )}
 
           {product.features && (
-            <>
+            <div className="mb-[55px]">
               <hr className="mt-[16px] mb-[16px]" />
               <div className="flex flex-col gap-[12px] mb-[8px]">
                 {product.features.map((feature, index) => (
@@ -83,13 +83,37 @@ const ProductCard = ({ product }) => {
                   </div>
                 ))}
               </div>
-            </>
+            </div>
           )}
+
+          <div className="md:hidden block">
+             {product.MobileFeatures && (
+            <div className="mb-[55px]">
+              <hr className="mb-[32px]" />
+              <div className="flex flex-col gap-[12px] mb-[8px]">
+                {product.MobileFeatures.map((feature, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-start items-start gap-[12px]"
+                  >
+                    <FaCheckCircle className="text-[#AE7E56] shrink-0 text-[17px] mt-[2px]" />
+                    <span className="text-[13px] font-normal leading-[140%] text-black">
+                      {feature}
+                    </span>
+                  </div>
+                ))}
+              </div>
+               {product.UpperBtnLabel && (
+                  <p className="text-center text-[12px] leading-[140%] font-medium mb-[47px] mt-[27px]">{product.UpperBtnLabel}</p>
+                )}
+            </div>
+          )}
+          </div>
         </div>
 
         <Link
           href="/wl-pre-consultation"
-          className="bg-black absolute bottom-[16px] left-[16px] right-[16px] text-white text-[16px] font-medium h-[44px] rounded-full flex items-center justify-center gap-[8px]"
+          className="bg-black absolute bottom-[16px] left-[16px] right-[16px] text-white text-[16px]  h-[44px] rounded-full flex items-center justify-center gap-[8px]"
         >
           Select {product.name} →
         </Link>

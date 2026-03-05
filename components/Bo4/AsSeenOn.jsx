@@ -48,7 +48,7 @@ const AsSeenOn = ({removeTitle = false, mobileSlider = false, gray = false}) => 
           <div className="md:hidden">
             <div
               ref={scrollContainerRef}
-              className="flex gap-8 overflow-x-auto snap-x snap-mandatory no-scrollbar scroll-smooth pb-4 pl-4"
+              className="flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar scroll-smooth pb-4 pl-4"
               style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
               {Array.from({ length: totalLogos }).map((_, index) => (
@@ -89,7 +89,7 @@ const AsSeenOn = ({removeTitle = false, mobileSlider = false, gray = false}) => 
         </>
       ) : (
         /* Original Layout for Both Mobile and Desktop */
-        <div className="flex items-center md:justify-between justify-center gap-8 flex-wrap">
+        <div className="flex items-center md:justify-between justify-center gap-4 flex-wrap">
           {Array.from({ length: totalLogos }).map((_, index) => (
             <div
               key={index}

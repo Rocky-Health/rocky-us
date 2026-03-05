@@ -5,7 +5,7 @@ const faqs = [
   {
     question: "How much does the Weight Loss Program cost?",
     answer:
-      "The initial consultation fee is $99. The cost of medication along with a $99 program fee is charged monthly. The program fee includes access to clinicians, new prescriptions and pharmacy counselling.",
+      "The Weight Loss Program entails an initial health and medication consultation fee of $99. Following this, only the medication is charged monthly. The membership starts upon the prescription being issued by our healthcare providers. It's important to note that the initial consultation is a one-time fee cost of $99, and follow-up consultations (if necessary) are $40.",
   },
   {
     question: "Do you accept insurance?",
@@ -18,9 +18,9 @@ const faqs = [
       "Upon completing the initial online consultation, a Rocky Healthcare provider will assess this and determine if you are eligible. Please check your account for messages from your clinician.",
   },
   {
-    question: "Why do I need a blood test?",
+    question: "Why do I need a metabolic lab test?",
     answer:
-      "Blood tests give insight into your current health and allows your clinician to better understand your needs. This helps them tailor their advice to meet your specific situation.",
+      "",
   },
   {
     question: "What are the side effects of GLP-1 medications?",
@@ -33,25 +33,22 @@ const faqs = [
       "After submitting your questionnaire, you will be able to schedule a call with a licensed US healthcare provider. To request this, simply send a message to your provider through your account by clicking on messages. They will send you a link to schedule a call at your convenience.",
   },
   {
-    question: "Can I cancel at any time?",
-    answer:
-      "Cancellations can be made at any time to avoid future charges. However, previously incurred monthly fees are nonrefundable.",
-  },
+    question: "What is the refund policy?",
+    answer:""
+   },
   {
-    question: "How do GLP-1s work?",
-    answer:
-      "Weight Loss injections available through Rocky belong to the GLP-1 class of medications, mimicking the natural hormone GLP-1. They work by reducing appetite and promoting a feeling of fullness, leading to reduced food intake and weight loss.",
-  },
+    question: "How do weight loss injections work?",
+    answer:""
+   },
+   {
+    question: "How can I get a weight loss medication prescription at Rocky?",
+    answer: ""
+   },
+  
   {
-    question: "How can I get a GLP-1 prescription at Rocky?",
-    answer:
-      'Simply click <a href="/wl-pre-consultation" style="text-decoration: underline;">here</a> and get started today!',
-  },
-  {
-    question: "Which GLP-1s does Rocky offer?",
-    answer:
-      "Rocky provides prescriptions for several GLP-1 medications, including Ozempic, Mounjaro® and Wegovy.",
-  },
+    question: "What type of weight loss medications does Rocky offer?",
+    answer: ""
+   },
 ];
 
 const WlFaqs = ({ moreQTitle = null }) => {

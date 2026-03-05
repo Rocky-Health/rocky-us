@@ -4,11 +4,11 @@ import CustomImage from "../utils/CustomImage";
 import { FaArrowRight } from "react-icons/fa";
 import { useRef, useState } from "react";
 
-const ChangingResults = () => {
+const ChangingResults = ({btnTxt = `Start Your Weight Loss Journey`}) => {
   const scrollContainerRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const totalImages = 5;
-
+  
   const handleScroll = () => {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
@@ -33,6 +33,31 @@ const ChangingResults = () => {
       setActiveIndex(index);
     }
   };
+
+  const members = [
+    { image: "https://myrocky.b-cdn.net/WP%20Images/wl-offer/one.jpg" },
+    { image: "https://myrocky.b-cdn.net/WP%20Images/wl-offer/two.jpg" },
+    { image: "https://myrocky.b-cdn.net/WP%20Images/wl-offer/Before-After-03.jpg" },
+    { image: "https://myrocky.b-cdn.net/WP%20Images/wl-offer/foure.jpg" },
+    { image: "https://myrocky.b-cdn.net/WP%20Images/wl-offer/Before-After-05.jpg" },
+    { image: "https://myrocky.b-cdn.net/WP%20Images/wl-offer/Before-After-06.jpg" },
+    { image: "https://myrocky.b-cdn.net/WP%20Images/wl-offer/Before-After-07.jpg" },
+    { image: "https://myrocky.b-cdn.net/WP%20Images/wl-offer/eight.jpg" },
+    { image: "https://myrocky.b-cdn.net/WP%20Images/wl-offer/Before-After-09.jpg" },
+    { image: "https://myrocky.b-cdn.net/WP%20Images/wl-offer/ten.jpg" },
+    { image: "https://myrocky.b-cdn.net/WP%20Images/wl-offer/Before-After-11.jpg" },
+    { image: "https://myrocky.b-cdn.net/WP%20Images/wl-offer/Before-After-12.jpg" },
+    { image: "https://myrocky.b-cdn.net/WP%20Images/wl-offer/Before-After-13.jpg" },
+    { image: "https://myrocky.b-cdn.net/WP%20Images/wl-offer/forteen.jpg" },
+    { image: "https://myrocky.b-cdn.net/WP%20Images/wl-offer/Before-After-15.jpg" },
+    { image: "https://myrocky.b-cdn.net/WP%20Images/wl-offer/sixteen.jpg" },
+    { image: "https://myrocky.b-cdn.net/WP%20Images/wl-offer/seventeen.jpg" },
+    { image: "https://myrocky.b-cdn.net/WP%20Images/wl-offer/Before-After-18.jpg" },
+    { image: "https://myrocky.b-cdn.net/WP%20Images/wl-offer/nineteen.jpg" },
+    { image: "https://myrocky.b-cdn.net/WP%20Images/wl-offer/twiny.jpg" },
+    { image: "https://myrocky.b-cdn.net/WP%20Images/wl-offer/twiny-one.jpg" },
+    { image: "https://myrocky.b-cdn.net/WP%20Images/wl-offer/Before-After-22.jpg" },
+];
 
   return (
     <>
@@ -71,24 +96,34 @@ const ChangingResults = () => {
           />
         </div>
 
-        <div className="md:hidden mt-[40px]">
+        <div className="md:hidden mt-[40px] pl-[20px]">
           <div
             ref={scrollContainerRef}
             onScroll={handleScroll}
             className="flex gap-[8px] overflow-x-auto snap-x snap-mandatory no-scrollbar pb-4"
           >
-            {Array.from({ length: totalImages }, (_, i) => (
+             {members.map((member, index) => (
               <div
-                key={i}
-                className="flex-shrink-0 snap-center rounded-[16px]"
+                key={index}
+                className="relative rounded-[16px] overflow-hidden shadow-md flex-shrink-0 snap-start"
               >
-                <CustomImage
-                  src={`/bo4/Before & After-${i}.png`}
-                  width={240}
-                  height={240}
-                  alt=""
-                  className="w-[240px] h-[240px] object-contain"
-                />
+                {/* Image Container - Mobile: 240px × 240px with aspect-ratio 1/1 */}
+                <div className="relative w-[240px] h-[240px] rounded-[16px] overflow-hidden bg-gradient-to-br from-gray-200 to-gray-300" style={{ aspectRatio: '1/1' }}>
+                  {/* Image or Placeholder */}
+                  {member.image ? (
+                    <img
+                      src={member.image}
+                      alt="Member transformation"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-gray-200 via-gray-250 to-gray-300 flex items-center justify-center">
+                      <div className="text-gray-400 text-xs text-center px-2">
+                        Before & After
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -120,7 +155,7 @@ const ChangingResults = () => {
               href={"/wl-pre-consultation"}
               className="md:text-[18px] leading-[140%] font-medium bg-black px-[24px] rounded-full text-white py-[10px] mt-[32px] inline-block"
             >
-              Start Your Weight Loss Journey{" "}
+              {btnTxt}{" "}
               <FaArrowRight className="inline ml-1" />
             </Link>
           </div>
