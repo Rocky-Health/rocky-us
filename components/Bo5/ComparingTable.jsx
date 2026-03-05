@@ -50,7 +50,7 @@ const ComparingTable = ({
           <div className="lg:h-[200px] h-[96px] border-b border-black flex items-center">
             {/* Empty space to align with other columns */}
             <div className="lg:flex hidden flex-col justify-start items-start gap-2">
-              <div className="w-full text-center md:text-left py-[29px]">
+              <div className="w-full text-center md:text-left md:py-[0px] py-[29px]">
                 <span className="text-black font-[550] headers-font text-[46px] leading-[115%] tracking-[-2%]">
                   <div dangerouslySetInnerHTML={{ __html: title }}></div>
                 </span>
@@ -100,10 +100,10 @@ const ComparingTable = ({
               <div className="flex flex-col w-full lg:w-auto lg:flex-row items-center justify-center md:justify-left  gap-1 lg:pl-[42px]">
                 {item ? (
                   <>
-                    <FaCheckCircle className="text-[#AE7E56] text-lg md:text-xl" /> <span className="text-[14px] md:text-[16px] font-[500] text-center md:text-left">{item}</span>
+                    <FaCheckCircle className="text-[#AE7E56] text-lg md:text-xl" /> <span className="text-[14px] md:text-[16px] font-[500] text-center md:text-left"><div dangerouslySetInnerHTML={{ __html: item }}></div></span>
                   </>
                 ) : (
-                  <><FaRegTimesCircle className="text-black text-lg md:text-xl" /> <span className="text-[14px] md:text-[16px] font-[500] text-center md:text-left">{item}</span></>
+                  <><FaRegTimesCircle className="text-black text-lg md:text-xl" /> <span className="text-[14px] md:text-[16px] font-[500] text-center md:text-left"><div dangerouslySetInnerHTML={{ __html: item }}></div></span></>
                 )}
               </div>
             </div>
@@ -125,7 +125,7 @@ const ComparingTable = ({
                 sec_title.length >= 20 ? `p-12` : `p-20`
               }`}
             >
-              {sec_title}
+              <div dangerouslySetInnerHTML={{ __html: sec_title }}></div>
             </div>
           </div>
           {third_col.map((item, index) => (

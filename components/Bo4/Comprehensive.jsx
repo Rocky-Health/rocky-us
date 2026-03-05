@@ -89,7 +89,7 @@ const Comprehensive = () => {
           [data-mobile-img="3"] { height: 256px !important; }
         }
       `}} />
-      <h2 className="text-center text-[32px] md:text-[48px] leading-[115%] tracking-tight font-[550] headers-font ">
+      <h2 className="text-center text-[32px] md:text-[48px] leading-[125%] tracking-tight font-[550] headers-font mb-[16px]">
         <span className="text-[#AE7E56] md:block">
           {" "}
           A comprehensive GLP-1 program {" "}

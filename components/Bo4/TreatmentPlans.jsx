@@ -45,6 +45,13 @@ export default function TreatmentPlans({bg='bg-white'}) {
         "Same active ingredient as Ozempic. The popular and affordable alternative.",
       WLPrograme: true,
       image: "/bo4/semaglutide.png",
+      MobileFeatures:[ 
+        "Prescriptions (if eligible)",
+        "Clinically proven standard of care",
+        "Provider Check-ins & Unlimited Support",
+        "Lifestyle, Nutrition & Mental Coaching",
+        "Exclusive tools to help your journey"
+      ]
     },
 
     {
@@ -58,6 +65,12 @@ export default function TreatmentPlans({bg='bg-white'}) {
         "Dual-action mechanism with the highest rated clinical weight loss.",
       WLPrograme: true,
       image: "/bo4/tirzepatide.png",
+      MobileFeatures:[
+        "Targets 2 hunger pathways (GLP-1 & GIP)",
+        "Less side effects",
+        "Faster results"
+      ],
+      UpperBtnLabel: "#1 RATED FOR RESULTS"
     },
 
     {
@@ -119,8 +132,12 @@ export default function TreatmentPlans({bg='bg-white'}) {
   ];
   return (
     <Section bg={`!px-0 ${bg}`}>
-      <h2 className="subheaders-font px-5 text-[40px] leading-[115%] tracking-tight font-medium text-center mb-[16px]">
+      <h2 className="hidden md:block subheaders-font px-5 text-[40px] leading-[115%] tracking-tight font-medium text-center mb-[16px]">
         <span className="text-[#AE7E56]">MyRocky</span> Treatment Plans
+      </h2>
+
+      <h2 className="block md:hidden subheaders-font px-5 font-[550] text-[36px] leading-[115%] tracking-tight  text-center mb-[16px]">
+        <span className="text-[#AE7E56]">MyRocky</span> Signature Plans
       </h2>
       <p className="md:text-[18px] px-5 tracking-tight text-center">
         Medication + Coaching + Support = Real Weight Loss Results.
@@ -183,7 +200,7 @@ export default function TreatmentPlans({bg='bg-white'}) {
         </div>
       </div>
 
-      <p className="text-center max-w-[878px] text-[14px] leading-[140%] text-[#00000066] tracking-tight mx-auto">
+      <p className="text-center px-[20px] max-w-[878px] text-[14px] leading-[140%] text-[#00000066] tracking-tight mx-auto">
         *Compounded medications have not been evaluated or approved by the FDA
         for safety, efficacy, or quality. Your provider will work with you to
         determine what, if any, medication is right for your own healthcare

@@ -83,29 +83,34 @@ const ExclusiveFeatures = () => {
       icon: AIHealthIcon,
       title: "AI Health Assistant",
       description: "Personalized lifestyle, exercise, sleep and nutrition advice. Includes proactive notifications, reminders and tracking to develop healthier habits and get better results.",
-      integrationNote: "Integrates with Apple Health Center"
+      integrationNote: "Integrates with Apple Health Center",
+      descriptionW: '480',
     },
     {
       icon: ChartIcon,
       title: "Weight Loss Progress Tracker",
-      description: "Log your weight, set goals, and monitor changes over time."
+      description: "Log your weight, set goals, and monitor changes over time.",
+      descriptionW: '320',
     },
     {
       icon: InjectionIcon,
       title: "Injection Tracker",
-      description: "Gain confidence knowing you're on track and getting the most out of your treatment."
+      description: "Gain confidence knowing you're on track and getting the most out of your treatment.",
+      descriptionW: '453',
     },
     {
       icon: BookIcon,
       title: "Integrated Treatment Guides",
-      description: "Receive customized guides that offer support tailored to wherever you are in your treatment plan."
+      description: "Receive customized guides that offer support tailored to wherever you are in your treatment plan.",
+      descriptionW: '420',
+   
     }
   ];
 
   return (
     <div className="w-full">
       {/* Headline */}
-      <div className="text-center mb-6">
+      <div className="text-center mb-6 max-w-[820px] mx-auto">
         <h2 className="text-center text-[32px] md:text-[48px] leading-[115%] tracking-tight font-[550] headers-font">
           <span className="text-[#AE7E56]">Exclusive Features </span>{' '}
           <span className="text-black">To Support Your Health & Weight Loss Journey</span>
@@ -114,8 +119,8 @@ const ExclusiveFeatures = () => {
 
       {/* Sub-headline */}
       <p className="text-center w-full md:max-w-[573px] text-[16px] md:text-[18px] font-normal text-black mb-12 mx-auto leading-[140%]">
-        Everything you need to stay on track, build better habits, and achieve lasting results—all in one seamless platform.
-      </p>
+       Everything you need to stay on track, build better habits, and achieve lasting results—all in one seamless platform.
+       </p>
 
       {/* Feature Cards Grid */}
       {/* Mobile: Horizontal Slider */}
@@ -154,7 +159,7 @@ const ExclusiveFeatures = () => {
                 </h3>
 
                 {/* Description */}
-                <p className="text-base font-normal text-[#000] leading-normal flex-grow">
+                <p className="text-base font-normal  text-[#000] leading-normal flex-grow">
                   {feature.description}
                 </p>
               </div>
@@ -222,7 +227,7 @@ const ExclusiveFeatures = () => {
               </h3>
 
               {/* Description */}
-              <p className="text-base font-normal text-[#000] leading-normal flex-grow md:max-w-[570px]">
+              <p className={`text-base font-normal text-[#000] leading-normal flex-grow max-w-[${feature.descriptionW}px]`}>
                 {feature.description}
               </p>
             </div>

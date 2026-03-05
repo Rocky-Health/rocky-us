@@ -28,7 +28,7 @@ const MarketingHeroSection = () => {
       <div className="flex justify-between items-center flex-col md:flex-row gap-4">
         {/* Right side  */}
         <div>
-          <div className="text-[18px] leading-[100%] tracking-tight text-[#AE7E56] mb-[8px]">
+          <div className="text-[14px] leading-[100%] tracking-tight text-[#AE7E56] mb-[8px]">
             EARLY SPRING SPECIAL: <b>OUR LOWEST PRICE EVER!</b>
           </div>
 
