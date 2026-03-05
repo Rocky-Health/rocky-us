@@ -57,6 +57,7 @@ const HowItWorks = ({ consultationHref = "/wl-offer-pre-consultation/" }) => {
                 className="relative"
               >
                 {/* Gold dots - vertical dotted line with circle at top, only for first step */}
+                {/* Gold circle and line for first step */}
                 {isFirstStep && (
                   <>
                     {/* Mobile version - on the left */}
@@ -78,14 +79,26 @@ const HowItWorks = ({ consultationHref = "/wl-offer-pre-consultation/" }) => {
                   </>
                 )}
 
-                
-
-                {/* Dashed line for steps 2-4 (step 1 has gold line) */}
+                {/* Gray circle and line for steps 2-4 */}
                 {!isFirstStep && (
-                  <div className="hidden md:block absolute left-1/2 top-0 bottom-0 -translate-x-1/2 z-0" style={{
-                    width: '2px',
-                    backgroundImage: 'repeating-linear-gradient(to bottom, #D9D9D9 0px, #D9D9D9 4px, transparent 4px, transparent 8px)'
-                  }}></div>
+                  <>
+                    {/* Mobile version - on the left */}
+                    <div className="md:hidden absolute left-0 top-0 bottom-0 z-0" style={{
+                      width: '2px',
+                      backgroundImage: 'repeating-linear-gradient(to bottom, #E5E7EB 0px, #E5E7EB 4px, transparent 4px, transparent 8px)'
+                    }}>
+                      {/* Circle at top of line */}
+                      <div className="absolute left-1/2 top-0 w-6 h-6 rounded-full bg-gray-200 border-4 border-gray-200 -translate-x-1/2 flex-shrink-0" style={{ aspectRatio: '1/1' }}></div>
+                    </div>
+                    {/* Desktop version - centered */}
+                    <div className="hidden md:block absolute left-1/2 top-0 bottom-0 -translate-x-1/2 z-0" style={{
+                      width: '2px',
+                      backgroundImage: 'repeating-linear-gradient(to bottom, #E5E7EB 0px, #E5E7EB 4px, transparent 4px, transparent 8px)'
+                    }}>
+                      {/* Circle at top of line */}
+                      <div className="absolute left-1/2 top-0 w-6 h-6 rounded-full bg-gray-200 border-4 border-gray-200 -translate-x-1/2 flex-shrink-0" style={{ aspectRatio: '1/1' }}></div>
+                    </div>
+                  </>
                 )}
 
                 {/* Content Grid - Alternating layout */}
