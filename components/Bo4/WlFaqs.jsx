@@ -1,4 +1,3 @@
-
 import MoreQuestions from "@/components/MoreQuestions";
 import FaqsSection from "../home/FaqsSection";
 const faqs = [
@@ -17,11 +16,11 @@ const faqs = [
     answer:
       "Upon completing the initial online consultation, a Rocky Healthcare provider will assess this and determine if you are eligible. Please check your account for messages from your clinician.",
   },
-  {
-    question: "Why do I need a metabolic lab test?",
-    answer:
-      "",
-  },
+  // {
+  //   question: "Why do I need a metabolic lab test?",
+  //   answer:
+  //     "",
+  // },
   {
     question: "What are the side effects of GLP-1 medications?",
     answer:
@@ -32,43 +31,44 @@ const faqs = [
     answer:
       "After submitting your questionnaire, you will be able to schedule a call with a licensed US healthcare provider. To request this, simply send a message to your provider through your account by clicking on messages. They will send you a link to schedule a call at your convenience.",
   },
-  {
-    question: "What is the refund policy?",
-    answer:""
-   },
-  {
-    question: "How do weight loss injections work?",
-    answer:""
-   },
-   {
-    question: "How can I get a weight loss medication prescription at Rocky?",
-    answer: ""
-   },
-  
-  {
-    question: "What type of weight loss medications does Rocky offer?",
-    answer: ""
-   },
+  // {
+  //   question: "What is the refund policy?",
+  //   answer:""
+  //  },
+  // {
+  //   question: "How do weight loss injections work?",
+  //   answer:""
+  //  },
+  //  {
+  //   question: "How can I get a weight loss medication prescription at Rocky?",
+  //   answer: ""
+  //  },
+
+  // {
+  //   question: "What type of weight loss medications does Rocky offer?",
+  //   answer: ""
+  //  },
 ];
 
 const WlFaqs = ({ moreQTitle = null }) => {
   return (
     <div className="mx-auto">
       <FaqsSection
-          faqs={faqs}
-          blackText="Your Questions, Answered"
-          accentText=""
-          subtitle="Frequently asked questions"
+        faqs={faqs}
+        blackText="Your Questions, Answered"
+        accentText=""
+        subtitle="Frequently asked questions"
+      />
+      <div className="showElement">
+        <MoreQuestions
+          bg="bg-[#fff] !w-[100%]"
+          title="Convenient, effective, doctor-trusted."
+          link="/wl-pre-consultation/"
+          buttonText="Get Started"
+          buttonWidth="md:w-[172px] w-[100%]"
+          preventLayoutHide
         />
-        <div className="showElement">
-          <MoreQuestions
-            bg="bg-white !w-[100%]"
-            title="Convenient, effective, doctor-trusted."
-            link="/wl-pre-consultation/"
-            buttonText="Get Started"
-            buttonWidth="md:w-[172px] w-[100%]"
-          />
-        </div>
+      </div>
     </div>
   );
 };

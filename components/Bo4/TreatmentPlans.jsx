@@ -3,7 +3,10 @@ import Section from "../utils/Section";
 import ProductCard from "./ProductCard";
 import { useRef, useState } from "react";
 
-export default function TreatmentPlans({bg='bg-white'}) {
+export default function TreatmentPlans({
+  bg = "bg-white",
+  productList = null,
+}) {
   const scrollContainerRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const totalBrandProducts = 4; // products[2] to products[5]
@@ -33,7 +36,7 @@ export default function TreatmentPlans({bg='bg-white'}) {
     }
   };
 
-  const products = [
+  const products = productList || [
     {
       label: "MOST POPULAR",
       activeIngeredient: "(GLP-1)",
@@ -45,13 +48,13 @@ export default function TreatmentPlans({bg='bg-white'}) {
         "Same active ingredient as Ozempic. The popular and affordable alternative.",
       WLPrograme: true,
       image: "/bo4/semaglutide.png",
-      MobileFeatures:[ 
+      MobileFeatures: [
         "Prescriptions (if eligible)",
         "Clinically proven standard of care",
         "Provider Check-ins & Unlimited Support",
         "Lifestyle, Nutrition & Mental Coaching",
-        "Exclusive tools to help your journey"
-      ]
+        "Exclusive tools to help your journey",
+      ],
     },
 
     {
@@ -65,12 +68,12 @@ export default function TreatmentPlans({bg='bg-white'}) {
         "Dual-action mechanism with the highest rated clinical weight loss.",
       WLPrograme: true,
       image: "/bo4/tirzepatide.png",
-      MobileFeatures:[
+      MobileFeatures: [
         "Targets 2 hunger pathways (GLP-1 & GIP)",
         "Less side effects",
-        "Faster results"
+        "Faster results",
       ],
-      UpperBtnLabel: "#1 RATED FOR RESULTS"
+      UpperBtnLabel: "#1 RATED FOR RESULTS",
     },
 
     {
@@ -149,7 +152,8 @@ export default function TreatmentPlans({bg='bg-white'}) {
       </div>
 
       <h2 className="subheaders-font px-5 text-[48px] leading-[115%] tracking-tight font-medium text-center mb-[16px]">
-        <span className="text-[#AE7E56] block">Brand Name GLP-1</span> Treatments
+        <span className="text-[#AE7E56] block">Brand Name GLP-1</span>{" "}
+        Treatments
       </h2>
 
       {/* Desktop View */}
@@ -189,9 +193,7 @@ export default function TreatmentPlans({bg='bg-white'}) {
               onClick={() => scrollToCard(i)}
               className={`h-2 transition-all duration-300 ${
                 i === 0 ? "rounded-l-full" : ""
-              } ${
-                i === totalBrandProducts - 1 ? "rounded-r-full" : ""
-              } ${
+              } ${i === totalBrandProducts - 1 ? "rounded-r-full" : ""} ${
                 activeIndex === i ? "w-8 bg-black" : "w-2 bg-gray-300"
               }`}
               aria-label={`Go to product ${i + 1}`}
