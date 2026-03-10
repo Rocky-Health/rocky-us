@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getTikTokGatewayConfig, getTikTokEndpoint } from '@/utils/tiktokCapiConfig';
 import { hashEmail, hashPhone, hashSHA256 } from '@/utils/analytics/hashServerSide';
+import { toMoney } from '@/utils/priceFormatter';
 import axios from 'axios';
 
 const BASE_URL = process.env.BASE_URL;
@@ -139,7 +140,7 @@ export async function POST(req) {
       properties: {
         contents: contents || [],
         currency: currency || 'USD',
-        value: parseFloat(value)
+        value: toMoney(value)
       }
     };
 

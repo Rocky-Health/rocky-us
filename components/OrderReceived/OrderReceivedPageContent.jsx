@@ -10,7 +10,7 @@ import { FaArrowRight } from "react-icons/fa";
 import CustomImage from "../utils/CustomImage";
 import { analyticsService } from "@/utils/analytics/analyticsService";
 import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
-import { formatPrice } from "@/utils/priceFormatter";
+import { formatPrice, toMoney } from "@/utils/priceFormatter";
 
 // AWIN API configuration
 const AWIN_CONFIG = {
@@ -400,13 +400,13 @@ const OrderReceivedContent = ({ userId }) => {
               window._conv_q = window._conv_q || [];
               window._conv_q.push([
                 "pushRevenue",
-                `${parseFloat(data.total) || 0}`,
+                `${toMoney(data.total)}`,
                 `${data.line_items?.length || 0}`,
                 "100430995",
               ]);
               window._conv_q.push([
                 "pushRevenue",
-                `${parseFloat(data.total) || 0}`,
+                `${toMoney(data.total)}`,
                 `${data.line_items?.length || 0}`,
                 "100467959",
               ]);

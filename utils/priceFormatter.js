@@ -50,3 +50,15 @@ export const formatDisplayPrice = (price, isInCents = false, currencySymbol = '$
   const actualPrice = isInCents ? price / 100 : price;
   return formatPriceWithCurrency(actualPrice, currencySymbol);
 };
+
+/**
+ * Round a numeric value to exactly 2 decimal places (standard currency precision).
+ * Avoids IEEE 754 floating-point artifacts like 1608.800000000000002.
+ * @param {number|string} n - The value to round
+ * @returns {number} Value rounded to 2 decimal places
+ */
+export const toMoney = (n) => {
+  const num = typeof n === 'string' ? parseFloat(n) : n;
+  if (!Number.isFinite(num)) return 0;
+  return Math.round(num * 100) / 100;
+};

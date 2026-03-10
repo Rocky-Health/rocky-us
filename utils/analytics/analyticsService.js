@@ -1,4 +1,5 @@
 import { logger } from "@/utils/devLogger";
+import { toMoney } from "@/utils/priceFormatter";
 import {
   trackGA4EcommerceEvent,
   trackGA4Event,
@@ -69,8 +70,9 @@ export const analyticsService = {
       const item = formatGA4Item(product, quantity);
       const ecommerce = {
         currency: "USD",
-        value:
-          (parseFloat(item.price) || 0) * (parseInt(item.quantity, 10) || 1),
+        value: toMoney(
+          (parseFloat(item.price) || 0) * (parseInt(item.quantity, 10) || 1)
+        ),
         items: [item],
       };
       trackGA4EcommerceEvent(
@@ -119,7 +121,7 @@ export const analyticsService = {
       const item = formatGA4Item(product, quantity);
       const ecommerce = {
         currency: "USD",
-        value: item.price * quantity,
+        value: toMoney(item.price * quantity),
         items: [item],
       };
 
@@ -150,7 +152,7 @@ export const analyticsService = {
       );
       const ecommerce = {
         currency: "USD",
-        value,
+        value: toMoney(value),
         items,
       };
       trackGA4EcommerceEvent("view_cart", ecommerce, additionalData, true);
@@ -176,7 +178,7 @@ export const analyticsService = {
       );
       const ecommerce = {
         currency: "USD",
-        value,
+        value: toMoney(value),
         items,
       };
 

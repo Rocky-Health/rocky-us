@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getGatewayConfig, getGatewayUrl } from '@/utils/metaCapiConfig';
 import { hashEmail, hashPhone, hashSHA256 } from '@/utils/analytics/hashServerSide';
 import { processMetaParameters } from '@/lib/meta/paramBuilderHelper';
+import { toMoney } from '@/utils/priceFormatter';
 import axios from 'axios';
 
 const BASE_URL = process.env.BASE_URL;
@@ -334,7 +335,7 @@ export async function POST(req) {
 
     // Build custom_data object
     const customData = {
-      value: parseFloat(value),
+      value: toMoney(value),
       currency: resolvedCurrency,
       content_ids: content_ids || [],
       content_type: 'item',
@@ -344,10 +345,10 @@ export async function POST(req) {
     };
 
     // Add cost breakdown if available
-    if (subtotal !== undefined) customData.subtotal = parseFloat(subtotal);
-    if (shipping !== undefined) customData.shipping = parseFloat(shipping);
-    if (tax !== undefined) customData.tax = parseFloat(tax);
-    if (discount !== undefined) customData.discount = parseFloat(discount);
+    if (subtotal !== undefined) customData.subtotal = toMoney(subtotal);
+    if (shipping !== undefined) customData.shipping = toMoney(shipping);
+    if (tax !== undefined) customData.tax = toMoney(tax);
+    if (discount !== undefined) customData.discount = toMoney(discount);
 
     // Build Meta CAPI event payload
     const eventPayload = {
