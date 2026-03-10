@@ -1,5 +1,6 @@
 import { formatGA4Item } from "@/utils/ga4Events";
 import { logger } from "@/utils/devLogger";
+import { toMoney } from "@/utils/priceFormatter";
 
 /**
  * Fetch product details (client-side) to enrich GA4 items with categories/attributes
@@ -37,7 +38,7 @@ export const mapOrderToEcommerce = async (order) => {
           id: item.product_id,
           sku: item.sku || productDetails?.sku,
           name: item.name,
-          price: parseFloat(item.total) / Math.max(1, item.quantity) || 0,
+          price: toMoney(parseFloat(item.total) / Math.max(1, item.quantity)) || 0,
           categories: productDetails?.categories || [],
           attributes: productDetails?.attributes || [],
           meta_data: productDetails?.meta_data || [],
@@ -64,9 +65,9 @@ export const mapOrderToEcommerce = async (order) => {
   return {
     transaction_id: order?.id?.toString() || "",
     affiliation: "MyRocky",
-    value: parseFloat(order?.total) || 0,
-    tax: parseFloat(order?.total_tax) || 0,
-    shipping: parseFloat(order?.shipping_total) || 0,
+    value: toMoney(order?.total),
+    tax: toMoney(order?.total_tax),
+    shipping: toMoney(order?.shipping_total),
     currency: order?.currency || "USD",
     coupon: order?.coupon_lines?.map((c) => c.code).join(", ") || "",
     payment_type: order?.payment_method_title || "Visa",

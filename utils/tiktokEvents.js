@@ -1,4 +1,5 @@
 import { logger } from "@/utils/devLogger";
+import { toMoney } from "@/utils/priceFormatter";
 import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
 
 /**
@@ -94,8 +95,8 @@ export const trackTikTokEvent = (eventName, eventData = {}, debug = true, mirror
  * @returns {Object} Formatted data for TikTok
  */
 export const formatTikTokEventData = (product, quantity = 1) => {
-  const price = parseFloat(product.price) || 0;
-  const value = price * quantity;
+  const price = toMoney(product.price);
+  const value = toMoney(price * quantity);
 
   const categories = product.categories || [];
   const contentCategory = categories
@@ -217,7 +218,7 @@ export const trackTikTokPurchase = (
     content_ids: content_ids,
     content_category: [...categorySet].join(", "),
     quantity: totalQuantity,
-    value: parseFloat(order.total) || 0,
+    value: toMoney(order.total),
     currency: order.currency || "USD",
     description: `Order #${order.id}`,
     order_data: additionalData.order_data || {},
