@@ -1,4 +1,5 @@
 import { logger } from '@/utils/devLogger';
+import { toMoney } from '@/utils/priceFormatter';
 import { TIKTOK_CAPI_GATEWAYS } from './tiktokCapiConfig';
 import { splitOrderByGateway, allocateCostsForSplit, reconcilePennyDifferences } from './metaCapiPurchase';
 import { enrichOrderWithProductData } from './enrichOrderData';
@@ -82,7 +83,7 @@ export const trackTikTokCapiPurchase = async (order, additionalData = {}, debug 
             content_type: 'product',
             content_name: item.name,
             quantity: parseInt(item.quantity) || 1,
-            price: parseFloat(item.subtotal) || 0
+            price: toMoney(item.subtotal)
           })),
           order_data: enrichedOrder,
           ...additionalData

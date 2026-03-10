@@ -6,6 +6,7 @@
 
 import { logger } from "@/utils/devLogger";
 import { getOrCreateSessionId } from "@/utils/dataLayerHelper";
+import { toMoney } from "@/utils/priceFormatter";
 import {
   trackTikTokAddToCart,
   trackTikTokInitiateCheckout,
@@ -219,7 +220,7 @@ export const formatGA4Item = (product, quantity = 1) => {
   return {
     item_id: product.sku || product.id?.toString() || "", // Matches PHP $product_sku ?: $product_id
     item_name: product.name || "", // Matches PHP $product_name
-    price: parseFloat(product.price) || 0, // Matches PHP (float) $product_price
+    price: toMoney(product.price), // Matches PHP (float) $product_price
     quantity: quantity,
     item_brand: brand, // Matches PHP $product_brand with fallback
     ...categoryData, // Matches PHP item_category through item_category5
@@ -266,7 +267,7 @@ export const trackAddToCart = (
 
   const ecommerceData = {
     currency: "USD",
-    value: item.price * quantity,
+    value: toMoney(item.price * quantity),
     items: [item],
   };
 
@@ -294,7 +295,7 @@ export const trackRemoveFromCart = (
 
   const ecommerceData = {
     currency: "USD",
-    value: item.price * quantity,
+    value: toMoney(item.price * quantity),
     items: [item],
   };
 
@@ -327,7 +328,7 @@ export const trackViewCart = (
 
   const ecommerceData = {
     currency: "USD",
-    value: totalValue,
+    value: toMoney(totalValue),
     items: items,
   };
 
@@ -355,7 +356,7 @@ export const trackBeginCheckout = (
 
   const ecommerceData = {
     currency: "USD",
-    value: totalValue,
+    value: toMoney(totalValue),
     items: items,
   };
 
