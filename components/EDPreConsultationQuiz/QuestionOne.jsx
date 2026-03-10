@@ -51,7 +51,7 @@ const QuestionOne = ({ currentPage, answer, onAnswerChange }) => {
             <p className="text-sm font-normal">
               Already have an account?{" "}
               <a
-                href="/login-register?viewshow=login&ed-flow=1"
+                href="/login-register?viewshow=login&redirect_to=/ed-pre-consultation-quiz"
                 className="font-[400] text-[#C19A6B] underline ml-1"
               >
                 Sign in
