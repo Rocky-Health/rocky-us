@@ -36,10 +36,10 @@ export async function POST(request) {
                     user: {
                         email: email,
                     },
-                    locale: {
-                      language: "en",
-                      country: "US",
-                    },
+                    // locale: {
+                    //   language: "en",
+                    //   country: "CA",
+                    // },
                     signUpSourceId: "1239403",
                     singleOptIn: false,
                     subscriptionType: "MARKETING",
