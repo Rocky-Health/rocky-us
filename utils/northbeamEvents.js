@@ -1,4 +1,5 @@
 import { logger } from "@/utils/devLogger";
+import { toMoney } from "@/utils/priceFormatter";
 import { getNorthbeamSourceTags, getAttributionData } from "@/utils/sourceAttribution";
 
 /**
@@ -264,7 +265,7 @@ export const trackNorthbeamPurchase = async (
             product_id: item.product_id?.toString() || "",
             name: item.name || "",
             quantity: parseInt(item.quantity) || 1,
-            price: parseFloat(item.total) / Math.max(1, item.quantity) || 0, // Keep in dollars, not cents
+            price: toMoney(parseFloat(item.total) / Math.max(1, item.quantity)) || 0,
             variant_id: item.variation_id?.toString() || "",
             ...(item.product_type && { product_type: item.product_type }),
             ...(item.variation?.attributes && {
@@ -406,7 +407,7 @@ export const formatNorthbeamOrderData = async (order) => {
       id: item.sku || item.product_id?.toString() || "",
       name: item.name || "",
       quantity: parseInt(item.quantity) || 1,
-      price: parseFloat(item.total) / Math.max(1, item.quantity) || 0, // Keep in dollars, not cents
+      price: toMoney(parseFloat(item.total) / Math.max(1, item.quantity)) || 0,
       variant_id: item.variation_id?.toString() || "",
       ...(item.variation?.attributes && {
         variant_name: item.variation.attributes
