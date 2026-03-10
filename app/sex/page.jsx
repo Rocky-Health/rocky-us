@@ -11,6 +11,8 @@ import TeamSection from "@/components/TeamSection";
 import FaqsSection from "@/components/FaqsSection";
 import EdComparisonTable from "@/components/Sex/EdComparisonTable";
 import EdProducts from "@/components/EDPlans/EdProducts";
+import { Suspense } from "react";
+import { useAutoApplyCoupon } from "@/lib/hooks/useAutoApplyCoupon";
 
 const edFaqs = [
   {
@@ -55,9 +57,17 @@ const edFaqs = [
   },
 ];
 
+function CouponCapture() {
+  useAutoApplyCoupon();
+  return null;
+}
+
 export default function Sex() {
   return (
     <main>
+      <Suspense fallback={null}>
+        <CouponCapture />
+      </Suspense>
       <CoverSection>
         <SexCover />
       </CoverSection>

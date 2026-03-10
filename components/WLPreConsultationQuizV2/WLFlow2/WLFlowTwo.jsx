@@ -7,6 +7,7 @@ import GenericPopup from "../components/GenericPopup";
 import { PasswordProvider } from "../contexts/PasswordContext";
 
 import QuizStepRenderer from "./QuizStepRenderer";
+import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
 
 const getPopupConfigWithChosenValue = (popupKey, userData) => {
   if (popupKey === "YourGoalIs") {
@@ -105,9 +106,11 @@ const getPopupConfigWithChosenValue = (popupKey, userData) => {
   return quizConfig.popups[popupKey] || null;
 };
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import QuestionnaireNavbar from "../components/QuestionnaireNavbar";
 import { ProgressBar } from "@/components/EdQuestionnaire/ProgressBar";
+
+const COUPON_STORAGE_KEY = "pending_coupon_code";
 
 const WLFlowTwo = () => {
   const {
@@ -125,6 +128,30 @@ const WLFlowTwo = () => {
     handleRecommendationContinue,
   } = useWLFlowTwo();
 
+  useQuestionnaireStepTracking({
+    questionnaireId: "wl-flow-two",
+    stepId: currentStep,
+    stepIndex: currentStep,
+    flowId: "weight-loss",
+    stepType: "pre-consultation",
+  });
+
+  const [couponBanner, setCouponBanner] = useState(false);
+
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const coupon = params.get("apply_coupon");
+      if (coupon && coupon.trim()) {
+        localStorage.setItem(COUPON_STORAGE_KEY, coupon.trim());
+        setCouponBanner(true);
+        setTimeout(() => setCouponBanner(false), 60000);
+      }
+    } catch (e) {
+      logger.error("Error capturing coupon from URL:", e);
+    }
+  }, []);
+
   // Ensure hooks run in the same order on every render: place effects immediately after hooks
   useEffect(() => {
     logger.log("[WLFlowTwo] Current step changed:", currentStep);
@@ -139,10 +166,47 @@ const WLFlowTwo = () => {
     return activePopup; // assume object
   })();
 
+  const couponBannerEl = couponBanner && (
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 999999,
+        background: "#16a34a",
+        color: "#fff",
+        textAlign: "center",
+        padding: "12px 16px",
+        fontSize: "14px",
+        fontWeight: 600,
+      }}
+    >
+      $100 Discount Code Auto-Applied For You in Checkout For The Next 60
+      Minutes
+      <button
+        onClick={() => setCouponBanner(false)}
+        style={{
+          marginLeft: 16,
+          background: "transparent",
+          border: "none",
+          color: "#fff",
+          fontSize: 18,
+          cursor: "pointer",
+          lineHeight: 1,
+        }}
+        aria-label="Close"
+      >
+        &times;
+      </button>
+    </div>
+  );
+
   // Only short-circuit the whole flow when the popup is intended to be a full page
   if (activePopup && (activePopupConfig?.asPage ?? true)) {
     return (
       <PasswordProvider>
+        {couponBannerEl}
         <GenericPopup
           isOpen={!!activePopup}
           onClose={closePopup}
@@ -159,6 +223,7 @@ const WLFlowTwo = () => {
 
   return (
     <PasswordProvider>
+      {couponBannerEl}
       <div className="min-h-screen">
         <div className="bg-black text-white text-[14px] leading-[140%] font-medium items-center text-center p-2">
           Lose Weight or Your Money Back

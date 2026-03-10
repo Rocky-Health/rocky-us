@@ -4,14 +4,39 @@ import { layoutExemptRoutes } from "./utils/layoutConfig";
 
 export function middleware(req) {
   try {
-    // Skip middleware for static files and API routes
     const { pathname } = req.nextUrl;
-    if (
-      pathname.startsWith("/_next/") ||
-      pathname.includes(".") ||
-      pathname.startsWith("/api/")
-    ) {
+
+    // Skip middleware for static files
+    if (pathname.startsWith("/_next/") || pathname.includes(".")) {
       return NextResponse.next();
+    }
+
+    // API route tracing: log session + request IDs, then pass through
+    if (pathname.startsWith("/api/")) {
+      const sessionId =
+        req.headers.get("x-session-id") ??
+        req.cookies.get("rk_session_id")?.value ??
+        "unknown";
+      const requestId =
+        req.headers.get("x-request-id") ?? crypto.randomUUID();
+
+      console.log(
+        `[API] ${req.method} ${pathname} | session=${sessionId} | request=${requestId}`
+      );
+
+      const requestHeaders = new Headers(req.headers);
+      requestHeaders.set("x-session-id", sessionId);
+      requestHeaders.set("x-request-id", requestId);
+
+      const response = NextResponse.next({
+        request: { headers: requestHeaders },
+      });
+
+      if (!response.headers.has("x-request-id")) {
+        response.headers.set("x-request-id", requestId);
+      }
+
+      return response;
     }
 
     // Handle redirects for old blog structure to new blog structure
@@ -137,6 +162,17 @@ export function middleware(req) {
       return NextResponse.redirect(new URL("/", req.url));
     }
 
+    // Allow unauthenticated access to pay-for-order links (email payment links)
+    if (
+      pathname.startsWith("/checkout/order-pay/") &&
+      req.nextUrl.searchParams.get("pay_for_order") === "true" &&
+      req.nextUrl.searchParams.get("key")
+    ) {
+      return NextResponse.next({
+        request: { headers: requestHeaders },
+      });
+    }
+
     // Case 3: If user is not authenticated and trying to access protected routes, redirect to register
     if (!authToken && !isLoginPage && shouldProtectRoute(pathname)) {
       // Create login URL with register view
@@ -258,6 +294,7 @@ export const config = {
     "/acne-consultation-quiz/:path*",
     "/anti-aging-consultation-quiz/:path*",
     "/hyperpigmentation-consultation-quiz/:path*",
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+    "/api/:path*",
+    "/((?!_next/static|_next/image|favicon.ico).*)",
   ],
 };

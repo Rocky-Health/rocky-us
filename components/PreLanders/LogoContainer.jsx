@@ -8,7 +8,7 @@ const LogoContainer = ({ quizHref }) => {
           <div className="flex-shrink-0">
             <img
               src="https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp"
-              alt="Rocky"
+              alt="MyRocky"
               className="w-[90px] md:w-[116px]"
             />
           </div>

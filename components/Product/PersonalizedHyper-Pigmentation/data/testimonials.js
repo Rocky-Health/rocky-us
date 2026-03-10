@@ -29,7 +29,7 @@ export const testimonials = [
   {
     name: "Amanda",
     description:
-      "“It works! It feels like the people behind Rocky truly have the knowledge and dedication to help. They’ve shown great care. Visible results for sure!”",
+      "“It works! It feels like the people behind MyRocky truly have the knowledge and dedication to help. They’ve shown great care. Visible results for sure!”",
     condition: "Hyper-pigmentation",
     Treatment: "Hyper-pigmentation Cream",
     image:

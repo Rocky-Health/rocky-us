@@ -117,31 +117,31 @@ export default Faqs;
 // Keep your existing FAQ data arrays here
 const HomeFaqs = [
   {
-    question: "What is Rocky?",
+    question: "What is MyRocky?",
     answer:
-      "Rocky is a 100% online platform with a focus to normalize men's health and eliminate the stigma surrounding it. At Rocky, we make it easy for patients to connect to licensed healthcare professionals. We specialize in medical conditions commonly experienced by men including Erectile Dysfunction and Hair Loss. We've built a simple & convenient online process which helps you connect to healthcare professionals in order to get customized treatment plans, shipped right to your door.",
+      "MyRocky is a 100% online platform with a focus to normalize men's health and eliminate the stigma surrounding it. At MyRocky, we make it easy for patients to connect to licensed healthcare professionals. We specialize in medical conditions commonly experienced by men including Erectile Dysfunction and Hair Loss. We've built a simple & convenient online process which helps you connect to healthcare professionals in order to get customized treatment plans, shipped right to your door.",
   },
   {
-    question: "How does Rocky work?",
+    question: "How does MyRocky work?",
     answer:
-      "Rocky offers prescription and over-the-counter products. For Prescription medication, you will need to complete an online medical intake/ questionnaire pertaining to the medical condition you are interested in treating. This step covers your medical history, medical conditions, medication you currently take, etc. A licensed healthcare provider then takes a look at your information and assesses whether or not you are a good candidate for any particular treatment. If a healthcare professional determines a treatment is right for you, it is delivered by Rocky Pharmacy straight to your doorstep.",
+      "MyRocky offers prescription and over-the-counter products. For Prescription medication, you will need to complete an online medical intake/ questionnaire pertaining to the medical condition you are interested in treating. This step covers your medical history, medical conditions, medication you currently take, etc. A licensed healthcare provider then takes a look at your information and assesses whether or not you are a good candidate for any particular treatment. If a healthcare professional determines a treatment is right for you, it is delivered by MyRocky Pharmacy straight to your doorstep.",
   },
   {
-    question: "Who looks after you at Rocky?",
+    question: "Who looks after you at MyRocky?",
     answer:
-      "Rocky is operated by Healthcare Professionals including Doctors, Nurse Practitioners, and Pharmacists. Our team is experienced and readily available to ensure your needs are met. You can contact any member of the team by portal message, or emailing the respective departments directly.",
+      "MyRocky is operated by Healthcare Professionals including Doctors, Nurse Practitioners, and Pharmacists. Our team is experienced and readily available to ensure your needs are met. You can contact any member of the team by portal message, or emailing the respective departments directly.",
   },
   {
-    question: "How does Rocky ensure patient privacy?",
+    question: "How does MyRocky ensure patient privacy?",
     answer:
-      "Rocky handles the privacy and security of all our customers with great care. Our platform meets all required regulatory compliance, as well having systems in place to ensure all information provided is secured. Any medical or personal information provided is only accessed by the medical team managing your care.",
+      "MyRocky handles the privacy and security of all our customers with great care. Our platform meets all required regulatory compliance, as well having systems in place to ensure all information provided is secured. Any medical or personal information provided is only accessed by the medical team managing your care.",
   },
   {
-    question: "What products does Rocky offer?",
+    question: "What products does MyRocky offer?",
     answer: `
       <div class="pb-4 text-gray-700">
         
-        <p>Rocky offers a range of treatments across the following categories:</p>
+        <p>MyRocky offers a range of treatments across the following categories:</p>
         
         <div><span class="font-[700]">Sexual health:</span> Sildenafil (Generic), Tadalafil (Generic) </div>
         <div><span class="font-[700]">Hair loss:</span> Finasteride & Minoxidil Topical Foam </div>
@@ -150,9 +150,9 @@ const HomeFaqs = [
     `,
   },
   {
-    question: "How do I get started with Rocky?",
+    question: "How do I get started with MyRocky?",
     answer:
-      "To get started, take the treatment quiz or choose your desired product. Then, create a profile by providing some basic information. Rocky offers fast, free delivery—no in-person visit required.",
+      "To get started, take the treatment quiz or choose your desired product. Then, create a profile by providing some basic information. MyRocky offers fast, free delivery—no in-person visit required.",
   },
   {
     question: "Do I need an in-person visit to receive treatment?",
@@ -162,12 +162,12 @@ const HomeFaqs = [
   {
     question: "How can I track my order?",
     answer:
-      "Track your order by logging into the Rocky platform. You’ll be able to check order status and manage your treatment.",
+      "Track your order by logging into the MyRocky platform. You’ll be able to check order status and manage your treatment.",
   },
   {
-    question: "How can I contact Rocky for support?",
+    question: "How can I contact Customer Support?",
     answer:
-      "For support, message us through the portal, email the appropriate department, or call +1 (416) 900-1444 (Mon–Fri, 6 PM–8 PM EST)",
+      "For support, message us through the portal, email the appropriate department. <a href='/contact-us' class='underline text-black'>Contact Us</a>",
   },
   {
     question: "What is the name and address of our affiliate partner pharmacy?",
@@ -179,7 +179,7 @@ const HairLossFaqs = [
   {
     question: "What are the common causes of hair loss?",
     answer:
-      "The most common cause tends to be hereditary which becomes evident as you age, typically starting in your 20’s. Another name for this type of hair loss is male pattern baldness or androgenetic alopecia. The first sign of male pattern hair loss may be a receding hairline or thinning around the temples or crown of the head. Other causes of hair loss include iron deficiency, thyroid disease and autoimmune disease. In some instances, it could be a local scalp problem such as seborrhoeic dermatitis, fungal infections or psoriasis. Here at Rocky, we focus on male pattern baldness and treat this using clinically proven/FDA approved medications consisting of pharmaceutical and non-pharmaceutical products.",
+      "The most common cause tends to be hereditary which becomes evident as you age, typically starting in your 20’s. Another name for this type of hair loss is male pattern baldness or androgenetic alopecia. The first sign of male pattern hair loss may be a receding hairline or thinning around the temples or crown of the head. Other causes of hair loss include iron deficiency, thyroid disease and autoimmune disease. In some instances, it could be a local scalp problem such as seborrhoeic dermatitis, fungal infections or psoriasis. Here at MyRocky, we focus on male pattern baldness and treat this using clinically proven/FDA approved medications consisting of pharmaceutical and non-pharmaceutical products.",
   },
   {
     question: "What is DHT and how is it contributing to my hair loss?",
@@ -231,7 +231,7 @@ const SexualHealthFaqs = [
   {
     question: "What is the most effective medication for ED?",
     answer:
-      "While both Sildenafil (Viagra) and Tadalafil (Cialis) are equally effective, there are a few differences. Sildenafil (Viagra) can take between 30-60 mins to work after ingestion, but sometimes can be delayed up to 2 hours with its effects lasting an average of 4 hours; food affects its effects. Tadalafil (Cialis), on the other hand, may act faster, last longer and it works regardless of when you had your last meal. With enough information, Rocky can help you find an ED medication and dosage that is right for you. Our platform provides ongoing care from our healthcare providers.",
+      "While both Sildenafil (Viagra) and Tadalafil (Cialis) are equally effective, there are a few differences. Sildenafil (Viagra) can take between 30-60 mins to work after ingestion, but sometimes can be delayed up to 2 hours with its effects lasting an average of 4 hours; food affects its effects. Tadalafil (Cialis), on the other hand, may act faster, last longer and it works regardless of when you had your last meal. With enough information, MyRocky can help you find an ED medication and dosage that is right for you. Our platform provides ongoing care from our healthcare providers.",
   },
   {
     question: "What are the side effects of ED medications?",
@@ -246,7 +246,7 @@ const SexualHealthFaqs = [
   {
     question: "Are ED medications available OTC?",
     answer:
-      "In the United States, erectile dysfunction medications are not available over-the-counter (OTC) and can only be obtained with a prescription. ED medications sold without a prescription are illegal and could potentially result in harm; ED medication in the counterfeit market does not undergo the correct production, testing, and approval and thus is not safe. Rocky provides access to a licensed health care team so you can be certain that you are getting safe and effective care. Through our online platform, you will be guided through a series of medical questions which are then reviewed by a licensed U.S. physician. Once the medical questionnaire is reviewed, you will be notified if you have been approved, and if so, the appropriate treatment is delivered to your doorstep.",
+      "In the United States, erectile dysfunction medications are not available over-the-counter (OTC) and can only be obtained with a prescription. ED medications sold without a prescription are illegal and could potentially result in harm; ED medication in the counterfeit market does not undergo the correct production, testing, and approval and thus is not safe. MyRocky provides access to a licensed health care team so you can be certain that you are getting safe and effective care. Through our online platform, you will be guided through a series of medical questions which are then reviewed by a licensed U.S. physician. Once the medical questionnaire is reviewed, you will be notified if you have been approved, and if so, the appropriate treatment is delivered to your doorstep.",
   },
   {
     question: "How can I improve my ED?",
@@ -268,7 +268,7 @@ const WlFaqs = [
   {
     question: "What can I expect after I sign up?",
     answer:
-      "Upon completing the initial online consultation, a Rocky Healthcare provider will assess this and determine if you are eligible. Please check your account for messages from your clinician.",
+      "Upon completing the initial online consultation, a MyRocky Healthcare provider will assess this and determine if you are eligible. Please check your account for messages from your clinician.",
   },
   {
     question: "Why do I need a blood test?",
@@ -293,16 +293,16 @@ const WlFaqs = [
   {
     question: "How do GLP-1s work?",
     answer:
-      "Body Optimization injections available through Rocky belong to the GLP-1 class of medications, mimicking the natural hormone GLP-1. They work by reducing appetite and promoting a feeling of fullness, leading to reduced food intake and body optimization.",
+      "Body Optimization injections available through MyRocky belong to the GLP-1 class of medications, mimicking the natural hormone GLP-1. They work by reducing appetite and promoting a feeling of fullness, leading to reduced food intake and body optimization.",
   },
   {
-    question: "How can I get a GLP-1 prescription at Rocky?",
+    question: "How can I get a GLP-1 prescription at MyRocky?",
     answer:
       'Simply click <a href="/wl-pre-consultation" class="underlined-link">here</a> and get started today!',
   },
   {
-    question: "Which GLP-1s does Rocky offer?",
+    question: "Which GLP-1s does MyRocky offer?",
     answer:
-      "Rocky provides prescriptions for several GLP-1 medications, including Ozempic, Mounjaro® and Wegovy.",
+      "MyRocky provides prescriptions for several GLP-1 medications, including Ozempic, Mounjaro® and Wegovy.",
   },
 ];

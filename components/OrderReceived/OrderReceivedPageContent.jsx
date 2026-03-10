@@ -9,6 +9,7 @@ import Link from "next/link";
 import { FaArrowRight } from "react-icons/fa";
 import CustomImage from "../utils/CustomImage";
 import { analyticsService } from "@/utils/analytics/analyticsService";
+import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
 import { formatPrice } from "@/utils/priceFormatter";
 
 // AWIN API configuration
@@ -47,7 +48,7 @@ const fireAwinClientPixel = (orderData, s2sOrderData = null) => {
             (Number.parseFloat(orderData.total_tax || 0) || 0) -
             (Number.parseFloat(orderData.shipping_total || 0) || 0)
         );
-    const currency = s2sOrderData?.currency || orderData.currency || "CAD";
+    const currency = s2sOrderData?.currency || orderData.currency || "USD";
     const orderRef =
       s2sOrderData?.order_reference || orderData.number || String(orderData.id);
     const commissionGroup = s2sOrderData?.commission_group || "DEFAULT";
@@ -382,6 +383,17 @@ const OrderReceivedContent = ({ userId }) => {
         if (data && data.id) {
           // Short delay to ensure GTM is ready
           setTimeout(() => {
+            // Diagnostic: confirm GTM is present on order-received page
+            try {
+              safePush({
+                event: "rk_after_checkout_return",
+                rk_session_id: getOrCreateSessionId(),
+                rk_order_id: String(data.id || ""),
+              });
+            } catch (_) {
+              // non-fatal diagnostic
+            }
+
             // Unified analytics purchase event (GA4 + Attentive hashes)
             analyticsService.trackPurchase(data);
             try {
@@ -408,6 +420,22 @@ const OrderReceivedContent = ({ userId }) => {
               const s2s = await sendAwinTracking(data);
               fireAwinClientPixel(data, s2s);
             })();
+
+            // Heatmap.com conversion tracking
+            try {
+              function heatmapLoadConversionSnippet(url) {
+                var script = document.createElement('script');
+                script.type = 'text/javascript';
+                script.src = url;
+                script.async = false;
+                script.defer = true;
+                document.head.appendChild(script);
+              }
+              heatmapLoadConversionSnippet('https://dashboard.heatmap.com/conversions.js?siteId=5229');
+              logger.log("[Heatmap] Conversion snippet loaded");
+            } catch (err) {
+              logger.error("[Heatmap] Conversion tracking failed:", err);
+            }
           }, 1000);
         }
 

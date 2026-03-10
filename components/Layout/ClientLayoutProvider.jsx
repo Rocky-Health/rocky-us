@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import LayoutDetector from "./LayoutDetector";
 import BugHerdProvider from "./BugHerdProvider";
 import AttributionTracker from "./AttributionTracker";
+import SessionInit from "./SessionInit";
 
 /**
  * ClientLayoutProvider serves as a client component wrapper
@@ -15,6 +16,7 @@ const ClientLayoutProvider = ({ children }) => {
   return (
     <BugHerdProvider>
       <LayoutDetector />
+      <SessionInit />
       <Suspense fallback={null}>
         <AttributionTracker />
       </Suspense>

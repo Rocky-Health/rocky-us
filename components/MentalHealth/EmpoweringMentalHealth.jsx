@@ -17,7 +17,7 @@ const EmpoweringMentalHealth = () => {
           </p>
           <p className="text-[20px] leading-[24px] md:leading-[30px] text-[#535353] md:text-[#000000A6] tracking-[-0.02em] md:h[142px] mb-[24px] md:mb-[45px] md:h-[123px] md:w-[551px] subheaders-font md:poppins-font">
             Manage your anxiety or depression with the dedicated support of our
-            licensed healthcare practitioners. At Rocky, we'll help you find the
+            licensed healthcare practitioners. At MyRocky, we'll help you find the
             right treatment to regain control over your life.
           </p>
         </div>

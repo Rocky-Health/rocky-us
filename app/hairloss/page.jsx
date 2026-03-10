@@ -9,10 +9,12 @@ import HairProducts from "@/components/Hair/HairProducts";
 import AfterAndBeforSection from "@/components/Hair/AfterAndBeforSection";
 import HairBlog from "@/components/Hair/HairBlog";
 import PartWaysHairLoss from "@/components/Hair/PartWaysHairLoss";
+import CouponCapture from "@/components/utils/CouponCapture";
 
 export default async function Hair() {
   return (
     <main>
+      <CouponCapture />
       <CoverSection>
         <HairCover />
       </CoverSection>

@@ -16,6 +16,7 @@ import QuestionnaireNavbar from "../EdQuestionnaire/QuestionnaireNavbar";
 import { ProgressBar } from "../EdQuestionnaire/ProgressBar";
 import Logo from "../Navbar/Logo";
 import Link from "next/link";
+import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
 
 // Pages 1-5: Migrated pre-quiz questions (moved to start)
 // Pages 6-27: Standard WL questionnaire questions (22 pages)
@@ -193,6 +194,15 @@ export default function NewBOWLConsultationQuiz({
   const router = useRouter();
   const formRef = useRef(null);
   const [currentPage, setCurrentPage] = useState(1);
+
+  useQuestionnaireStepTracking({
+    questionnaireId: "bo-weight-consultation",
+    stepId: currentPage,
+    stepIndex: currentPage,
+    flowId: "weight-loss",
+    stepType: "quiz",
+  });
+
   const [progress, setProgress] = useState(0);
   const [formData, setFormData] = useState(getInitialFormData());
   const [isClient, setIsClient] = useState(false);
@@ -4605,7 +4615,7 @@ export default function NewBOWLConsultationQuiz({
         isOpen={showNoAppointmentAcknowledgement}
         onClose={handleNoAppointmentContinue}
         title="Acknowledgement"
-        message="I hereby acknowledge that by foregoing an appointment with a licensed physician or pharmacist, it is my sole responsibility to ensure I am aware of how to appropriately use the medication requested, furthermore I hereby confirm that I am aware of any potential side effects that may occur through the use of the aforementioned medication and hereby confirm that I do not have any medical questions to ask. I will ensure I have read the relevant product page and FAQ prior to use of the prescribed medication. Should I have any questions to ask, I am aware of how to contact the clinical team at Rocky or get a hold of my primary care provider."
+        message="I hereby acknowledge that by foregoing an appointment with a licensed physician or pharmacist, it is my sole responsibility to ensure I am aware of how to appropriately use the medication requested, furthermore I hereby confirm that I am aware of any potential side effects that may occur through the use of the aforementioned medication and hereby confirm that I do not have any medical questions to ask. I will ensure I have read the relevant product page and FAQ prior to use of the prescribed medication. Should I have any questions to ask, I am aware of how to contact the clinical team at MyRocky or get a hold of my primary care provider."
         isAcknowledged={noAppointmentAcknowledged}
         onAcknowledge={handleNoAppointmentAcknowledgement}
         backgroundColor="bg-[#F5F4EF]"

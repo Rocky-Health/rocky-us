@@ -6,6 +6,7 @@ import { wlOfferConfig } from "./config/wlOfferConfig";
 import WLOfferGenericPopup from "./WLOfferGenericPopup"; // Use dedicated popup component for wl-offer flow
 import { PasswordProvider } from "../contexts/PasswordContext";
 import QuizStepRenderer from "./QuizStepRenderer";
+import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
 
 import { useEffect } from "react";
 import QuestionnaireNavbar from "../components/QuestionnaireNavbar";
@@ -77,6 +78,14 @@ const WLOfferPreConsultationFlow = () => {
     handleRecommendationContinue,
     isAddingToCart,
   } = useWLOfferFlow();
+
+  useQuestionnaireStepTracking({
+    questionnaireId: "wl-offer",
+    stepId: currentStep,
+    stepIndex: currentStep,
+    flowId: "weight-loss",
+    stepType: "pre-consultation",
+  });
 
   // Ensure hooks run in the same order on every render
   useEffect(() => {

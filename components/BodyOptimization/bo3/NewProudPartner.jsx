@@ -19,7 +19,7 @@ const ProudPartner = ({ section = false, bg = "bg-white" }) => {
           <div className={`relative overflow-hidden ${rockyLogoSize}`}>
             <CustomContainImage
               src="https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp"
-              alt="Rocky Logo"
+              alt="MyRocky Logo"
               fill
               className="object-contain"
             />
@@ -56,14 +56,7 @@ const ProudPartner = ({ section = false, bg = "bg-white" }) => {
               className="object-contain"
             />
           </div>
-          <div className={`relative overflow-hidden ${argonautsLogoSize}`}>
-            <CustomContainImage
-              src="https://myrocky.b-cdn.net/partner-2.png"
-              alt="Toronto Argonauts"
-              fill
-              className="object-contain"
-            />
-          </div>
+          
         </div>
       </div>
     </div>

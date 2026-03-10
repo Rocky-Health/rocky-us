@@ -7,6 +7,7 @@ import BasicProductInfo from "./BasicProductInfo";
 import Section from "@/components/utils/Section";
 import MoreQuestions from "@/components/MoreQuestions";
 import dynamic from "next/dynamic";
+import { PRODUCT_TYPES } from "@/lib/constants/productTypes";
 
 // Dynamically import non-critical components to improve initial load time
 const DynamicProfessionalAdvice = dynamic(
@@ -16,7 +17,7 @@ const DynamicProfessionalAdvice = dynamic(
       <div className="min-h-[250px] bg-[#F5F4EF] animate-pulse"></div>
     ),
     ssr: false,
-  }
+  },
 );
 
 // Use dynamic imports with loading=false to prevent render blocking for non-critical sections
@@ -27,7 +28,7 @@ const DynamicReviewsSection = dynamic(
       <div className="min-h-[300px] bg-[#F5F4EF] animate-pulse"></div>
     ),
     ssr: false,
-  }
+  },
 );
 
 const DynamicHowRockyWorks = dynamic(
@@ -35,7 +36,7 @@ const DynamicHowRockyWorks = dynamic(
   {
     loading: () => <div className="min-h-[300px] animate-pulse"></div>,
     ssr: false,
-  }
+  },
 );
 
 const DynamicFaqsSection = dynamic(() => import("@/components/FaqsSection"), {
@@ -61,15 +62,15 @@ const ProductPageContent = ({ clientProps, faqs }) => {
   const formattedFaqs = useMemo(() => {
     try {
       const productSlug = product?.slug || "";
-      
+
       if (productSlug === "sildenafil-viagra") {
         return sildenafilFaqs;
       }
-      
+
       if (productSlug === "tadalafil-cialis") {
         return tadalafilFaqs;
       }
-      
+
       // If in loading state or no faqs available, return minimal set
       if (isLoading || !faqs) {
         return [
@@ -194,10 +195,14 @@ const ProductPageContent = ({ clientProps, faqs }) => {
             "No GP or pharmacy visits needed.",
           ]}
           buttonText="Start Free Visit"
-          buttonLink={consultationLink || "/consultation"}
+          buttonLink={
+            productType === PRODUCT_TYPES.HAIR
+              ? "/hair-pre-consultation-quiz"
+              : "/ed-pre-consultation-quiz"
+          }
           buttonLinkProps={{ prefetch: true }}
           imageUrl="https://myrocky.b-cdn.net/WP%20Images/product%20v2/get-p-advice.png"
-          imageAlt="Rocky professional advice"
+          imageAlt="MyRocky professional advice"
         />
       </Section>
 

@@ -330,7 +330,7 @@ const GenericPopup = ({
                   <div>
                     <p className="text-[11px] font-normal leading-[140%] text-[#212121] mb-4">
                       *On average, through lifestyle changes, treatment and
-                      support, Rocky members lose 12% of their weight in 6
+                      support, MyRocky members lose 12% of their weight in 6
                       months.
                     </p>
                   </div>

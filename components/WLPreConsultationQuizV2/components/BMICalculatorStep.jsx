@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { logger } from "@/utils/devLogger";
 
 const BMICalculatorStep = ({
@@ -10,6 +10,11 @@ const BMICalculatorStep = ({
 }) => {
   const { weight: weightPounds, height = {}, bmi } = userData || {};
   const { feet: heightFeet = "", inches: heightInches = "" } = height;
+
+  const feetRef = useRef(null);
+  const inchesRef = useRef(null);
+  const weightRef = useRef(null);
+  const continueRef = useRef(null);
 
   useEffect(() => {
     const feetNum = parseFloat(heightFeet) || 0;
@@ -54,12 +59,19 @@ const BMICalculatorStep = ({
   return (
     <div className="w-full h-full flex flex-col">
       <div className="w-full md:w-[520px] mx-auto flex-grow pb-32">
-        <div className="mb-6">
-          <label className="block mb-2">How tall are you?</label>
+        <p className="mb-[24px] text-[#AE7E56] font-poppins font-medium text-base leading-[140%] tracking-normal align-middle">
+          This helps calculate your BMI (Body Mass Index), a general screening tool for body composition.
+        </p>
+        <div className="mb-[16px]">
+          <label className="block mb-2 text-[14px] font-medium">
+            How tall are you?
+          </label>
           <div className="flex items-center mb-4 gap-2">
             <input
+              ref={feetRef}
               type="number"
               min="0"
+              enterKeyHint="next"
               className="h-[60px] w-full p-3 border border-gray-300 rounded-md "
               placeholder="Feet"
               value={
@@ -79,11 +91,19 @@ const BMICalculatorStep = ({
                   weight: weightPounds,
                 }));
               }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  inchesRef.current?.focus();
+                }
+              }}
             />
 
             <input
+              ref={inchesRef}
               type="number"
               min="0"
+              enterKeyHint="next"
               className="h-[60px] w-full p-3 border border-gray-300 rounded-md mr-2"
               placeholder="Inches"
               value={
@@ -103,15 +123,24 @@ const BMICalculatorStep = ({
                   weight: weightPounds,
                 }));
               }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  weightRef.current?.focus();
+                }
+              }}
             />
-           
           </div>
         </div>
 
-        <div className="mb-6">
-          <label className="block mb-2">How much do you currently weigh?  </label>
+        <div className="mb-[16px]">
+          <label className="block mb-2 text-[14px] font-medium">
+            How much do you currently weigh?
+          </label>
           <input
+            ref={weightRef}
             type="number"
+            enterKeyHint="done"
             className="h-[60px] w-full p-3 border border-gray-300 rounded-md"
             placeholder="Weight (Pounds)"
             value={
@@ -126,6 +155,12 @@ const BMICalculatorStep = ({
                 weight: value === "" ? "" : parseInt(value) || 0,
                 height: { feet: heightFeet, inches: heightInches },
               }));
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                continueRef.current?.focus();
+              }
             }}
           />
         </div>
@@ -152,6 +187,7 @@ const BMICalculatorStep = ({
             ))}
 
           <button
+            ref={continueRef}
             className={`w-full py-3 ${
               isEligible ? "bg-black text-white" : "bg-gray-300 text-gray-700"
             }  rounded-full h-[52px] font-medium border-none focus:outline-none focus:ring-0`}

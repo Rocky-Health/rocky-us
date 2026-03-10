@@ -5,6 +5,7 @@
  */
 
 import { logger } from "@/utils/devLogger";
+import { getOrCreateSessionId } from "@/utils/dataLayerHelper";
 import {
   trackTikTokAddToCart,
   trackTikTokInitiateCheckout,
@@ -62,10 +63,18 @@ export const trackGA4Event = (eventName, eventData = {}, debug = true) => {
       ...eventData,
     };
 
+    // Attach session_id for GTM/partner visibility
+    try {
+      eventPayload.rk_session_id = eventPayload.rk_session_id || getOrCreateSessionId();
+    } catch (_) {
+      // non-fatal
+    }
+
     // Add user_id to dataLayer if available, but do NOT clobber canonical IDs
     // Only set customer_id from cookie when caller did not supply any id fields
     if (userId) {
       eventPayload.user_id = eventPayload.user_id || userId;
+      eventPayload.rk_user_id = eventPayload.rk_user_id || userId;
       const hasCanonicalId =
         typeof eventPayload.customer_id_canonical !== "undefined" &&
         eventPayload.customer_id_canonical !== null &&
@@ -106,9 +115,9 @@ export const trackGA4EcommerceEvent = (
   additionalData = {},
   debug = true
 ) => {
-  // Clear previous ecommerce object for purchase events per GA4 best practices
+  // Clear previous ecommerce object per GA4 best practices
   try {
-    if (typeof window !== "undefined" && eventName === "purchase") {
+    if (typeof window !== "undefined") {
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({ ecommerce: null });
     }
@@ -172,7 +181,7 @@ export const formatGA4Item = (product, quantity = 1) => {
   }
 
   // Extract brand from attributes (matches PHP get_attribute('brand'))
-  let brand = "Rocky"; // Default fallback
+  let brand = "MyRocky"; // Default fallback
 
   if (product.attributes) {
     const brandAttr = product.attributes.find(
@@ -187,7 +196,7 @@ export const formatGA4Item = (product, quantity = 1) => {
         brand = brandAttr.terms[0].name;
       } else if (brandAttr.options) {
         brand = Array.isArray(brandAttr.options)
-          ? brandAttr.options[0]?.toString() || "Rocky"
+          ? brandAttr.options[0]?.toString() || "MyRocky"
           : brandAttr.options.toString();
       }
     }
@@ -195,7 +204,7 @@ export const formatGA4Item = (product, quantity = 1) => {
 
   // If no brand found in attributes, check meta_data
   if (
-    brand === "Rocky" &&
+    brand === "MyRocky" &&
     product.meta_data &&
     Array.isArray(product.meta_data)
   ) {
@@ -228,7 +237,7 @@ export const trackViewItem = (product, additionalData = {}, debug = true) => {
   const item = formatGA4Item(product);
 
   const ecommerceData = {
-    currency: "CAD",
+    currency: "USD",
     value: item.price,
     items: [item],
   };
@@ -256,7 +265,7 @@ export const trackAddToCart = (
   const item = formatGA4Item(product, quantity);
 
   const ecommerceData = {
-    currency: "CAD",
+    currency: "USD",
     value: item.price * quantity,
     items: [item],
   };
@@ -284,7 +293,7 @@ export const trackRemoveFromCart = (
   const item = formatGA4Item(product, quantity);
 
   const ecommerceData = {
-    currency: "CAD",
+    currency: "USD",
     value: item.price * quantity,
     items: [item],
   };
@@ -317,7 +326,7 @@ export const trackViewCart = (
   );
 
   const ecommerceData = {
-    currency: "CAD",
+    currency: "USD",
     value: totalValue,
     items: items,
   };
@@ -345,7 +354,7 @@ export const trackBeginCheckout = (
   );
 
   const ecommerceData = {
-    currency: "CAD",
+    currency: "USD",
     value: totalValue,
     items: items,
   };

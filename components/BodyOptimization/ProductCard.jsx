@@ -1,7 +1,11 @@
 import Link from "next/link";
 import CustomImage from "../utils/CustomImage";
 
-const ProductCard = ({ product, btnColor = null, consultationHref = "/wl-pre-consultation" }) => {
+const ProductCard = ({
+  product,
+  btnColor = null,
+  consultationHref = "/wl-pre-consultation",
+}) => {
   return (
     <div className="relative rounded-[16px] overflow-hidden min-w-[284px] h-[400px] border border-solid border-[#E2E2E1] bg-white shadow-md">
       <div className="relative overflow-hidden w-full h-full">

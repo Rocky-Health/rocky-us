@@ -2,6 +2,8 @@ import { blogService } from "@/components/NewBlogs/services/blogService";
 import { AllBlogsPage } from "@/components/NewBlogs/AllBlogsPage";
 import { logger } from "@/utils/devLogger";
 
+export const dynamic = "force-dynamic";
+
 export default async function AllBlogsPageRoute({ searchParams }) {
   try {
     // Await searchParams as it's now a promise in Next.js 15+

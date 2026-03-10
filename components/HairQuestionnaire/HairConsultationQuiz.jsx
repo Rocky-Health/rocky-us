@@ -14,6 +14,7 @@ import hairQuestionList from "./hairQuestion";
 import Logo from "../Navbar/Logo";
 import DOBInput from "../shared/DOBInput";
 import Link from "next/link";
+import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
 
 const { uploadFileToS3WithProgress } = await import(
   "@/utils/s3/frontend-upload"
@@ -40,6 +41,15 @@ export default function HairConsultationQuiz({
   const [isSyncing, setIsSyncing] = useState(false);
   const [isMovingForward, setIsMovingForward] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+
+  useQuestionnaireStepTracking({
+    questionnaireId: "hair-consultation",
+    stepId: currentPage,
+    stepIndex: currentPage,
+    flowId: "hair",
+    stepType: "quiz",
+  });
+
   const [progress, setProgress] = useState(10);
   const [showPopup, setShowPopup] = useState(false);
   const [showUnder18Popup, setShowUnder18Popup] = useState(false);
@@ -4278,7 +4288,7 @@ export default function HairConsultationQuiz({
                       isOpen={showNoCallAcknowledgement}
                       onClose={handleNoCallContinue}
                       title="No Call Acknowledgement"
-                      message="I hereby acknowledge that by foregoing an appointment with a licensed physician or pharmacist, it is my sole responsibility to ensure I am aware of how to appropriately use the medication requested, furthermore I hereby confirm that I am aware of any potential side effects that may occur through the use of the aforementioned medication and hereby confirm that I do not have any medical questions to ask. I will ensure I have read the relevant product page and FAQ prior to use of the prescribed medication. Should I have any questions to ask, I am aware of how to contact the clinical team at Rocky or get a hold of my primary care provider."
+                      message="I hereby acknowledge that by foregoing an appointment with a licensed physician or pharmacist, it is my sole responsibility to ensure I am aware of how to appropriately use the medication requested, furthermore I hereby confirm that I am aware of any potential side effects that may occur through the use of the aforementioned medication and hereby confirm that I do not have any medical questions to ask. I will ensure I have read the relevant product page and FAQ prior to use of the prescribed medication. Should I have any questions to ask, I am aware of how to contact the clinical team at MyRocky or get a hold of my primary care provider."
                       isAcknowledged={noCallAcknowledged}
                       onAcknowledge={handleNoCallAcknowledgement}
                       buttonText="I Acknowledge"
@@ -4405,7 +4415,7 @@ export default function HairConsultationQuiz({
                       isOpen={showBreastCancerWarning}
                       onClose={handleBreastCancerWarningClose}
                       title="Please keep in mind that..."
-                      message="We care about your health here at Rocky. This medication may not be safe for use with breast cancer and we are therefore unable to provide you with a prescription at this time. Please speak to your health care provider to see if Finasteride may be safe for you."
+                      message="We care about your health here at MyRocky. This medication may not be safe for use with breast cancer and we are therefore unable to provide you with a prescription at this time. Please speak to your health care provider to see if Finasteride may be safe for you."
                       isAcknowledged={breastCancerWarningAcknowledged}
                       onAcknowledge={handleBreastCancerWarningAcknowledge}
                       buttonText="OK"

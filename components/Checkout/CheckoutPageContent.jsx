@@ -3,7 +3,7 @@
 import Loader from "@/components/Loader";
 import { logger } from "@/utils/devLogger";
 import CheckoutSkeleton from "@/components/ui/skeletons/CheckoutSkeleton";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import BillingAndShipping from "./BillingAndShipping";
 import CartAndPayment from "./CartAndPayment";
 import { toast } from "react-toastify";
@@ -42,11 +42,18 @@ import {
     isRestrictedWlCartItem,
 } from "@/utils/edShippingRestrictions";
 import { getAwinFromUrlOrStorage } from "@/utils/awin";
+import { analyticsService } from "@/utils/analytics/analyticsService";
+import { getOrCreateSessionId } from "@/utils/dataLayerHelper";
 import StripeElementsPayment from "./StripeElementsPayment";
 import { Elements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { useAddressManager } from "@/lib/hooks/useAddressManager";
 import { debugAddressData } from "@/utils/addressDebugger";
+import {
+    useAutoApplyCoupon,
+    getPendingCouponCode,
+    clearPendingCouponCode,
+} from "@/lib/hooks/useAutoApplyCoupon";
 
 // Load Stripe outside component to avoid recreating on every render
 const stripePromise = loadStripe(
@@ -78,6 +85,7 @@ const CheckoutPageContent = () => {
     const stripe = useStripe(); // Get the Stripe instance from context
     const router = useRouter();
     const searchParams = useSearchParams();
+    useAutoApplyCoupon();
     const isEdFlow = searchParams.get("ed-flow") === "1";
     const isSmokingFlow = searchParams.get("smoking-flow") === "1";
     const onboardingAddToCart = searchParams.get("onboarding-add-to-cart");
@@ -106,6 +114,7 @@ const CheckoutPageContent = () => {
     const [submitting, setSubmitting] = useState(false);
     const [cartItems, setCartItems] = useState();
     const [isProcessingUrlParams, setIsProcessingUrlParams] = useState(false);
+    const beginCheckoutFiredRef = useRef(false);
     const [savedCards, setSavedCards] = useState([]);
     const [selectedCard, setSelectedCard] = useState(null);
     const [isLoadingSavedCards, setIsLoadingSavedCards] = useState(false);
@@ -140,6 +149,39 @@ const CheckoutPageContent = () => {
         clearStoredAddresses,
         fetchProfileData,
     } = useAddressManager();
+
+    useEffect(() => {
+        if (
+            beginCheckoutFiredRef.current ||
+            !cartItems?.items?.length ||
+            window.location.pathname.includes("order-received")
+        ) {
+            return;
+        }
+        beginCheckoutFiredRef.current = true;
+
+        try {
+            const items = cartItems.items.map((item) => ({
+                product: {
+                    id: String(item.id || item.product_id || ""),
+                    sku: String(item.id || item.product_id || ""),
+                    name: item.name || "",
+                    price: parseFloat(item.prices?.price || item.totals?.line_total || 0) / 100,
+                    categories: [],
+                    attributes: [],
+                },
+                quantity: item.quantity || 1,
+            }));
+            const sessionId = getOrCreateSessionId();
+            const cartHash = cartItems.items.map((i) => i.id).sort().join("-");
+            analyticsService.trackBeginCheckout(items, {
+                event_id: `begin_checkout_${sessionId}_${cartHash}_${Date.now()}`,
+            });
+        } catch (_) {
+            // non-blocking
+        }
+    }, [cartItems]);
+
     const [formData, setFormData] = useState({
         additional_fields: [],
         shipping_address: {},
@@ -1165,18 +1207,46 @@ const CheckoutPageContent = () => {
                     }
                 }
 
-                // STEP 2: Load profile data AFTER cart completes to override cart data
-                // This ensures logged-in users always see their latest profile data
-                // logger.log("=== LOADING PROFILE DATA ===");
-                // await fetchUserProfile();
-                // logger.log("=== PROFILE DATA LOADED ===");
+                // STEP 2: Auto-apply pending coupon from localStorage (or URL)
+                const pendingCoupon =
+                    searchParams.get("apply_coupon") ||
+                    getPendingCouponCode();
+                if (pendingCoupon) {
+                    try {
+                        logger.log(
+                            `Auto-applying pending coupon: ${pendingCoupon}`
+                        );
+                        const couponRes = await fetch("/api/coupons", {
+                            headers: { "Content-Type": "application/json" },
+                            method: "POST",
+                            body: JSON.stringify({ code: pendingCoupon }),
+                        });
+                        const couponData = await couponRes.json();
 
-                // STEP 3: Profile data is already fetched and merged in fetchCartItems
-                // No need to call populateAddressData again as it would use stale formData state
-                // The profile data merging happens inside fetchCartItems before setFormData is called
+                        if (couponData.error) {
+                            toast.error(
+                                `Coupon "${pendingCoupon}" could not be applied.`
+                            );
+                        } else {
+                            setCartItems(couponData);
+                            toast.success(
+                                `Coupon "${pendingCoupon}" applied!`
+                            );
+                        }
+                    } catch (couponErr) {
+                        logger.error(
+                            "Error auto-applying coupon:",
+                            couponErr
+                        );
+                        toast.error("Failed to apply coupon.");
+                    } finally {
+                        clearPendingCouponCode();
+                    }
+                }
+
                 logger.log("=== ADDRESS DATA ALREADY POPULATED IN FETCHCARTITEMS ===");
 
-                // STEP 4: Load saved cards (doesn't affect form data)
+                // STEP 3: Load saved cards (doesn't affect form data)
                 await fetchSavedCards();
             } catch (error) {
                 logger.error("Error loading checkout data:", error);

@@ -2,6 +2,7 @@ import YourWeightPopup from "./YourWeightPopup";
 import React, { useEffect } from "react";
 import CustomImage from "@/components/utils/CustomImage";
 import Counter from "./Counter"; // Use separate Counter for BO2/BO3
+import WeightLossResultPasswordPopup from "../../components/WeightLossResultPasswordPopup";
 import { ProgressBar } from "@/components/EdQuestionnaire/ProgressBar";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -170,7 +171,7 @@ const GenericPopup = ({
             }
           >
             <div
-              className={` px-8 md:px-0 max-w-lg flex flex-col  ${
+              className={` px-4 md:px-0 max-w-lg flex flex-col  ${
                 popupConfig.contentAlign === "left"
                   ? "items-start"
                   : "items-center justify-center mx-auto"
@@ -193,23 +194,27 @@ const GenericPopup = ({
                 </div>
               )}
 
-              {popupConfig.component !== "Counter" && popupConfig.title && (
-                <h3
-                  className={
-                    popupConfig.headerStyle
-                      ? popupConfig.headerStyle
-                      : `text-[26px] md:text-[32px]  headers-font ${getTitleColor()} leading-[140%] mb-8`
-                  }
-                >
-                  {popupConfig.titleIsHtml ? (
-                    <span
-                      dangerouslySetInnerHTML={{ __html: popupConfig.title }}
-                    />
-                  ) : (
-                    popupConfig.title
-                  )}
-                </h3>
-              )}
+              {popupConfig.component !== "Counter" &&
+                popupConfig.component !== "YourWeightPopup" &&
+                popupConfig.title && (
+                  <h3
+                    className={
+                      popupConfig.headerStyle
+                        ? popupConfig.headerStyle
+                        : `text-[26px] md:text-[32px]  headers-font ${getTitleColor()} leading-[140%] mb-8`
+                    }
+                  >
+                    {popupConfig.titleIsHtml ? (
+                      <span
+                        dangerouslySetInnerHTML={{
+                          __html: popupConfig.title,
+                        }}
+                      />
+                    ) : (
+                      popupConfig.title
+                    )}
+                  </h3>
+                )}
 
               {popupConfig.component === "Counter" ? (
                 <Counter
@@ -219,9 +224,18 @@ const GenericPopup = ({
                   onAction={onAction}
                   nextPopup={popupConfig.nextPopup || "YourWeightPopup"}
                 />
+              ) : popupConfig.component === "WeightLossResultPasswordPopup" ? (
+                <WeightLossResultPasswordPopup
+                  onSubmit={onAction}
+                  setUserData={setUserData}
+                />
               ) : popupConfig.component === "YourWeightPopup" ? (
                 <YourWeightPopup
-                  weight={popupConfig.weight !== undefined ? popupConfig.weight : popupConfig.text}
+                  weight={
+                    popupConfig.weight !== undefined
+                      ? popupConfig.weight
+                      : popupConfig.text
+                  }
                   onAction={onAction}
                   setUserData={setUserData}
                 />
@@ -234,15 +248,15 @@ const GenericPopup = ({
                   }
                 >
                   {popupConfig.message &&
-                    popupConfig.message
-                      .split("\n")
-                      .map((line, index) => (
-                        <p
-                          key={index}
-                          className={index > 0 ? "mt-4" : ""}
-                          dangerouslySetInnerHTML={{ __html: line }}
-                        />
-                      ))}
+                    popupConfig.message.split("\n").map((line, index) => (
+                      <p
+                        key={index}
+                        className={index > 0 ? "mt-4" : ""}
+                        dangerouslySetInnerHTML={{
+                          __html: line,
+                        }}
+                      />
+                    ))}
                 </div>
               )}
 
@@ -250,7 +264,9 @@ const GenericPopup = ({
                 <div>
                   {typeof popupConfig.content === "string" ? (
                     <div
-                      dangerouslySetInnerHTML={{ __html: popupConfig.content }}
+                      dangerouslySetInnerHTML={{
+                        __html: popupConfig.content,
+                      }}
                     />
                   ) : (
                     popupConfig.content
@@ -279,7 +295,7 @@ const GenericPopup = ({
                 <>
                   <div className="text-[10px] leading-[140%] font-medium text-[#BABABA] mt-2 mb-24">
                     We respect your privacy. All of your information is securely
-                    stored on our PIPEDA Compliant server.
+                    stored on our HIPAA Compliant server.
                   </div>
                 </>
               )}
@@ -287,7 +303,9 @@ const GenericPopup = ({
               {/* Fixed bottom button area */}
               <div
                 className="fixed  bottom-0 left-0 w-full px-4 pb-4 flex items-center justify-center z-50 bg-white/90 backdrop-blur-sm"
-                style={{ boxShadow: "0 -12px 30px rgba(255,255,255,0.95)" }}
+                style={{
+                  boxShadow: "0 -12px 30px rgba(255,255,255,0.95)",
+                }}
               >
                 <div
                   className={
@@ -296,24 +314,25 @@ const GenericPopup = ({
                       : "w-full flex flex-col items-center justify-center gap-3"
                   }
                 >
-                  {popupConfig.buttons && popupConfig.buttons.map((button, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleButtonClick(button)}
-                      disabled={button.disabled}
-                      className={`w-full h-[52px] ${
-                        popupConfig.title === "You want something..."
-                          ? "w-full"
-                          : "max-w-sm"
-                      }  py-3 items-center rounded-full font-medium transition-colors ${
-                        button.primary
-                          ? "bg-black text-white hover:bg-gray-800"
-                          : "border border-gray-300 text-gray-700 hover:bg-gray-50"
-                      }`}
-                    >
-                      {button.label}
-                    </button>
-                  ))}
+                  {popupConfig.buttons &&
+                    popupConfig.buttons.map((button, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleButtonClick(button)}
+                        disabled={button.disabled}
+                        className={`w-full h-[52px] ${
+                          popupConfig.title === "You want something..."
+                            ? "w-full"
+                            : "max-w-sm"
+                        }  py-3 items-center rounded-full font-medium transition-colors ${
+                          button.primary
+                            ? "bg-black text-white hover:bg-gray-800"
+                            : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+                        }`}
+                      >
+                        {button.label}
+                      </button>
+                    ))}
                 </div>
               </div>
             </div>

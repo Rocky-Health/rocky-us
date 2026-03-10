@@ -6,6 +6,8 @@ import {
   getUserState,
   isEdRestrictedProduct,
 } from "@/utils/edShippingRestrictions";
+import { analyticsService } from "@/utils/analytics/analyticsService";
+import { getOrCreateSessionId } from "@/utils/dataLayerHelper";
 
 /**
  * Add ED product to cart directly using API
@@ -114,6 +116,25 @@ export const addEdProductToCart = async (
 
     const result = await response.json();
     logger.log("Product added to cart:", result);
+
+    // Fire add_to_cart analytics event
+    try {
+      const itemId = String(requestBody.productId || requestBody.variationId || "");
+      analyticsService.trackAddToCart(
+        {
+          id: itemId,
+          sku: itemId,
+          name: productOptions.name || dosage || "",
+          price: result?.price ? parseFloat(result.price) : 0,
+          categories: [],
+          attributes: [],
+        },
+        1,
+        { event_id: `add_to_cart_${getOrCreateSessionId()}_${itemId}_${Date.now()}` }
+      );
+    } catch (_) {
+      // non-blocking
+    }
 
     // Show success message
     toast.success("Product added to cart");

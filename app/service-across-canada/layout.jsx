@@ -2,18 +2,18 @@ import MoreQuestions from "@/components/MoreQuestions";
 import React from "react";
 
 export const metadata = {
-    title: "ED Medication Services Across US | Rocky",
+    title: "ED Medication Services Across US | MyRocky",
     description:
         "Access ED medications online with discreet delivery across US. Professional consultation and prescription services for Viagra and Cialis.",
     openGraph: {
-        title: "ED Medication Services Across US | Rocky",
+        title: "ED Medication Services Across US | MyRocky",
         description:
             "Access ED medications online with discreet delivery across US. Professional consultation and prescription services for Viagra and Cialis.",
         images: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp",
     },
     twitter: {
-        card: "ED Medication Services Across US | Rocky",
-        title: "ED Medication Services Across US | Rocky",
+        card: "ED Medication Services Across US | MyRocky",
+        title: "ED Medication Services Across US | MyRocky",
         description:
             "Access ED medications online with discreet delivery across US. Professional consultation and prescription services for Viagra and Cialis.",
         images: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp",

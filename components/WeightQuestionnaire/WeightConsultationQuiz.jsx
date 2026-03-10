@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { logger } from "@/utils/devLogger";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { WarningPopup } from "../EdQuestionnaire/WarningPopup";
 import { QuestionLayout } from "../EdQuestionnaire/QuestionLayout";
 import { QuestionOption } from "../EdQuestionnaire/QuestionOption";
@@ -13,6 +13,7 @@ import { ProgressBar } from "../EdQuestionnaire/ProgressBar";
 import Logo from "../Navbar/Logo";
 import Link from "next/link";
 import BMICalculatorStep from "../WLPreConsultationQuiz/steps/BMICalculatorStep";
+import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
 
 const SINGLE_CHOICE_PAGES = [1, 2, 3, 7, 10, 11, 12, 14];
 
@@ -179,7 +180,6 @@ export default function WeightLossConsultationQuiz({
   const fname = nameParts[0] || "";
   const lname = nameParts[1] || "";
   const router = useRouter();
-  const searchParams = useSearchParams();
   const formRef = useRef(null);
 
   const [nameUpdateOption, setNameUpdateOption] = useState("");
@@ -199,6 +199,15 @@ export default function WeightLossConsultationQuiz({
   const [photoIdFile, setPhotoIdFile] = useState(null);
   const [isMovingForward, setIsMovingForward] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+
+  useQuestionnaireStepTracking({
+    questionnaireId: "weight-consultation",
+    stepId: currentPage,
+    stepIndex: currentPage,
+    flowId: "weight-loss",
+    stepType: "quiz",
+  });
+
   const [progress, setProgress] = useState(0);
   const [photoIdAcknowledged, setPhotoIdAcknowledged] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -902,7 +911,7 @@ export default function WeightLossConsultationQuiz({
   };
 
   useEffect(() => {
-    if (!searchParams) return;
+    const searchParams = new URLSearchParams(window.location.search);
 
     const orderId = searchParams.get("order-id");
     const purchasedProduct = searchParams.get("purchased_product");
@@ -937,7 +946,7 @@ export default function WeightLossConsultationQuiz({
 
       logger.log("Updated form data with URL parameters:", urlParamUpdates);
     }
-  }, [searchParams]);
+  }, []);
 
   useEffect(() => {
     if (!formRef.current) return;
@@ -5613,7 +5622,7 @@ export default function WeightLossConsultationQuiz({
                           isOpen={showNoAppointmentAcknowledgement}
                           onClose={handleNoAppointmentContinue}
                           title="Acknowledgement"
-                          message="I hereby acknowledge that by foregoing an appointment with a licensed physician or pharmacist, it is my sole responsibility to ensure I am aware of how to appropriately use the medication requested, furthermore I hereby confirm that I am aware of any potential side effects that may occur through the use of the aforementioned medication and hereby confirm that I do not have any medical questions to ask. I will ensure I have read the relevant product page and FAQ prior to use of the prescribed medication. Should I have any questions to ask, I am aware of how to contact the clinical team at Rocky or get a hold of my primary care provider."
+                          message="I hereby acknowledge that by foregoing an appointment with a licensed physician or pharmacist, it is my sole responsibility to ensure I am aware of how to appropriately use the medication requested, furthermore I hereby confirm that I am aware of any potential side effects that may occur through the use of the aforementioned medication and hereby confirm that I do not have any medical questions to ask. I will ensure I have read the relevant product page and FAQ prior to use of the prescribed medication. Should I have any questions to ask, I am aware of how to contact the clinical team at MyRocky or get a hold of my primary care provider."
                           isAcknowledged={noAppointmentAcknowledged}
                           onAcknowledge={handleNoAppointmentAcknowledgement}
                           backgroundColor="bg-[#F5F4EF]"

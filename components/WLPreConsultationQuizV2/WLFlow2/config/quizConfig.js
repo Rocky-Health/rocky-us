@@ -21,7 +21,13 @@ export const quizConfig = {
       },
       outcome: {
         recommended: WLProducts.RYBELSUS,
-        alternatives: [WLProducts.COMPOUNDED_TIRZEPATIDE, WLProducts.COMPOUNDED_SEMAGLUTIDE, WLProducts.OZEMPIC, WLProducts.WEGOVY, WLProducts.RYBELSUS],
+        alternatives: [
+          WLProducts.COMPOUNDED_TIRZEPATIDE,
+          WLProducts.COMPOUNDED_SEMAGLUTIDE,
+          WLProducts.OZEMPIC,
+          WLProducts.WEGOVY,
+          WLProducts.RYBELSUS,
+        ],
       },
     },
     {
@@ -30,14 +36,26 @@ export const quizConfig = {
       },
       outcome: {
         recommended: WLProducts.COMPOUNDED_TIRZEPATIDE,
-        alternatives: [WLProducts.COMPOUNDED_SEMAGLUTIDE, WLProducts.OZEMPIC, WLProducts.MOUNJARO, WLProducts.WEGOVY, WLProducts.RYBELSUS],
+        alternatives: [
+          WLProducts.COMPOUNDED_SEMAGLUTIDE,
+          WLProducts.OZEMPIC,
+          WLProducts.MOUNJARO,
+          WLProducts.WEGOVY,
+          WLProducts.RYBELSUS,
+        ],
       },
     },
     {
       conditions: {}, // Default case
       outcome: {
         recommended: WLProducts.COMPOUNDED_TIRZEPATIDE,
-        alternatives: [WLProducts.COMPOUNDED_SEMAGLUTIDE, WLProducts.OZEMPIC, WLProducts.MOUNJARO, WLProducts.WEGOVY, WLProducts.RYBELSUS],
+        alternatives: [
+          WLProducts.COMPOUNDED_SEMAGLUTIDE,
+          WLProducts.OZEMPIC,
+          WLProducts.MOUNJARO,
+          WLProducts.WEGOVY,
+          WLProducts.RYBELSUS,
+        ],
       },
     },
   ],
@@ -46,7 +64,7 @@ export const quizConfig = {
     1: {
       id: "accomplishment",
       type: "checkbox",
-      title: "What do you want to accomplish with Rocky?",
+      title: "What do you want to accomplish with MyRocky?",
       QSpanHeader: "I want to ...",
       subtitle: "I want to ...",
       field: "accomplishment",
@@ -119,7 +137,6 @@ export const quizConfig = {
         "We respect your privacy. All of your information is securely stored on our HIPAA Compliant server.",
       required: true,
     },
-
 
     4: {
       id: "pregnantOrbreastfeeding",
@@ -271,8 +288,6 @@ export const quizConfig = {
     //   ],
     // },
 
-
-
     9: {
       id: "province",
       type: "select",
@@ -285,6 +300,7 @@ export const quizConfig = {
       label: "State",
       options: [
         { id: "", label: "Select a state" },
+        { id: "CA", label: "California" },
         { id: "CO", label: "Colorado" },
         { id: "CT", label: "Connecticut" },
         { id: "FL", label: "Florida" },
@@ -466,11 +482,11 @@ export const quizConfig = {
       isWL: true,
       headerStyle:
         "headers-font text-[26px]  md:text-[32px] headers-font leading-[120%] mb-[16px] text-center",
-      title: "Rocky creates long-term weight loss",
+      title: "MyRocky creates long-term weight loss",
       messageStyle:
         "text-[14px] md:text-[16px] leading-[140%] mb-[24px] text-center",
       message:
-        "On average, Rocky members lose 2-5x more weight vs. similar programs – without restrictive diets. Our holistic approach goes beyond just treatments – we help you develop habits for a healthier, happier you.",
+        "On average, MyRocky members lose 2-5x more weight vs. similar programs – without restrictive diets. Our holistic approach goes beyond just treatments – we help you develop habits for a healthier, happier you.",
       image: "/wl-pre-consultation/Weight.png",
       imageTop: false,
       imageStyle:
@@ -491,7 +507,7 @@ export const quizConfig = {
       isWL: true,
       messageStyle:
         "text-[14px] md:text-[16px] leading-[140%] mb-[24px] bg-[#F7F9FB] rounded-lg p-[16px]",
-      message: `<center class="font-medium">Your body needs time to adjust to GLP-1 therapy—typically the first 4 weeks are about metabolic acclimation. From there,<u class="font-light"> weight loss tends to accelerate </u>, with many patients seeing their most noticeable results between weeks 5 and 9.</center> <br /> <center>At Rocky, we don’t just treat the symptoms — we <b>identify the underlying drivers of your metabolic health, helping you lose weight and keep it off for good.</b></center>`,
+      message: `<center class="font-medium">Your body needs time to adjust to GLP-1 therapy—typically the first 4 weeks are about metabolic acclimation. From there,<u class="font-light"> weight loss tends to accelerate </u>, with many patients seeing their most noticeable results between weeks 5 and 9.</center> <br /> <center>At MyRocky, we don’t just treat the symptoms — we <b>identify the underlying drivers of your metabolic health, helping you lose weight and keep it off for good.</b></center>`,
       image: "/wl-pre-consultation/WeightLossProgress.png",
       imageStyle: "w-[335px] h-[309px]",
       imageTop: true,

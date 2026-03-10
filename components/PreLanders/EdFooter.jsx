@@ -30,9 +30,9 @@ const EdFooter = () => {
         </Link>
         <hr className="mt-8 mb-4 w-[80%] ml-[10%] border-[#AEAEAE]" />
         <p className="text-[#AEAEAE]">
-          ©{new Date().getFullYear()} Rocky Health Inc. All rights reserved.
-          Rocky Health Pharmacy Inc. & Rocky Health Clinic Inc. are subsidiaries
-          of Rocky Health Inc.
+          ©{new Date().getFullYear()} MyRocky Health Inc. All rights reserved.
+          MyRocky Health Pharmacy Inc. & MyRocky Health Clinic Inc. are subsidiaries
+          of MyRocky Health Inc.
         </p>
       </footer>
     </>

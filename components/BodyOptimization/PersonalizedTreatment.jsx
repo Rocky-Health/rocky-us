@@ -22,7 +22,7 @@ const PersonalizedTreatment = ({ consultationHref = "/wl-pre-consultation/" }) =
           </p>
           <p className="text-[20px] leading-[24px] md:leading-[30px] text-[#000000A6] md:text-[#535353] tracking-[-0.02em] mb-[24px] md:mb-[40px] md:h-[123px] md:w-[536px] subheaders-font md:poppins-font">
             Track lab results and progress, gain insights, manage appointments,
-            treatments, and more—all from your all-in-1 Rocky Health portal.
+            treatments, and more—all from your all-in-1 MyRocky Health portal.
           </p>
         </div>
         {/* Button */}

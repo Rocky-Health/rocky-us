@@ -2,7 +2,7 @@ export const QUESTION_CONFIG = {
   1: {
     // Current situation question
     nextQuestions: {
-      "I’m currently on medications and want to get it from Rocky": 9,
+      "I’m currently on medications and want to get it from MyRocky": 9,
       "I'm currently on medication but want to make a change": 2,
       "I am not on medication for mental health but have been in the past": 4,
       "I have never been on medication for mental health before": 4,

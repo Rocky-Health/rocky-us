@@ -170,7 +170,7 @@ const HairCrossSellPopup = ({
     // },
     {
       id: "353755",
-      title: "Rocky Essential Cap",
+      title: "MyRocky Essential Cap",
       price: "25",
       quantity: "Adjustable",
       frequency: "One time purchase",

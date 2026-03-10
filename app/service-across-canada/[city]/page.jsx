@@ -12,7 +12,7 @@ export async function generateMetadata({ params }) {
             : cityInfo.description;
 
     return {
-        title: `${cityInfo.title} | Rocky`,
+        title: `${cityInfo.title} | MyRocky`,
         description: metaDescription.substring(0, 160),
     };
 }

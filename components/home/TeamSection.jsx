@@ -111,7 +111,7 @@ const TeamSection = () => {
             Led by Health Experts
           </h2>
           <p className="text-[16px] md:text-[18px] mt-[16px] mb-[40px] ">
-            Rocky Health delivers expert, evidence-based care that gets results.
+            MyRocky Health delivers expert, evidence-based care that gets results.
           </p>
           <ul className="!text-left">
             {trustedTeam.map((a, i) => (

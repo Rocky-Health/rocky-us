@@ -66,21 +66,7 @@ export default function ContactUsDetails() {
                 pharmacy@myrocky.com
               </Link>
             </div>
-            <div>
-              <p className="text-[14px] font-[500] leading-[140%] mb-1 md:hidden">
-                Call:
-              </p>
-              <p className="text-[16px] font-[500] leading-[140%] mb-1 hidden md:block">
-                Phone:
-              </p>
 
-              <Link
-                href="tel:+18887391444"
-                className="text-[14px] md:text-[16px] leading-[140%] font-[600] text-[#814b00] hover:text-[#4e340fec]  "
-              >
-                +1 (888) 739-1444
-              </Link>
-            </div>
             <div>
               <p className="text-[14px] md:text-[16px] font-[500] leading-[140%] mb-1">
                 Fax:

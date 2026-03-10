@@ -38,7 +38,7 @@ const ProudPartnerLine = ({
                     >
                         <CustomContainImage
                             src="https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp"
-                            alt="Rocky Logo"
+                            alt="MyRocky Logo"
                             fill
                         />
                     </div>
@@ -75,15 +75,7 @@ const ProudPartnerLine = ({
                             fill
                         />
                     </div>
-                    <div
-                        className={`relative overflow-hidden scale-125 ${argonautsLogoSize}`}
-                    >
-                        <CustomContainImage
-                            src="https://myrocky.b-cdn.net/partner-2.png"
-                            alt="Toronto Argonauts"
-                            fill
-                        />
-                    </div>
+                   
                 </div>
             </div>
         </div>

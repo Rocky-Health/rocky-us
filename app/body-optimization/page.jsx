@@ -11,10 +11,20 @@ import PersonalizedTreatment from "@/components/BodyOptimization/PersonalizedTre
 import MoneyBack from "@/components/MoneyBack";
 import WlFaqsSection from "@/components/BodyOptimization/WlFaqsSection";
 import ResultSection from "@/components/BodyOptimization/ResultSection";
+import { Suspense } from "react";
+import { useAutoApplyCoupon } from "@/lib/hooks/useAutoApplyCoupon";
+
+function CouponCapture() {
+  useAutoApplyCoupon();
+  return null;
+}
 
 export default function BodyOptimization() {
   return (
     <main>
+      <Suspense fallback={null}>
+        <CouponCapture />
+      </Suspense>
       <CoverSection>
         <WlCover />
       </CoverSection>

@@ -6,10 +6,14 @@ import { boSimplifiedConfig } from "./config/boSimplifiedConfig";
 import GenericPopup from "./components/GenericPopup"; // Use separate GenericPopup for BO
 import { PasswordProvider } from "../contexts/PasswordContext";
 import QuizStepRenderer from "./QuizStepRenderer";
+import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
 
 import { useEffect } from "react";
+import { toast } from "react-toastify";
 import QuestionnaireNavbar from "../components/QuestionnaireNavbar";
 import { ProgressBar } from "@/components/EdQuestionnaire/ProgressBar";
+
+const COUPON_STORAGE_KEY = "pending_coupon_code";
 
 const getPopupConfigWithChosenValue = (popupKey, userData) => {
   if (popupKey === "potentialWeightLoss") {
@@ -23,7 +27,7 @@ const getPopupConfigWithChosenValue = (popupKey, userData) => {
     const weightStr = userData?.weight ? `${userData.weight} lbs` : "";
     const texts = popupConfig.texts
       ? popupConfig.texts.map((t) =>
-          t.replace("{height}", heightStr).replace("{weight}", weightStr)
+          t.replace("{height}", heightStr).replace("{weight}", weightStr),
         )
       : [];
     return { ...popupConfig, texts };
@@ -32,11 +36,15 @@ const getPopupConfigWithChosenValue = (popupKey, userData) => {
   if (popupKey === "YourWeightPopup") {
     const popupConfig = boSimplifiedConfig.popups[popupKey];
     if (!popupConfig) return null;
-    
+
     // Extract numeric weight from userData.weight
     // Weight can be: number (200), string number ("200"), or string with units ("200 lbs")
     let numericWeight = null;
-    if (userData.weight !== undefined && userData.weight !== null && userData.weight !== "") {
+    if (
+      userData.weight !== undefined &&
+      userData.weight !== null &&
+      userData.weight !== ""
+    ) {
       if (typeof userData.weight === "number") {
         // Already a number
         numericWeight = userData.weight;
@@ -49,7 +57,7 @@ const getPopupConfigWithChosenValue = (popupKey, userData) => {
         }
       }
     }
-    
+
     // Create a new config object to avoid mutating the original
     return {
       ...popupConfig,
@@ -77,6 +85,40 @@ const BOSimplifiedFlow = () => {
     handleRecommendationContinue,
   } = useBOSimplifiedFlow();
 
+  useQuestionnaireStepTracking({
+    questionnaireId: "bo-simplified",
+    stepId: currentStep,
+    stepIndex: currentStep,
+    flowId: "weight-loss",
+    stepType: "pre-consultation",
+  });
+
+  useEffect(() => {
+    try {
+      // const params = new URLSearchParams(window.location.search);
+      // const coupon = params.get("apply_coupon");
+      // if (coupon && coupon.trim()) {
+      //   localStorage.setItem(COUPON_STORAGE_KEY, coupon.trim());
+      //   toast.success(
+      //     "$100 Discount Code Auto-Applied For You in Checkout For The Next 60 Minutes",
+      //     { autoClose: 8000 },
+      //   );
+      // }
+
+      // Only show toast once by checking if coupon is already set
+      const existingCoupon = localStorage.getItem(COUPON_STORAGE_KEY);
+      if (existingCoupon !== "save100") {
+        localStorage.setItem(COUPON_STORAGE_KEY, "save100");
+        toast.success(
+          "$100 Discount Code Auto-Applied For You in Checkout For The Next 60 Minutes",
+          { autoClose: 8000 },
+        );
+      }
+    } catch (e) {
+      logger.error("Error capturing coupon from URL:", e);
+    }
+  }, []);
+
   // Ensure hooks run in the same order on every render
   useEffect(() => {
     logger.log("[BOSimplifiedFlow] Current step changed:", currentStep);
@@ -87,12 +129,17 @@ const BOSimplifiedFlow = () => {
     if (!activePopup) return null;
     if (typeof activePopup === "string") {
       const config = getPopupConfigWithChosenValue(activePopup, userData);
-      logger.log("[BOSimplifiedFlow] Popup config for", activePopup, ":", config);
+      logger.log(
+        "[BOSimplifiedFlow] Popup config for",
+        activePopup,
+        ":",
+        config,
+      );
       return config;
     }
     return activePopup; // assume object
   })();
-  
+
   // Debug logging
   useEffect(() => {
     if (activePopup) {
@@ -127,9 +174,12 @@ const BOSimplifiedFlow = () => {
           Lose Weight or Your Money Back
         </div>
         {/* QuestionnaireNavbar */}
-        <QuestionnaireNavbar onBackClick={handleBack} currentPage={currentStep} />
+        <QuestionnaireNavbar
+          onBackClick={handleBack}
+          currentPage={currentStep}
+        />
         {/* Progress Bar - Hide for recommendation step */}
-        {currentStep !== 3 && (
+        {currentStep !== 7 && (
           <div className="pt-4 pb-6">
             <ProgressBar progress={progressPercent || 100} />
           </div>

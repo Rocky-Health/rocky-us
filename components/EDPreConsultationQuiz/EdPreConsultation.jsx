@@ -27,10 +27,20 @@ import {
     varietyPackProduct,
 } from "./productData";
 import FaqsSection from "../FaqsSection";
+import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
 
 const EDPreConsultationQuiz = () => {
     const router = useRouter();
     const [currentPage, setCurrentPage] = useState(1);
+
+    useQuestionnaireStepTracking({
+        questionnaireId: "ed-pre-consultation",
+        stepId: currentPage,
+        stepIndex: currentPage,
+        flowId: "ed",
+        stepType: "pre-consultation",
+    });
+
     const [answers, setAnswers] = useState({});
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -842,7 +852,7 @@ const faqs = [
     },
     {
         question: "What is the most effective pill for ED?",
-        answer: "While both Sildenafil and Tadalafil are equally effective, there are a few differences. Viagra takes anywhere between 30-60 mins to work after ingestion but sometimes can be delayed up to 2 hours and its effects lasts on average 4 hours. Cialis on the other hand , some may act faster, last longer or work regardless of when you had your last meal. With enough information, Rocky can help you find an ED medication and dosage that is right for you. You may connect with providers and receive ongoing care through our platform.",
+        answer: "While both Sildenafil and Tadalafil are equally effective, there are a few differences. Viagra takes anywhere between 30-60 mins to work after ingestion but sometimes can be delayed up to 2 hours and its effects lasts on average 4 hours. Cialis on the other hand , some may act faster, last longer or work regardless of when you had your last meal. With enough information, MyRocky can help you find an ED medication and dosage that is right for you. You may connect with providers and receive ongoing care through our platform.",
     },
     {
         question: "What are the side effects of ED medications?",
@@ -854,7 +864,7 @@ const faqs = [
     },
     {
         question: "Are ED drugs available OTC?",
-        answer: "In the United States, erectile dysfunction medications are not available over-the-counter and can only be obtained with a prescription. ED medications that are sold without a prescription is illegal and could potentially result in harm from counterfeit drugs. Rocky provides access to a licensed health care team so you can be certain that you are getting safe and effective care. Through our online platform, you will be guided through a series of medical questions which is then received by a Customer licensed doctor. They will review this information, and once approved, treatment is delivered straight to your home.",
+        answer: "In the United States, erectile dysfunction medications are not available over-the-counter and can only be obtained with a prescription. ED medications that are sold without a prescription is illegal and could potentially result in harm from counterfeit drugs. MyRocky provides access to a licensed health care team so you can be certain that you are getting safe and effective care. Through our online platform, you will be guided through a series of medical questions which is then received by a Customer licensed doctor. They will review this information, and once approved, treatment is delivered straight to your home.",
     },
     {
         question: "How can I improve my ED?",

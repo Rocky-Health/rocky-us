@@ -171,9 +171,56 @@ export async function GET(req) {
   try {
     const order_id = req.nextUrl.searchParams.get("order_id");
     const order_key = req.nextUrl.searchParams.get("order_key");
+    const validate_key = req.nextUrl.searchParams.get("validate_key");
     const cookieStore = await cookies();
 
     const encodedCredentials = cookieStore.get("authToken");
+
+    // Pay-for-order link: allow unauthenticated access when order_key + validate_key are present
+    const isPayForOrder = validate_key === "true" && order_key && order_id;
+
+    if (isPayForOrder) {
+      // Fetch order using server credentials only (no user auth)
+      const response = await axios.get(
+        `${BASE_URL}/wp-json/wc/v3/orders/${order_id}?consumer_key=${process.env.CONSUMER_KEY}&consumer_secret=${process.env.CONSUMER_SECRET}`
+      );
+      const order = response.data;
+
+      if (order.order_key !== order_key) {
+        logger.error("Order key mismatch", {
+          order_id,
+          provided_key: order_key,
+          actual_key: order?.order_key,
+        });
+        return NextResponse.json(
+          { error: "Invalid order key" },
+          { status: 403 }
+        );
+      }
+
+      if (order.status !== "pending") {
+        const errorMessages = {
+          processing: "This order has already been paid and is being processed",
+          completed: "This order has already been completed",
+          refunded: "This order has been refunded",
+          cancelled: "This order has been cancelled",
+          failed: "This order has failed. Please contact support",
+          "on-hold":
+            "This order has already been paid and is on medical review.",
+        };
+        return NextResponse.json(
+          {
+            error:
+              errorMessages[order.status] ||
+              `This order cannot be paid. Status: ${order.status}`,
+            status: order.status,
+          },
+          { status: 400 }
+        );
+      }
+
+      return NextResponse.json(order);
+    }
 
     if (!encodedCredentials) {
       return NextResponse.json(

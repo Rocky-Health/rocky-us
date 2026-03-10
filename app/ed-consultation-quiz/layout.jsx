@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 export default function EDQuestionnaireLayout({ children }) {
   return (
@@ -7,7 +7,7 @@ export default function EDQuestionnaireLayout({ children }) {
         .fixed.inset-0.flex.items-center.justify-center.bg-black.bg-opacity-50.z-50 {
           display: none !important;
         }
-        
+
         /* Hide ALL headers by default */
         header,
         nav,
@@ -65,26 +65,33 @@ export default function EDQuestionnaireLayout({ children }) {
         .footer-container {
           display: none !important;
         }
-        
+
         .questionnaire-header {
           display: flex !important;
         }
-        
+
         .questionnaire-footer {
           display: block !important;
         }
-        
+
         body {
           padding-top: 0 !important;
           margin-top: 0 !important;
           padding-bottom: 0 !important;
           margin-bottom: 0 !important;
         }
-          #launcher {
-            display: none !important;
-          }
+
+        #launcher {
+          display: none !important;
+        }
+        iframe[title="Close message"] {
+          display: none !important;
+        }
+        iframe[title="Message from company"] {
+          display: none !important;
+        }
       `}</style>
-      
+
       {children}
     </div>
   );
