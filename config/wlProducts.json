@@ -4,7 +4,7 @@
       "id": "489523",
       "name": "Compounded Tirzepatide",
       "description": "(tirzepatide) Vial",
-      "price": "249.00",
+      "price": "348.00",
       "details": "Tirzepatide is the generic version of Mounjaro. It is a personalized treatment to help reduce appetite and keep you fuller for longer",
       "url": "https://mycdn.myrocky.com/wp-content/uploads/20260115220421/Tirzepatide.png",
       "isDefault": true,
@@ -14,7 +14,7 @@
       "id": "489798",
       "name": "Compounded Semaglutide",
       "description": "(semaglutide) Vial",
-      "price": "149.00",
+      "price": "248.00",
       "details": "Semaglutide is the generic version of Ozempic. It is a personalized treatment to help reduce appetite and keep you fuller for longer",
       "url": "https://mycdn.myrocky.com/wp-content/uploads/20260115220418/Semaglutide.png",
       "supplyAvailable": true
@@ -23,7 +23,7 @@
       "id": "142976",
       "name": "Ozempic",
       "description": "(semaglutide) injection",
-      "price": "1310.00",
+      "price": "1409.00",
       "details": "Ozempic is the brand name for Semaglutide which is a FDA-approved medication. It helps reduce appetite and keeps you feeling fuller for longer",
       "url": "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/ozempic/ozempic_2x.webp",
       "supplyAvailable": true
@@ -32,7 +32,7 @@
       "id": "160469",
       "name": "Mounjaro",
       "description": "(tirzepatide) injection",
-      "price": "1410.00",
+      "price": "1509.00",
       "details": "Mounjaro is the brand name for Tirzepatide which is a FDA-approved medication. It helps reduce appetite and keeps you feeling fuller for longer",
       "url": "/products/monjaro.png",
       "supplyAvailable": true
@@ -41,7 +41,7 @@
       "id": "276274",
       "name": "Wegovy",
       "description": "(semaglutide) injection",
-      "price": "1770.00",
+      "price": "1869.00",
       "details": "Wegovy is the brand name for semaglutide, an FDA-approved medication prescribed at a higher dose. It helps reduce appetite and keeps you feeling fuller for longer.",
       "url": "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/wegovy/wegovy_2x.webp",
       "supplyAvailable": true
@@ -50,7 +50,7 @@
       "id": "369795",
       "name": "Rybelsus",
       "description": "(semaglutide) tablets",
-      "price": "1310.00",
+      "price": "1409.00",
       "details": "Rybelsus is the brand name for semaglutide, an FDA-approved oral medication. It helps reduce appetite and keeps you feeling fuller for longer.",
       "url": "/products/rybelsus.png",
       "supplyAvailable": true

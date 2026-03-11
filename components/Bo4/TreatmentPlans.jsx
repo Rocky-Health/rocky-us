@@ -42,7 +42,7 @@ export default function TreatmentPlans({
       activeIngeredient: "(GLP-1)",
       name: "Semaglutide",
       hasSale: true,
-      price: "149",
+      price: "248",
       oldPrice: "300",
       description:
         "Same active ingredient as Ozempic. The popular and affordable alternative.",
@@ -62,7 +62,7 @@ export default function TreatmentPlans({
       activeIngeredient: "(GLP-1/GIP)",
       name: "Tirzepatide",
       hasSale: true,
-      price: "249",
+      price: "348",
       oldPrice: "450",
       description:
         "Dual-action mechanism with the highest rated clinical weight loss.",
@@ -80,7 +80,7 @@ export default function TreatmentPlans({
       activeIngeredient: "(GLP-1)",
       name: "Ozempic®",
       hasSale: false,
-      price: "1310",
+      price: "1409",
       description: "Name Brand Semaglutide Injection",
       WLPrograme: true,
       image:
@@ -92,7 +92,7 @@ export default function TreatmentPlans({
       activeIngeredient: "(GLP-1/GIP)",
       name: "Mounjaro®",
       hasSale: false,
-      price: "1410",
+      price: "1509",
       description: "Name Brand Tirzepatide Injection",
       WLPrograme: true,
       image:
@@ -107,7 +107,7 @@ export default function TreatmentPlans({
       activeIngeredient: "(GLP-1)",
       name: "Wegovy®",
       hasSale: false,
-      price: "1770",
+      price: "1869",
       description: "Name Brand Semaglutide Injection",
       WLPrograme: true,
       image:
@@ -122,7 +122,7 @@ export default function TreatmentPlans({
       activeIngeredient: "(GLP-1)",
       name: "Rybelsus®",
       hasSale: false,
-      price: "1310",
+      price: "1409",
       description: "Name Brand Oral Semaglutide Pill",
       WLPrograme: true,
       image:
