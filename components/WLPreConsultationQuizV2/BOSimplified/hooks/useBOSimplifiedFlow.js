@@ -2,6 +2,8 @@ import { useStepNavigation } from "../../hooks/useStepNavigation";
 import { useBOQuizData } from "./useBOQuizData";
 import { boSimplifiedConfig } from "../config/boSimplifiedConfig";
 import { logger } from "@/utils/devLogger";
+import { wlFlowAddToCart } from "@/utils/flowCartHandler";
+import { addRequiredConsultation } from "@/utils/requiredConsultation";
 
 export const useBOSimplifiedFlow = () => {
     const {
@@ -55,9 +57,47 @@ export const useBOSimplifiedFlow = () => {
         logger.log("[BOSimplified] Product selected, ready for checkout");
     };
 
+    const handlePlanStepCheckout = async (selectedPlan) => {
+        if (!selectedProduct) {
+            alert("Please select a product to continue");
+            return;
+        }
+        const mainProductForCheckout = {
+            id: selectedProduct.id,
+            name: selectedProduct.name,
+            price: selectedPlan?.price || selectedProduct.price,
+            quantity: 1,
+            isSubscription: true,
+            subscriptionPeriod: selectedPlan?.subscriptionPeriod || "1_month",
+        };
+        addRequiredConsultation(selectedProduct.id, "wl-flow");
+        logger.log("🛒 BOSimplified Plan checkout:", mainProductForCheckout);
+        const result = await wlFlowAddToCart(mainProductForCheckout, [], {
+            requireConsultation: true,
+            subscriptionPeriod: selectedPlan?.subscriptionPeriod || "1_month",
+        });
+        if (result.success) {
+            try {
+                if (typeof window !== "undefined" && window.localStorage) {
+                    localStorage.removeItem("wl_flow2_quiz_data");
+                }
+            } catch (e) {
+                logger.error("Error clearing localStorage:", e);
+            }
+            if (typeof window !== "undefined" && result.redirectUrl) {
+                window.location.href = result.redirectUrl;
+                return;
+            }
+        } else {
+            logger.error("❌ BOSimplified Plan checkout failed:", result.error);
+            alert("There was an issue processing your checkout. Please try again.");
+        }
+    };
+
     return {
         currentStep,
         progressPercent,
+        goToStep,
         userData,
         setUserData,
         selectedProduct,
@@ -68,6 +108,7 @@ export const useBOSimplifiedFlow = () => {
         handleAction,
         closePopup,
         handleRecommendationContinue,
+        handlePlanStepCheckout,
         clearQuizData,
         resetQuiz,
     };

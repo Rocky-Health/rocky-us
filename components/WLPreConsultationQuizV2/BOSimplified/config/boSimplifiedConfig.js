@@ -208,6 +208,14 @@ export const boSimplifiedConfig = {
             field: "selectedProduct",
             required: true,
         },
+        // Step 8: Select Your Weight Loss Plan (Compounded products only)
+        8: {
+            id: "selectWeightLossPlan",
+            type: "planSelection",
+            title: "Select Your Weight Loss Plan",
+            field: "selectedPlan",
+            required: true,
+        },
     },
 
     // Navigation configuration
@@ -218,6 +226,8 @@ export const boSimplifiedConfig = {
         4: 5, // Basic Info -> First Information
         5: 6, // First Information -> Contact Info
         6: 7, // Contact Info -> Product Recommendations
+        7: 8, // Product Recommendations -> Plan Selection (for compounded only; else checkout)
+        8: 100, // Plan Selection -> Checkout
     },
 
     // Progress mapping
@@ -228,7 +238,8 @@ export const boSimplifiedConfig = {
         4: 56, // Basic Info
         5: 70, // First Information
         6: 85, // Contact Info
-        7: 100, // Product Recommendations
+        7: 92, // Product Recommendations
+        8: 100, // Plan Selection
     },
 
     // Step titles
@@ -240,7 +251,58 @@ export const boSimplifiedConfig = {
         5: "Your Details",
         6: "Contact Information",
         7: "Product Recommendations",
+        8: "Select Your Weight Loss Plan",
     },
+
+    // Plan options for compounded products (Step 8)
+    planOptions: {
+        monthly: {
+            id: "monthly",
+            label: "Monthly Auto-Refill",
+            subtitle: "Flexible. Pay as you go plan.",
+            price: "$359",
+            originalPrice: "$389",
+            savings: "Save $30",
+            subscriptionPeriod: "1_month",
+            isDefault: true,
+        },
+        "3month": {
+            id: "3month",
+            badge: "STARTER BUNDLE",
+            label: "3 Month Supply",
+            price: "$289",
+            originalPrice: "$389",
+            savings: "Save $100",
+            subscriptionPeriod: "3_month",
+            type: "One-time purchase",
+        },
+        "6month": {
+            id: "6month",
+            badge: "MOST POPULAR",
+            label: "6 Month Supply",
+            price: "$275",
+            originalPrice: "$389",
+            savings: "Save $114",
+            subscriptionPeriod: "6_month",
+            type: "One-time purchase",
+        },
+        "12month": {
+            id: "12month",
+            badge: "BEST VALUE",
+            label: "12 Month Supply",
+            price: "$240",
+            originalPrice: "$389",
+            savings: "Save $149",
+            subscriptionPeriod: "12_month",
+            type: "One-time purchase",
+        },
+    },
+    planInclusions: [
+        "New Rx shipped every 30 days",
+        "Unlimited provider support",
+        "Regular check-ins",
+        "Nutrition & lifestyle support",
+    ],
 
     // Popup configurations
     popups: {

@@ -29,6 +29,9 @@ const GenericRecommendationStep = ({
   showAlternatives = true,
   variations = [],
   showIncluded = true,
+  // Optional: when provided and returns true for selectedProduct, navigate instead of checkout
+  onBeforeCheckout,
+  onNavigateToPlanStep,
 }) => {
   const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
@@ -144,6 +147,14 @@ const GenericRecommendationStep = ({
       return;
     }
 
+    // If onBeforeCheckout returns true, navigate to plan step instead of checkout
+    if (typeof onBeforeCheckout === "function" && onBeforeCheckout(selectedProduct)) {
+      if (typeof onNavigateToPlanStep === "function") {
+        onNavigateToPlanStep();
+      }
+      return;
+    }
+
     try {
       setIsCheckoutLoading(true);
 
@@ -228,6 +239,13 @@ const GenericRecommendationStep = ({
   };
 
   const isContinueEnabled = selectedProduct !== null;
+  const isPlanStepProduct =
+    selectedProduct &&
+    typeof onBeforeCheckout === "function" &&
+    onBeforeCheckout(selectedProduct);
+  const proceedButtonLabel = isPlanStepProduct
+    ? "Continue"
+    : `Proceed - ${selectedProduct?.price || ""} →`;
 
   if (!recommended) {
     return (
@@ -415,9 +433,7 @@ const GenericRecommendationStep = ({
             onClick={isContinueEnabled ? handleCheckout : null}
             disabled={!isContinueEnabled || isCheckoutLoading}
           >
-            {isCheckoutLoading
-              ? "Processing..."
-              : `Proceed - ${selectedProduct?.price || ""} →`}
+            {isCheckoutLoading ? "Processing..." : proceedButtonLabel}
           </button>
         </div>
       </div>

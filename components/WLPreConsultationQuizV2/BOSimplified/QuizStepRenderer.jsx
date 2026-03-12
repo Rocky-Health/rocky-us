@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { boSimplifiedConfig } from "./config/boSimplifiedConfig";
 import GenericQuestionStep from "../components/GenericQuestionStep";
 import GenericRecommendationStep from "../components/GenericRecommendationStep";
-import SkincareProductCard from "../components/SkincareProductCard";
+import BOSimplifiedPlanSelectionStep from "./components/BOSimplifiedPlanSelectionStep";
 import { getProductRecommendation } from "../utils/recommendationEngine";
 import WLProductCard from "../components/WLProductCard";
+
+const COMPOUNDED_PRODUCT_IDS = ["489523", "489798"];
 
 const QuizStepRenderer = ({
   currentStep,
@@ -13,10 +15,29 @@ const QuizStepRenderer = ({
   selectedProduct,
   setSelectedProduct,
   handleContinue,
+  handleBack,
   handleAction,
   handleRecommendationContinue,
+  goToStep,
+  handlePlanStepCheckout,
 }) => {
+  const [selectedPlan, setSelectedPlan] = useState(null);
   const stepConfig = boSimplifiedConfig.steps[currentStep];
+
+  // Handle plan selection step (step 8) - for Compounded Tirzepatide/Semaglutide
+  if (currentStep === 8) {
+    return (
+      <BOSimplifiedPlanSelectionStep
+        product={selectedProduct}
+        selectedPlan={selectedPlan}
+        setSelectedPlan={setSelectedPlan}
+        planOptions={boSimplifiedConfig.planOptions}
+        planInclusions={boSimplifiedConfig.planInclusions}
+        onBack={handleBack}
+        onContinue={handlePlanStepCheckout}
+      />
+    );
+  }
 
   // Handle recommendation step (step 7)
   if (currentStep === 7) {
@@ -25,15 +46,19 @@ const QuizStepRenderer = ({
       boSimplifiedConfig.recommendationRules,
     );
 
+    const shouldShowPlanStep = (product) =>
+      product && COMPOUNDED_PRODUCT_IDS.includes(String(product.id));
+
     return (
       <GenericRecommendationStep
         {...recommendation}
         selectedProduct={selectedProduct}
         setSelectedProduct={setSelectedProduct}
         onContinue={handleRecommendationContinue}
-        // ProductCard={SkincareProductCard}
         ProductCard={WLProductCard}
         showAlternatives={true}
+        onBeforeCheckout={shouldShowPlanStep}
+        onNavigateToPlanStep={() => goToStep(8)}
       />
     );
   }

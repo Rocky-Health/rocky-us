@@ -73,6 +73,7 @@ const BOSimplifiedFlow = () => {
   const {
     currentStep,
     progressPercent,
+    goToStep,
     userData,
     setUserData,
     selectedProduct,
@@ -83,6 +84,7 @@ const BOSimplifiedFlow = () => {
     handleAction,
     closePopup,
     handleRecommendationContinue,
+    handlePlanStepCheckout,
   } = useBOSimplifiedFlow();
 
   useQuestionnaireStepTracking({
@@ -178,7 +180,7 @@ const BOSimplifiedFlow = () => {
           onBackClick={handleBack}
           currentPage={currentStep}
         />
-        {/* Progress Bar - Hide for recommendation step */}
+        {/* Progress Bar - Hide for recommendation step only */}
         {currentStep !== 7 && (
           <div className="pt-4 pb-6">
             <ProgressBar progress={progressPercent || 100} />
@@ -196,6 +198,9 @@ const BOSimplifiedFlow = () => {
             handleContinue={handleContinue}
             handleAction={handleAction}
             handleRecommendationContinue={handleRecommendationContinue}
+            handleBack={handleBack}
+            goToStep={goToStep}
+            handlePlanStepCheckout={handlePlanStepCheckout}
           />
         </div>
 
