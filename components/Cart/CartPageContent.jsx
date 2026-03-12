@@ -125,7 +125,7 @@ const CartPageContent = () => {
   logger.log("Rendering cart with items:", cartItems.items.length);
   return (
     <div className="grid lg:grid-cols-2 min-h-[calc(100vh-100px)] border-t">
-      <CartItems items={cartItems.items} setCartItems={setCartItems} />
+      <CartItems items={cartItems.items} setCartItems={setCartItems} coupons={cartItems?.coupons || []} />
       <CartCalculations cartItems={cartItems} setCartItems={setCartItems} />
     </div>
   );
