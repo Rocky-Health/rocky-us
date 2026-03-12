@@ -62,13 +62,25 @@ export const useBOSimplifiedFlow = () => {
             alert("Please select a product to continue");
             return;
         }
+
+        // Resolve the exact WooCommerce variation ID for this product + plan combo.
+        // Same pattern as the ED flow: the variation ID IS sent as both id and variationId,
+        // so WooCommerce applies the correct price for the chosen plan.
+        const productVariationMap = boSimplifiedConfig.planVariationIds?.[String(selectedProduct.id)] || {};
+        const resolvedVariationId = productVariationMap[selectedPlan?.id] || String(selectedProduct.id);
+
+        logger.log(
+            `🛒 BOSimplified: product=${selectedProduct.id}, plan=${selectedPlan?.id}, resolvedVariationId=${resolvedVariationId}`
+        );
+
         const mainProductForCheckout = {
-            id: selectedProduct.id,
+            id: resolvedVariationId,
             name: selectedProduct.name,
             price: selectedPlan?.price || selectedProduct.price,
             quantity: 1,
             isSubscription: true,
             subscriptionPeriod: selectedPlan?.subscriptionPeriod || "1_month",
+            variationId: resolvedVariationId,
         };
         addRequiredConsultation(selectedProduct.id, "wl-flow");
         logger.log("🛒 BOSimplified Plan checkout:", mainProductForCheckout);

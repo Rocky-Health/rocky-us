@@ -55,6 +55,47 @@ import {
     clearPendingCouponCode,
 } from "@/lib/hooks/useAutoApplyCoupon";
 
+// Compounded product plan detection for smart coupon logic
+// Monthly plan → apply save100 coupon
+// Multi-month plan → no coupon (user already gets bigger discount from the plan itself)
+function getCompoundedPlanType(cartData) {
+    const items = cartData?.items || [];
+    for (const item of items) {
+        const name = (item.name || "").toLowerCase();
+        const isCompounded =
+            (name.includes("tirzepatide") || name.includes("semaglutide")) &&
+            !name.includes("oral") &&
+            !name.includes("sublingual");
+
+        if (isCompounded) {
+            const subscription = item.extensions?.subscriptions;
+            const billingInterval = parseInt(
+                subscription?.billing_interval || "1",
+                10
+            );
+            const billingPeriod = (
+                subscription?.billing_period || "month"
+            ).toLowerCase();
+
+            // "Monthly" covers:
+            //   - 1 month billing  (Semaglutide: billing_interval=1, period="month")
+            //   - ≤5 week billing  (Tirzepatide: billing_interval=4, period="week")
+            // Anything else (3 months, 6 months, 12 months) is "multi-month"
+            const isMonthly =
+                (billingPeriod === "month" && billingInterval === 1) ||
+                (billingPeriod === "week" && billingInterval <= 5);
+
+            logger.log(
+                `[Checkout] Compounded product detected: ${item.name}, ` +
+                `billing=${billingInterval} ${billingPeriod} → ${isMonthly ? "monthly" : "multi-month"}`
+            );
+
+            return isMonthly ? "monthly" : "multi-month";
+        }
+    }
+    return null; // no compounded product in cart
+}
+
 // Load Stripe outside component to avoid recreating on every render
 const stripePromise = loadStripe(
     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
@@ -1207,35 +1248,72 @@ const CheckoutPageContent = () => {
                     }
                 }
 
-                // STEP 2: Auto-apply pending coupon from localStorage (or URL)
-                const pendingCoupon =
-                    searchParams.get("apply_coupon") ||
-                    getPendingCouponCode();
-                if (pendingCoupon) {
+                // STEP 2: Smart coupon logic
+                // - Compounded Tirz/Sema monthly    → apply "save100" + show toast
+                // - Compounded Tirz/Sema multi-month → NO coupon (plan discount is bigger)
+                // - WL flow other products (Ozempic, Mounjaro, etc.) → apply "save100" + show toast
+                // - All other flows → apply pending coupon from URL/localStorage
+                const compoundedPlanType = getCompoundedPlanType(cartData);
+                const isWlFlow = !!flowParams["wl-flow"];
+
+                let couponToApply = null;
+                let couponToastMsg = null;
+
+                if (compoundedPlanType === "monthly") {
+                    couponToApply = "save100";
+                    couponToastMsg =
+                        "$100 Discount Code Auto-Applied For You in Checkout For The Next 60 Minutes";
+                    logger.log(
+                        "[Checkout] Compounded monthly plan detected → applying save100 coupon"
+                    );
+                } else if (compoundedPlanType === "multi-month") {
+                    // Multi-month plan already has a bigger discount — no coupon
+                    clearPendingCouponCode();
+                    logger.log(
+                        "[Checkout] Compounded multi-month plan detected → skipping coupon"
+                    );
+                } else if (isWlFlow) {
+                    // Other WL products (Ozempic, Mounjaro, Wegovy, etc.) → always apply save100
+                    couponToApply = "save100";
+                    couponToastMsg =
+                        "$100 Discount Code Auto-Applied For You in Checkout For The Next 60 Minutes";
+                    logger.log(
+                        "[Checkout] WL flow non-compounded product → applying save100 coupon"
+                    );
+                } else {
+                    // Non-WL flows: use coupon from URL param or localStorage
+                    couponToApply =
+                        searchParams.get("apply_coupon") ||
+                        getPendingCouponCode();
+                }
+
+                if (couponToApply) {
                     try {
                         logger.log(
-                            `Auto-applying pending coupon: ${pendingCoupon}`
+                            `[Checkout] Auto-applying coupon: ${couponToApply}`
                         );
                         const couponRes = await fetch("/api/coupons", {
                             headers: { "Content-Type": "application/json" },
                             method: "POST",
-                            body: JSON.stringify({ code: pendingCoupon }),
+                            body: JSON.stringify({ code: couponToApply }),
                         });
                         const couponData = await couponRes.json();
 
                         if (couponData.error) {
                             toast.error(
-                                `Coupon "${pendingCoupon}" could not be applied.`
+                                `Coupon "${couponToApply}" could not be applied.`
                             );
                         } else {
                             setCartItems(couponData);
                             toast.success(
-                                `Coupon "${pendingCoupon}" applied!`
+                                couponToastMsg ||
+                                "$100 Discount Code Auto-Applied For You in Checkout For The Next 60 Minutes",
+                                { autoClose: 8000 }
                             );
                         }
                     } catch (couponErr) {
                         logger.error(
-                            "Error auto-applying coupon:",
+                            "[Checkout] Error auto-applying coupon:",
                             couponErr
                         );
                         toast.error("Failed to apply coupon.");
@@ -1870,14 +1948,22 @@ const CheckoutPageContent = () => {
                 useStripe: !selectedCard, // Use Stripe only when NOT using a saved card
 
                 // Add total amount for saved card payments
-                totalAmount:
-                    cartItems.totals && cartItems.totals.total_price
-                        ? parseFloat(cartItems.totals.total_price) / 100
-                        : cartItems.totals && cartItems.totals.total
-                            ? parseFloat(
-                                cartItems.totals.total.replace(/[^0-9.]/g, "")
-                            )
-                            : 0,
+                // Include $99 Body Optimization Program when no coupon applied
+                totalAmount: (() => {
+                    const base =
+                        cartItems.totals && cartItems.totals.total_price
+                            ? parseFloat(cartItems.totals.total_price) / 100
+                            : cartItems.totals && cartItems.totals.total
+                                ? parseFloat(
+                                    cartItems.totals.total.replace(/[^0-9.]/g, "")
+                                )
+                                : 0;
+                    const noCoupon = !cartItems?.coupons || cartItems.coupons.length === 0;
+                    const hasBodyOpt = cartItems?.items?.some(
+                        (i) => i.name === "Body Optimization Program"
+                    );
+                    return noCoupon && hasBodyOpt ? base + 99 : base;
+                })(),
 
                 // ED Flow parameter
                 isEdFlow: isEdFlow,

@@ -26,12 +26,17 @@ const QuizStepRenderer = ({
 
   // Handle plan selection step (step 8) - for Compounded Tirzepatide/Semaglutide
   if (currentStep === 8) {
+    // Pick plan options specific to the selected product (Tirz vs Sema pricing differs)
+    const productPlanOptions = selectedProduct
+      ? boSimplifiedConfig.planOptions[String(selectedProduct.id)]
+      : null;
+
     return (
       <BOSimplifiedPlanSelectionStep
         product={selectedProduct}
         selectedPlan={selectedPlan}
         setSelectedPlan={setSelectedPlan}
-        planOptions={boSimplifiedConfig.planOptions}
+        planOptions={productPlanOptions}
         planInclusions={boSimplifiedConfig.planInclusions}
         onBack={handleBack}
         onContinue={handlePlanStepCheckout}
