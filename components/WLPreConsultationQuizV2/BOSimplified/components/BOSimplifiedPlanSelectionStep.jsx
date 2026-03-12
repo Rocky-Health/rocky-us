@@ -383,11 +383,11 @@ const BOSimplifiedPlanSelectionStep = ({
                   following criteria:
                 </p>
               </div>
-              <ul className="list-decimal pl-4 space-y-3 text-[14px] lg:text-[16px] font-[350]">
+              <ul className="list-decimal pl-4 space-y-2 text-[14px] lg:text-[16px] font-[350]">
                 <li>
                   Patient has completed their lab work within 4 weeks of
                   starting treatment and discussed the results with their
-                  clinician.
+                  clinician. 
                 </li>
                 <li>
                   Be on treatment for a minimum of 6 months with no pauses or
