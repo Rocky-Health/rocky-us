@@ -28,7 +28,7 @@ export const timelineSteps = [
   },
   {
     section: "medication",
-    headTitle: "Get Your Medication (Starting at $300)",
+    // headTitle: "Get Your Medication (Starting at $300)",
     title: "Receive medication",
     timeframe: "Within 2-3 days",
     content:
