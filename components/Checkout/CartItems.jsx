@@ -474,9 +474,7 @@ const CartITem2 = ({ item, hasCoupon = false }) => {
       </div>
       <div className="">
         {item.name === "Body Optimization Program" ? (
-          hasCoupon
-            ? <span className="text-green-500">FREE</span>
-            : <span>{currencySymbol}99</span>
+          <span className="text-green-500">FREE</span>
         ) : (
           currencySymbol + formatPrice(itemPrice)
         )}

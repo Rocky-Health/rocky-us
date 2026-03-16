@@ -89,7 +89,7 @@ const BOSimplifiedPlanSelectionStep = ({
                     <div className="hidden md:block md:col-span-1" />
 
                     {/* Product + Plan content - 6 cols (desktop) */}
-                    <div className="md:col-span-6 space-y-4 md:border border-[#E2E2E1]  md:bg-white bg-transparent md:p-3 pt-3 px-3 rounded-2xl">
+                    <div className="md:col-span-6 space-y-4 md:border border-[#E2E2E1]  md:bg-white bg-transparent md:p-5 pt-3 px-3 rounded-2xl">
                         {/* Product label */}
                         <div className="flex items-center justify-between mt-2">
                             <span className="text-[16px] font-[600] text-[#000000]">
@@ -321,7 +321,7 @@ const BOSimplifiedPlanSelectionStep = ({
                                                     {plan.savings}
                                                 </span>
                                                 {plan.type && (
-                                                    <p className="text-sm text-[#666666]">
+                                                    <p className="text-[12px] md:text-sm text-[#666666]">
                                                         {plan.type}
                                                     </p>
                                                 )}
@@ -516,7 +516,7 @@ const BOSimplifiedPlanSelectionStep = ({
             )}
 
             {/* Footer Navigation - Fixed */}
-            <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 px-14 py-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 z-50">
+            <div className=" fixed bottom-0 left-0 w-full bg-white border-t border-gray-200  py-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-evenly px-4 gap-3 z-50">
                 <button
                     onClick={onBack}
                     disabled={isCheckoutLoading}

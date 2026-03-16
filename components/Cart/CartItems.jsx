@@ -465,9 +465,7 @@ const CartItem = ({ item, setCartItems, allItems, hasCoupon = false }) => {
           <span className="woocommerce-Price-amount amount">
             <bdi>
               {item.name === "Body Optimization Program" ? (
-                hasCoupon
-                  ? <span className="text-green-500">FREE</span>
-                  : <span>{currencySymbol}99</span>
+                <span className="text-green-500">FREE</span>
               ) : (
                 <><span className="woocommerce-Price-currencySymbol">
                   {currencySymbol}

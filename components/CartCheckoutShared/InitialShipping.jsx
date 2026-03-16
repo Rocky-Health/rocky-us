@@ -13,26 +13,15 @@ const InitialShipping = ({
     formData,
 }) => {
     const [removingCode, setRemovingCode] = useState(false);
-    const rawSubTotal = cartItems?.totals?.total_items
+    const subTotalPrice = cartItems?.totals?.total_items
         ? cartItems.totals.total_items / 100
         : 0;
-    const rawTotal = cartItems?.totals?.total_price
+    const totalPrice = cartItems?.totals?.total_price
         ? cartItems.totals.total_price / 100
         : 0;
     const totalTax = cartItems?.totals?.total_tax
         ? cartItems.totals.total_tax / 100
         : 0;
-
-    // WooCommerce prices Body Optimization Program (148515) at $0.
-    // When no coupon is applied (multi-month compounded plans), the program
-    // should cost $99.  Add the difference so the displayed totals are correct.
-    const hasCoupon = cartItems?.coupons && cartItems.coupons.length > 0;
-    const hasBodyOptimization = cartItems?.items?.some(
-        (item) => item.name === "Body Optimization Program"
-    );
-    const bodyOptAdjustment = !hasCoupon && hasBodyOptimization ? 99 : 0;
-    const subTotalPrice = rawSubTotal + bodyOptAdjustment;
-    const totalPrice = rawTotal + bodyOptAdjustment;
 
     const handleCodeRemove = async (code) => {
         setRemovingCode(true);

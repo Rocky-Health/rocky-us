@@ -1948,22 +1948,14 @@ const CheckoutPageContent = () => {
                 useStripe: !selectedCard, // Use Stripe only when NOT using a saved card
 
                 // Add total amount for saved card payments
-                // Include $99 Body Optimization Program when no coupon applied
-                totalAmount: (() => {
-                    const base =
-                        cartItems.totals && cartItems.totals.total_price
-                            ? parseFloat(cartItems.totals.total_price) / 100
-                            : cartItems.totals && cartItems.totals.total
-                                ? parseFloat(
-                                    cartItems.totals.total.replace(/[^0-9.]/g, "")
-                                )
-                                : 0;
-                    const noCoupon = !cartItems?.coupons || cartItems.coupons.length === 0;
-                    const hasBodyOpt = cartItems?.items?.some(
-                        (i) => i.name === "Body Optimization Program"
-                    );
-                    return noCoupon && hasBodyOpt ? base + 99 : base;
-                })(),
+                totalAmount:
+                    cartItems.totals && cartItems.totals.total_price
+                        ? parseFloat(cartItems.totals.total_price) / 100
+                        : cartItems.totals && cartItems.totals.total
+                            ? parseFloat(
+                                cartItems.totals.total.replace(/[^0-9.]/g, "")
+                            )
+                            : 0,
 
                 // ED Flow parameter
                 isEdFlow: isEdFlow,

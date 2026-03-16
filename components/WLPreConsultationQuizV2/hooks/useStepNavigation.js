@@ -82,6 +82,37 @@ export const useStepNavigation = (quizConfig) => {
     }
   }, [currentStep, progressPercent, history]);
 
+  // Browser back button support: push history state on step change,
+  // intercept popstate to navigate within the quiz instead of leaving the page.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    // Push a new browser history entry whenever the step advances beyond 1.
+    // We only push (not replace) so each step gets its own entry.
+    if (currentStep > 1) {
+      window.history.pushState({ quizStep: currentStep }, "");
+    }
+  }, [currentStep]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const onPopState = (e) => {
+      // Only intercept if we have internal history to go back to
+      if (history.length > 0) {
+        // Prevent the browser from actually navigating away
+        const last = history[history.length - 1];
+        setHistory((h) => h.slice(0, -1));
+        setCurrentStep(last);
+        setProgressPercent(quizConfig.progressMap[last] || 0);
+      }
+      // If history is empty (step 1), let the browser navigate normally
+    };
+
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, [history, quizConfig.progressMap]);
+
 
 
 
