@@ -266,7 +266,7 @@ const CartItem = ({ item, refreshCart, isLocalCart, allItems }) => {
 
   // Handle local cart items which have a different structure
   const itemPrice = isLocalCart
-    ? item.price
+    ? item.price / 100
     : (item.prices?.sale_price || item.prices?.regular_price) / 100;
 
   const quantity = item.quantity;
