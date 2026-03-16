@@ -107,29 +107,37 @@ export default function MobileCartPopup({
                       dangerouslySetInnerHTML={{ __html: item.name }}
                     ></span>
                   </div>
-                 {item.name === "Body Optimization Program" ?  <div className="text-green-500 text-sm">
-                    FREE
-                 </div>  : <>
-                  <div className="text-[#212121] text-sm">
-                    {item.quantity || 1} × $
-                    {item.prices?.sale_price
-                      ? formatPrice(item.prices.sale_price / 100)
-                      : formatPrice(
-                          item.prices?.regular_price / 100 || item.price
-                        )}
-                  </div>
-                  <div className="text-[#212121] text-sm font-semibold">
-                    Total: $
-                    {item.prices?.sale_price
-                      ? formatPrice(
-                          (item.prices.sale_price / 100) *
-                          (item.quantity || 1)
-                        )
-                      : formatPrice(
-                          (item.prices?.regular_price / 100 || item.price) *
-                          (item.quantity || 1)
-                        )}
-                  </div></>}
+                  {item.name === "Body Optimization Program" ? (
+                    <div className="text-green-500 text-sm">FREE</div>
+                  ) : (
+                    <>
+                      {(() => {
+                        // Normalize price: server cart uses cents in prices.*, local cart often stores cents in item.price
+                        const rawUnitPrice =
+                          (isLocalCart
+                            ? item.price ??
+                              item.prices?.sale_price ??
+                              item.prices?.regular_price
+                            : item.prices?.sale_price ??
+                              item.prices?.regular_price ??
+                              item.price) || 0;
+
+                        const unitPrice = rawUnitPrice / 100;
+                        const quantity = item.quantity || 1;
+
+                        return (
+                          <>
+                            <div className="text-[#212121] text-sm">
+                              {quantity} × ${formatPrice(unitPrice)}
+                            </div>
+                            <div className="text-[#212121] text-sm font-semibold">
+                              Total: ${formatPrice(unitPrice * quantity)}
+                            </div>
+                          </>
+                        );
+                      })()}
+                    </>
+                  )}
                 </div>
                 <button
                   onClick={async (e) => {

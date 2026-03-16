@@ -26,6 +26,7 @@ The changes ensure that:
 
 **File:** `app/api/create-payment-intent/route.js`
 
+
 ### Purpose
 Return the Stripe customer ID in the payment intent response so it can be passed to WordPress.
 
@@ -380,12 +381,12 @@ if (stripeCustomerId && paymentMethodId && paymentMethod === "stripe_cc") {
 
 The following metadata keys are now sent to WordPress/WooCommerce:
 
-| Key | Description | Location |
-|-----|-------------|----------|
-| `_stripe_customer_id` | Stripe customer ID | Order & Subscription metadata |
-| `_payment_intent_id` | Payment intent ID | Order & Subscription metadata |
-| `_payment_method_token` | Payment method token/ID | Order & Subscription metadata |
-| `_stripe_source_id` | Payment method ID (legacy) | Order & Subscription metadata |
+| Key                     | Description                | Location                      |
+| ----------------------- | -------------------------- | ----------------------------- |
+| `_stripe_customer_id`   | Stripe customer ID         | Order & Subscription metadata |
+| `_payment_intent_id`    | Payment intent ID          | Order & Subscription metadata |
+| `_payment_method_token` | Payment method token/ID    | Order & Subscription metadata |
+| `_stripe_source_id`     | Payment method ID (legacy) | Order & Subscription metadata |
 
 ---
 
