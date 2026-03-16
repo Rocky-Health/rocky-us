@@ -7,7 +7,7 @@ export const boSimplifiedConfig = {
         // Weight loss recommendation logic (same as standard WL)
         {
             conditions: {
-                bmi: (bmi) => bmi < 27,
+                bmi: (bmi) => bmi <= 20,
             },
             outcome: {
                 recommended: null,

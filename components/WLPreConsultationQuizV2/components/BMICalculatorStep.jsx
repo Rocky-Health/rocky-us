@@ -52,7 +52,7 @@ const BMICalculatorStep = ({
     }
   };
 
-  const isEligible = bmi && !isNaN(parseFloat(bmi)) && parseFloat(bmi) >= 27;
+  const isEligible = bmi && !isNaN(parseFloat(bmi)) && parseFloat(bmi) >= 20;
   const bmiDisplay =
     bmi && !isNaN(parseFloat(bmi)) ? parseFloat(bmi).toFixed(1) : "--";
 
@@ -60,7 +60,8 @@ const BMICalculatorStep = ({
     <div className="w-full h-full flex flex-col">
       <div className="w-full md:w-[520px] mx-auto flex-grow pb-32">
         <p className="mb-[24px] text-[#AE7E56] font-poppins font-medium text-base leading-[140%] tracking-normal align-middle">
-          This helps calculate your BMI (Body Mass Index), a general screening tool for body composition.
+          This helps calculate your BMI (Body Mass Index), a general screening
+          tool for body composition.
         </p>
         <div className="mb-[16px]">
           <label className="block mb-2 text-[14px] font-medium">
