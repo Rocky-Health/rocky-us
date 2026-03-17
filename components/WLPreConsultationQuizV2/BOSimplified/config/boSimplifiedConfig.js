@@ -208,6 +208,14 @@ export const boSimplifiedConfig = {
             field: "selectedProduct",
             required: true,
         },
+        // Step 8: Select Your Weight Loss Plan (Compounded products only)
+        8: {
+            id: "selectWeightLossPlan",
+            type: "planSelection",
+            title: "Select Your Weight Loss Plan",
+            field: "selectedPlan",
+            required: true,
+        },
     },
 
     // Navigation configuration
@@ -218,6 +226,8 @@ export const boSimplifiedConfig = {
         4: 5, // Basic Info -> First Information
         5: 6, // First Information -> Contact Info
         6: 7, // Contact Info -> Product Recommendations
+        7: 8, // Product Recommendations -> Plan Selection (for compounded only; else checkout)
+        8: 100, // Plan Selection -> Checkout
     },
 
     // Progress mapping
@@ -228,7 +238,8 @@ export const boSimplifiedConfig = {
         4: 56, // Basic Info
         5: 70, // First Information
         6: 85, // Contact Info
-        7: 100, // Product Recommendations
+        7: 92, // Product Recommendations
+        8: 100, // Plan Selection
     },
 
     // Step titles
@@ -240,7 +251,121 @@ export const boSimplifiedConfig = {
         5: "Your Details",
         6: "Contact Information",
         7: "Product Recommendations",
+        8: "Select Your Weight Loss Plan",
     },
+
+    // WooCommerce variation IDs per plan, keyed by product ID
+    // Variation ID IS sent as the product ID to WooCommerce (same pattern as ED flow)
+    planVariationIds: {
+        "489523": { // Compounded Tirzepatide
+            monthly:   "489523",
+            "3month":  "490167",
+            "6month":  "490168",
+            "12month": "490169",
+        },
+        "489798": { // Compounded Semaglutide
+            monthly:   "489798",
+            "3month":  "490164",
+            "6month":  "490165",
+            "12month": "490166",
+        },
+    },
+
+    // Plan options keyed by product ID — each product has its own pricing
+    planOptions: {
+        // Compounded Tirzepatide (489523)
+        "489523": {
+            monthly: {
+                id: "monthly",
+                label: "Monthly Auto-Refill",
+                subtitle: "Flexible. Pay as you go plan.",
+                price: "$359",
+                originalPrice: "$389",
+                savings: "Save $30",
+                subscriptionPeriod: "1_month",
+                isDefault: true,
+            },
+            "3month": {
+                id: "3month",
+                badge: "STARTER BUNDLE",
+                label: "3 Month Supply",
+                price: "$299",
+                originalPrice: "$389",
+                savings: "Save $270",
+                subscriptionPeriod: "3_month",
+                type: "One-time purchase",
+            },
+            "6month": {
+                id: "6month",
+                badge: "MOST POPULAR",
+                label: "6 Month Supply",
+                price: "$275",
+                originalPrice: "$389",
+                savings: "Save $684",
+                subscriptionPeriod: "6_month",
+                type: "One-time purchase",
+            },
+            "12month": {
+                id: "12month",
+                badge: "BEST VALUE",
+                label: "12 Month Supply",
+                price: "$240",
+                originalPrice: "$389",
+                savings: "Save $1,788",
+                subscriptionPeriod: "12_month",
+                type: "One-time purchase",
+            },
+        },
+        // Compounded Semaglutide (489798)
+        "489798": {
+            monthly: {
+                id: "monthly",
+                label: "Monthly Auto-Refill",
+                subtitle: "Flexible. Pay as you go plan.",
+                price: "$249",
+                originalPrice: "$279",
+                savings: "Save $30",
+                subscriptionPeriod: "1_month",
+                isDefault: true,
+            },
+            "3month": {
+                id: "3month",
+                badge: "STARTER BUNDLE",
+                label: "3 Month Supply",
+                price: "$199",
+                originalPrice: "$279",
+                savings: "Save $240",
+                subscriptionPeriod: "3_month",
+                type: "One-time purchase",
+            },
+            "6month": {
+                id: "6month",
+                badge: "MOST POPULAR",
+                label: "6 Month Supply",
+                price: "$175",
+                originalPrice: "$279",
+                savings: "Save $624",
+                subscriptionPeriod: "6_month",
+                type: "One-time purchase",
+            },
+            "12month": {
+                id: "12month",
+                badge: "BEST VALUE",
+                label: "12 Month Supply",
+                price: "$150",
+                originalPrice: "$279",
+                savings: "Save $1,548",
+                subscriptionPeriod: "12_month",
+                type: "One-time purchase",
+            },
+        },
+    },
+    planInclusions: [
+        "New Rx shipped every 30 days",
+        "Unlimited provider support",
+        "Regular check-ins",
+        "Nutrition & lifestyle support",
+    ],
 
     // Popup configurations
     popups: {

@@ -74,7 +74,7 @@ const WLProducts = {
     id: "489523",
     name: "Compounded Tirzepatide",
     description: "Same active ingredient as Ozempic. The popular, affordable alternative.",
-    price: "$348",
+    price: "$240",
     details:
       "Tirzepatide is the generic version of Mounjaro. It is a personalized treatment to help reduce appetite and keep you fuller for longer",
     isDefault: true,
@@ -96,7 +96,7 @@ const WLProducts = {
     id: "489798",
     name: "Compounded Semaglutide",
     description: "Dual-action mechanism with the highest rated clinical weight loss.",
-    price: "$248",
+    price: "$150",
     details:
       "Semaglutide is the generic version of Ozempic. It is a personalized treatment to help reduce appetite and keep you fuller for longer",
     url: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/wl/Compounded Semaglutide (GLP-1).jpg",
