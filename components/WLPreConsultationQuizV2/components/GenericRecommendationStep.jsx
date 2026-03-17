@@ -189,18 +189,6 @@ const GenericRecommendationStep = ({
           result.redirectUrl,
         );
 
-        // Clear all localStorage keys used in WL flow before redirecting
-        try {
-          if (typeof window !== "undefined" && window.localStorage) {
-            // Remove WL flow specific key (used by useStepNavigation and useQuizData hooks)
-            localStorage.removeItem("wl_flow2_quiz_data");
-
-            logger.log("✓ Cleared WL flow localStorage key before redirect");
-          }
-        } catch (e) {
-          logger.error("Error clearing localStorage:", e);
-        }
-
         // Use a full-page navigation to ensure server-side state (cookies/nonce)
         // is properly established and the next page does a full reload.
         try {

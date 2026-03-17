@@ -89,13 +89,6 @@ export const useBOSimplifiedFlow = () => {
             subscriptionPeriod: selectedPlan?.subscriptionPeriod || "1_month",
         });
         if (result.success) {
-            try {
-                if (typeof window !== "undefined" && window.localStorage) {
-                    localStorage.removeItem("wl_flow2_quiz_data");
-                }
-            } catch (e) {
-                logger.error("Error clearing localStorage:", e);
-            }
             if (typeof window !== "undefined" && result.redirectUrl) {
                 window.location.href = result.redirectUrl;
                 return;
