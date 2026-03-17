@@ -1,7 +1,7 @@
 # Northbeam Backfill-Auto - Quick Implementation Checklist
  
 ## 🎯 Pre-Implementation
-
+ 
 - [ ] Review full implementation guide: `NORTHBEAM_BACKFILL_AUTO_IMPLEMENTATION_GUIDE.md`
 - [ ] Have Northbeam US credentials ready (Client ID + API Key)
 - [ ] Have WooCommerce US credentials ready (Consumer Key + Secret)
