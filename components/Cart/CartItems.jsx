@@ -9,9 +9,44 @@ import { canRemoveItem } from "@/lib/cart/cartService";
 import { analyticsService } from "@/utils/analytics/analyticsService";
 import { formatPrice } from "@/utils/priceFormatter";
 
-const CartItems = ({ items, setCartItems }) => {
+const COMPOUNDED_ORIGINAL_PRICES = {
+  tirzepatide: "$389",
+  semaglutide: "$279",
+};
+
+const PLAN_LABEL_BY_INTERVAL = {
+  1:  "Monthly Auto-Refill",
+  3:  "3 Month Supply",
+  6:  "6 Month Supply",
+  12: "Annual Supply",
+};
+
+function getCompoundedPlanInfo(item) {
+  const name = (item.name || "").toLowerCase();
+  const isTirz = name.includes("tirzepatide");
+  const isSema = name.includes("semaglutide") && !name.includes("oral") && !name.includes("sublingual");
+
+  if (!isTirz && !isSema) return null;
+
+  const subscription = item.extensions?.subscriptions;
+  const billingInterval = parseInt(subscription?.billing_interval || "1", 10);
+  const billingPeriod = (subscription?.billing_period || "month").toLowerCase();
+
+  const isWeeklyMonthly = billingPeriod === "week" && billingInterval <= 5;
+  const normalizedMonthInterval = isWeeklyMonthly ? 1 : billingInterval;
+
+  return {
+    plan: PLAN_LABEL_BY_INTERVAL[normalizedMonthInterval] || "Monthly Auto-Refill",
+    originalPrice: isTirz
+      ? COMPOUNDED_ORIGINAL_PRICES.tirzepatide
+      : COMPOUNDED_ORIGINAL_PRICES.semaglutide,
+  };
+}
+
+const CartItems = ({ items, setCartItems, coupons = [] }) => {
   const emptyCart = useEmptyCart();
   const [isEmptyingCart, setIsEmptyingCart] = useState(false);
+  const hasCoupon = coupons.length > 0;
 
   const handleEmptyCart = async () => {
     try {
@@ -46,7 +81,7 @@ const CartItems = ({ items, setCartItems }) => {
 
       {items.map((item) => (
         <div key={item.key}>
-          <CartItem item={item} setCartItems={setCartItems} allItems={items} />
+          <CartItem item={item} setCartItems={setCartItems} allItems={items} hasCoupon={hasCoupon} />
           <hr />
         </div>
       ))}
@@ -128,7 +163,7 @@ const CartItems = ({ items, setCartItems }) => {
 
 export default CartItems;
 
-const CartItem = ({ item, setCartItems, allItems }) => {
+const CartItem = ({ item, setCartItems, allItems, hasCoupon = false }) => {
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const itemPrice = (item.prices.sale_price || item.prices.regular_price) / 100;
@@ -142,6 +177,8 @@ const CartItem = ({ item, setCartItems, allItems }) => {
   // This product should be treated as a monthly subscription even if WooCommerce metadata is missing
   const isOralSemaglutide = item.id === 490537 || item.product_id === 490537;
   const isSubscriptionWithFallback = isSubscription || isOralSemaglutide;
+
+  const compoundedPlanInfo = getCompoundedPlanInfo(item);
 
   let supply = "";
   if (
@@ -335,7 +372,7 @@ const CartItem = ({ item, setCartItems, allItems }) => {
                   `(${item.variation[0]?.value})`}
               </p>
 
-              {item.name != "Body Optimization Program" && (
+              {item.name != "Body Optimization Program" && !compoundedPlanInfo && (
                 <>
                   <p className="text-[12px] font-[400] text-[#212121] inline">
                     {currencySymbol}
@@ -363,6 +400,21 @@ const CartItem = ({ item, setCartItems, allItems }) => {
                       )}
                   </p>
                 </>
+              )}
+              {compoundedPlanInfo && (
+                <div className="mt-1">
+                  <p className="text-[12px] font-[400] text-[#212121]">
+                    {currencySymbol}{formatPrice(itemTotalPrice)} / {intervalText}
+                  </p>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="text-[11px] text-[#999999] line-through">
+                      {compoundedPlanInfo.originalPrice}/mo
+                    </span>
+                    <span className="text-[11px] font-[600] text-[#212121]">
+                      {currencySymbol}{formatPrice(itemTotalPrice)}/mo
+                    </span>
+                  </div>
+                </div>
               )}
               {item.name === "Body Optimization Program" && (
                 <div className="flex flex-col">
@@ -412,11 +464,14 @@ const CartItem = ({ item, setCartItems, allItems }) => {
         <div className="text-[14px] font-[500] leading-[19.6px] justify-self-end product-sub-total">
           <span className="woocommerce-Price-amount amount">
             <bdi>
-              {item.name == "Body Optimization Program" ? <span className="text-green-500">FREE</span> :
-               <><span className="woocommerce-Price-currencySymbol">
-                {currencySymbol}
-              </span>
-              {formatPrice(itemTotalPrice)} </>}
+              {item.name === "Body Optimization Program" ? (
+                <span className="text-green-500">FREE</span>
+              ) : (
+                <><span className="woocommerce-Price-currencySymbol">
+                  {currencySymbol}
+                </span>
+                {formatPrice(itemTotalPrice)}</>
+              )}
             </bdi>
           </span>
         </div>

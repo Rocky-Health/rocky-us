@@ -36,7 +36,7 @@ const CartAndPayment = ({
         Your Order
       </h1>
       <div className="bg-white w-full lg:max-w-[512px] p-4 md:p-6 py-0 md:py-0 rounded-[16px] shadow-[0px_1px_1px_0px_#E2E2E1] border border-[#E2E2E1] mt-8 lg:mt-0 ">
-        <CartItems items={items} />
+        <CartItems items={items} coupons={cartItems?.coupons || []} />
         <CouponApply setCartItems={setCartItems} />
         <InitialShipping
           cartItems={cartItems}

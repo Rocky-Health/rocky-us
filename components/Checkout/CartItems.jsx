@@ -3,12 +3,13 @@ import { formatPrice } from "@/utils/priceFormatter";
 import { useState } from "react";
 import { logger } from "@/utils/devLogger";
 
-const CartItems = ({ items }) => {
+const CartItems = ({ items, coupons = [] }) => {
+  const hasCoupon = coupons.length > 0;
   return (
     <div className="w-full">
       {items.map((item) => (
         <div key={item.key}>
-          <CartITem2 item={item} />
+          <CartITem2 item={item} hasCoupon={hasCoupon} />
         </div>
       ))}
 
@@ -195,7 +196,51 @@ const CartItem = ({ item }) => {
   );
 };
 
-const CartITem2 = ({ item }) => {
+// Original (base/retail) price per compounded product — shown as strikethrough in checkout
+const COMPOUNDED_ORIGINAL_PRICES = {
+  tirzepatide: "$389",
+  semaglutide: "$279",
+};
+
+// Map subscription billing interval (months) → plan label
+const PLAN_LABEL_BY_INTERVAL = {
+  1:  "Monthly Auto-Refill",
+  3:  "3 Month Supply",
+  6:  "6 Month Supply",
+  12: "Annual Supply",
+};
+
+/**
+ * Returns compounded plan display info for Tirzepatide / Semaglutide cart items.
+ * Uses the subscription billing data (returned by WooCommerce) instead of variation IDs
+ * because the Store API returns the parent product ID, not the variation ID.
+ * Returns null for all other products.
+ */
+function getCompoundedPlanInfo(item) {
+  const name = (item.name || "").toLowerCase();
+  const isTirz = name.includes("tirzepatide");
+  const isSema = name.includes("semaglutide") && !name.includes("oral") && !name.includes("sublingual");
+
+  if (!isTirz && !isSema) return null;
+
+  const subscription = item.extensions?.subscriptions;
+  const billingInterval = parseInt(subscription?.billing_interval || "1", 10);
+  const billingPeriod = (subscription?.billing_period || "month").toLowerCase();
+
+  // Tirzepatide monthly uses 4-week billing (billing_interval=4, period="week")
+  // Treat ≤5 week intervals as monthly to handle this case
+  const isWeeklyMonthly = billingPeriod === "week" && billingInterval <= 5;
+  const normalizedMonthInterval = isWeeklyMonthly ? 1 : billingInterval;
+
+  return {
+    plan: PLAN_LABEL_BY_INTERVAL[normalizedMonthInterval] || "Monthly Auto-Refill",
+    originalPrice: isTirz
+      ? COMPOUNDED_ORIGINAL_PRICES.tirzepatide
+      : COMPOUNDED_ORIGINAL_PRICES.semaglutide,
+  };
+}
+
+const CartITem2 = ({ item, hasCoupon = false }) => {
   logger.log("itemms ->" ,item);
   const itemPrice = item.totals.line_subtotal / 100;
 
@@ -208,6 +253,9 @@ const CartITem2 = ({ item }) => {
   // This product should be treated as a monthly subscription even if WooCommerce metadata is missing
   const isOralSemaglutide = item.id === 490537 || item.product_id === 490537;
   const isSubscriptionWithFallback = isSubscription || isOralSemaglutide;
+
+  // Check if this is a compounded Tirzepatide / Semaglutide item
+  const compoundedPlanInfo = getCompoundedPlanInfo(item);
 
   // Check if this is the special offer product [GLP-1] Buy 2 Get 1 Free
   const isOfferProduct = item.id === 489780 || item.product_id === 489780;
@@ -292,6 +340,23 @@ const CartITem2 = ({ item }) => {
                   )}
               </span>
             </p>
+          )}
+
+          {/* Compounded Tirzepatide / Semaglutide: show selected plan + sale vs base price */}
+          {compoundedPlanInfo && (
+            <div className="mt-1.5 space-y-0.5">
+              {/* <p className="text-[11px] font-[500] text-[#000000]">
+                {compoundedPlanInfo.plan}
+              </p> */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] text-[#999999] line-through">
+                  {compoundedPlanInfo.originalPrice}/mo
+                </span>
+                <span className="text-[11px] font-[600] text-[#000000]">
+                  {currencySymbol}{formatPrice(itemPrice)}/mo
+                </span>
+              </div>
+            </div>
           )}
           {isOfferProduct && (
             <p className="text-[12px]">
@@ -408,9 +473,11 @@ const CartITem2 = ({ item }) => {
         </div>
       </div>
       <div className="">
-        { item.name == "Body Optimization Program" ? <>
+        {item.name === "Body Optimization Program" ? (
           <span className="text-green-500">FREE</span>
-        </> : currencySymbol + formatPrice(itemPrice)}
+        ) : (
+          currencySymbol + formatPrice(itemPrice)
+        )}
       </div>
     </div>
   );

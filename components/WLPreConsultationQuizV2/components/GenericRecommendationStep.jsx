@@ -29,6 +29,9 @@ const GenericRecommendationStep = ({
   showAlternatives = true,
   variations = [],
   showIncluded = true,
+  // Optional: when provided and returns true for selectedProduct, navigate instead of checkout
+  onBeforeCheckout,
+  onNavigateToPlanStep,
 }) => {
   const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
@@ -144,6 +147,14 @@ const GenericRecommendationStep = ({
       return;
     }
 
+    // If onBeforeCheckout returns true, navigate to plan step instead of checkout
+    if (typeof onBeforeCheckout === "function" && onBeforeCheckout(selectedProduct)) {
+      if (typeof onNavigateToPlanStep === "function") {
+        onNavigateToPlanStep();
+      }
+      return;
+    }
+
     try {
       setIsCheckoutLoading(true);
 
@@ -177,18 +188,6 @@ const GenericRecommendationStep = ({
           "✅ WL cart addition successful, redirecting to:",
           result.redirectUrl,
         );
-
-        // Clear all localStorage keys used in WL flow before redirecting
-        try {
-          if (typeof window !== "undefined" && window.localStorage) {
-            // Remove WL flow specific key (used by useStepNavigation and useQuizData hooks)
-            localStorage.removeItem("wl_flow2_quiz_data");
-
-            logger.log("✓ Cleared WL flow localStorage key before redirect");
-          }
-        } catch (e) {
-          logger.error("Error clearing localStorage:", e);
-        }
 
         // Use a full-page navigation to ensure server-side state (cookies/nonce)
         // is properly established and the next page does a full reload.
@@ -228,6 +227,13 @@ const GenericRecommendationStep = ({
   };
 
   const isContinueEnabled = selectedProduct !== null;
+  const isPlanStepProduct =
+    selectedProduct &&
+    typeof onBeforeCheckout === "function" &&
+    onBeforeCheckout(selectedProduct);
+  const proceedButtonLabel = isPlanStepProduct
+    ? "Continue"
+    : `Proceed - ${selectedProduct?.price || ""} →`;
 
   if (!recommended) {
     return (
@@ -415,9 +421,7 @@ const GenericRecommendationStep = ({
             onClick={isContinueEnabled ? handleCheckout : null}
             disabled={!isContinueEnabled || isCheckoutLoading}
           >
-            {isCheckoutLoading
-              ? "Processing..."
-              : `Proceed - ${selectedProduct?.price || ""} →`}
+            {isCheckoutLoading ? "Processing..." : proceedButtonLabel}
           </button>
         </div>
       </div>

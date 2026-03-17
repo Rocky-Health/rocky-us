@@ -9,11 +9,9 @@ import QuizStepRenderer from "./QuizStepRenderer";
 import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
 
 import { useEffect } from "react";
-import { toast } from "react-toastify";
 import QuestionnaireNavbar from "../components/QuestionnaireNavbar";
 import { ProgressBar } from "@/components/EdQuestionnaire/ProgressBar";
 
-const COUPON_STORAGE_KEY = "pending_coupon_code";
 
 const getPopupConfigWithChosenValue = (popupKey, userData) => {
   if (popupKey === "potentialWeightLoss") {
@@ -73,6 +71,7 @@ const BOSimplifiedFlow = () => {
   const {
     currentStep,
     progressPercent,
+    goToStep,
     userData,
     setUserData,
     selectedProduct,
@@ -83,6 +82,7 @@ const BOSimplifiedFlow = () => {
     handleAction,
     closePopup,
     handleRecommendationContinue,
+    handlePlanStepCheckout,
   } = useBOSimplifiedFlow();
 
   useQuestionnaireStepTracking({
@@ -93,31 +93,6 @@ const BOSimplifiedFlow = () => {
     stepType: "pre-consultation",
   });
 
-  useEffect(() => {
-    try {
-      // const params = new URLSearchParams(window.location.search);
-      // const coupon = params.get("apply_coupon");
-      // if (coupon && coupon.trim()) {
-      //   localStorage.setItem(COUPON_STORAGE_KEY, coupon.trim());
-      //   toast.success(
-      //     "$100 Discount Code Auto-Applied For You in Checkout For The Next 60 Minutes",
-      //     { autoClose: 8000 },
-      //   );
-      // }
-
-      // Only show toast once by checking if coupon is already set
-      const existingCoupon = localStorage.getItem(COUPON_STORAGE_KEY);
-      if (existingCoupon !== "save100") {
-        localStorage.setItem(COUPON_STORAGE_KEY, "save100");
-        toast.success(
-          "$100 Discount Code Auto-Applied For You in Checkout For The Next 60 Minutes",
-          { autoClose: 8000 },
-        );
-      }
-    } catch (e) {
-      logger.error("Error capturing coupon from URL:", e);
-    }
-  }, []);
 
   // Ensure hooks run in the same order on every render
   useEffect(() => {
@@ -178,7 +153,7 @@ const BOSimplifiedFlow = () => {
           onBackClick={handleBack}
           currentPage={currentStep}
         />
-        {/* Progress Bar - Hide for recommendation step */}
+        {/* Progress Bar - Hide for recommendation step only */}
         {currentStep !== 7 && (
           <div className="pt-4 pb-6">
             <ProgressBar progress={progressPercent || 100} />
@@ -196,6 +171,9 @@ const BOSimplifiedFlow = () => {
             handleContinue={handleContinue}
             handleAction={handleAction}
             handleRecommendationContinue={handleRecommendationContinue}
+            handleBack={handleBack}
+            goToStep={goToStep}
+            handlePlanStepCheckout={handlePlanStepCheckout}
           />
         </div>
 
