@@ -40,6 +40,7 @@ function getCompoundedPlanInfo(item) {
     originalPrice: isTirz
       ? COMPOUNDED_ORIGINAL_PRICES.tirzepatide
       : COMPOUNDED_ORIGINAL_PRICES.semaglutide,
+    months: normalizedMonthInterval,
   };
 }
 
@@ -411,7 +412,7 @@ const CartItem = ({ item, setCartItems, allItems, hasCoupon = false }) => {
                       {compoundedPlanInfo.originalPrice}/mo
                     </span>
                     <span className="text-[11px] font-[600] text-[#212121]">
-                      {currencySymbol}{formatPrice(itemTotalPrice)}/mo
+                      {currencySymbol}{formatPrice(itemTotalPrice / compoundedPlanInfo.months)}/mo
                     </span>
                   </div>
                 </div>
