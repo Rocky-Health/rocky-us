@@ -237,6 +237,7 @@ function getCompoundedPlanInfo(item) {
     originalPrice: isTirz
       ? COMPOUNDED_ORIGINAL_PRICES.tirzepatide
       : COMPOUNDED_ORIGINAL_PRICES.semaglutide,
+    months: normalizedMonthInterval,
   };
 }
 
@@ -345,15 +346,12 @@ const CartITem2 = ({ item, hasCoupon = false }) => {
           {/* Compounded Tirzepatide / Semaglutide: show selected plan + sale vs base price */}
           {compoundedPlanInfo && (
             <div className="mt-1.5 space-y-0.5">
-              {/* <p className="text-[11px] font-[500] text-[#000000]">
-                {compoundedPlanInfo.plan}
-              </p> */}
               <div className="flex items-center gap-1.5">
                 <span className="text-[11px] text-[#999999] line-through">
                   {compoundedPlanInfo.originalPrice}/mo
                 </span>
                 <span className="text-[11px] font-[600] text-[#000000]">
-                  {currencySymbol}{formatPrice(itemPrice)}/mo
+                  {currencySymbol}{formatPrice(itemPrice / compoundedPlanInfo.months)}/mo
                 </span>
               </div>
             </div>
