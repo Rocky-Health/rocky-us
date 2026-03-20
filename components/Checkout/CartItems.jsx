@@ -227,10 +227,16 @@ function getCompoundedPlanInfo(item) {
   const billingInterval = parseInt(subscription?.billing_interval || "1", 10);
   const billingPeriod = (subscription?.billing_period || "month").toLowerCase();
 
-  // Tirzepatide monthly uses 4-week billing (billing_interval=4, period="week")
-  // Treat ≤5 week intervals as monthly to handle this case
-  const isWeeklyMonthly = billingPeriod === "week" && billingInterval <= 5;
-  const normalizedMonthInterval = isWeeklyMonthly ? 1 : billingInterval;
+  // Convert subscription schedule to a month-equivalent divisor for "/mo" display.
+  // Example: every 1 year should divide by 12, not 1.
+  let normalizedMonthInterval = billingInterval;
+  if (billingPeriod === "year") {
+    normalizedMonthInterval = billingInterval * 12;
+  } else if (billingPeriod === "week") {
+    normalizedMonthInterval = billingInterval <= 5 ? 1 : Math.max(1, Math.round(billingInterval / 4));
+  } else if (billingPeriod === "day") {
+    normalizedMonthInterval = billingInterval <= 31 ? 1 : Math.max(1, Math.round(billingInterval / 30));
+  }
 
   return {
     plan: PLAN_LABEL_BY_INTERVAL[normalizedMonthInterval] || "Monthly Auto-Refill",

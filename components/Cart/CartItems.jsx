@@ -32,8 +32,16 @@ function getCompoundedPlanInfo(item) {
   const billingInterval = parseInt(subscription?.billing_interval || "1", 10);
   const billingPeriod = (subscription?.billing_period || "month").toLowerCase();
 
-  const isWeeklyMonthly = billingPeriod === "week" && billingInterval <= 5;
-  const normalizedMonthInterval = isWeeklyMonthly ? 1 : billingInterval;
+  // Convert subscription schedule to a month-equivalent divisor for "/mo" display.
+  // Example: every 1 year should divide by 12, not 1.
+  let normalizedMonthInterval = billingInterval;
+  if (billingPeriod === "year") {
+    normalizedMonthInterval = billingInterval * 12;
+  } else if (billingPeriod === "week") {
+    normalizedMonthInterval = billingInterval <= 5 ? 1 : Math.max(1, Math.round(billingInterval / 4));
+  } else if (billingPeriod === "day") {
+    normalizedMonthInterval = billingInterval <= 31 ? 1 : Math.max(1, Math.round(billingInterval / 30));
+  }
 
   return {
     plan: PLAN_LABEL_BY_INTERVAL[normalizedMonthInterval] || "Monthly Auto-Refill",
