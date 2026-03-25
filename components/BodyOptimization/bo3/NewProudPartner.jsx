@@ -1,6 +1,6 @@
 import CustomContainImage from "@/components/utils/CustomContainImage";
 
-const ProudPartner = ({ section = false, bg = "bg-white" }) => {
+const ProudPartner = ({ section = false, bg = "bg-white", hideMapleLeaf = false }) => {
   const rockyLogoSize = "h-[28px] w-[72px]";
   const nbaLogoSize = "w-[16px] h-[36px]";
   const blueJaysLogoSize = "w-[45px] h-[38px]";
@@ -9,12 +9,13 @@ const ProudPartner = ({ section = false, bg = "bg-white" }) => {
 
   // Handle arbitrary values like bg-[#F4F3EF] for responsive
   const desktopBg = bg.includes("[") ? bg.replace("bg-", "md:bg-") : `md:${bg}`;
+  const rowWidthClass = hideMapleLeaf ? "w-full md:w-fit" : "w-full";
 
   return (
     <div
       className={`flex flex-row items-center justify-center bg-transparent ${desktopBg} w-[285.1812px] h-[40px] overflow-hidden`}
     >
-      <div className="flex flex-row items-center gap-[15px] w-full">
+      <div className={`flex flex-row items-center gap-[15px] ${rowWidthClass}`}>
         <div className="text-center flex flex-col items-center justify-center">
           <div className={`relative overflow-hidden ${rockyLogoSize}`}>
             <CustomContainImage
@@ -48,14 +49,16 @@ const ProudPartner = ({ section = false, bg = "bg-white" }) => {
               className="object-contain"
             />
           </div>
-          <div className={`relative overflow-hidden ${mapleLeafsLogoSize}`}>
-            <CustomContainImage
-              src="https://myrocky.b-cdn.net/partner-1.png"
-              alt="Toronto Maple Leafs Logo"
-              fill
-              className="object-contain"
-            />
-          </div>
+          {!hideMapleLeaf && (
+            <div className={`relative overflow-hidden ${mapleLeafsLogoSize}`}>
+              <CustomContainImage
+                src="https://myrocky.b-cdn.net/partner-1.png"
+                alt="Toronto Maple Leafs Logo"
+                fill
+                className="object-contain"
+              />
+            </div>
+          )}
           
         </div>
       </div>
