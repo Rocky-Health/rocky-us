@@ -11,7 +11,7 @@ const GLP1HeroSection = ({ ctaHref = "#" }) => {
       <div className="pt-8 pb-20 md:pb-28 px-5 md:px-0 max-w-[1200px] mx-auto relative">
         <div className="flex flex-col items-center text-center max-w-[700px] mx-auto">
           <p className="text-black poppins-font text-[14px] md:text-[16px] font-[400] leading-[100%] flex items-center gap-2 mb-4 md:mb-6">
-            Trusted by 350,000+ users
+            Trusted by 350,000+ Patients
           </p>
 
           <h1 className="text-[36px] md:text-[54px] leading-[115%] tracking-[-0.72px] md:tracking-[-1.08px] text-black mb-4 md:mb-6 headers-font">

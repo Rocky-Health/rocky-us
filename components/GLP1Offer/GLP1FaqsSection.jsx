@@ -15,7 +15,7 @@ const GLP1FaqsSection = () => {
         <MoreQuestions
           title="Convenient, researched, trusted."
           link="/faqs/"
-          buttonWidth="w-full min-w-[295px] min-w-none"
+          buttonWidth="w-full sm:w-auto sm:min-w-[295px]"
         />
       </div>
     </div>
