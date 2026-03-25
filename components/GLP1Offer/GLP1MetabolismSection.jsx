@@ -21,7 +21,7 @@ const GLP1MetabolismSection = ({ ctaHref = "#" }) => {
               src="/bo3/NDWL.jpg"
               alt="Couple relaxing on couch"
               fill
-              className="object-cover object-right"
+              className="object-cover object-[87%_center] md:object-[93%_center]"
             />
           </div>
         </div>
