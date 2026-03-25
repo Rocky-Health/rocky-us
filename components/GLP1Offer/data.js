@@ -3,14 +3,14 @@ export const productTiers = [
   {
     name: "GLP-1 Injections",
     subtitle: "One simple injection per week.",
-    price: "320",
+    price: "149",
     image: "/products/glp1-vial.png",
     inStock: true,
   },
   {
     name: "GLP-1 + GIP Injections",
     subtitle: "One simple injection per week.",
-    price: "505",
+    price: "240",
     image: "/products/glp1-gip-vial.png",
     inStock: true,
   },
@@ -58,16 +58,14 @@ export const steps = [
     title: "Get Approved",
     description:
       "Complete a quick online evaluation to determine if GLP-1 medication is right for you. Our team of licensed professionals will review your information and provide approval in no time.",
-    image:
-      "https://myrocky.b-cdn.net/WP%20Images/bo3/new/Startyour.jpg",
+    image: "https://myrocky.b-cdn.net/WP%20Images/bo3/new/Startyour.jpg",
   },
   {
     number: "2",
     title: "Get Prescribed",
     description:
       "Once approved, you\u2019ll receive personalized care and a prescription to support your weight loss and health goals. Your care plan is designed to help you achieve lasting results safely and effectively.",
-    image:
-      "https://myrocky.b-cdn.net/WP%20Images/bo3/new/Provider.jpg",
+    image: "https://myrocky.b-cdn.net/WP%20Images/bo3/new/Provider.jpg",
   },
   {
     number: "3",
