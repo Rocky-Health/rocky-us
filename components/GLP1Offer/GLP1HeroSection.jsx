@@ -25,9 +25,9 @@ const GLP1HeroSection = ({ ctaHref = "#" }) => {
           <p className="poppins-font text-[16px] md:text-[18px] font-[400] mb-8 md:mb-10">
             Starting at{" "}
             <span className="text-[#AE7E56] font-[700] text-[28px] md:text-[36px] headers-font">
-              $315
-            </span>
-            {" "}&mdash; GLP-1 &amp; GLP-1 + GIP in stock
+              $149
+            </span>{" "}
+            &mdash; GLP-1 &amp; GLP-1 + GIP in stock
           </p>
 
           {/* Checklist */}
@@ -46,7 +46,9 @@ const GLP1HeroSection = ({ ctaHref = "#" }) => {
               </span>
               <p className="text-black poppins-font text-[15px] md:text-[16px] leading-[140%]">
                 <span className="font-[600]">No insurance required</span>
-                <span className="text-[rgba(0,0,0,0.60)] ml-2">Simple monthly plan</span>
+                <span className="text-[rgba(0,0,0,0.60)] ml-2">
+                  Simple monthly plan
+                </span>
               </p>
             </li>
             <li className="flex items-center gap-3">
@@ -55,7 +57,9 @@ const GLP1HeroSection = ({ ctaHref = "#" }) => {
               </span>
               <p className="text-black poppins-font text-[15px] md:text-[16px] leading-[140%]">
                 Transparent pricing
-                <span className="text-[rgba(0,0,0,0.60)] ml-2">No hidden fees</span>
+                <span className="text-[rgba(0,0,0,0.60)] ml-2">
+                  No hidden fees
+                </span>
               </p>
             </li>
             <li className="flex items-center gap-3">
@@ -78,8 +82,8 @@ const GLP1HeroSection = ({ ctaHref = "#" }) => {
           </Link>
 
           <p className="text-black poppins-font text-[12px] font-[400] leading-normal text-center max-w-[300px] mx-auto mb-6">
-            <span className="font-[600]">Money-back Guarantee:</span>{" "}
-            The only thing you&apos;ll lose is extra weight.
+            <span className="font-[600]">Money-back Guarantee:</span> The only
+            thing you&apos;ll lose is extra weight.
           </p>
 
           <div className="w-full flex justify-center">
