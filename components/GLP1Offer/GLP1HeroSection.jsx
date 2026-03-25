@@ -83,7 +83,11 @@ const GLP1HeroSection = ({ ctaHref = "#" }) => {
           </p>
 
           <div className="w-full flex justify-center">
-            <NewProudPartner section={true} bg="bg-[#F4F3EF] mx-auto" />
+            <NewProudPartner
+              section={true}
+              bg="bg-[#F4F3EF] mx-auto"
+              hideMapleLeaf={true}
+            />
           </div>
         </div>
       </div>

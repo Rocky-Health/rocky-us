@@ -1,9 +1,17 @@
 "use client";
 import CustomImage from "../utils/CustomImage";
 import CustomContainImage from "../utils/CustomContainImage";
+import { usePathname } from "next/navigation";
 import { partners } from "./partnersData";
 
 const HeaderProudPartner = () => {
+  const pathname = usePathname();
+  const isGlpHeroPage =
+    pathname === "/glp1-offer-hero" || pathname === "/glp2-offer-hero";
+  const visiblePartners = isGlpHeroPage
+    ? partners.filter((partner) => partner.name !== "Toronto Maple Leafs")
+    : partners;
+
   return (
     <div className="bg-[#003876] text-white py-2">
       {/* Desktop view - static display */}
@@ -13,7 +21,7 @@ const HeaderProudPartner = () => {
           <div className="w-0 h-8 origin-top-left outline outline-1 outline-offset-[-0.50px] outline-white/50"></div>
         </div>
 
-        {partners.map((partner, index) => (
+        {visiblePartners.map((partner, index) => (
           <div key={index} className="flex items-center">
             <div className="flex items-center gap-1">
               <div
@@ -31,7 +39,7 @@ const HeaderProudPartner = () => {
               </div>
               <span className="font-[500] text-[18px]">{partner.name}</span>
             </div>
-            {index < partners.length - 1 && (
+            {index < visiblePartners.length - 1 && (
               <div className="px-4">
                 <div className="w-0 h-8 origin-top-left outline outline-1 outline-offset-[-0.50px] outline-white/50"></div>
               </div>
@@ -56,9 +64,9 @@ const HeaderProudPartner = () => {
 
           {/* Partners container */}
           <div className="flex items-center whitespace-nowrap w-fit overflow-hidden animate-partner-scroll">
-            {partners
-              .concat(partners)
-              .concat(partners)
+            {visiblePartners
+              .concat(visiblePartners)
+              .concat(visiblePartners)
               .map((partner, index) => (
                 <div key={index} className="flex items-center flex-shrink-0">
                   <div className="flex items-center gap-2 px-3">
