@@ -19,7 +19,7 @@ import RockyInTheNews from "@/components/RockyInTheNews";
 export const metadata = {
   title: "GLP-1 Weight Loss Program | Rocky",
   description:
-    "Lose 1-2lbs per week with GLP-1 medication. 100% online medical review, free delivery, and money-back guarantee. Starting at $315/mo.",
+    "Lose 1-2lbs per week with GLP-1 medication. 100% online medical review, free delivery, and money-back guarantee. Starting at $149/mo.",
   robots: {
     index: false,
     follow: false,
