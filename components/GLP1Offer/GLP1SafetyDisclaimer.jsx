@@ -6,13 +6,12 @@ const GLP1SafetyDisclaimer = () => {
           IMPORTANT SAFETY INFORMATION &amp; DISCLAIMER:
         </p>
         <p className="poppins-font text-[rgba(0,0,0,0.60)] text-[12px] font-[400] leading-[160%] mb-3">
-          Medication Options: Rocky connects you with licensed Canadian medical
-          providers who can prescribe medication based on their professional
-          judgment. Your provider may prescribe Health Canada-approved branded
-          medications (e.g., Ozempic&reg;, Wegovy&reg;, Mounjaro&reg;,
-          Rybelsus&reg;). Rocky does not sell, dispense, or ship any medications
-          directly. All prescriptions are filled and dispensed by a licensed
-          Canadian pharmacy.
+          Medication Options: Rocky connects you with licensed medical providers
+          who can prescribe medication based on their professional judgment.
+          Your provider may prescribe branded medications (e.g., Ozempic&reg;,
+          Wegovy&reg;, Mounjaro&reg;, Rybelsus&reg;). Rocky does not sell,
+          dispense, or ship any medications directly. All prescriptions are
+          filled and dispensed by a licensed partner pharmacy.
         </p>
         <p className="poppins-font text-[rgba(0,0,0,0.60)] text-[12px] font-[400] leading-[160%] mb-3">
           No Guarantees: Individual results may vary. Weight loss is not
