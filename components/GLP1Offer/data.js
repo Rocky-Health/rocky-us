@@ -3,7 +3,7 @@ export const productTiers = [
   {
     name: "GLP-1 Injections",
     subtitle: "One simple injection per week.",
-    price: "150",
+    price: "149",
     image: "/products/glp1-vial.png",
     inStock: true,
   },
