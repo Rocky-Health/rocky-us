@@ -3,11 +3,16 @@ import Author from "./Author";
 import HtmlContent from "./HtmlContent";
 import BlogSideNavigation from "@/components/Blogs/BlogSideNavigation";
 import Loader from "@/components/Loader";
+import { getAuthorSectionLabel } from "@/lib/constants/blogAuthorSectionLabels";
 
 const Content = ({ html, loding = false, AuthorContent = null }) => {
+  const authorSectionLabel = getAuthorSectionLabel({
+    authorName: AuthorContent?.display_name,
+    postLabel:
+      AuthorContent?.author_section_label || AuthorContent?.section_label,
+  });
   if (loding) {
     return <Loader />;
-
   }
 
   return (
@@ -21,7 +26,7 @@ const Content = ({ html, loding = false, AuthorContent = null }) => {
 
           <div className="flex justify-center content-center">
             <h2 className="w-full lg:w-[770px] text-gray-900 font-semibold text-base mt-6 mb-2">
-              Author Bio
+              {authorSectionLabel}
             </h2>
           </div>
 
