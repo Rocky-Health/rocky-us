@@ -7,8 +7,8 @@ import WLProgram from "@/components/WL/WLProgram";
 
 const faqs = [
     {
-        question: "What is Rocky?",
-        answer: "Rocky is a 100% online platform with a focus to normalize men's health and eliminate the stigma surrounding it. At Rocky, we make it easy for patients to connect to licensed healthcare professionals. We specialize in medical conditions commonly experienced by men including Erectile Dysfunction and Hair Loss. We've built a simple & convenient online process which helps you connect to healthcare professionals in order to get customized treatment plans, shipped right to your door.",
+        question: "What is myRocky?",
+        answer: "myRocky is a 100% online platform with a focus to normalize health topics that too often go unspoken and eliminate the stigma surrounding them. At myRocky, we make it easy for patients to connect to licensed healthcare professionals. We help with weight loss, sexual health, hair Loss, mental health and much more. We've built a simple & convenient online process which helps you connect to healthcare professionals in order to get customized treatment plans, shipped right to your door.",
     },
     {
         question: "How does Rocky work?",
