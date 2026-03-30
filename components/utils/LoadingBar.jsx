@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
-const SKIP_PATHS = ["/ed-consultation-quiz", "/wl-pre-consultation", "/ed-pre-consultation", "/hair-flow", "/mh-pre-quiz"];
+const SKIP_PATHS = ["/ed-consultation-quiz", "/wl-pre-consultation", "/glp2-pre-consultation", "/ed-pre-consultation", "/hair-flow", "/mh-pre-quiz"];
 
 function LoadingBarContent() {
   const [loading, setLoading] = useState(false);
