@@ -22,6 +22,7 @@ const WeightLossResultPasswordPopup = ({
   const [emailTouched, setEmailTouched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [emailExists, setEmailExists] = useState(false);
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
   // Password validation
   const isValidPassword = (pwd) => {
     return true;
@@ -55,6 +56,7 @@ const WeightLossResultPasswordPopup = ({
     if (!isValidEmail(emailToCheck)) return;
 
     try {
+      setIsCheckingEmail(true);
       const res = await fetch("/api/check-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -75,7 +77,16 @@ const WeightLossResultPasswordPopup = ({
     } finally {
       // Only show password field AFTER we've done the check
       setShowPasswordSection(true);
+      setIsCheckingEmail(false);
     }
+  };
+
+  const maybeCheckEmailAndShowPassword = () => {
+    if (isCheckingEmail) return;
+    const trimmedEmail = String(email || "").trim();
+    if (trimmedEmail.length === 0) return;
+    if (!isValidEmail(trimmedEmail)) return;
+    checkEmailExists(trimmedEmail);
   };
 
   const TryLogin = async ({ email, password }) => {
@@ -163,7 +174,10 @@ const WeightLossResultPasswordPopup = ({
           <h2 className="text-center font-medium text-[24px] leading-[120%] mb-8">
             See how much weight you could lose
           </h2>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col gap-6"
+          >
             <div>
               <label className="block text-[14px] font-medium mb-2">
                 Email Address
@@ -175,16 +189,20 @@ const WeightLossResultPasswordPopup = ({
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
+                  // Email changed: hide password section until we re-check on blur.
+                  if (showPasswordSection) {
+                    setShowPasswordSection(false);
+                  }
+                  setEmailExists(false);
+                  setPassword("");
+                  setContextPassword("");
                   // mark touched as user types so errors can show after interaction
                   if (!emailTouched) setEmailTouched(true);
                 }}
                 onBlur={() => {
                   if (!emailTouched) setEmailTouched(true);
-                  if (String(email || "").trim().length > 0) {
-                    // First check if email exists in the database;
-                    // password field will only show AFTER this check finishes.
-                    checkEmailExists(email);
-                  }
+                  // Re-check email existence every time user leaves this field.
+                  maybeCheckEmailAndShowPassword();
                 }}
                 aria-invalid={emailTouched && !isValidEmail(email)}
                 aria-describedby={emailTouched && !isValidEmail(email) ? 'email-error' : undefined}
@@ -196,8 +214,8 @@ const WeightLossResultPasswordPopup = ({
                 </p>
               )}
             </div>
-            {/* Password field — appears only after checkbox is checked AND email request finished */}
-            {agreePrivacy && showPasswordSection && (
+            {/* Password field appears once email is validated and checked. */}
+            {showPasswordSection && (
               <div>
                 <label className="block text-[14px] font-medium mb-2">
                   {emailExists ? "Enter your password to log in" : "Create a Password"}
@@ -273,43 +291,40 @@ const WeightLossResultPasswordPopup = ({
               </div>
             )}
 
-            {/* Checkbox — always visible, disappears once checked AND email request finished */}
-            {!(agreePrivacy && showPasswordSection) && (
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="privacy"
-                  checked={agreePrivacy}
-                  onChange={() => setAgreePrivacy((v) => !v)}
-                  className="w-5 h-5 accent-black"
-                />
-                <label htmlFor="privacy" className="text-[12px]">
-                  <span className="font-medium leading-[140%]">
-                    By clicking "Continue" I agree to the{" "}
-                    <Link
-                      href="/terms-of-use"
-                      className="text-[#00000080] font-bold underline"
-                    >
-                      Terms and Conditions
-                    </Link>{" "}
-                    and{" "}
-                    <Link
-                      href="/telehealth-consent"
-                      className="text-[#00000080] font-bold underline"
-                    >
-                      Telehealth Consent
-                    </Link>{" "}
-                    and acknowledge the{" "}
-                    <Link
-                      href="/privacy-policy"
-                      className="text-[#00000080] font-bold underline"
-                    >
-                      Privacy Policy.
-                    </Link>
-                  </span>
-                </label>
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="privacy"
+                checked={agreePrivacy}
+                onChange={() => setAgreePrivacy((v) => !v)}
+                className="w-5 h-5 accent-black"
+              />
+              <label htmlFor="privacy" className="text-[12px]">
+                <span className="font-medium leading-[140%]">
+                  By clicking "Continue" I agree to the{" "}
+                  <Link
+                    href="/terms-of-use"
+                    className="text-[#00000080] font-bold underline"
+                  >
+                    Terms and Conditions
+                  </Link>{" "}
+                  and{" "}
+                  <Link
+                    href="/telehealth-consent"
+                    className="text-[#00000080] font-bold underline"
+                  >
+                    Telehealth Consent
+                  </Link>{" "}
+                  and acknowledge the{" "}
+                  <Link
+                    href="/privacy-policy"
+                    className="text-[#00000080] font-bold underline"
+                  >
+                    Privacy Policy.
+                  </Link>
+                </span>
+              </label>
+            </div>
 
             <button
               type="submit"
