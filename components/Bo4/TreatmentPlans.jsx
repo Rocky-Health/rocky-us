@@ -42,8 +42,8 @@ export default function TreatmentPlans({
       activeIngeredient: "(GLP-1)",
       name: "Semaglutide",
       hasSale: true,
-      price: "248",
-      oldPrice: "300",
+      price: "150",
+      oldPrice: "279",
       description:
         "Same active ingredient as Ozempic. The popular and affordable alternative.",
       WLPrograme: true,
@@ -62,8 +62,8 @@ export default function TreatmentPlans({
       activeIngeredient: "(GLP-1/GIP)",
       name: "Tirzepatide",
       hasSale: true,
-      price: "348",
-      oldPrice: "450",
+      price: "240",
+      oldPrice: "389",
       description:
         "Dual-action mechanism with the highest rated clinical weight loss.",
       WLPrograme: true,
