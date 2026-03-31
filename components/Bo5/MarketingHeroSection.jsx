@@ -7,11 +7,11 @@ const MarketingHeroSection = () => {
   var list = [
     {
       icon: "/bo4/1.svg",
-      text: "Semaglutide: $248/mo <span class='text-[#00000099]'>(Lowest Price)</span>",
+      text: "Semaglutide: $150/mo <span class='text-[#00000099]'>(Lowest Price)</span>",
     },
     {
       icon: "/bo4/2.svg",
-      text: "Tirzepatide: $348/mo <span class='text-[#00000099]'>(Lowest Price)</span>",
+      text: "Tirzepatide: $240/mo <span class='text-[#00000099]'>(Lowest Price)</span>",
     },
     {
       icon: "/bo4/3.svg",
@@ -36,13 +36,13 @@ const MarketingHeroSection = () => {
             GLP-1 Weight Loss,
           </h1>
           <span className="block headers-font w-fit px-2 mt-2 bg-[#F5F4EF] text-[28px] md:text-[40px] leading-[140%] mb-[22px] md:mb-[0px]">
-            Now as low as $248/mo
+            Now as low as $150/mo
           </span>
 
           <p className="text-[16px] tracking-tight text-[#00000099] mt-[8px]">
             Lose weight for the last time or your money back.{" "}
             <span className="inline md:block text-black font-[500]">
-              Save up to $1,621 vs. Retail. No insurance required.
+              Save up to $1,788 vs. Retail. No insurance required.
             </span>
           </p>
 

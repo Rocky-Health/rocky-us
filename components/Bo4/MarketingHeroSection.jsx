@@ -44,7 +44,7 @@ const MarketingHeroSection = () => {
             </span>
           </h1>
           <span className="block headers-font w-fit px-2 mt-2 bg-[#F5F4EF] text-[28px] md:text-[40px] leading-[140%] mb-[22px] md:mb-[0px]">
-            Now as low as $248/mo
+            Now as low as $150 /mo
           </span>
 
           {/* List */}

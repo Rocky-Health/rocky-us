@@ -29,9 +29,7 @@ const ProductCard = ({ product }) => {
       </div>
 
       {/* Content */}
-      <div
-        className={`p-[16px] min-h-[300px]`}
-      >
+      <div className={`p-[16px] min-h-[270px]`}>
         {activeIngredient && (
           <p className="text-[14px] font-normal leading-[140%] tracking-normal text-black">
             {activeIngredient}
@@ -61,11 +59,11 @@ const ProductCard = ({ product }) => {
               <span className="text-[16px] font-normal text-black">/mo</span>
             </span>
           </div>
-          {product.WLPrograme && (
+          {/* {product.WLPrograme && (
             <p className={`text-[14px] font-normal leading-[140%] text-black mt-[6px] `}>
               + $99/mo <span className={`${product.features ? 'underline' : ''}`}>Program Membership</span>
             </p>
-          )}
+          )} */}
 
           {product.features && (
             <div className="mb-[55px]">
@@ -87,27 +85,29 @@ const ProductCard = ({ product }) => {
           )}
 
           <div className="md:hidden block">
-             {product.MobileFeatures && (
-            <div className="mb-[55px]">
-              <hr className="mb-[32px]" />
-              <div className="flex flex-col gap-[12px] mb-[8px]">
-                {product.MobileFeatures.map((feature, index) => (
-                  <div
-                    key={index}
-                    className="flex justify-start items-start gap-[12px]"
-                  >
-                    <FaCheckCircle className="text-[#AE7E56] shrink-0 text-[17px] mt-[2px]" />
-                    <span className="text-[13px] font-normal leading-[140%] text-black">
-                      {feature}
-                    </span>
-                  </div>
-                ))}
-              </div>
-               {product.UpperBtnLabel && (
-                  <p className="text-center text-[12px] leading-[140%] font-medium mb-[47px] mt-[27px]">{product.UpperBtnLabel}</p>
+            {product.MobileFeatures && (
+              <div className="mb-[55px]">
+                <hr className="mb-[32px]" />
+                <div className="flex flex-col gap-[12px] mb-[8px]">
+                  {product.MobileFeatures.map((feature, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-start items-start gap-[12px]"
+                    >
+                      <FaCheckCircle className="text-[#AE7E56] shrink-0 text-[17px] mt-[2px]" />
+                      <span className="text-[13px] font-normal leading-[140%] text-black">
+                        {feature}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                {product.UpperBtnLabel && (
+                  <p className="text-center text-[12px] leading-[140%] font-medium mb-[47px] mt-[27px]">
+                    {product.UpperBtnLabel}
+                  </p>
                 )}
-            </div>
-          )}
+              </div>
+            )}
           </div>
         </div>
 
