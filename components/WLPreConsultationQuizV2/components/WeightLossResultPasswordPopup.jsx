@@ -11,6 +11,8 @@ const WeightLossResultPasswordPopup = ({
   disabled,
   style,
   setUserData,
+  nextAction = "openPopup",
+  nextPayload = "YourWeightPopup",
 }) => {
   const { password: contextPassword, setPassword: setContextPassword } = usePassword();
   const [isAuth, setIsAuth] = useState(false);
@@ -36,15 +38,22 @@ const WeightLossResultPasswordPopup = ({
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
   };
 
+  const triggerNext = () => {
+    if (typeof onSubmit !== "function") return;
+    if (nextPayload !== undefined && nextPayload !== null) {
+      onSubmit(nextAction, nextPayload);
+      return;
+    }
+    onSubmit(nextAction);
+  };
+
   // Run auth check on mount and call onSubmit if authenticated.
   // This must run in a useEffect to avoid updating state during render.
   React.useEffect(() => {
     try {
       if (isAuthenticated()) {
         setIsAuth(true);
-        if (typeof onSubmit === "function") {
-          onSubmit("openPopup", "YourWeightPopup");
-        }
+        triggerNext();
       }
     } catch (e) {
       // ignore
@@ -144,7 +153,7 @@ const WeightLossResultPasswordPopup = ({
 
       const goNext = await TryLogin({ email, password });
       if (goNext == 0) return;
-      onSubmit("openPopup", "YourWeightPopup");
+      triggerNext();
     }
   };
 
