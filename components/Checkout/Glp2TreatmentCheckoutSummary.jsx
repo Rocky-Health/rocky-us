@@ -1,8 +1,11 @@
 "use client";
 
+import { useState } from "react";
+import { toast } from "react-toastify";
 import { formatPrice } from "@/utils/priceFormatter";
 import { getCompoundedPlanInfo } from "./CartItems";
 import CustomImage from "@/components/utils/CustomImage";
+import { logger } from "@/utils/devLogger";
 
 /** trimrx-style mobile palette */
 const ACCENT_GREEN = "#22c55e";
@@ -73,7 +76,65 @@ function PriceTagIcon({ className }) {
 /**
  * GLP2 checkout: trimrx-style treatment summary (mobile-first), data from cart API.
  */
-const Glp2TreatmentCheckoutSummary = ({ cartItems }) => {
+const Glp2TreatmentCheckoutSummary = ({ cartItems, setCartItems }) => {
+  const [couponInput, setCouponInput] = useState("");
+  const [applyingCoupon, setApplyingCoupon] = useState(false);
+  const [removingCode, setRemovingCode] = useState(null);
+
+  const handleApplyCoupon = async () => {
+    const code = couponInput.trim();
+    if (!code || !setCartItems) return;
+    setApplyingCoupon(true);
+    try {
+      const res = await fetch("/api/coupons", {
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json();
+      if (data.error) {
+        toast.error("Invalid coupon code.");
+      } else {
+        setCartItems(data);
+        setCouponInput("");
+      }
+    } catch (error) {
+      logger.error("GLP2 apply coupon:", error);
+      toast.error("Failed to apply coupon.");
+    } finally {
+      setApplyingCoupon(false);
+    }
+  };
+
+  const handleCouponInputKeyDown = (e) => {
+    if (e.key === "Enter" && couponInput.trim() !== "" && !applyingCoupon) {
+      e.preventDefault();
+      void handleApplyCoupon();
+    }
+  };
+
+  const handleRemoveCoupon = async (code) => {
+    if (!code || !setCartItems) return;
+    setRemovingCode(String(code));
+    try {
+      const res = await fetch("/api/coupons", {
+        headers: { "Content-Type": "application/json" },
+        method: "DELETE",
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json();
+      if (data.error) {
+        toast.error("Could not remove coupon.");
+      } else {
+        setCartItems(data);
+      }
+    } catch (error) {
+      logger.error("GLP2 remove coupon:", error);
+      toast.error("Failed to remove coupon.");
+    } finally {
+      setRemovingCode(null);
+    }
+  };
   const items = cartItems?.items || [];
   const primary = pickPrimaryMedicationItem(items);
   const currencySymbol =
@@ -86,6 +147,12 @@ const Glp2TreatmentCheckoutSummary = ({ cartItems }) => {
     ? Number(primary.totals.line_subtotal)
     : 0;
   const lineSubtotalDollars = lineSubtotalCents / 100;
+  // line_total reflects coupons; fall back to line_subtotal if absent
+  const lineTotalCents = primary?.totals?.line_total
+    ? Number(primary.totals.line_total)
+    : lineSubtotalCents;
+  const lineTotalDollars = lineTotalCents / 100;
+  const couponReducedPrice = lineTotalDollars < lineSubtotalDollars;
 
   const medicationName = primary ? stripHtml(primary.name) : "Your treatment";
 
@@ -114,20 +181,33 @@ const Glp2TreatmentCheckoutSummary = ({ cartItems }) => {
     const origNum = parseFloat(orig);
     if (!Number.isNaN(origNum)) {
       compoundedOrigMonthly = origNum;
-      monthlyStrike = `${currencySymbol}${formatPrice(origNum)}/mo`;
     }
+    // Strike: coupon → plan price per month; no coupon → hardcoded retail price per month
+    const strikePerMonth = couponReducedPrice
+      ? lineSubtotalDollars / compounded.months
+      : compoundedOrigMonthly;
+    if (strikePerMonth != null) {
+      monthlyStrike = `${currencySymbol}${formatPrice(strikePerMonth)}/mo`;
+    }
+    // Current uses line_total so it reflects applied coupons
     monthlyCurrent = `${currencySymbol}${formatPrice(
-      lineSubtotalDollars / compounded.months,
+      lineTotalDollars / compounded.months,
     )}/mo`;
   } else if (primary) {
-    monthlyCurrent = `${currencySymbol}${formatPrice(lineSubtotalDollars)}/mo`;
+    // Monthly plan (months = 1 or no compounded info)
+    if (couponReducedPrice) {
+      monthlyStrike = `${currencySymbol}${formatPrice(lineSubtotalDollars)}/mo`;
+    } else if (compoundedOrigMonthly != null) {
+      monthlyStrike = `${currencySymbol}${formatPrice(compoundedOrigMonthly)}/mo`;
+    }
+    monthlyCurrent = `${currencySymbol}${formatPrice(lineTotalDollars)}/mo`;
   }
 
-  const totalStrikeDisplay =
-    compounded && compounded.months > 0 && compoundedOrigMonthly != null
-      ? `${currencySymbol}${formatPrice(
-          compoundedOrigMonthly * compounded.months,
-        )}`
+  // Total row strike: coupon active → plan price; no coupon → retail total
+  const totalStrikeDisplay = couponReducedPrice
+    ? `${currencySymbol}${formatPrice(lineSubtotalDollars)}`
+    : compounded && compounded.months > 0 && compoundedOrigMonthly != null
+      ? `${currencySymbol}${formatPrice(compoundedOrigMonthly * compounded.months)}`
       : null;
 
   const thumb =
@@ -240,7 +320,7 @@ const Glp2TreatmentCheckoutSummary = ({ cartItems }) => {
                     ) : null}
                     <span style={{ color: ACCENT_GREEN }}>
                       {currencySymbol}
-                      {formatPrice(lineSubtotalDollars)}
+                      {formatPrice(lineTotalDollars)}
                     </span>
                   </span>
                 </div>
@@ -285,12 +365,73 @@ const Glp2TreatmentCheckoutSummary = ({ cartItems }) => {
       ) : null}
 
       {coupons.length > 0 ? (
-        <div className="mt-4 flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-center text-sm font-semibold text-white shadow-sm bg-black">
-          <PriceTagIcon className="h-5 w-5 shrink-0 opacity-95" />
-          <span>
-            CODE APPLIED:{" "}
-            {coupons.map((c) => String(c.code || "").toUpperCase()).join(", ")}
-          </span>
+        <div className="mt-4 flex flex-col gap-2">
+          {coupons.map((c) => {
+            const rawCode = c.code || "";
+            const codeDisplay = String(rawCode).toUpperCase();
+            const isRemovingThis = removingCode === String(rawCode);
+            return (
+              <div
+                key={codeDisplay || rawCode}
+                className="flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold text-white shadow-sm bg-black"
+              >
+                <PriceTagIcon className="h-5 w-5 shrink-0 opacity-95" />
+                <span className="flex-1 min-w-0 text-center sm:text-left">
+                  CODE APPLIED:{" "}
+                  <span className="font-bold">{codeDisplay}</span>
+                </span>
+                {setCartItems ? (
+                  <button
+                    type="button"
+                    onClick={() => void handleRemoveCoupon(rawCode)}
+                    disabled={Boolean(removingCode) || applyingCoupon}
+                    className="shrink-0 flex h-9 w-9 items-center justify-center rounded-lg text-xl leading-none text-white hover:bg-white/10 disabled:opacity-50"
+                    aria-label={`Remove coupon ${codeDisplay}`}
+                  >
+                    {isRemovingThis ? (
+                      <span
+                        className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+                        aria-hidden
+                      />
+                    ) : (
+                      "×"
+                    )}
+                  </button>
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+      ) : setCartItems ? (
+        <div className="mt-4 flex items-center gap-2">
+          <input
+            type="text"
+            value={couponInput}
+            onChange={(e) => setCouponInput(e.target.value)}
+            onKeyDown={handleCouponInputKeyDown}
+            placeholder="Coupon code"
+            disabled={applyingCoupon || Boolean(removingCode)}
+            className="flex-1 min-w-0 rounded-xl border border-[#E2E2E1] bg-white py-3 px-4 text-sm focus:outline-none focus:border-[#c4c4c2] disabled:opacity-60"
+            autoComplete="off"
+            aria-label="Coupon code"
+          />
+          <button
+            type="button"
+            onClick={() => void handleApplyCoupon()}
+            disabled={
+              applyingCoupon || Boolean(removingCode) || !couponInput.trim()
+            }
+            className="shrink-0 rounded-xl bg-black px-4 py-3 text-sm font-semibold text-white disabled:opacity-50 min-h-[46px] min-w-[88px] flex items-center justify-center"
+          >
+            {applyingCoupon ? (
+              <span
+                className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+                aria-hidden
+              />
+            ) : (
+              "Apply"
+            )}
+          </button>
         </div>
       ) : null}
 
