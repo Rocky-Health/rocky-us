@@ -201,7 +201,9 @@ const Glp2GenericQuestionStep = ({
           />
         );
       case "paceResult":
-        return <Glp2PaceResultStep userData={userData} onContinue={handleContinue} />;
+        return (
+          <Glp2PaceResultStep userData={userData} onContinue={handleContinue} />
+        );
       case "sleepQuestion":
         return (
           <Glp2SleepStep

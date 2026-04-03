@@ -216,7 +216,7 @@ const PLAN_LABEL_BY_INTERVAL = {
  * because the Store API returns the parent product ID, not the variation ID.
  * Returns null for all other products.
  */
-function getCompoundedPlanInfo(item) {
+export function getCompoundedPlanInfo(item) {
   const name = (item.name || "").toLowerCase();
   const isTirz = name.includes("tirzepatide");
   const isSema = name.includes("semaglutide") && !name.includes("oral") && !name.includes("sublingual");

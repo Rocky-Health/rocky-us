@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { glp2PreConsultationConfig } from "./config/glp2PreConsultationConfig";
 import Glp2GenericQuestionStep from "./components/Glp2GenericQuestionStep";
-import GenericRecommendationStep from "../components/GenericRecommendationStep";
 import Glp2PlanSelectionStep from "./components/Glp2PlanSelectionStep";
+import Glp2RecommendationStep from "./components/Glp2RecommendationStep";
+import Glp2TreatmentAndPlanStep from "./components/Glp2TreatmentAndPlanStep";
 import { getProductRecommendation } from "../utils/recommendationEngine";
-import WLProductCard from "../components/WLProductCard";
 
 const COMPOUNDED_PRODUCT_IDS = ["489523", "489798"];
 
@@ -51,19 +51,13 @@ const QuizStepRenderer = ({
       glp2PreConsultationConfig.recommendationRules,
     );
 
-    const shouldShowPlanStep = (product) =>
-      product && COMPOUNDED_PRODUCT_IDS.includes(String(product.id));
-
     return (
-      <GenericRecommendationStep
+      <Glp2TreatmentAndPlanStep
         {...recommendation}
         selectedProduct={selectedProduct}
         setSelectedProduct={setSelectedProduct}
-        onContinue={handleRecommendationContinue}
-        ProductCard={WLProductCard}
-        showAlternatives={true}
-        onBeforeCheckout={shouldShowPlanStep}
-        onNavigateToPlanStep={() => goToStep(17)}
+        planOptionsByProduct={glp2PreConsultationConfig.planOptions}
+        onContinue={handlePlanStepCheckout}
       />
     );
   }
