@@ -38,12 +38,11 @@ const GLP1WeightCalculator = ({ ctaHref = "#" }) => {
       <div className="w-full md:w-1/2">
         <div className="bg-[#F5F4EF] rounded-2xl p-6 md:p-10">
           <div className="flex items-center justify-between mb-4">
-            <p className="poppins-font text-black text-[16px] font-[600]">
+            <p className="headers-font text-black text-[16px] ">
               Select your current weight:
             </p>
-            <p className="headers-font text-black text-[36px] md:text-[42px] leading-[100%]">
-              {weight}{" "}
-              <span className="poppins-font text-[18px] font-[400]">lbs</span>
+            <p className="headers-font text-black text-[24px] md:text-[36px] leading-[100%]">
+              {weight} <span className="headers-font text-[18px] ">lbs</span>
             </p>
           </div>
 
@@ -65,14 +64,12 @@ const GLP1WeightCalculator = ({ ctaHref = "#" }) => {
           </div>
 
           <div className="flex items-center justify-between">
-            <p className="poppins-font text-black text-[16px] font-[600]">
+            <p className="headers-font text-black text-[16px]">
               Weight loss potential:
             </p>
-            <p className="headers-font text-[#AE7E56] text-[42px] md:text-[52px] leading-[100%]">
+            <p className="headers-font text-[#AE7E56] text-[24px] md:text-[36px] leading-[100%]">
               {weightLoss}{" "}
-              <span className="poppins-font text-black text-[18px] font-[400]">
-                lbs
-              </span>
+              <span className="headers-font text-black text-[18px]">lbs</span>
             </p>
           </div>
         </div>
