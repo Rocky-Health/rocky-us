@@ -29,37 +29,61 @@ const CartAndPayment = ({
   isPaymentValid,
   paymentValidationMessage,
   onStripeReady, // NEW: Callback for Stripe Elements
+  layoutVariant = "default",
 }) => {
+  const isGlp2 = layoutVariant === "glp2";
+
   return (
-    <div className="bg-[#f7f7f7] h-full justify-self-start w-full px-4 mt-8 lg:mt-0 lg:pl-[80px] lg:pt-[50px] pb-10 overflow-x-hidden">
-      <h1 className="hidden lg:block text-[20px] leading-[24px] text-[#251F20] text-start mt-0 font-[500] mb-[24px]">
-        Your Order
-      </h1>
-      <div className="bg-white w-full lg:max-w-[512px] p-4 md:p-6 py-0 md:py-0 rounded-[16px] shadow-[0px_1px_1px_0px_#E2E2E1] border border-[#E2E2E1] mt-8 lg:mt-0 ">
-        <CartItems items={items} coupons={cartItems?.coupons || []} />
-        <CouponApply setCartItems={setCartItems} />
-        <InitialShipping
-          cartItems={cartItems}
-          setCartItems={setCartItems}
-          isUpdatingShipping={isUpdatingShipping}
-          formData={formData}
-        />
-      </div>
+    <div
+      className={
+        isGlp2
+          ? "w-full px-0 mt-2 pb-10 overflow-x-hidden"
+          : "bg-[#f7f7f7] h-full justify-self-start w-full px-4 mt-8 lg:mt-0 lg:pl-[80px] lg:pt-[50px] pb-10 overflow-x-hidden"
+      }
+    >
+      {!isGlp2 && (
+        <h1 className="hidden lg:block text-[20px] leading-[24px] text-[#251F20] text-start mt-0 font-[500] mb-[24px]">
+          Your Order
+        </h1>
+      )}
+      {!isGlp2 && (
+        <div className="bg-white w-full lg:max-w-[512px] p-4 md:p-6 py-0 md:py-0 rounded-[16px] shadow-[0px_1px_1px_0px_#E2E2E1] border border-[#E2E2E1] mt-8 lg:mt-0 ">
+          <CartItems items={items} coupons={cartItems?.coupons || []} />
+          <CouponApply setCartItems={setCartItems} />
+          <InitialShipping
+            cartItems={cartItems}
+            setCartItems={setCartItems}
+            isUpdatingShipping={isUpdatingShipping}
+            formData={formData}
+          />
+        </div>
+      )}
 
       <Payment
         setFormData={setFormData}
         formData={formData}
         onStripeReady={onStripeReady}
+        heading={isGlp2 ? "Enter your card details" : "Payment Method"}
+        cardLabel={isGlp2 ? "Card details" : "Card Details"}
+        fullWidth={isGlp2}
       />
       <button
         onClick={handleSubmit}
         type="button"
         disabled={isUpdatingShipping || ageValidationFailed || !isPaymentValid}
-        className={`bg-black text-white text-sm font-semibold h-[44px] flex items-center justify-center rounded-full w-full lg:max-w-[512px] mt-6 transition ${
-          isUpdatingShipping || ageValidationFailed || !isPaymentValid
-            ? "opacity-50 cursor-not-allowed"
-            : "hover:-translate-y-1"
-        }`}
+        className={
+          isGlp2
+            ? `bg-black text-white text-sm font-bold h-[52px] flex items-center justify-center rounded-xl w-full mt-6 tracking-wide uppercase transition ${
+                isUpdatingShipping || ageValidationFailed || !isPaymentValid
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:-translate-y-1"
+              }`
+            : `bg-black text-white text-sm font-semibold h-[44px] flex items-center justify-center rounded-full w-full lg:max-w-[512px] mt-6 transition ${
+                isUpdatingShipping || ageValidationFailed || !isPaymentValid
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:-translate-y-1"
+              }`
+        }
       >
         {isUpdatingShipping ? (
           <div className="flex items-center gap-2">
@@ -84,6 +108,8 @@ const CartAndPayment = ({
           </div>
         ) : ageValidationFailed ? (
           "Age Restriction - Cannot Place Order"
+        ) : isGlp2 ? (
+          "Continue →"
         ) : (
           "Place order"
         )}
@@ -100,19 +126,25 @@ const CartAndPayment = ({
       )}
 
       {ageValidationFailed && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mt-4 w-full lg:max-w-[512px]">
+        <div
+          className={`bg-red-50 border border-red-200 rounded-lg p-4 mt-4 w-full ${isGlp2 ? "" : "lg:max-w-[512px]"}`}
+        >
           <p className="text-red-700 text-sm text-center">
             ⚠️ You must be at least 19 years old to purchase Zonnic products.
             Please update your date of birth to continue.
           </p>
         </div>
       )}
-      <p className="text-[10px] text-gray-700 mt-4 text-center w-full lg:max-w-[512px]">
-        Pay securely using your credit card. This transaction is a
-        pre-authorization. Your credit card will only be charged if your
-        prescription is approved.
+      <p
+        className={`text-[10px] text-gray-700 mt-4 text-center w-full ${isGlp2 ? "" : "lg:max-w-[512px]"}`}
+      >
+        256-bit SSL encryption · PCI DSS compliant. Pay securely using your
+        credit card. This transaction is a pre-authorization. Your card is only
+        charged if your prescription is approved.
       </p>
-      <p className="text-[10px] text-gray-700 mt-4 text-center w-full lg:max-w-[512px]">
+      <p
+        className={`text-[10px] text-gray-700 mt-4 text-center w-full ${isGlp2 ? "" : "lg:max-w-[512px]"}`}
+      >
         Please note that your purchase is subject to our cancellation policy as
         outlined in our{" "}
         <Link

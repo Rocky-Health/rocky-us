@@ -171,6 +171,7 @@ const Glp2RecommendationStep = ({
 
       const result = await wlFlowAddToCart(mainProductForCheckout, [], {
         requireConsultation: true,
+        checkoutQueryParams: { "glp2-checkout": "1" },
       });
 
       if (result.success) {

@@ -168,6 +168,7 @@ const Glp2TreatmentAndPlanStep = ({
       }
       const result = await wlFlowAddToCart(mainProductForCheckout, [], {
         requireConsultation: true,
+        checkoutQueryParams: { "glp2-checkout": "1" },
       });
       if (result.success) {
         if (typeof window !== "undefined" && result.redirectUrl) {

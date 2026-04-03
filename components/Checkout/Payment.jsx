@@ -6,6 +6,10 @@ const Payment = ({
   setFormData,
   onStripeReady, // Callback for Stripe Elements
   formData, // Get form data to pass customer info
+  heading = "Payment Method",
+  cardLabel = "Card Details",
+  /** When true, omit lg max-width so the card spans the column (e.g. GLP2 checkout). */
+  fullWidth = false,
 }) => {
   const elements = useElements(); // Get Stripe Elements instance
 
@@ -17,13 +21,17 @@ const Payment = ({
   }, [elements, onStripeReady]);
 
   return (
-    <div className="bg-white w-full lg:max-w-[512px] p-4 md:p-6 rounded-[16px] shadow-[0px_1px_1px_0px_#E2E2E1] border border-[#E2E2E1] mt-8">
+    <div
+      className={`bg-white w-full p-4 md:p-6 rounded-[16px] shadow-[0px_1px_1px_0px_#E2E2E1] border border-[#E2E2E1] mt-8 ${
+        fullWidth ? "" : "lg:max-w-[512px]"
+      }`}
+    >
       <h2 className="text-[20px] leading-[24px] text-[#251F20] text-start font-[500] mb-[24px]">
-        Payment Method
+        {heading}
       </h2>
       <div className="mt-2">
         <label className="block text-sm font-medium text-[#251F20] mb-2">
-          Card Details
+          {cardLabel}
         </label>
         <StripeCardInput
           customerData={{
