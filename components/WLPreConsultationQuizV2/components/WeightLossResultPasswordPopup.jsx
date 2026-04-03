@@ -14,7 +14,8 @@ const WeightLossResultPasswordPopup = ({
   nextAction = "openPopup",
   nextPayload = "YourWeightPopup",
 }) => {
-  const { password: contextPassword, setPassword: setContextPassword } = usePassword();
+  const { password: contextPassword, setPassword: setContextPassword } =
+    usePassword();
   const [isAuth, setIsAuth] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -102,10 +103,10 @@ const WeightLossResultPasswordPopup = ({
     // attempt login
     try {
       setLoading(true);
-      
+
       // Use password from Context (memory) or fallback to parameter
       const loginPassword = contextPassword || password || "";
-      
+
       const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -158,12 +159,12 @@ const WeightLossResultPasswordPopup = ({
   };
 
   const isButtonDisabled =
-  !email ||
-  !isValidEmail(email) ||
-  !password ||
-  !agreePrivacy ||
-  !isValidPassword(password) ||
-  disabled;
+    !email ||
+    !isValidEmail(email) ||
+    !password ||
+    !agreePrivacy ||
+    !isValidPassword(password) ||
+    disabled;
 
   return (
     <div
@@ -183,10 +184,7 @@ const WeightLossResultPasswordPopup = ({
           <h2 className="text-center font-medium text-[24px] leading-[120%] mb-8">
             See how much weight you could lose
           </h2>
-          <form
-            onSubmit={handleSubmit}
-            className="flex flex-col gap-6"
-          >
+          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
             <div>
               <label className="block text-[14px] font-medium mb-2">
                 Email Address
@@ -214,11 +212,19 @@ const WeightLossResultPasswordPopup = ({
                   maybeCheckEmailAndShowPassword();
                 }}
                 aria-invalid={emailTouched && !isValidEmail(email)}
-                aria-describedby={emailTouched && !isValidEmail(email) ? 'email-error' : undefined}
+                aria-describedby={
+                  emailTouched && !isValidEmail(email)
+                    ? "email-error"
+                    : undefined
+                }
                 required
               />
               {emailTouched && !isValidEmail(email) && (
-                <p id="email-error" className="mt-2 text-[12px] text-red-600" role="alert">
+                <p
+                  id="email-error"
+                  className="mt-2 text-[12px] text-red-600"
+                  role="alert"
+                >
                   Please enter a valid email address (e.g. name@domain.com)
                 </p>
               )}
@@ -227,13 +233,17 @@ const WeightLossResultPasswordPopup = ({
             {showPasswordSection && (
               <div>
                 <label className="block text-[14px] font-medium mb-2">
-                  {emailExists ? "Enter your password to log in" : "Create a Password"}
+                  {emailExists
+                    ? "Enter your password to log in"
+                    : "Create a Password"}
                 </label>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
                     className="w-full border border-[#E5E5E5] rounded-lg px-4 py-4 text-[14px] focus:outline-none focus:border-black pr-12"
-                    placeholder={emailExists ? "Password" : "Must be at least 8 characters"}
+                    placeholder={
+                      emailExists ? "Password" : "Must be at least 8 characters"
+                    }
                     value={password}
                     onChange={(e) => {
                       setPassword(e.target.value);

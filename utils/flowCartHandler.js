@@ -56,6 +56,7 @@ export const addToCartDirectly = async (
       requireConsultation = false,
       subscriptionPeriod = null,
       varietyPackId = null,
+      checkoutQueryParams = null,
     } = options;
 
     // Check authentication status
@@ -71,6 +72,7 @@ export const addToCartDirectly = async (
         preserveExistingCart,
         subscriptionPeriod,
         varietyPackId,
+        checkoutQueryParams,
       });
     } else {
       // ===== UNAUTHENTICATED FLOW: Save to LocalStorage + Login =====
@@ -78,6 +80,7 @@ export const addToCartDirectly = async (
         requireConsultation,
         subscriptionPeriod,
         varietyPackId,
+        checkoutQueryParams,
       });
     }
   } catch (error) {
@@ -94,7 +97,12 @@ export const addToCartDirectly = async (
  * Handle cart addition for authenticated users (Direct API calls)
  */
 async function handleAuthenticatedFlow(mainProduct, addons, flowType, options) {
-  const { preserveExistingCart, subscriptionPeriod, varietyPackId } = options;
+  const {
+    preserveExistingCart,
+    subscriptionPeriod,
+    varietyPackId,
+    checkoutQueryParams,
+  } = options;
 
   try {
     // Flow-specific pre-processing
@@ -170,7 +178,11 @@ async function handleAuthenticatedFlow(mainProduct, addons, flowType, options) {
       addFlowConsultationRequirements(mainProduct, flowType);
 
       // Generate clean checkout URL
-      const checkoutUrl = generateFlowCheckoutUrl(flowType, true);
+      const checkoutUrl = generateFlowCheckoutUrl(
+        flowType,
+        true,
+        checkoutQueryParams
+      );
 
       return {
         success: true,
@@ -199,7 +211,12 @@ async function handleUnauthenticatedFlow(
   flowType,
   options
 ) {
-  const { requireConsultation, subscriptionPeriod, varietyPackId } = options;
+  const {
+    requireConsultation,
+    subscriptionPeriod,
+    varietyPackId,
+    checkoutQueryParams,
+  } = options;
 
   try {
     logger.log(
@@ -338,7 +355,11 @@ async function handleUnauthenticatedFlow(
     );
 
     // Generate login URL with proper redirect
-    const loginUrl = generateLoginUrl(flowType, requireConsultation);
+    const loginUrl = generateLoginUrl(
+      flowType,
+      requireConsultation,
+      checkoutQueryParams
+    );
 
     return {
       success: true,
@@ -894,27 +915,42 @@ function addFlowConsultationRequirements(mainProduct, flowType) {
 }
 
 /**
- * Generate clean checkout URL for authenticated users
+ * Generate clean checkout URL for flow redirects
+ * @param {Record<string, string>} [extraQueryParams] - e.g. { "glp2-checkout": "1" }
  */
-function generateFlowCheckoutUrl(flowType, isAuthenticated = true) {
-  const baseUrl = "/checkout";
-  const flowParam = `${flowType}-flow=1`;
-
-  if (isAuthenticated) {
-    return `${baseUrl}?${flowParam}`;
-  } else {
-    return `${baseUrl}?${flowParam}&onboarding=1`;
+function generateFlowCheckoutUrl(
+  flowType,
+  isAuthenticated = true,
+  extraQueryParams = null
+) {
+  const params = new URLSearchParams();
+  params.set(`${flowType}-flow`, "1");
+  if (!isAuthenticated) {
+    params.set("onboarding", "1");
   }
+  if (extraQueryParams && typeof extraQueryParams === "object") {
+    Object.entries(extraQueryParams).forEach(([key, value]) => {
+      if (value != null && String(value) !== "") {
+        params.set(key, String(value));
+      }
+    });
+  }
+  return `/checkout?${params.toString()}`;
 }
 
 /**
  * Generate login URL for unauthenticated users
+ * @param {Record<string, string>} [extraCheckoutQueryParams] - merged into post-login checkout URL
  */
-function generateLoginUrl(flowType, requireConsultation = false) {
+function generateLoginUrl(
+  flowType,
+  requireConsultation = false,
+  extraCheckoutQueryParams = null
+) {
   const baseUrl = "/login-register";
   const flowParam = `${flowType}-flow=1`;
   const checkoutRedirect = encodeURIComponent(
-    generateFlowCheckoutUrl(flowType, true)
+    generateFlowCheckoutUrl(flowType, true, extraCheckoutQueryParams)
   );
 
   let loginUrl = `${baseUrl}?${flowParam}&onboarding=1&view=account&viewshow=register&redirect_to=${checkoutRedirect}`;

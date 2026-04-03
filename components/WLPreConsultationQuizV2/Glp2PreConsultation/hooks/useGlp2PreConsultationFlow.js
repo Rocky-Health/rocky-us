@@ -85,8 +85,9 @@ export const useGlp2PreConsultationFlow = () => {
         addRequiredConsultation(selectedProduct.id, "wl-flow");
         logger.log("🛒 Glp2PreConsultation Plan checkout:", mainProductForCheckout);
         const result = await wlFlowAddToCart(mainProductForCheckout, [], {
-            requireConsultation: true,
-            subscriptionPeriod: selectedPlan?.subscriptionPeriod || "1_month",
+          requireConsultation: true,
+          subscriptionPeriod: selectedPlan?.subscriptionPeriod || "1_month",
+          checkoutQueryParams: { "glp2-checkout": "1" },
         });
         if (result.success) {
             if (typeof window !== "undefined" && result.redirectUrl) {

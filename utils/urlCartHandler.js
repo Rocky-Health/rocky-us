@@ -1646,7 +1646,15 @@ export const cleanupCartUrlParameters = (flowType = "ed") => {
       ? "mh-flow=1"
       : `${flowType}-flow=1`;
 
-  const newUrl = window.location.pathname + `?${flowParam}`;
+  let newUrl = window.location.pathname + `?${flowParam}`;
+  try {
+    const current = new URLSearchParams(window.location.search);
+    if (current.get("glp2-checkout") === "1") {
+      newUrl += "&glp2-checkout=1";
+    }
+  } catch (_) {
+    // ignore
+  }
   logger.log(`Cleaning up URL parameters, preserving flow type: ${flowType}`);
   window.history.replaceState({}, document.title, newUrl);
 };
