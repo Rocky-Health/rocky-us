@@ -5,8 +5,7 @@ import { getCompoundedPlanInfo } from "./CartItems";
 import CustomImage from "@/components/utils/CustomImage";
 
 /** trimrx-style mobile palette */
-const NAVY = "#003b5c";
-const ACCENT_GREEN = "#2ed296";
+const ACCENT_GREEN = "#22c55e";
 const LABEL_MUTED = "#5c6f7a";
 
 /** Local hero art (same as GLP1 offer); avoids remote Woo URLs without dimensions */
@@ -109,10 +108,12 @@ const Glp2TreatmentCheckoutSummary = ({ cartItems }) => {
 
   let monthlyStrike = null;
   let monthlyCurrent = null;
+  let compoundedOrigMonthly = null;
   if (compounded && compounded.months > 0) {
     const orig = compounded.originalPrice?.replace(/[^0-9.]/g, "") || "";
     const origNum = parseFloat(orig);
     if (!Number.isNaN(origNum)) {
+      compoundedOrigMonthly = origNum;
       monthlyStrike = `${currencySymbol}${formatPrice(origNum)}/mo`;
     }
     monthlyCurrent = `${currencySymbol}${formatPrice(
@@ -121,6 +122,13 @@ const Glp2TreatmentCheckoutSummary = ({ cartItems }) => {
   } else if (primary) {
     monthlyCurrent = `${currencySymbol}${formatPrice(lineSubtotalDollars)}/mo`;
   }
+
+  const totalStrikeDisplay =
+    compounded && compounded.months > 0 && compoundedOrigMonthly != null
+      ? `${currencySymbol}${formatPrice(
+          compoundedOrigMonthly * compounded.months,
+        )}`
+      : null;
 
   const thumb =
     primary?.images?.[0]?.thumbnail || primary?.images?.[0]?.src || "";
@@ -137,13 +145,12 @@ const Glp2TreatmentCheckoutSummary = ({ cartItems }) => {
 
   return (
     <section
-      className="w-full mb-5 md:mb-6"
+      className="w-full p-4 md:p-6 w-full rounded-[16px] border border-solid border-[#E2E2E1] bg-white"
       aria-labelledby="glp2-treatment-summary-heading "
     >
       <h2
         id="glp2-treatment-summary-heading"
-        className="hidden md:block text-xl md:text-[22px] mx-auto text-center font-bold tracking-tight mb-4 px-0.5"
-        style={{ color: NAVY }}
+        className="hidden md:block text-xl md:text-[22px] mx-auto text-center tracking-tight mb-4 px-0.5 headers-font"
       >
         Your Treatment Details
       </h2>
@@ -171,14 +178,13 @@ const Glp2TreatmentCheckoutSummary = ({ cartItems }) => {
             <h2
               id="glp2-treatment-summary-heading"
               className="md:hidden text-xl md:text-[22px] mx-auto text-center font-bold tracking-tight px-0.5"
-              style={{ color: NAVY }}
             >
               Your Treatment Details
             </h2>
           </>
         ) : null}
 
-        <div className="rounded-2xl px-4 py-5 md:px-5 md:py-6 shadow-sm border border-black/5 flex-1 w-full bg-[#eceaea]">
+        <div className="rounded-2xl px-4 py-5 md:px-5 md:py-6 shadow-sm border border-black/5 flex-1 w-full bg-[#f7f7f7]">
           <div className="space-y-3 text-sm md:text-[15px]">
             <SummaryRow label="Medication" value={medicationName} />
             <SummaryRow label="Delivery plan" value={deliveryPlan} />
@@ -186,7 +192,6 @@ const Glp2TreatmentCheckoutSummary = ({ cartItems }) => {
               <SummaryRow
                 label="Total savings"
                 value={savingsDisplay}
-                valueClassName="font-bold"
                 valueStyle={{ color: ACCENT_GREEN }}
               />
             ) : null}
@@ -197,28 +202,49 @@ const Glp2TreatmentCheckoutSummary = ({ cartItems }) => {
               valueStyle={shippingFree ? { color: ACCENT_GREEN } : undefined}
             />
             {(monthlyStrike || monthlyCurrent) && (
-              <div className="flex justify-between gap-3 pt-2 border-t border-[#003b5c]/10">
-                <span className="shrink-0" style={{ color: LABEL_MUTED }}>
-                  Monthly price
-                </span>
-                <span className="text-right font-semibold">
-                  {monthlyStrike ? (
-                    <span
-                      className="line-through text-[13px] md:text-sm mr-2"
-                      style={{ color: LABEL_MUTED }}
-                    >
-                      {monthlyStrike}
-                    </span>
-                  ) : null}
-                  {compounded && monthlyCurrent ? (
+              <>
+                <div className="flex justify-between gap-3 pt-2 border-t border-[#003b5c]/10">
+                  <span className="shrink-0" style={{ color: LABEL_MUTED }}>
+                    Monthly price
+                  </span>
+                  <span className="text-right ">
+                    {monthlyStrike ? (
+                      <span
+                        className="line-through text-[13px] md:text-sm mr-2"
+                        style={{ color: LABEL_MUTED }}
+                      >
+                        {monthlyStrike}
+                      </span>
+                    ) : null}
+                    {compounded && monthlyCurrent ? (
+                      <span style={{ color: ACCENT_GREEN }}>
+                        {monthlyCurrent}
+                      </span>
+                    ) : (
+                      <span>{monthlyCurrent}</span>
+                    )}
+                  </span>
+                </div>
+                <div className="flex justify-between gap-3 mt-1 font-semibold">
+                  <span className="shrink-0 " style={{ color: LABEL_MUTED }}>
+                    Total
+                  </span>
+                  <span className="text-right">
+                    {totalStrikeDisplay ? (
+                      <span
+                        className="line-through text-[13px] md:text-sm mr-2"
+                        style={{ color: LABEL_MUTED }}
+                      >
+                        {totalStrikeDisplay}
+                      </span>
+                    ) : null}
                     <span style={{ color: ACCENT_GREEN }}>
-                      {monthlyCurrent}
+                      {currencySymbol}
+                      {formatPrice(lineSubtotalDollars)}
                     </span>
-                  ) : (
-                    <span style={{ color: NAVY }}>{monthlyCurrent}</span>
-                  )}
-                </span>
-              </div>
+                  </span>
+                </div>
+              </>
             )}
             {/* <div className="flex justify-between gap-3 items-baseline">
               <span
@@ -245,16 +271,13 @@ const Glp2TreatmentCheckoutSummary = ({ cartItems }) => {
       </div>
 
       {savingsDisplay && coupons.length > 0 ? (
-        <p
-          className="mt-4 text-sm text-center px-1 leading-relaxed"
-          style={{ color: NAVY }}
-        >
+        <p className="mt-4 text-sm text-center px-1 leading-relaxed">
           You are saving{" "}
-          <strong style={{ color: ACCENT_GREEN }}>{savingsDisplay}</strong> vs
+          <span style={{ color: ACCENT_GREEN }}>{savingsDisplay}</span> vs
           monthly with your exclusive plan.
         </p>
       ) : savingsDisplay ? (
-        <p className="mt-4 text-sm text-center px-1" style={{ color: NAVY }}>
+        <p className="mt-4 text-sm text-center px-1">
           You are saving{" "}
           <strong style={{ color: ACCENT_GREEN }}>{savingsDisplay}</strong> on
           your order.
@@ -262,10 +285,7 @@ const Glp2TreatmentCheckoutSummary = ({ cartItems }) => {
       ) : null}
 
       {coupons.length > 0 ? (
-        <div
-          className="mt-4 flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-center text-sm font-semibold text-white shadow-sm"
-          style={{ backgroundColor: NAVY }}
-        >
+        <div className="mt-4 flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-center text-sm font-semibold text-white shadow-sm bg-black">
           <PriceTagIcon className="h-5 w-5 shrink-0 opacity-95" />
           <span>
             CODE APPLIED:{" "}
@@ -274,25 +294,22 @@ const Glp2TreatmentCheckoutSummary = ({ cartItems }) => {
         </div>
       ) : null}
 
-      <ul
-        className="mt-5 space-y-2.5 text-[13px] md:text-sm px-0.5"
-        style={{ color: NAVY }}
-      >
+      <ul className="mt-5 text-[13px] md:text-sm px-0.5 flex flex-col gap-2 items-center">
         <li className="flex gap-2.5 items-start">
-          <CheckIcon className="mt-0.5 shrink-0" />
+          <CheckIcon className="mt-0.5 shrink-0 text-[#22c55e]" />
           <span>Same Price. All Dosage Levels.</span>
         </li>
         <li className="flex gap-2.5 items-start">
-          <CheckIcon className="mt-0.5 shrink-0" />
+          <CheckIcon className="mt-0.5 shrink-0 text-[#22c55e]" />
           <span>Prescribed &amp; shipped within 48 hours</span>
         </li>
         <li className="flex gap-2.5 items-start">
-          <CheckIcon className="mt-0.5 shrink-0" />
+          <CheckIcon className="mt-0.5 shrink-0 text-[#22c55e]" />
           <span>UNLIMITED doctor calls 7 days a week</span>
         </li>
       </ul>
 
-      <div className="mt-5 rounded-2xl bg-[#2ed296] text-white text-center py-4 px-4 shadow-sm">
+      <div className="mt-5 rounded-2xl bg-[#22c55e] text-white text-center py-4 px-4 shadow-sm">
         <div className="font-bold text-base md:text-lg">$0 Due Today!</div>
         <div className="text-xs md:text-sm font-normal mt-1 leading-snug opacity-[0.98]">
           Only charged if your prescription is approved.
@@ -306,7 +323,7 @@ const Glp2TreatmentCheckoutSummary = ({ cartItems }) => {
         >
           ✓
         </span>
-        <span style={{ color: NAVY }}>HSA/FSA Eligible</span>
+        <span>HSA/FSA Eligible</span>
       </div>
     </section>
   );
@@ -323,7 +340,7 @@ function CheckIcon({ className }) {
     >
       <path
         d="M16.667 5L7.5 14.167 3.333 10"
-        stroke={NAVY}
+        stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -339,8 +356,8 @@ function SummaryRow({ label, value, valueClassName = "", valueStyle }) {
         {label}
       </span>
       <span
-        className={`text-right font-bold ${valueClassName}`}
-        style={{ color: NAVY, ...valueStyle }}
+        className={`text-right ${valueClassName}`}
+        style={{ ...valueStyle }}
       >
         {value}
       </span>

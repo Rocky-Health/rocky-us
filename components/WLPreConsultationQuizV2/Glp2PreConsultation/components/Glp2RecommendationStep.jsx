@@ -36,7 +36,10 @@ const TreatmentCardWithCounter = ({
   onSelect,
   isSelected,
 }) => {
-  const { displayCount } = useDailyPatientCounter(COUNTER_ANCHOR_DATE, baseCount);
+  const { displayCount } = useDailyPatientCounter(
+    COUNTER_ANCHOR_DATE,
+    baseCount,
+  );
 
   return (
     <Glp2TreatmentCard

@@ -40,7 +40,8 @@ const BADGE_STYLE_BY_TEXT = {
 const Glp2PlanOptionsSection = ({
   planValues,
   selectedPlan,
-  setSelectedPlan,
+  onSelectPlan,
+  disabled = false,
 }) => {
   return (
     <div className="w-full md:w-[620px] mx-auto mb-8">
@@ -77,12 +78,13 @@ const Glp2PlanOptionsSection = ({
             <button
               key={plan.id}
               type="button"
-              onClick={() => setSelectedPlan(plan)}
+              disabled={disabled}
+              onClick={() => onSelectPlan?.(plan)}
               className={`w-full rounded-[8px] border p-5 text-left transition-colors ${
                 isSelected
                   ? "border-[#A7885A] bg-[#F7F2EA]"
                   : "border-[#C7D1DA] bg-white"
-              }`}
+              } ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
             >
               <div>
                 <div className="flex items-center gap-2 justify-between sm:justify-start">
@@ -102,7 +104,7 @@ const Glp2PlanOptionsSection = ({
                   <p className="md:text-sm text-xs text-[#666666]">
                     {subtitle}
                   </p>
-                  <p className="font-[600] text-[#000000] whitespace-nowrap">
+                  <p className="text-[#000000] whitespace-nowrap">
                     {supplyText}
                   </p>
                 </div>
@@ -114,7 +116,7 @@ const Glp2PlanOptionsSection = ({
                 </div>
               )}
 
-              <div className="mt-3 rounded-[4px] bg-[#9b6511] text-center py-3">
+              <div className="mt-3 rounded-[4px] bg-[#A7885A] text-center py-3">
                 <p className="text-xl leading-none text-white">
                   Select Plan ·{" "}
                   <span className="font-normal">{plan.price}/mo</span>

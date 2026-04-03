@@ -147,19 +147,20 @@ const Glp2TreatmentAndPlanStep = ({
     };
   }, [showLoader]);
 
-  const handleContinue = async () => {
-    if (!selectedProduct || !selectedPlan) return;
+  const proceedWithPlan = async (plan) => {
+    if (!selectedProduct || !plan || isCheckoutLoading) return;
     try {
       setIsCheckoutLoading(true);
+      setSelectedPlan(plan);
       if (typeof onContinue === "function") {
-        await onContinue(selectedPlan);
+        await onContinue(plan);
         return;
       }
 
       const mainProductForCheckout = {
         id: selectedProduct.id,
         name: selectedProduct.name,
-        price: selectedProduct.price,
+        price: plan?.price || selectedProduct.price,
         quantity: 1,
         isSubscription: selectedProduct.isSubscription || false,
       };
@@ -186,10 +187,8 @@ const Glp2TreatmentAndPlanStep = ({
     }
   };
 
-  const isContinueEnabled = Boolean(selectedProduct && selectedPlan);
-
   return (
-    <div className="w-full mx-auto px-4 md:px-0 flex flex-col min-h-screen relative pb-32">
+    <div className="w-full mx-auto px-4 md:px-0 flex flex-col min-h-screen relative pb-10">
       {isCheckoutLoading && (
         <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black bg-opacity-30">
           <Loader />
@@ -235,25 +234,10 @@ const Glp2TreatmentAndPlanStep = ({
         <Glp2PlanOptionsSection
           planValues={planValues}
           selectedPlan={selectedPlan}
-          setSelectedPlan={setSelectedPlan}
+          onSelectPlan={(plan) => void proceedWithPlan(plan)}
+          disabled={isCheckoutLoading}
         />
       ) : null}
-
-      <div className="fixed bottom-0 left-0 w-full px-4 py-4 flex items-center justify-center z-50 bg-white">
-        <div className="w-[335px] md:w-[620px] max-w-xl flex flex-col gap-3">
-          <button
-            className={`w-full py-3 rounded-full font-medium ${
-              isContinueEnabled
-                ? "bg-black text-white"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-            }`}
-            onClick={isContinueEnabled ? handleContinue : undefined}
-            disabled={!isContinueEnabled || isCheckoutLoading}
-          >
-            {isCheckoutLoading ? "Processing..." : "Continue"}
-          </button>
-        </div>
-      </div>
     </div>
   );
 };

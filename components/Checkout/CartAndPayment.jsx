@@ -139,8 +139,7 @@ const CartAndPayment = ({
         className={`text-[10px] text-gray-700 mt-4 text-center w-full ${isGlp2 ? "" : "lg:max-w-[512px]"}`}
       >
         256-bit SSL encryption · PCI DSS compliant. Pay securely using your
-        credit card. This transaction is a pre-authorization. Your card is only
-        charged if your prescription is approved.
+        credit card.
       </p>
       <p
         className={`text-[10px] text-gray-700 mt-4 text-center w-full ${isGlp2 ? "" : "lg:max-w-[512px]"}`}

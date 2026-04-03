@@ -2861,6 +2861,10 @@ const CheckoutPageContent = () => {
                 </span>
               </button>
             </div>
+            <p className="text-xs md:text-sm text-gray-600 text-center mb-3">
+              This transaction is a pre-authorization. <br /> Your card is only
+              charged if your prescription is approved.
+            </p>
             <Glp2TreatmentCheckoutSummary cartItems={cartItems} />
             <BillingAndShipping {...billingShippingProps} variant="glp2" />
             <CartAndPayment {...cartPaymentProps} layoutVariant="glp2" />

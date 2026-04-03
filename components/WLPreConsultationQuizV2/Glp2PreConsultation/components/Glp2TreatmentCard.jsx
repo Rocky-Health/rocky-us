@@ -17,7 +17,7 @@ const renderBadge = (badge) => {
     return <div className="font-medium">{cleanBadge}</div>;
   }
 
-  const colorClass = isAffordable ? "text-[#2ED296]" : "text-[#00598D]";
+  const colorClass = isAffordable ? "text-[#22c55e]" : "text-[#a7885a]";
 
   return (
     <div className={`mt-1 flex items-center text-base leading-6 ${colorClass}`}>
@@ -92,7 +92,7 @@ const Glp2TreatmentCard = ({
           </p>
           {renderBadge(badge)}
 
-          <p className="mt-1 flex items-center gap-1 font-semibold text-brand-500 text-xs md:text-sm">
+          <p className="mt-1 flex items-center gap-1  text-brand-500 text-xs md:text-sm">
             <span className="h-2 w-2 rounded-full bg-[#30B130] animate-pulse"></span>
             {counterText}
           </p>
