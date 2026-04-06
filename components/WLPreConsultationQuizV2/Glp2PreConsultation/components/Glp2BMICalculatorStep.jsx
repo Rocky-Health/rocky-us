@@ -84,7 +84,7 @@ const Glp2BMICalculatorStep = ({
             <input
               ref={feetRef}
               type="number"
-              inputMode="numeric"
+              inputMode="decimal"
               min="0"
               enterKeyHint="next"
               className="h-[52px] w-full px-[14px] py-[16px] border border-[#E2E2E1] rounded-md bg-[#F9F9F9]"
@@ -117,7 +117,7 @@ const Glp2BMICalculatorStep = ({
             <input
               ref={inchesRef}
               type="number"
-              inputMode="numeric"
+              inputMode="decimal"
               min="0"
               enterKeyHint="next"
               className="h-[52px] w-full px-4 border border-[#E2E2E1] rounded-md bg-[#F9F9F9]"
@@ -156,7 +156,7 @@ const Glp2BMICalculatorStep = ({
           <input
             ref={weightRef}
             type="number"
-            inputMode="numeric"
+            inputMode="decimal"
             enterKeyHint="done"
             className="h-[52px] w-full px-4 border border-[#E2E2E1] rounded-md bg-[#F9F9F9]"
             placeholder="Weight (in lbs)"
