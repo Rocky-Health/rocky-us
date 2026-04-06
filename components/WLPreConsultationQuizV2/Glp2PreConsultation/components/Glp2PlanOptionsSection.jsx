@@ -116,28 +116,29 @@ const Glp2PlanOptionsSection = ({
                 </div>
               )}
 
-              <div className="mt-3 rounded-[4px] bg-[#A7885A] text-center py-3">
-                <p className="text-xl leading-none text-white">
-                  Select Plan ·{" "}
-                  <span className="font-normal">{plan.price}/mo</span>
-                </p>
-                {/* {plan.originalPrice && (
-                  <p className="text-sm md:text-base text-[#6B7280] line-through mt-1">
-                    {plan.originalPrice}
+              {plan.id === "monthly" ? (
+                <div className="mt-3 rounded-[4px] bg-[#A7885A] text-center py-3 px-3">
+                  <p className="text-base leading-snug text-white font-bold">
+                    Select Plan ·{" "}
+                    {plan.originalPrice && (
+                      <span className="line-through font-normal opacity-80">
+                        {plan.originalPrice}/month
+                      </span>
+                    )}
                   </p>
-                )} */}
-                {/* {plan.type && (
-                  <p className="text-sm md:text-base text-[#0F2F4D] mt-1">
-                    {plan.type}
-                  </p>
-                )} */}
-                {/* {plan.id === "monthly" && (
-                  <p className="text-sm md:text-base text-[#0F2F4D] mt-1">
-                    PAY ONLY <span className="font-semibold">{plan.price}</span>{" "}
+                  <p className="text-sm text-white/90 mt-0.5 uppercase tracking-wide">
+                    PAY ONLY <span className="font-bold">{plan.price}</span>{" "}
                     LIMITED OFFER
                   </p>
-                )} */}
-              </div>
+                </div>
+              ) : (
+                <div className="mt-3 rounded-[4px] bg-[#A7885A] text-center py-3">
+                  <p className="text-xl leading-none text-white">
+                    Select Plan ·{" "}
+                    <span className="font-normal">{plan.price}/mo</span>
+                  </p>
+                </div>
+              )}
             </button>
           );
         })}
