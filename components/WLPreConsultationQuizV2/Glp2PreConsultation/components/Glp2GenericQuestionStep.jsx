@@ -8,6 +8,7 @@ import RadioImagesQuestion from "../../components/RadioImagesQuestion";
 import SelectQuestion from "../../components/SelectQuestion";
 import DateQuestion from "../../components/DateQuestion";
 import Glp2BMICalculatorStep from "./Glp2BMICalculatorStep";
+import Glp2GoalWeightStep from "./Glp2GoalWeightStep";
 import Glp2BeforeAfterStep from "./Glp2BeforeAfterStep";
 import Glp2BeforeAfterStep2 from "./Glp2BeforeAfterStep2";
 import Glp2BeforeAfterStep3 from "./Glp2BeforeAfterStep3";
@@ -186,6 +187,14 @@ const Glp2GenericQuestionStep = ({
             setUserData={setUserData}
           />
         );
+      case "goalWeight":
+        return (
+          <Glp2GoalWeightStep
+            userData={userData}
+            setUserData={setUserData}
+            onContinue={handleContinue}
+          />
+        );
       case "beforeAfter":
         return <Glp2BeforeAfterStep onContinue={handleContinue} />;
       case "beforeAfter2":
@@ -269,6 +278,7 @@ const Glp2GenericQuestionStep = ({
   }
 
   const isBmiStep = stepConfig?.id === "currentWeight";
+  const isGoalWeightStep = stepConfig?.type === "goalWeight";
   const isBeforeAfterStep = stepConfig?.type === "beforeAfter";
   const isBeforeAfterStep2 = stepConfig?.type === "beforeAfter2";
   const isBeforeAfterStep3 = stepConfig?.type === "beforeAfter3";
@@ -282,6 +292,7 @@ const Glp2GenericQuestionStep = ({
   const isStateOfMindStep = stepConfig?.type === "stateOfMindQuestion";
   const isCustomFullLayoutStep =
     isBmiStep ||
+    isGoalWeightStep ||
     isBeforeAfterStep ||
     isBeforeAfterStep2 ||
     isBeforeAfterStep3 ||
@@ -294,6 +305,7 @@ const Glp2GenericQuestionStep = ({
     isStateOfMindStep;
 
   if (
+    isGoalWeightStep ||
     isBeforeAfterStep ||
     isBeforeAfterStep2 ||
     isBeforeAfterStep3 ||

@@ -52,31 +52,39 @@ export const glp2PreConsultationConfig = {
             field: "currentWeight",
             required: true,
         },
-        // Step 2: Before & After
+        // Step 2: Goal Weight
         2: {
+            id: "goalWeight",
+            type: "goalWeight",
+            title: "",
+            field: "goalWeight",
+            required: true,
+        },
+        // Step 3: Before & After
+        3: {
             id: "beforeAfter",
             type: "beforeAfter",
             title: "",
             required: false,
         },
-        // Step 3: Pace Question
-        3: {
+        // Step 4: Pace Question
+        4: {
             id: "paceQuestion",
             type: "paceQuestion",
             title: "",
             field: "pacePreference",
             required: true,
         },
-        // Step 4: Pace Result (depends on selected Step 3 answer)
-        4: {
+        // Step 5: Pace Result (depends on selected Step 4 answer)
+        5: {
             id: "paceResult",
             type: "paceResult",
             title: "",
             field: "pacePreference",
             required: false,
         },
-        // Step 5: Sleep Hours
-        5: {
+        // Step 6: Sleep Hours
+        6: {
             id: "sleepHours",
             type: "sleepQuestion",
             title: "",
@@ -89,15 +97,15 @@ export const glp2PreConsultationConfig = {
                 { id: "more-than-9", label: "More than 9 hours" },
             ],
         },
-        // Step 6: Before & After 2
-        6: {
+        // Step 7: Before & After 2
+        7: {
             id: "beforeAfter2",
             type: "beforeAfter2",
             title: "",
             required: false,
         },
-        // Step 7: Willingness
-        7: {
+        // Step 8: Willingness
+        8: {
             id: "willingness",
             type: "willingnessQuestion",
             title: "",
@@ -115,8 +123,8 @@ export const glp2PreConsultationConfig = {
                 { id: "none", label: "None of the above" },
             ],
         },
-        // Step 8: Weight Changed
-        8: {
+        // Step 9: Weight Changed
+        9: {
             id: "weightChangedLastYear",
             type: "weightChangedQuestion",
             title: "",
@@ -130,15 +138,15 @@ export const glp2PreConsultationConfig = {
                 { id: "gained-significant", label: "Gained a significant amount" },
             ],
         },
-        // Step 9: Before & After 3
-        9: {
+        // Step 10: Before & After 3
+        10: {
             id: "beforeAfter3",
             type: "beforeAfter3",
             title: "",
             required: false,
         },
-        // Step 10: Medication Priority
-        10: {
+        // Step 11: Medication Priority
+        11: {
             id: "medicationPriority",
             type: "medicationPriorityQuestion",
             title: "",
@@ -149,8 +157,8 @@ export const glp2PreConsultationConfig = {
                 { id: "potency", label: "Potency" },
             ],
         },
-        // Step 11: State of Mind
-        11: {
+        // Step 12: State of Mind
+        12: {
             id: "stateOfMind",
             type: "stateOfMindQuestion",
             title: "",
@@ -162,8 +170,8 @@ export const glp2PreConsultationConfig = {
                 { id: "cautious", label: "I'm cautious" },
             ],
         },
-        // Step 12: Date of Birth (only shown if not authenticated)
-        12: {
+        // Step 13: Date of Birth (only shown if not authenticated)
+        13: {
             id: "dateOfBirth",
             passIf: "authenticate",
             type: "glp2Dob",
@@ -171,8 +179,8 @@ export const glp2PreConsultationConfig = {
             field: "dateOfBirth",
             required: true,
         },
-        // Step 13: Personal Info - First Name, Last Name, State (only shown if not authenticated)
-        13: {
+        // Step 14: Personal Info - First Name, Last Name, State (only shown if not authenticated)
+        14: {
             id: "personalInfo",
             passIf: "authenticate",
             type: "form",
@@ -248,8 +256,8 @@ export const glp2PreConsultationConfig = {
             ],
             required: true,
         },
-        // Step 14: Contact / Auth - Email, Phone, Password (only shown if not authenticated)
-        14: {
+        // Step 15: Contact / Auth - Email, Phone, Password (only shown if not authenticated)
+        15: {
             id: "contactAuth",
             passIf: "authenticate",
             type: "glp2ContactAuth",
@@ -275,40 +283,42 @@ export const glp2PreConsultationConfig = {
 
     // Navigation configuration
     navigation: {
-        1: 2, // BMI Calculator -> Before/After
-        2: 3, // Before/After -> Pace Question
-        3: 4, // Pace Question -> Pace Result
-        4: 5, // Pace Result -> Sleep Hours
-        5: 6, // Sleep Hours -> Before/After2
-        6: 7, // Before/After2 -> Willingness
-        7: 8, // Willingness -> Weight Changed
-        8: 9, // Weight Changed -> Before/After3
-        9: 10, // Before/After3 -> Medication Priority
-        10: 11, // Medication Priority -> State of Mind
-        11: 12, // State of Mind -> DOB (or skip to 16 if authenticated)
-        12: 13, // DOB -> Personal Info
-        13: 14, // Personal Info -> Contact/Auth
-        14: 16, // Contact/Auth -> Product Recommendations
+        1: 2,   // BMI Calculator -> Goal Weight
+        2: 3,   // Goal Weight -> Before/After
+        3: 4,   // Before/After -> Pace Question
+        4: 5,   // Pace Question -> Pace Result
+        5: 6,   // Pace Result -> Sleep Hours
+        6: 7,   // Sleep Hours -> Before/After2
+        7: 8,   // Before/After2 -> Willingness
+        8: 9,   // Willingness -> Weight Changed
+        9: 10,  // Weight Changed -> Before/After3
+        10: 11, // Before/After3 -> Medication Priority
+        11: 12, // Medication Priority -> State of Mind
+        12: 13, // State of Mind -> DOB (or skip to 16 if authenticated)
+        13: 14, // DOB -> Personal Info
+        14: 15, // Personal Info -> Contact/Auth
+        15: 16, // Contact/Auth -> Product Recommendations
         16: 17, // Product Recommendations -> Plan Selection (for compounded only; else checkout)
         17: 100, // Plan Selection -> Checkout
     },
 
     // Progress mapping
     progressMap: {
-        1: 10, // BMI Calculator
-        2: 20, // Before/After
-        3: 30, // Pace Question
-        4: 40, // Pace Result
-        5: 50, // Sleep Hours
-        6: 58, // Before/After2
-        7: 66, // Willingness
-        8: 73, // Weight Changed
-        9: 79, // Before/After3
-        10: 84, // Medication Priority
-        11: 88, // State of Mind
-        12: 91, // DOB
-        13: 94, // Personal Info
-        14: 97, // Contact/Auth
+        1: 8,  // BMI Calculator
+        2: 16, // Goal Weight
+        3: 24, // Before/After
+        4: 32, // Pace Question
+        5: 40, // Pace Result
+        6: 48, // Sleep Hours
+        7: 55, // Before/After2
+        8: 62, // Willingness
+        9: 69, // Weight Changed
+        10: 75, // Before/After3
+        11: 81, // Medication Priority
+        12: 86, // State of Mind
+        13: 90, // DOB
+        14: 93, // Personal Info
+        15: 96, // Contact/Auth
         16: 99, // Product Recommendations
         17: 100, // Plan Selection
     },
@@ -316,19 +326,20 @@ export const glp2PreConsultationConfig = {
     // Step titles
     stepTitles: {
         1: "Height & Weight",
-        2: "Before & After",
-        3: "Weekly Pace",
-        4: "Personalized Pace",
-        5: "Sleep",
-        6: "Before & After",
-        7: "Willingness",
-        8: "Weight Changed",
-        9: "Before & After",
-        10: "Priority",
-        11: "State Of Mind",
-        12: "Date of Birth",
-        13: "Personal Info",
-        14: "Contact & Account",
+        2: "Goal Weight",
+        3: "Before & After",
+        4: "Weekly Pace",
+        5: "Personalized Pace",
+        6: "Sleep",
+        7: "Before & After",
+        8: "Willingness",
+        9: "Weight Changed",
+        10: "Before & After",
+        11: "Priority",
+        12: "State Of Mind",
+        13: "Date of Birth",
+        14: "Personal Info",
+        15: "Contact & Account",
         16: "Product Recommendations",
         17: "Select Your Weight Loss Plan",
     },
