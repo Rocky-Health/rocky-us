@@ -1,12 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { glp2PreConsultationConfig } from "./config/glp2PreConsultationConfig";
 import Glp2GenericQuestionStep from "./components/Glp2GenericQuestionStep";
-import Glp2PlanSelectionStep from "./components/Glp2PlanSelectionStep";
-import Glp2RecommendationStep from "./components/Glp2RecommendationStep";
 import Glp2TreatmentAndPlanStep from "./components/Glp2TreatmentAndPlanStep";
+import Glp2DobStep from "./components/Glp2DobStep";
+import Glp2ContactAuthStep from "./components/Glp2ContactAuthStep";
 import { getProductRecommendation } from "../utils/recommendationEngine";
-
-const COMPOUNDED_PRODUCT_IDS = ["489523", "489798"];
 
 const QuizStepRenderer = ({
   currentStep,
@@ -15,37 +13,35 @@ const QuizStepRenderer = ({
   selectedProduct,
   setSelectedProduct,
   handleContinue,
-  handleBack,
   handleAction,
-  handleRecommendationContinue,
-  goToStep,
   handlePlanStepCheckout,
 }) => {
-  const [selectedPlan, setSelectedPlan] = useState(null);
   const stepConfig = glp2PreConsultationConfig.steps[currentStep];
 
-  // Handle plan selection step (step 17) - for Compounded Tirzepatide/Semaglutide
-  if (currentStep === 17) {
-    // Pick plan options specific to the selected product (Tirz vs Sema pricing differs)
-    const productPlanOptions = selectedProduct
-      ? glp2PreConsultationConfig.planOptions[String(selectedProduct.id)]
-      : null;
-
+  // Handle DOB step (step 12)
+  if (currentStep === 12 && stepConfig?.type === "glp2Dob") {
     return (
-      <Glp2PlanSelectionStep
-        product={selectedProduct}
-        selectedPlan={selectedPlan}
-        setSelectedPlan={setSelectedPlan}
-        planOptions={productPlanOptions}
-        planInclusions={glp2PreConsultationConfig.planInclusions}
-        onBack={handleBack}
-        onContinue={handlePlanStepCheckout}
+      <Glp2DobStep
+        userData={userData}
+        setUserData={setUserData}
+        onContinue={handleContinue}
       />
     );
   }
 
-  // Handle recommendation step (step 16)
-  if (currentStep === 16) {
+  // Handle Contact/Auth step (step 14)
+  if (currentStep === 14 && stepConfig?.type === "glp2ContactAuth") {
+    return (
+      <Glp2ContactAuthStep
+        userData={userData}
+        setUserData={setUserData}
+        onContinue={handleContinue}
+      />
+    );
+  }
+
+  // Handle recommendation + plan selection in one combined step
+  if (currentStep === 16 || currentStep === 17) {
     const recommendation = getProductRecommendation(
       userData,
       glp2PreConsultationConfig.recommendationRules,

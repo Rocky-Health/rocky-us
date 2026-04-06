@@ -52,31 +52,39 @@ export const glp2PreConsultationConfig = {
             field: "currentWeight",
             required: true,
         },
-        // Step 2: Before & After
+        // Step 2: Goal Weight
         2: {
+            id: "goalWeight",
+            type: "goalWeight",
+            title: "",
+            field: "goalWeight",
+            required: true,
+        },
+        // Step 3: Before & After
+        3: {
             id: "beforeAfter",
             type: "beforeAfter",
             title: "",
             required: false,
         },
-        // Step 3: Pace Question
-        3: {
+        // Step 4: Pace Question
+        4: {
             id: "paceQuestion",
             type: "paceQuestion",
             title: "",
             field: "pacePreference",
             required: true,
         },
-        // Step 4: Pace Result (depends on selected Step 3 answer)
-        4: {
+        // Step 5: Pace Result (depends on selected Step 4 answer)
+        5: {
             id: "paceResult",
             type: "paceResult",
             title: "",
             field: "pacePreference",
             required: false,
         },
-        // Step 5: Sleep Hours
-        5: {
+        // Step 6: Sleep Hours
+        6: {
             id: "sleepHours",
             type: "sleepQuestion",
             title: "",
@@ -89,15 +97,15 @@ export const glp2PreConsultationConfig = {
                 { id: "more-than-9", label: "More than 9 hours" },
             ],
         },
-        // Step 6: Before & After 2
-        6: {
+        // Step 7: Before & After 2
+        7: {
             id: "beforeAfter2",
             type: "beforeAfter2",
             title: "",
             required: false,
         },
-        // Step 7: Willingness
-        7: {
+        // Step 8: Willingness
+        8: {
             id: "willingness",
             type: "willingnessQuestion",
             title: "",
@@ -115,8 +123,8 @@ export const glp2PreConsultationConfig = {
                 { id: "none", label: "None of the above" },
             ],
         },
-        // Step 8: Weight Changed
-        8: {
+        // Step 9: Weight Changed
+        9: {
             id: "weightChangedLastYear",
             type: "weightChangedQuestion",
             title: "",
@@ -130,15 +138,15 @@ export const glp2PreConsultationConfig = {
                 { id: "gained-significant", label: "Gained a significant amount" },
             ],
         },
-        // Step 9: Before & After 3
-        9: {
+        // Step 10: Before & After 3
+        10: {
             id: "beforeAfter3",
             type: "beforeAfter3",
             title: "",
             required: false,
         },
-        // Step 10: Medication Priority
-        10: {
+        // Step 11: Medication Priority
+        11: {
             id: "medicationPriority",
             type: "medicationPriorityQuestion",
             title: "",
@@ -149,159 +157,110 @@ export const glp2PreConsultationConfig = {
                 { id: "potency", label: "Potency" },
             ],
         },
-        // Step 11: State of Mind
-        11: {
+        // Step 12: State of Mind
+        12: {
             id: "stateOfMind",
             type: "stateOfMindQuestion",
             title: "",
             field: "stateOfMind",
             required: true,
-            showPopupAfterStep: "Step11EmailPopUp",
             options: [
                 { id: "ready", label: "I'm Ready!" },
                 { id: "hopeful", label: "I'm feeling hopeful" },
                 { id: "cautious", label: "I'm cautious" },
             ],
         },
-        // Step 12: Province (only shown if not authenticated)
-        12: {
-            id: "province",
-            passIf: "authenticate",
-            type: "select",
-            title: "First, let's make sure we have licensed providers in your area.",
-            subtitle:
-                "Weight loss medications are prescribed online and delivered to your door.",
-            field: "province",
-            required: true,
-            label: "State",
-            privacyNote:
-                "We respect your privacy. All of your information is securely stored on our HIPAA Compliant server.",
-            options: [
-                { id: "", label: "Select a state" },
-                { id: "AZ", label: "Arizona" },
-                { id: "CA", label: "California" },
-                { id: "CO", label: "Colorado" },
-                { id: "CT", label: "Connecticut" },
-                { id: "DE", label: "Delaware" },
-                { id: "FL", label: "Florida" },
-                { id: "GA", label: "Georgia" },
-                { id: "ID", label: "Idaho" },
-                { id: "IL", label: "Illinois" },
-                { id: "IN", label: "Indiana" },
-                { id: "IA", label: "Iowa" },
-                { id: "KY", label: "Kentucky" },
-                { id: "LA", label: "Louisiana" },
-                { id: "ME", label: "Maine" },
-                { id: "MD", label: "Maryland" },
-                { id: "MA", label: "Massachusetts" },
-                { id: "MO", label: "Missouri" },
-                { id: "MT", label: "Montana" },
-                { id: "NE", label: "Nebraska" },
-                { id: "NV", label: "Nevada" },
-                { id: "NH", label: "New Hampshire" },
-                { id: "NJ", label: "New Jersey" },
-                { id: "NM", label: "New Mexico" },
-                { id: "NY", label: "New York" },
-                { id: "NC", label: "North Carolina" },
-                { id: "ND", label: "North Dakota" },
-                { id: "OH", label: "Ohio" },
-                { id: "OK", label: "Oklahoma" },
-                { id: "OR", label: "Oregon" },
-                { id: "PA", label: "Pennsylvania" },
-                { id: "RI", label: "Rhode Island" },
-                { id: "SC", label: "South Carolina" },
-                { id: "SD", label: "South Dakota" },
-                { id: "TN", label: "Tennessee" },
-                { id: "TX", label: "Texas" },
-                { id: "UT", label: "Utah" },
-                { id: "VT", label: "Vermont" },
-                { id: "VA", label: "Virginia" },
-                { id: "WA", label: "Washington" },
-                { id: "WV", label: "West Virginia" },
-                { id: "WI", label: "Wisconsin" },
-                { id: "WY", label: "Wyoming" },
-            ],
-        },
-        // Step 13: Basic Info (only shown if not authenticated)
+        // Step 13: Date of Birth (only shown if not authenticated)
         13: {
-            id: "basicInfo",
+            id: "dateOfBirth",
             passIf: "authenticate",
-            type: "form",
-            title: "Let’s start with the basics",
-            field: "sex",
-            conditionalNavigation: {
-                Male: 14,
-                Female: 14,
-            },
-            fields: [
-                {
-                    id: "sex",
-                    label: "Sex assigned at birth",
-                    type: "radio",
-                    options: [
-                        { value: "Male", label: "Male" },
-                        { value: "Female", label: "Female" },
-                    ],
-                },
-                {
-                    id: "dateOfBirth",
-                    label: "Birth Date",
-                    type: "date",
-                    placeholder: "mm/dd/yyyy",
-                },
-                {
-                    id: "zip_code",
-                    label: "Zip Code",
-                    type: "text",
-                    placeholder: "90210",
-                },
-            ],
-            privacyNote:
-                "We respect your privacy. All of your information is securely stored on our HIPAA Compliant server.",
+            type: "glp2Dob",
+            title: "What is your date of birth?",
+            field: "dateOfBirth",
             required: true,
         },
-        // Step 14: First Information (only shown if not authenticated)
+        // Step 14: Personal Info - First Name, Last Name, State (only shown if not authenticated)
         14: {
-            id: "firstInformation",
+            id: "personalInfo",
             passIf: "authenticate",
             type: "form",
-            titleCenter: true,
-            title: `<p style="color:#A0693B; text-align:center; line-height: 140%;font-size:16px">We're almost done!</p><p class="text-center text-[26px] headers-font mb-[24px]">Let us know your details</p>`,
+            title: "Your medical checkup",
             privacyNote:
                 "We respect your privacy. All of your information is securely stored on our HIPAA Compliant server.",
             fields: [
                 {
                     id: "firstName",
-                    label: "Name",
+                    label: "First Name",
                     type: "text",
-                    placeholder: "Enter Your Name",
+                    placeholder: "Enter your first name",
+                    required: true,
                 },
                 {
                     id: "lastName",
                     label: "Last Name",
                     type: "text",
-                    placeholder: "Your Last Name",
+                    placeholder: "Enter your last name",
+                    required: true,
+                },
+                {
+                    id: "province",
+                    label: "What state will your medication be shipped to?",
+                    type: "select",
+                    required: true,
+                    options: [
+                        { value: "", label: "Select a state" },
+                        { value: "AZ", label: "Arizona" },
+                        { value: "CA", label: "California" },
+                        { value: "CO", label: "Colorado" },
+                        { value: "CT", label: "Connecticut" },
+                        { value: "DE", label: "Delaware" },
+                        { value: "FL", label: "Florida" },
+                        { value: "GA", label: "Georgia" },
+                        { value: "ID", label: "Idaho" },
+                        { value: "IL", label: "Illinois" },
+                        { value: "IN", label: "Indiana" },
+                        { value: "IA", label: "Iowa" },
+                        { value: "KY", label: "Kentucky" },
+                        { value: "LA", label: "Louisiana" },
+                        { value: "ME", label: "Maine" },
+                        { value: "MD", label: "Maryland" },
+                        { value: "MA", label: "Massachusetts" },
+                        { value: "MO", label: "Missouri" },
+                        { value: "MT", label: "Montana" },
+                        { value: "NE", label: "Nebraska" },
+                        { value: "NV", label: "Nevada" },
+                        { value: "NH", label: "New Hampshire" },
+                        { value: "NJ", label: "New Jersey" },
+                        { value: "NM", label: "New Mexico" },
+                        { value: "NY", label: "New York" },
+                        { value: "NC", label: "North Carolina" },
+                        { value: "ND", label: "North Dakota" },
+                        { value: "OH", label: "Ohio" },
+                        { value: "OK", label: "Oklahoma" },
+                        { value: "OR", label: "Oregon" },
+                        { value: "PA", label: "Pennsylvania" },
+                        { value: "RI", label: "Rhode Island" },
+                        { value: "SC", label: "South Carolina" },
+                        { value: "SD", label: "South Dakota" },
+                        { value: "TN", label: "Tennessee" },
+                        { value: "TX", label: "Texas" },
+                        { value: "UT", label: "Utah" },
+                        { value: "VT", label: "Vermont" },
+                        { value: "VA", label: "Virginia" },
+                        { value: "WA", label: "Washington" },
+                        { value: "WV", label: "West Virginia" },
+                        { value: "WI", label: "Wisconsin" },
+                        { value: "WY", label: "Wyoming" },
+                    ],
                 },
             ],
             required: true,
         },
-        // Step 15: Contact Info (only shown if not authenticated) - This triggers registration
+        // Step 15: Contact / Auth - Email, Phone, Password (only shown if not authenticated)
         15: {
-            id: "contactInfo",
+            id: "contactAuth",
             passIf: "authenticate",
-            type: "form",
-            titleCenter: true,
-            title: `<p style="color:#A0693B; text-align:center; line-height: 140%;font-size:16px">Finally,</p><p class="text-center text-[26px] headers-font mb-[24px]">How can we reach you, if needed?</p>`,
-            privacyNote:
-                "We respect your privacy. All of your information is securely stored on our HIPAA Compliant server.",
-            fields: [
-                {
-                    id: "phone",
-                    label: "Phone Number",
-                    type: "tel",
-                    placeholder: "Your Phone Number",
-                },
-            ],
+            type: "glp2ContactAuth",
             required: true,
         },
         // Step 16: Product Recommendations
@@ -324,42 +283,42 @@ export const glp2PreConsultationConfig = {
 
     // Navigation configuration
     navigation: {
-        1: 2, // BMI Calculator -> Before/After
-        2: 3, // Before/After -> Pace Question
-        3: 4, // Pace Question -> Pace Result
-        4: 5, // Pace Result -> Sleep Hours
-        5: 6, // Sleep Hours -> Before/After2
-        6: 7, // Before/After2 -> Willingness
-        7: 8, // Willingness -> Weight Changed
-        8: 9, // Weight Changed -> Before/After3
-        9: 10, // Before/After3 -> Medication Priority
-        10: 11, // Medication Priority -> State of Mind
-        11: 12, // State of Mind -> Province (or skip to 16 if authenticated)
-        12: 13, // Province -> Basic Info
-        13: 14, // Basic Info -> First Information
-        14: 15, // First Information -> Contact Info
-        15: 16, // Contact Info -> Product Recommendations
+        1: 2,   // BMI Calculator -> Goal Weight
+        2: 3,   // Goal Weight -> Before/After
+        3: 4,   // Before/After -> Pace Question
+        4: 5,   // Pace Question -> Pace Result
+        5: 6,   // Pace Result -> Sleep Hours
+        6: 7,   // Sleep Hours -> Before/After2
+        7: 8,   // Before/After2 -> Willingness
+        8: 9,   // Willingness -> Weight Changed
+        9: 10,  // Weight Changed -> Before/After3
+        10: 11, // Before/After3 -> Medication Priority
+        11: 12, // Medication Priority -> State of Mind
+        12: 13, // State of Mind -> DOB (or skip to 16 if authenticated)
+        13: 14, // DOB -> Personal Info
+        14: 15, // Personal Info -> Contact/Auth
+        15: 16, // Contact/Auth -> Product Recommendations
         16: 17, // Product Recommendations -> Plan Selection (for compounded only; else checkout)
         17: 100, // Plan Selection -> Checkout
     },
 
     // Progress mapping
     progressMap: {
-        1: 10, // BMI Calculator
-        2: 20, // Before/After
-        3: 30, // Pace Question
-        4: 40, // Pace Result
-        5: 50, // Sleep Hours
-        6: 58, // Before/After2
-        7: 66, // Willingness
-        8: 73, // Weight Changed
-        9: 79, // Before/After3
-        10: 84, // Medication Priority
-        11: 88, // State of Mind
-        12: 91, // Province
-        13: 94, // Basic Info
-        14: 96, // First Information
-        15: 98, // Contact Info
+        1: 8,  // BMI Calculator
+        2: 16, // Goal Weight
+        3: 24, // Before/After
+        4: 32, // Pace Question
+        5: 40, // Pace Result
+        6: 48, // Sleep Hours
+        7: 55, // Before/After2
+        8: 62, // Willingness
+        9: 69, // Weight Changed
+        10: 75, // Before/After3
+        11: 81, // Medication Priority
+        12: 86, // State of Mind
+        13: 90, // DOB
+        14: 93, // Personal Info
+        15: 96, // Contact/Auth
         16: 99, // Product Recommendations
         17: 100, // Plan Selection
     },
@@ -367,20 +326,20 @@ export const glp2PreConsultationConfig = {
     // Step titles
     stepTitles: {
         1: "Height & Weight",
-        2: "Before & After",
-        3: "Weekly Pace",
-        4: "Personalized Pace",
-        5: "Sleep",
-        6: "Before & After",
-        7: "Willingness",
-        8: "Weight Changed",
-        9: "Before & After",
-        10: "Priority",
-        11: "State Of Mind",
-        12: "State Selection",
-        13: "Your Basic Info",
-        14: "Your Details",
-        15: "Contact Information",
+        2: "Goal Weight",
+        3: "Before & After",
+        4: "Weekly Pace",
+        5: "Personalized Pace",
+        6: "Sleep",
+        7: "Before & After",
+        8: "Willingness",
+        9: "Weight Changed",
+        10: "Before & After",
+        11: "Priority",
+        12: "State Of Mind",
+        13: "Date of Birth",
+        14: "Personal Info",
+        15: "Contact & Account",
         16: "Product Recommendations",
         17: "Select Your Weight Loss Plan",
     },
@@ -410,9 +369,9 @@ export const glp2PreConsultationConfig = {
                 id: "monthly",
                 label: "Monthly Auto-Refill",
                 subtitle: "Flexible. Pay as you go plan.",
-                price: "$359",
+                price: "$260",
                 originalPrice: "$389",
-                savings: "Save $30",
+                savings: "Save $129",
                 subscriptionPeriod: "1_month",
                 isDefault: true,
             },
@@ -453,9 +412,9 @@ export const glp2PreConsultationConfig = {
                 id: "monthly",
                 label: "Monthly Auto-Refill",
                 subtitle: "Flexible. Pay as you go plan.",
-                price: "$249",
+                price: "$150",
                 originalPrice: "$279",
-                savings: "Save $30",
+                savings: "Save $129",
                 subscriptionPeriod: "1_month",
                 isDefault: true,
             },
