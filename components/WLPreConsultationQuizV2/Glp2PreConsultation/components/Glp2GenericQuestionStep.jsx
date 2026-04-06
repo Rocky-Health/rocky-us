@@ -8,6 +8,7 @@ import RadioImagesQuestion from "../../components/RadioImagesQuestion";
 import SelectQuestion from "../../components/SelectQuestion";
 import DateQuestion from "../../components/DateQuestion";
 import Glp2BMICalculatorStep from "./Glp2BMICalculatorStep";
+import Glp2GoalWeightStep from "./Glp2GoalWeightStep";
 import Glp2BeforeAfterStep from "./Glp2BeforeAfterStep";
 import Glp2BeforeAfterStep2 from "./Glp2BeforeAfterStep2";
 import Glp2BeforeAfterStep3 from "./Glp2BeforeAfterStep3";
@@ -18,6 +19,8 @@ import Glp2WillingnessStep from "./Glp2WillingnessStep";
 import Glp2WeightChangedStep from "./Glp2WeightChangedStep";
 import Glp2MedicationPriorityStep from "./Glp2MedicationPriorityStep";
 import Glp2StateOfMindStep from "./Glp2StateOfMindStep";
+import Glp2DobStep from "./Glp2DobStep";
+import Glp2ContactAuthStep from "./Glp2ContactAuthStep";
 import Form from "../../components/Form";
 import MessageForQuiz from "../../components/MessageForQuiz";
 
@@ -186,6 +189,14 @@ const Glp2GenericQuestionStep = ({
             setUserData={setUserData}
           />
         );
+      case "goalWeight":
+        return (
+          <Glp2GoalWeightStep
+            userData={userData}
+            setUserData={setUserData}
+            onContinue={handleContinue}
+          />
+        );
       case "beforeAfter":
         return <Glp2BeforeAfterStep onContinue={handleContinue} />;
       case "beforeAfter2":
@@ -249,6 +260,22 @@ const Glp2GenericQuestionStep = ({
             onContinue={handleContinue}
           />
         );
+      case "glp2Dob":
+        return (
+          <Glp2DobStep
+            userData={userData}
+            setUserData={setUserData}
+            onContinue={handleContinue}
+          />
+        );
+      case "glp2ContactAuth":
+        return (
+          <Glp2ContactAuthStep
+            userData={userData}
+            setUserData={setUserData}
+            onContinue={handleContinue}
+          />
+        );
       case "form":
         return (
           <Form
@@ -269,6 +296,7 @@ const Glp2GenericQuestionStep = ({
   }
 
   const isBmiStep = stepConfig?.id === "currentWeight";
+  const isGoalWeightStep = stepConfig?.type === "goalWeight";
   const isBeforeAfterStep = stepConfig?.type === "beforeAfter";
   const isBeforeAfterStep2 = stepConfig?.type === "beforeAfter2";
   const isBeforeAfterStep3 = stepConfig?.type === "beforeAfter3";
@@ -280,8 +308,11 @@ const Glp2GenericQuestionStep = ({
   const isMedicationPriorityStep =
     stepConfig?.type === "medicationPriorityQuestion";
   const isStateOfMindStep = stepConfig?.type === "stateOfMindQuestion";
+  const isGlp2DobStep = stepConfig?.type === "glp2Dob";
+  const isGlp2ContactAuthStep = stepConfig?.type === "glp2ContactAuth";
   const isCustomFullLayoutStep =
     isBmiStep ||
+    isGoalWeightStep ||
     isBeforeAfterStep ||
     isBeforeAfterStep2 ||
     isBeforeAfterStep3 ||
@@ -291,9 +322,12 @@ const Glp2GenericQuestionStep = ({
     isWillingnessStep ||
     isWeightChangedStep ||
     isMedicationPriorityStep ||
-    isStateOfMindStep;
+    isStateOfMindStep ||
+    isGlp2DobStep ||
+    isGlp2ContactAuthStep;
 
   if (
+    isGoalWeightStep ||
     isBeforeAfterStep ||
     isBeforeAfterStep2 ||
     isBeforeAfterStep3 ||
@@ -303,7 +337,9 @@ const Glp2GenericQuestionStep = ({
     isWillingnessStep ||
     isWeightChangedStep ||
     isMedicationPriorityStep ||
-    isStateOfMindStep
+    isStateOfMindStep ||
+    isGlp2DobStep ||
+    isGlp2ContactAuthStep
   ) {
     return <>{renderQuestion()}</>;
   }

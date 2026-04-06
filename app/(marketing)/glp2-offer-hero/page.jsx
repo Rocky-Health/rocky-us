@@ -1,5 +1,7 @@
 import Section from "@/components/utils/Section";
 import GLP1HeroSection from "@/components/GLP1Offer/GLP1HeroSection";
+import Glp2OfferPromoBar from "@/components/GLP1Offer/Glp2OfferPromoBar";
+import Glp2OfferHeader from "@/components/GLP1Offer/Glp2OfferHeader";
 import GLP1ProductTiers from "@/components/GLP1Offer/GLP1ProductTiers";
 import GLP1StatsSection from "@/components/GLP1Offer/GLP1StatsSection";
 import GLP1TestimonialsShowcase from "@/components/GLP1Offer/GLP1TestimonialsShowcase";
@@ -31,9 +33,13 @@ export default async function GLP2OfferHeroPage() {
 
   return (
     <main>
+      {/* Promo banner + custom header (replaces global Navbar) */}
+      <Glp2OfferPromoBar />
+      <Glp2OfferHeader ctaHref={ctaHref} />
+
       {/* 1. Hero Section */}
       <section className="bg-[#F4F3EF]">
-        <GLP1HeroSection ctaHref={ctaHref} />
+        <GLP1HeroSection ctaHref={ctaHref} hideProudPartner />
       </section>
 
       {/* Rocky In The News */}

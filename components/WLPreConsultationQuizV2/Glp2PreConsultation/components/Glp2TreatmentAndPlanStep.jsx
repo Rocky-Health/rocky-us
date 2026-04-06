@@ -107,11 +107,18 @@ const Glp2TreatmentAndPlanStep = ({
 
   useEffect(() => {
     if (!productsToRender.length) return;
+    const semaProduct =
+      productsToRender.find((p) => String(p?.id || "") === "489798") ||
+      productsToRender[0];
+    if (!selectedProduct) {
+      setSelectedProduct(semaProduct);
+      return;
+    }
     if (
       selectedProduct &&
       !ALLOWED_PRODUCT_IDS.includes(String(selectedProduct.id || ""))
     ) {
-      setSelectedProduct(null);
+      setSelectedProduct(semaProduct);
     }
   }, [productsToRender, selectedProduct, setSelectedProduct]);
 

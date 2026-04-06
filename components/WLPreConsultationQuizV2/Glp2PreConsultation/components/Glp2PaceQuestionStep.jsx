@@ -3,6 +3,20 @@
 import React from "react";
 import { FaArrowRight } from "react-icons/fa";
 
+const LOW_RATE  = 0.015;
+const HIGH_RATE = 0.01666;
+
+function computeProjection(weight, goalWeight) {
+    const w   = parseFloat(weight)     || 0;
+    const g   = parseFloat(goalWeight) || 0;
+    const lbs = Math.max(w - g, 0);
+    const lossPerWeekLow  = +(w * LOW_RATE).toFixed(2);
+    const lossPerWeekHigh = +(w * HIGH_RATE).toFixed(2);
+    const weeksToGoal     = lossPerWeekLow > 0 ? +(lbs / lossPerWeekLow).toFixed(2) : null;
+    const weeksToGoalFast = lossPerWeekHigh > 0 ? +(lbs / lossPerWeekHigh).toFixed(2) : null;
+    return { lbs, lossPerWeekLow, lossPerWeekHigh, weeksToGoal, weeksToGoalFast, goalWeight: g };
+}
+
 const OPTIONS = [
     { value: "works-for-me", label: "Works for me" },
     { value: "faster", label: "I want it faster" },
@@ -11,6 +25,10 @@ const OPTIONS = [
 
 const Glp2PaceQuestionStep = ({ userData, setUserData, onContinue }) => {
     const selectedValue = userData?.pacePreference || "";
+    const { lossPerWeekLow, lossPerWeekHigh, weeksToGoal, goalWeight } =
+        computeProjection(userData?.weight, userData?.goalWeight);
+
+    const hasProjection = lossPerWeekLow > 0 && goalWeight > 0;
 
     const handleSelect = (value) => {
         setUserData((prev) => ({
@@ -21,14 +39,22 @@ const Glp2PaceQuestionStep = ({ userData, setUserData, onContinue }) => {
 
     return (
         <div className="w-full h-full flex flex-col px-4 md:px-0">
-            <div className="w-full md:w-[580px] mx-auto flex-grow  headers-font">
+            <div className="w-full md:w-[580px] mx-auto flex-grow headers-font">
                 <h1 className="headers-font text-[32px] leading-[105%] text-[#251F20] mb-10">
-                    With Medication, You&apos;ll Lose 3.75 To 4.17 Pounds{" "}
+                    {hasProjection ? (
+                        <>
+                            With Medication, You&apos;ll Lose {lossPerWeekLow} To{" "}
+                            {lossPerWeekHigh} Pounds{" "}
+                        </>
+                    ) : (
+                        "With Medication, You'll Lose Weight "
+                    )}
                     <span className="text-[#AE7E56]">Per Week.</span>
                 </h1>
                 <p className="text-[18px] leading-[130%] text-[#00000099] mb-[24px]">
-                    It will take about 24.0 weeks to reach your goal weight of
-                    160.
+                    {hasProjection && weeksToGoal
+                        ? `It will take about ${weeksToGoal} weeks to reach your goal weight of ${goalWeight}.`
+                        : "You're on your way to reaching your goal weight."}
                 </p>
 
                 <h2 className="headers-font text-[24px] leading-[115%] text-[#000000] mb-[24px]">

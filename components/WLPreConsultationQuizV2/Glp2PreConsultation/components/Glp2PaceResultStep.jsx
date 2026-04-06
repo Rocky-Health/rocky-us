@@ -3,31 +3,45 @@
 import React from "react";
 import { FaArrowRight } from "react-icons/fa";
 
-const CONSTANT_METABOLISM_LINE =
-  "Now, let’s analyze your metabolism and discover how well your body processes macronutrients.";
+const HIGH_RATE = 0.0175;
 
-const RESULT_COPY = {
-  "works-for-me": {
-    title: "Perfect!",
-    bodyLead: "Losing 90lbs Is Easier Than You Think - And It ",
-    bodyHighlight: "Doesn’t Involve Restrictive Diets.",
-  },
-  faster: {
-    title: "Not a problem, we can move faster.",
-    bodyLead:
-      "It will take some work, but with GLP-1 medication, your goal to lose 67lbs can be achieved in about 17.25 weeks - and it ",
-    bodyHighlight: "doesn’t involve restrictive diets.",
-  },
-  "too-fast": {
-    title: "We'll move at your pace.",
-    bodyLead:
-      "With GLP-1 medication, your goal to lose 67lbs is easier than you think - and it ",
-    bodyHighlight: "doesn’t involve restrictive diets.",
-  },
-};
+function computeProjection(weight, goalWeight) {
+  const w   = parseFloat(weight)     || 0;
+  const g   = parseFloat(goalWeight) || 0;
+  const lbs = Math.max(w - g, 0);
+  const lossPerWeekHigh = +(w * HIGH_RATE).toFixed(2);
+  const weeksToGoalFast = lossPerWeekHigh > 0 ? +(lbs / lossPerWeekHigh).toFixed(2) : null;
+  return { lbs, weeksToGoalFast };
+}
+
+const CONSTANT_METABOLISM_LINE =
+  "Now, let's analyze your metabolism and discover how well your body processes macronutrients.";
 
 const Glp2PaceResultStep = ({ userData, onContinue }) => {
   const selected = userData?.pacePreference || "works-for-me";
+  const { lbs, weeksToGoalFast } = computeProjection(userData?.weight, userData?.goalWeight);
+  const lbsLabel = lbs > 0 ? `${lbs}lbs` : "your goal weight";
+
+  const RESULT_COPY = {
+    "works-for-me": {
+      title: "Perfect!",
+      bodyLead: `Losing ${lbsLabel} Is Easier Than You Think \u2014 And It `,
+      bodyHighlight: "Doesn\u2019t Involve Restrictive Diets.",
+    },
+    faster: {
+      title: "Not a problem, we can move faster.",
+      bodyLead: weeksToGoalFast
+        ? `It will take some work, but with GLP-1 medication, your goal to lose ${lbsLabel} can be achieved in about ${weeksToGoalFast} weeks \u2014 and it `
+        : `With GLP-1 medication, your goal to lose ${lbsLabel} can be achieved faster \u2014 and it `,
+      bodyHighlight: "doesn\u2019t involve restrictive diets.",
+    },
+    "too-fast": {
+      title: "We\u2019ll move at your pace.",
+      bodyLead: `With GLP-1 medication, your goal to lose ${lbsLabel} is easier than you think \u2014 and it `,
+      bodyHighlight: "doesn\u2019t involve restrictive diets.",
+    },
+  };
+
   const copy = RESULT_COPY[selected] || RESULT_COPY["works-for-me"];
 
   return (
@@ -42,7 +56,7 @@ const Glp2PaceResultStep = ({ userData, onContinue }) => {
           <span className="text-[#AE7E56]">{copy.bodyHighlight}</span>
         </p>
 
-        <p className="text-[18px] md:text-[22px] leading-[135%] text-[#6F6F6F] ">
+        <p className="text-[18px] md:text-[22px] leading-[135%] text-[#6F6F6F]">
           {CONSTANT_METABOLISM_LINE}
         </p>
       </div>
