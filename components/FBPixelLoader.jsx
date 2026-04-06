@@ -15,7 +15,7 @@ const PIXEL_IDS = {
 
 const ROUTE_PREFIXES = {
   ED: ["pre-ed", "ed", "ed-pre", "ed-flow", "ed-consultation", "ed-prequiz", "erectile-dysfunction", "sex"],
-  WL: ["pre-wl", "wl", "wl-pre", "wl-consultation", "weight-loss", "body-optimization", "bo"],
+  WL: ["pre-wl", "wl", "wl-pre", "wl-consultation", "weight-loss", "body-optimization", "bo", "glp1", "glp2"],
   HL: ["hair", "hairloss", "hair-loss", "hair-main-questionnaire", "hair-pre-consultation", "hair-flow", "hair-products"],
   SMOKING: ["smoking", "smoking-consultation", "zonnic"],
   SKINCARE: ["skincare", "skin-care", "acne", "anti-aging", "anti-ageing", "hyperpigmentation", "hyper-pigmentation"],
