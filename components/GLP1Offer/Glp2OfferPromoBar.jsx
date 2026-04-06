@@ -22,10 +22,10 @@ const Glp2OfferPromoBar = () => {
     <div className="w-full bg-[#0a0a0a] py-2.5 px-4 flex flex-col items-center justify-center gap-1.5">
       <p className="flex items-center gap-1.5 text-white text-[13px] md:text-[14px] font-semibold leading-none">
         <TagIcon />
-        Limited Time: $99 OFF
+        Limited Time: $100 OFF
       </p>
       <span className="inline-flex items-center gap-1.5 bg-[#22c55e] text-white text-[12px] md:text-[13px] font-semibold px-4 py-1 rounded-full leading-none">
-        $99 OFF
+        $100 OFF
         <span className="font-normal">all weight loss plans</span>
       </span>
     </div>

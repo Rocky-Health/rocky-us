@@ -1,14 +1,102 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { FaArrowRight, FaCheck } from "react-icons/fa6";
-import NewHighlightV2 from "@/components/BodyOptimization/bo3/NewHighlightV2";
 import NewProudPartner from "@/components/BodyOptimization/bo3/NewProudPartner";
+
+const RESULTS = [
+  {
+    name: "Anthony",
+    duration: "52 lbs in 17 months",
+    before:
+      "https://myrocky.b-cdn.net/WP%20Images/Weight%20Loss/wl-1-before.webp",
+    after:
+      "https://myrocky.b-cdn.net/WP%20Images/Weight%20Loss/wl-1-after.webp",
+  },
+  {
+    name: "Ashley",
+    duration: "33 lbs in 15 months",
+    before:
+      "https://myrocky.b-cdn.net/WP%20Images/Weight%20Loss/wl-2-before.webp",
+    after:
+      "https://myrocky.b-cdn.net/WP%20Images/Weight%20Loss/wl-2-after.webp",
+  },
+  {
+    name: "Pedro",
+    duration: "17 lbs in 11 months",
+    before:
+      "https://myrocky.b-cdn.net/WP%20Images/Weight%20Loss/wl-3-before.webp",
+    after:
+      "https://myrocky.b-cdn.net/WP%20Images/Weight%20Loss/wl-3-after.webp",
+  },
+  {
+    name: "Stephen",
+    duration: "19 lbs in 8 months",
+    before:
+      "https://myrocky.b-cdn.net/WP%20Images/Weight%20Loss/wl-4-before.webp",
+    after:
+      "https://myrocky.b-cdn.net/WP%20Images/Weight%20Loss/wl-4-after.webp",
+  },
+];
+
+const BeforeAfterStrip = () => (
+  <div className="w-full overflow-x-auto no-scrollbar px-4 md:px-6 py-4">
+    <div className="flex gap-3 md:gap-4 justify-start md:justify-center w-max md:w-full mx-auto">
+      {RESULTS.map((r) => (
+        <div
+          key={r.name}
+          className="shrink-0 bg-white rounded-2xl overflow-hidden shadow-md w-[200px] md:w-[220px]"
+        >
+          {/* Duration badge */}
+          <div className="px-3 pt-3 pb-2 flex justify-center">
+            <span className="inline-block bg-[#F0E8DF] text-[#AE7E56]  text-[11px] md:text-[12px] font-semibold px-3 py-1 rounded-full">
+              {r.duration}
+            </span>
+          </div>
+          {/* Image pair */}
+          <div className="flex gap-1 px-2 pb-2">
+            <div className="flex-1 flex flex-col gap-1">
+              <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden">
+                <Image
+                  src={r.before}
+                  alt={`${r.name} before`}
+                  fill
+                  className="object-cover"
+                  sizes="90px"
+                  unoptimized
+                />
+              </div>
+              <p className="text-center text-[11px] text-[#888] font-medium">
+                Before
+              </p>
+            </div>
+            <div className="flex-1 flex flex-col gap-1">
+              <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden">
+                <Image
+                  src={r.after}
+                  alt={`${r.name} after`}
+                  fill
+                  className="object-cover"
+                  sizes="90px"
+                  unoptimized
+                />
+              </div>
+              <p className="text-center text-[11px] text-[#888] font-medium">
+                After
+              </p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 const GLP1HeroSection = ({ ctaHref = "#", hideProudPartner = false }) => {
   return (
     <section className="w-full relative bg-[#F4F3EF] mx-auto max-w-[1440px]">
-      <div className="pt-8 pb-20 md:pb-28 px-5 md:px-0 max-w-[1200px] mx-auto relative">
+      <div className="pt-8 pb-10 md:pb-20 px-5 md:px-0 max-w-[1200px] mx-auto relative">
         <div className="flex flex-col items-center text-center max-w-[700px] mx-auto">
           <div className="flex items-center gap-1 mb-2">
             {[...Array(5)].map((_, i) => (
@@ -105,9 +193,9 @@ const GLP1HeroSection = ({ ctaHref = "#", hideProudPartner = false }) => {
         </div>
       </div>
 
-      {/* Highlight bar overlay at bottom */}
-      <div className="absolute bottom-0 left-0 right-0 translate-y-3/4 z-10">
-        <NewHighlightV2 />
+      {/* Before/After strip overlay at bottom */}
+      <div className=" z-10">
+        <BeforeAfterStrip />
       </div>
     </section>
   );
