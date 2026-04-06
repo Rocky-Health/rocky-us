@@ -5,11 +5,18 @@ import { FaArrowRight, FaCheck } from "react-icons/fa6";
 import NewHighlightV2 from "@/components/BodyOptimization/bo3/NewHighlightV2";
 import NewProudPartner from "@/components/BodyOptimization/bo3/NewProudPartner";
 
-const GLP1HeroSection = ({ ctaHref = "#" }) => {
+const GLP1HeroSection = ({ ctaHref = "#", hideProudPartner = false }) => {
   return (
     <section className="w-full relative bg-[#F4F3EF] mx-auto max-w-[1440px]">
       <div className="pt-8 pb-20 md:pb-28 px-5 md:px-0 max-w-[1200px] mx-auto relative">
         <div className="flex flex-col items-center text-center max-w-[700px] mx-auto">
+          <div className="flex items-center gap-1 mb-2">
+            {[...Array(5)].map((_, i) => (
+              <svg key={i} width="20" height="20" viewBox="0 0 24 24" fill="#F59E0B" aria-hidden="true">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
+            ))}
+          </div>
           <p className="text-black poppins-font text-[14px] md:text-[16px] font-[400] leading-[100%] flex items-center gap-2 mb-4 md:mb-6">
             Trusted by 350,000+ Patients
           </p>
@@ -37,7 +44,16 @@ const GLP1HeroSection = ({ ctaHref = "#" }) => {
                 <FaCheck className="w-3 h-3" />
               </span>
               <p className="text-black poppins-font text-[15px] md:text-[16px] font-[400] leading-[140%]">
-                100% online medical review with licensed providers
+                100% online medical visit. Injections and oral options
+                available.
+              </p>
+            </li>
+            <li className="flex items-center gap-3">
+              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#AE7E56] text-white flex-shrink-0">
+                <FaCheck className="w-3 h-3" />
+              </span>
+              <p className="font-[600] text-black poppins-font text-[15px] md:text-[16px] leading-[140%]">
+                Same price, every dose. No hidden fees.
               </p>
             </li>
             <li className="flex items-center gap-3">
@@ -45,10 +61,7 @@ const GLP1HeroSection = ({ ctaHref = "#" }) => {
                 <FaCheck className="w-3 h-3" />
               </span>
               <p className="text-black poppins-font text-[15px] md:text-[16px] leading-[140%]">
-                <span className="font-[600]">No insurance required</span>
-                <span className="text-[rgba(0,0,0,0.60)] ml-2">
-                  Simple monthly plan
-                </span>
+                Prescription & telemed visits included. No insurance required.
               </p>
             </li>
             <li className="flex items-center gap-3">
@@ -56,18 +69,7 @@ const GLP1HeroSection = ({ ctaHref = "#" }) => {
                 <FaCheck className="w-3 h-3" />
               </span>
               <p className="text-black poppins-font text-[15px] md:text-[16px] leading-[140%]">
-                Transparent pricing
-                <span className="text-[rgba(0,0,0,0.60)] ml-2">
-                  No hidden fees
-                </span>
-              </p>
-            </li>
-            <li className="flex items-center gap-3">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#AE7E56] text-white flex-shrink-0">
-                <FaCheck className="w-3 h-3" />
-              </span>
-              <p className="text-black poppins-font text-[15px] md:text-[16px] leading-[140%]">
-                Discreet delivery
+                Free shipping. Arrives in 1–2 days.
               </p>
             </li>
           </ul>
@@ -86,13 +88,15 @@ const GLP1HeroSection = ({ ctaHref = "#" }) => {
             thing you&apos;ll lose is extra weight.
           </p>
 
-          <div className="w-full flex justify-center">
-            <NewProudPartner
-              section={true}
-              bg="bg-[#F4F3EF] mx-auto"
-              hideMapleLeaf={true}
-            />
-          </div>
+          {!hideProudPartner && (
+            <div className="w-full flex justify-center">
+              <NewProudPartner
+                section={true}
+                bg="bg-[#F4F3EF] mx-auto"
+                hideMapleLeaf={true}
+              />
+            </div>
+          )}
         </div>
       </div>
 
