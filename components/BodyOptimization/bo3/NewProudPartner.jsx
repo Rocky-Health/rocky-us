@@ -1,6 +1,10 @@
 import CustomContainImage from "@/components/utils/CustomContainImage";
 
-const ProudPartner = ({ section = false, bg = "bg-white", hideMapleLeaf = false }) => {
+const ProudPartner = ({
+  section = false,
+  bg = "bg-white",
+  hideMapleLeaf = false,
+}) => {
   const rockyLogoSize = "h-[28px] w-[72px]";
   const nbaLogoSize = "w-[16px] h-[36px]";
   const blueJaysLogoSize = "w-[45px] h-[38px]";
@@ -15,7 +19,9 @@ const ProudPartner = ({ section = false, bg = "bg-white", hideMapleLeaf = false 
     <div
       className={`flex flex-row items-center justify-center bg-transparent ${desktopBg} w-[285.1812px] h-[40px] overflow-hidden`}
     >
-      <div className={`flex flex-row items-center gap-[15px] ${rowWidthClass}`}>
+      <div
+        className={`flex flex-row items-center gap-[15px] justify-center ${rowWidthClass}`}
+      >
         <div className="text-center flex flex-col items-center justify-center">
           <div className={`relative overflow-hidden ${rockyLogoSize}`}>
             <CustomContainImage
@@ -59,7 +65,6 @@ const ProudPartner = ({ section = false, bg = "bg-white", hideMapleLeaf = false 
               />
             </div>
           )}
-          
         </div>
       </div>
     </div>

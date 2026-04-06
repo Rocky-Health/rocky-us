@@ -12,7 +12,14 @@ const GLP1HeroSection = ({ ctaHref = "#", hideProudPartner = false }) => {
         <div className="flex flex-col items-center text-center max-w-[700px] mx-auto">
           <div className="flex items-center gap-1 mb-2">
             {[...Array(5)].map((_, i) => (
-              <svg key={i} width="20" height="20" viewBox="0 0 24 24" fill="#F59E0B" aria-hidden="true">
+              <svg
+                key={i}
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="#F59E0B"
+                aria-hidden="true"
+              >
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
               </svg>
             ))}
@@ -88,15 +95,13 @@ const GLP1HeroSection = ({ ctaHref = "#", hideProudPartner = false }) => {
             thing you&apos;ll lose is extra weight.
           </p>
 
-          {!hideProudPartner && (
-            <div className="w-full flex justify-center">
-              <NewProudPartner
-                section={true}
-                bg="bg-[#F4F3EF] mx-auto"
-                hideMapleLeaf={true}
-              />
-            </div>
-          )}
+          <div className="w-full flex justify-center">
+            <NewProudPartner
+              section={true}
+              bg="bg-[#F4F3EF] mx-auto"
+              hideMapleLeaf={true}
+            />
+          </div>
         </div>
       </div>
 
