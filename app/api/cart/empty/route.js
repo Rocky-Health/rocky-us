@@ -29,21 +29,41 @@ export async function POST() {
       });
     }
 
-    // For authenticated users, call the WordPress REST API endpoint
+    // For authenticated users, call the WordPress REST API endpoint.
+    // Run the empty-cart POST and a cart GET (for nonce) in parallel.
+    // The custom empty-cart endpoint does not return a WC nonce header, so we
+    // fetch the cart simultaneously to reliably capture the nonce.
     try {
-      const response = await axios.post(
-        `${BASE_URL}/wp-json/custom/v1/empty-cart`,
-        {},
-        {
-          headers: {
-            Authorization: `${encodedCredentials.value}`,
-            "X-WP-Nonce": nonce,
-          },
-        }
-      );
+      const [response] = await Promise.all([
+        axios.post(
+          `${BASE_URL}/wp-json/custom/v1/empty-cart`,
+          {},
+          {
+            headers: {
+              Authorization: `${encodedCredentials.value}`,
+              "X-WP-Nonce": nonce,
+            },
+          }
+        ),
+        // Parallel nonce refresh — result is discarded, only the nonce header matters
+        axios
+          .get(`${BASE_URL}/wp-json/wc/store/cart`, {
+            headers: { Authorization: `${encodedCredentials.value}` },
+          })
+          .then((cartRes) => {
+            const freshNonce = cartRes.headers?.nonce;
+            if (freshNonce) {
+              cookieStore.set("cart-nonce", freshNonce);
+              logger.log("Cart nonce refreshed in parallel with empty-cart");
+            }
+          })
+          .catch(() => {
+            // Non-blocking — nonce fetch failure must not prevent empty from succeeding
+          }),
+      ]);
 
-      // Update the cart nonce if available
-      if (response.headers && response.headers.nonce) {
+      // Also capture nonce from empty-cart response if the custom endpoint returns one
+      if (response.headers?.nonce) {
         cookieStore.set("cart-nonce", response.headers.nonce);
       }
 
