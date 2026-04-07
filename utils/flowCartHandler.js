@@ -107,10 +107,8 @@ async function handleAuthenticatedFlow(mainProduct, addons, flowType, options) {
 
   try {
     // Flow-specific pre-processing
+    // Note: emptyCart sets a fresh cart-nonce cookie; add-items-batch reuses it via getCurrentCartNonce
     await handleFlowSpecificPreProcessing(flowType, preserveExistingCart);
-
-    // Refresh cart nonce to ensure we have a valid nonce for cart operations
-    await refreshCartNonce();
 
     // Prepare items for batch addition
     const cartItems = await prepareCartItems(mainProduct, addons, flowType, {
