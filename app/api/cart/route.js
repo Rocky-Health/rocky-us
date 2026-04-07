@@ -92,11 +92,28 @@ export async function GET() {
       });
     }
 
-    const response = await axios.get(`${BASE_URL}/wp-json/wc/store/cart`, {
-      headers: {
-        Authorization: `${encodedCredentials.value}`,
-      },
-    });
+    // Fetch cart and customer address in parallel — both are independent WP calls
+    const userId = cookieStore.get("userId");
+
+    const [response, customerResponse] = await Promise.all([
+      axios.get(`${BASE_URL}/wp-json/wc/store/cart`, {
+        headers: {
+          Authorization: `${encodedCredentials.value}`,
+        },
+      }),
+      userId
+        ? axios
+            .get(`${BASE_URL}/wp-json/wc/v3/customers/${userId.value}`, {
+              headers: {
+                Authorization: process.env.ADMIN_TOKEN || encodedCredentials.value,
+              },
+            })
+            .catch((addressError) => {
+              logger.log("Could not fetch customer address data:", addressError.message);
+              return null; // Non-blocking — address failure must not fail cart
+            })
+        : Promise.resolve(null),
+    ]);
 
     cookieStore.set("cart-nonce", response.headers.nonce);
 
@@ -107,37 +124,13 @@ export async function GET() {
       responseData.items = responseData.items || [];
     }
 
-    // Try to fetch and include user address data if not already present in cart
-    if (!responseData.billing_address && !responseData.shipping_address) {
-      try {
-        const userId = cookieStore.get("userId");
-        if (userId) {
-          // Fetch customer data to get billing and shipping addresses
-          const customerResponse = await axios.get(
-            `${BASE_URL}/wp-json/wc/v3/customers/${userId.value}`,
-            {
-              headers: {
-                Authorization: process.env.ADMIN_TOKEN || encodedCredentials.value,
-              },
-            }
-          );
-
-          const customerData = customerResponse.data;
-          if (customerData.billing || customerData.shipping) {
-            logger.log("Adding customer address data to cart response");
-            
-            // Add billing and shipping addresses to cart response
-            if (customerData.billing) {
-              responseData.billing_address = customerData.billing;
-            }
-            if (customerData.shipping) {
-              responseData.shipping_address = customerData.shipping;
-            }
-          }
-        }
-      } catch (addressError) {
-        logger.log("Could not fetch customer address data:", addressError.message);
-        // Continue without address data - not a critical error
+    // Merge customer address data if available
+    if (customerResponse?.data) {
+      const { billing, shipping } = customerResponse.data;
+      if (billing || shipping) {
+        logger.log("Adding customer address data to cart response");
+        if (billing) responseData.billing_address = billing;
+        if (shipping) responseData.shipping_address = shipping;
       }
     }
 

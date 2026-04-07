@@ -141,6 +141,10 @@ const Glp2TreatmentAndPlanStep = ({
   }, [planValues, selectedProduct]);
 
   useEffect(() => {
+    router.prefetch("/checkout");
+  }, [router]);
+
+  useEffect(() => {
     const timer = setTimeout(() => setShowLoader(false), 2000);
     return () => clearTimeout(timer);
   }, []);

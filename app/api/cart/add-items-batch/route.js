@@ -3,7 +3,7 @@ import axios from "axios";
 import { cookies } from "next/headers";
 import { logger } from "@/utils/devLogger";
 import {
-  ensureValidCartNonce,
+  getCurrentCartNonce,
   updateCartNonceFromResponse,
 } from "@/utils/nonceManager";
 
@@ -57,12 +57,12 @@ export async function POST(req) {
       );
     }
 
-    // Use unified nonce management
-    const nonceResult = await ensureValidCartNonce(
+    // Reuse the nonce set by emptyCart (or any prior cart operation); only fetch fresh if missing
+    const currentNonce = await getCurrentCartNonce(
       cookieStore,
-      encodedCredentials
+      encodedCredentials,
+      true, // refreshIfMissing — fetches from WP only when no cookie is present
     );
-    const currentNonce = nonceResult.nonce;
 
     // Build batch request structure
     const batchRequests = items.map((item) => {
