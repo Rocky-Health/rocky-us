@@ -14,7 +14,7 @@ import useDailyPatientCounter from "../hooks/useDailyPatientCounter";
 const ALLOWED_PRODUCT_IDS = ["489798", "489523"];
 const COUNTER_BASE_BY_PRODUCT = {
   489798: 872, // Semaglutide
-  489523: 621, // Tirzepatide
+  489523: 621, // Tirz
 };
 const COUNTER_ANCHOR_DATE = "2026-04-03";
 
