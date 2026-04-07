@@ -25,10 +25,10 @@ import { getOrCreateSessionId } from "@/utils/dataLayerHelper";
  * Handles prices with currency symbols like "$399" or "399.00"
  */
 function parsePrice(price) {
-  if (typeof price === 'number') return price;
+  if (typeof price === "number") return price;
   if (!price) return 0;
   // Remove all non-numeric characters except decimal point
-  const cleanPrice = String(price).replace(/[^0-9.]/g, '');
+  const cleanPrice = String(price).replace(/[^0-9.]/g, "");
   return parseFloat(cleanPrice) || 0;
 }
 
@@ -44,7 +44,7 @@ export const addToCartDirectly = async (
   mainProduct,
   addons = [],
   flowType = "ed",
-  options = {}
+  options = {},
 ) => {
   try {
     logger.log(`🛒 Starting direct cart addition for ${flowType} flow`);
@@ -62,8 +62,9 @@ export const addToCartDirectly = async (
     // Check authentication status
     const isAuthenticated = isUserAuthenticated();
     logger.log(
-      `Authentication status: ${isAuthenticated ? "Authenticated" : "Not authenticated"
-      }`
+      `Authentication status: ${
+        isAuthenticated ? "Authenticated" : "Not authenticated"
+      }`,
     );
 
     if (isAuthenticated) {
@@ -119,7 +120,7 @@ async function handleAuthenticatedFlow(mainProduct, addons, flowType, options) {
 
     logger.log(
       `🛒 Flow Handler - Prepared ${cartItems.length} items for ${flowType} flow:`,
-      cartItems
+      cartItems,
     );
 
     // Log each item details for debugging
@@ -131,7 +132,7 @@ async function handleAuthenticatedFlow(mainProduct, addons, flowType, options) {
     let cartResult;
     if (cartItems.length > 1) {
       logger.log(
-        `🛒 Flow Handler - Using BATCH endpoint for ${cartItems.length} items`
+        `🛒 Flow Handler - Using BATCH endpoint for ${cartItems.length} items`,
       );
       cartResult = await addItemsBatch(cartItems);
     } else if (cartItems.length === 1) {
@@ -150,13 +151,13 @@ async function handleAuthenticatedFlow(mainProduct, addons, flowType, options) {
       const failedItems = cartResult.failed_items || 0;
 
       logger.log(
-        `🛒 Flow Handler - Items check: Expected=${expectedItems}, Added=${addedItems}, Failed=${failedItems}`
+        `🛒 Flow Handler - Items check: Expected=${expectedItems}, Added=${addedItems}, Failed=${failedItems}`,
       );
 
       // If we have failed items or didn't add all expected items, treat as failure
       if (failedItems > 0 || addedItems < expectedItems) {
         logger.error(
-          `🛒 Flow Handler - Partial failure detected: ${addedItems}/${expectedItems} items added`
+          `🛒 Flow Handler - Partial failure detected: ${addedItems}/${expectedItems} items added`,
         );
 
         // Log specific errors for debugging
@@ -165,13 +166,13 @@ async function handleAuthenticatedFlow(mainProduct, addons, flowType, options) {
         }
 
         throw new Error(
-          `Unable to add all products to cart (${addedItems}/${expectedItems} successful). Please try again or contact support if the problem persists.`
+          `Unable to add all products to cart (${addedItems}/${expectedItems} successful). Please try again or contact support if the problem persists.`,
         );
       }
 
       // All items added successfully
       logger.log(
-        `✅ Flow Handler - All ${addedItems} items added successfully`
+        `✅ Flow Handler - All ${addedItems} items added successfully`,
       );
 
       // Add flow-specific consultation requirements
@@ -181,7 +182,7 @@ async function handleAuthenticatedFlow(mainProduct, addons, flowType, options) {
       const checkoutUrl = generateFlowCheckoutUrl(
         flowType,
         true,
-        checkoutQueryParams
+        checkoutQueryParams,
       );
 
       return {
@@ -209,7 +210,7 @@ async function handleUnauthenticatedFlow(
   mainProduct,
   addons,
   flowType,
-  options
+  options,
 ) {
   const {
     requireConsultation,
@@ -220,7 +221,7 @@ async function handleUnauthenticatedFlow(
 
   try {
     logger.log(
-      `🛒 Unauthenticated flow - Adding products to cart for ${flowType} flow`
+      `🛒 Unauthenticated flow - Adding products to cart for ${flowType} flow`,
     );
 
     // Prepare and add main product to cart
@@ -254,7 +255,8 @@ async function handleUnauthenticatedFlow(
         if (
           !addonVariation.some(
             (v) =>
-              v.attribute === "Subscription Type" || v.attribute === "Frequency"
+              v.attribute === "Subscription Type" ||
+              v.attribute === "Frequency",
           )
         ) {
           if (addon.frequency) {
@@ -262,10 +264,7 @@ async function handleUnauthenticatedFlow(
               attribute: "Frequency",
               value: addon.frequency,
             });
-          } else if (
-            addon.dataType === "simple" ||
-            !addon.isSubscription
-          ) {
+          } else if (addon.dataType === "simple" || !addon.isSubscription) {
             addonVariation.push({
               attribute: "Subscription Type",
               value: "One-time Purchase",
@@ -285,11 +284,7 @@ async function handleUnauthenticatedFlow(
           productId: extractProductId(addon),
           variationId: addon.variationId || addon.dataAddToCart,
           quantity: 1,
-          name:
-            addon.title ||
-            addon.name ||
-            addon.dataName ||
-            "Add-on Product",
+          name: addon.title || addon.name || addon.dataName || "Add-on Product",
           price: addonPriceInCents,
           image:
             addon.image ||
@@ -311,7 +306,7 @@ async function handleUnauthenticatedFlow(
     // For WL flow, add Body Optimization Program as required addon
     if (flowType === "wl") {
       logger.log(
-        "🛒 Adding Body Optimization Program for WL flow via cartService"
+        "🛒 Adding Body Optimization Program for WL flow via cartService",
       );
       const bodyOptimizationData = {
         productId: "148515",
@@ -338,10 +333,10 @@ async function handleUnauthenticatedFlow(
 
     localStorage.setItem(
       "flow_cart_products",
-      JSON.stringify(savedProductData)
+      JSON.stringify(savedProductData),
     );
     logger.log(
-      `Saved ${flowType} flow products to localStorage for post-login processing`
+      `Saved ${flowType} flow products to localStorage for post-login processing`,
     );
 
     // Add flow-specific consultation requirements to localStorage
@@ -351,14 +346,14 @@ async function handleUnauthenticatedFlow(
     const cartData = getLocalCart();
     logger.log(
       "✅ Products added to localStorage cart via cartService:",
-      cartData
+      cartData,
     );
 
     // Generate login URL with proper redirect
     const loginUrl = generateLoginUrl(
       flowType,
       requireConsultation,
-      checkoutQueryParams
+      checkoutQueryParams,
     );
 
     return {
@@ -407,11 +402,11 @@ function formatCartDataForDisplay(cartServiceData) {
 async function handleUnauthenticatedEarlyAddition(
   mainProduct,
   flowType,
-  options
+  options,
 ) {
   try {
     logger.log(
-      `🛒 Early addition via cartService for ${flowType} flow (unauthenticated)`
+      `🛒 Early addition via cartService for ${flowType} flow (unauthenticated)`,
     );
 
     const { requireConsultation, subscriptionPeriod, varietyPackId } = options;
@@ -434,7 +429,7 @@ async function handleUnauthenticatedEarlyAddition(
 
     logger.log("🛒 Adding main product via cartService:", mainProductData);
     logger.log(
-      `💰 Price conversion: $${priceInDollars} → ${priceInCents} cents`
+      `💰 Price conversion: $${priceInDollars} → ${priceInCents} cents`,
     );
 
     // Add main product to localStorage cart via cartService
@@ -443,7 +438,7 @@ async function handleUnauthenticatedEarlyAddition(
     // For WL flow, add Body Optimization Program as required addon
     if (flowType === "wl") {
       logger.log(
-        "🛒 Adding Body Optimization Program for WL flow via cartService"
+        "🛒 Adding Body Optimization Program for WL flow via cartService",
       );
       const bodyOptimizationData = {
         productId: "148515",
@@ -466,12 +461,14 @@ async function handleUnauthenticatedEarlyAddition(
     const cartData = getLocalCart();
     logger.log(
       "✅ Products added to localStorage cart via cartService:",
-      cartData
+      cartData,
     );
 
     // Fire add_to_cart analytics event
     try {
-      const itemId = String(extractProductId(mainProduct) || mainProduct.variationId || "");
+      const itemId = String(
+        extractProductId(mainProduct) || mainProduct.variationId || "",
+      );
       analyticsService.trackAddToCart(
         {
           id: itemId,
@@ -482,7 +479,9 @@ async function handleUnauthenticatedEarlyAddition(
           attributes: [],
         },
         1,
-        { event_id: `add_to_cart_${getOrCreateSessionId()}_${itemId}_${Date.now()}` }
+        {
+          event_id: `add_to_cart_${getOrCreateSessionId()}_${itemId}_${Date.now()}`,
+        },
       );
     } catch (_) {
       // non-blocking
@@ -499,7 +498,7 @@ async function handleUnauthenticatedEarlyAddition(
   } catch (error) {
     logger.error(
       `Error in unauthenticated early addition for ${flowType}:`,
-      error
+      error,
     );
     return {
       success: false,
@@ -516,11 +515,11 @@ async function handleUnauthenticatedEarlyAddition(
 async function handleUnauthenticatedAddonAddition(
   addonProduct,
   flowType,
-  options
+  options,
 ) {
   try {
     logger.log(
-      `🛒 Adding addon via cartService for ${flowType} flow (unauthenticated)`
+      `🛒 Adding addon via cartService for ${flowType} flow (unauthenticated)`,
     );
 
     // Build variation data for addon if not already provided
@@ -530,7 +529,7 @@ async function handleUnauthenticatedAddonAddition(
     if (
       !addonVariation.some(
         (v) =>
-          v.attribute === "Subscription Type" || v.attribute === "Frequency"
+          v.attribute === "Subscription Type" || v.attribute === "Frequency",
       )
     ) {
       if (addonProduct.frequency) {
@@ -563,7 +562,7 @@ async function handleUnauthenticatedAddonAddition(
     // Prepare addon for cartService
     // Convert price from dollars to cents (flow config files use dollars)
     const addonPriceInDollars = parseFloat(
-      addonProduct.price || addonProduct.dataPrice || 0
+      addonProduct.price || addonProduct.dataPrice || 0,
     );
     const addonPriceInCents = addonPriceInDollars * 100;
 
@@ -591,7 +590,7 @@ async function handleUnauthenticatedAddonAddition(
 
     logger.log("🛒 Adding addon via cartService:", addonData);
     logger.log(
-      `💰 Addon price conversion: $${addonPriceInDollars} → ${addonPriceInCents} cents`
+      `💰 Addon price conversion: $${addonPriceInDollars} → ${addonPriceInCents} cents`,
     );
 
     // Add addon to localStorage cart via cartService
@@ -601,7 +600,7 @@ async function handleUnauthenticatedAddonAddition(
     const cartData = getLocalCart();
     logger.log(
       "✅ Addon added to localStorage cart via cartService:",
-      cartData
+      cartData,
     );
 
     // Return success with cart data formatted for display
@@ -649,7 +648,7 @@ async function prepareCartItems(mainProduct, addons, flowType, options) {
   if (mainProduct) {
     logger.log(
       `🛒 Flow Handler - Preparing main product for ${flowType} flow:`,
-      mainProduct
+      mainProduct,
     );
 
     // Check if this is a variety pack with comma-separated product IDs
@@ -662,7 +661,7 @@ async function prepareCartItems(mainProduct, addons, flowType, options) {
       const productIds = productId.split(",").map((id) => id.trim());
       logger.log(
         `🛒 Flow Handler - Variety pack detected, splitting into ${productIds.length} products:`,
-        productIds
+        productIds,
       );
 
       productIds.forEach((singleProductId, index) => {
@@ -706,7 +705,7 @@ async function prepareCartItems(mainProduct, addons, flowType, options) {
         items.push(mainItem);
         logger.log(
           `🛒 Flow Handler - Variety pack item ${index + 1} prepared:`,
-          mainItem
+          mainItem,
         );
       });
     } else {
@@ -724,7 +723,7 @@ async function prepareCartItems(mainProduct, addons, flowType, options) {
       if (mainProduct.variationId) {
         mainItem.variationId = mainProduct.variationId;
         logger.log(
-          `🛒 Flow Handler - Using variation ID: ${mainProduct.variationId} for product: ${mainItem.productId}`
+          `🛒 Flow Handler - Using variation ID: ${mainProduct.variationId} for product: ${mainItem.productId}`,
         );
       }
 
@@ -736,7 +735,7 @@ async function prepareCartItems(mainProduct, addons, flowType, options) {
         subscriptionPeriod
       ) {
         logger.log(
-          `Subscription product ${mainItem.productId} without variation ID - letting API handle variation lookup for period: ${subscriptionPeriod}`
+          `Subscription product ${mainItem.productId} without variation ID - letting API handle variation lookup for period: ${subscriptionPeriod}`,
         );
         // Don't set variationId, let WooCommerce find it based on subscription attributes
       }
@@ -806,7 +805,7 @@ async function prepareCartItems(mainProduct, addons, flowType, options) {
   // WL Flow: Add required Body Optimization Program to batch
   if (flowType === "wl") {
     logger.log(
-      "🛒 Flow Handler - Adding Body Optimization Program to WL batch"
+      "🛒 Flow Handler - Adding Body Optimization Program to WL batch",
     );
     const bodyOptimizationProgram = {
       productId: "148515",
@@ -820,7 +819,7 @@ async function prepareCartItems(mainProduct, addons, flowType, options) {
     items.push(bodyOptimizationProgram);
     logger.log(
       "🛒 Flow Handler - Body Optimization Program prepared:",
-      bodyOptimizationProgram
+      bodyOptimizationProgram,
     );
   }
 
@@ -874,7 +873,7 @@ async function addSingleItem(item) {
   if (!response.ok) {
     const errorText = await response.text();
     throw new Error(
-      `Individual add failed: ${response.statusText} - ${errorText}`
+      `Individual add failed: ${response.statusText} - ${errorText}`,
     );
   }
 
@@ -903,10 +902,10 @@ function addFlowConsultationRequirements(mainProduct, flowType) {
 
     localStorage.setItem(
       `required_consultation_${productId}`,
-      JSON.stringify(consultationData)
+      JSON.stringify(consultationData),
     );
     logger.log(
-      `Added consultation requirement for ${flowType} flow, product ${productId}`
+      `Added consultation requirement for ${flowType} flow, product ${productId}`,
     );
   } catch (error) {
     logger.error("Error adding consultation requirements:", error);
@@ -921,7 +920,7 @@ function addFlowConsultationRequirements(mainProduct, flowType) {
 function generateFlowCheckoutUrl(
   flowType,
   isAuthenticated = true,
-  extraQueryParams = null
+  extraQueryParams = null,
 ) {
   const params = new URLSearchParams();
   params.set(`${flowType}-flow`, "1");
@@ -945,12 +944,12 @@ function generateFlowCheckoutUrl(
 function generateLoginUrl(
   flowType,
   requireConsultation = false,
-  extraCheckoutQueryParams = null
+  extraCheckoutQueryParams = null,
 ) {
   const baseUrl = "/login-register";
   const flowParam = `${flowType}-flow=1`;
   const checkoutRedirect = encodeURIComponent(
-    generateFlowCheckoutUrl(flowType, true, extraCheckoutQueryParams)
+    generateFlowCheckoutUrl(flowType, true, extraCheckoutQueryParams),
   );
 
   let loginUrl = `${baseUrl}?${flowParam}&onboarding=1&view=account&viewshow=register&redirect_to=${checkoutRedirect}`;
@@ -1001,7 +1000,7 @@ function generateVarietyPackId() {
  */
 export async function processSavedFlowProducts() {
   logger.warn(
-    "processSavedFlowProducts() is deprecated. Use cartService.migrateLocalCartToServer() instead."
+    "processSavedFlowProducts() is deprecated. Use cartService.migrateLocalCartToServer() instead.",
   );
   return { success: true, message: "Migration handled by cartService" };
 }
@@ -1046,7 +1045,7 @@ export const skincareFlowAddToCart = (mainProduct, addons, options) =>
 export const addToCartEarly = async (
   mainProduct,
   flowType = "ed",
-  options = {}
+  options = {},
 ) => {
   try {
     logger.log(`🛒 Early Cart Addition - Starting for ${flowType} flow`);
@@ -1062,16 +1061,15 @@ export const addToCartEarly = async (
     // Check authentication status
     const isAuthenticated = isUserAuthenticated();
     logger.log(
-      `Authentication status: ${isAuthenticated ? "Authenticated" : "Not authenticated"
-      }`
+      `Authentication status: ${
+        isAuthenticated ? "Authenticated" : "Not authenticated"
+      }`,
     );
 
     // Check for shipping restrictions (for authenticated users only)
     if (isAuthenticated) {
-      const {
-        checkShippingRestriction,
-        getUserState,
-      } = await import("@/utils/edShippingRestrictions");
+      const { checkShippingRestriction, getUserState } =
+        await import("@/utils/edShippingRestrictions");
 
       try {
         // Fetch user profile to check state
@@ -1083,12 +1081,12 @@ export const addToCartEarly = async (
             const productName = mainProduct.name || "";
 
             logger.log(
-              `[Product Restriction] Checking restriction for product "${productName}" in state "${userState}"`
+              `[Product Restriction] Checking restriction for product "${productName}" in state "${userState}"`,
             );
 
             if (userState && checkShippingRestriction(userState, mainProduct)) {
               logger.log(
-                `[Product Restriction] BLOCKING: Product "${productName}" is restricted for state: ${userState}`
+                `[Product Restriction] BLOCKING: Product "${productName}" is restricted for state: ${userState}`,
               );
               return {
                 success: false,
@@ -1100,10 +1098,7 @@ export const addToCartEarly = async (
           }
         }
       } catch (restrictionError) {
-        logger.error(
-          "Error checking shipping restriction:",
-          restrictionError
-        );
+        logger.error("Error checking shipping restriction:", restrictionError);
         // Continue with cart addition if restriction check fails
       }
     }
@@ -1140,7 +1135,7 @@ export const addToCartEarly = async (
 async function handleAuthenticatedEarlyAddition(
   mainProduct,
   flowType,
-  options
+  options,
 ) {
   const { preserveExistingCart, subscriptionPeriod, varietyPackId } = options;
 
@@ -1159,14 +1154,14 @@ async function handleAuthenticatedEarlyAddition(
 
     logger.log(
       `🛒 Early Addition - Prepared ${cartItems.length} items for ${flowType} flow:`,
-      cartItems
+      cartItems,
     );
 
     // Use batch endpoint for multiple items, individual for single item
     let cartResult;
     if (cartItems.length > 1) {
       logger.log(
-        `🛒 Early Addition - Using BATCH endpoint for ${cartItems.length} items`
+        `🛒 Early Addition - Using BATCH endpoint for ${cartItems.length} items`,
       );
       cartResult = await addItemsBatch(cartItems);
     } else if (cartItems.length === 1) {
@@ -1186,10 +1181,10 @@ async function handleAuthenticatedEarlyAddition(
 
       if (failedItems > 0 || addedItems < expectedItems) {
         logger.error(
-          `🛒 Early Addition - Partial failure: ${addedItems}/${expectedItems} items added`
+          `🛒 Early Addition - Partial failure: ${addedItems}/${expectedItems} items added`,
         );
         throw new Error(
-          `Unable to add all products to cart (${addedItems}/${expectedItems} successful).`
+          `Unable to add all products to cart (${addedItems}/${expectedItems} successful).`,
         );
       }
 
@@ -1198,7 +1193,9 @@ async function handleAuthenticatedEarlyAddition(
 
       // Fire add_to_cart analytics event
       try {
-        const itemId = String(extractProductId(mainProduct) || mainProduct.variationId || "");
+        const itemId = String(
+          extractProductId(mainProduct) || mainProduct.variationId || "",
+        );
         analyticsService.trackAddToCart(
           {
             id: itemId,
@@ -1209,7 +1206,9 @@ async function handleAuthenticatedEarlyAddition(
             attributes: [],
           },
           1,
-          { event_id: `add_to_cart_${getOrCreateSessionId()}_${itemId}_${Date.now()}` }
+          {
+            event_id: `add_to_cart_${getOrCreateSessionId()}_${itemId}_${Date.now()}`,
+          },
         );
       } catch (_) {
         // non-blocking
@@ -1248,7 +1247,7 @@ async function handleAuthenticatedEarlyAddition(
 export const addAddonToCart = async (
   addonProduct,
   flowType = "ed",
-  options = {}
+  options = {},
 ) => {
   try {
     logger.log(`🛒 Adding addon to cart for ${flowType} flow`);
@@ -1262,7 +1261,7 @@ export const addAddonToCart = async (
       return await handleUnauthenticatedAddonAddition(
         addonProduct,
         flowType,
-        options
+        options,
       );
     }
 
@@ -1343,7 +1342,7 @@ export const addAddonToCart = async (
  */
 export const finalizeFlowCheckout = (
   flowType = "ed",
-  isAuthenticated = true
+  isAuthenticated = true,
 ) => {
   logger.log(`🎯 Finalizing checkout for ${flowType} flow`);
 

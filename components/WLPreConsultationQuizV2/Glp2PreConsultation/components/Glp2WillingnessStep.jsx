@@ -4,14 +4,25 @@ import React from "react";
 import { FaArrowRight } from "react-icons/fa";
 
 const Glp2WillingnessStep = ({ userData, setUserData, config, onContinue }) => {
-    const selectedValue = userData?.[config.field] || "";
+    const selectedValues = userData?.[config.field] || [];
     const options = config?.options || [];
 
     const handleSelect = (value) => {
-        setUserData((prev) => ({
-            ...prev,
-            [config.field]: value,
-        }));
+        setUserData((prev) => {
+            const current = prev[config.field] || [];
+            let next;
+            if (value === "none") {
+                // "None of the above" clears everything else
+                next = current.includes("none") ? [] : ["none"];
+            } else {
+                // Any real option removes "none", then toggles itself
+                const withoutNone = current.filter((v) => v !== "none");
+                next = withoutNone.includes(value)
+                    ? withoutNone.filter((v) => v !== value)
+                    : [...withoutNone, value];
+            }
+            return { ...prev, [config.field]: next };
+        });
     };
 
     return (
@@ -23,7 +34,7 @@ const Glp2WillingnessStep = ({ userData, setUserData, config, onContinue }) => {
 
                 <div className="space-y-3">
                     {options.map((option) => {
-                        const checked = selectedValue === option.id;
+                        const checked = selectedValues.includes(option.id);
                         return (
                             <button
                                 key={option.id}
@@ -36,14 +47,14 @@ const Glp2WillingnessStep = ({ userData, setUserData, config, onContinue }) => {
                                 }`}
                             >
                                 <span
-                                    className={`w-[18px] h-[18px] rounded-full border flex items-center justify-center shrink-0 ${
+                                    className={`w-[18px] h-[18px] rounded-[4px] border flex items-center justify-center shrink-0 ${
                                         checked
                                             ? "border-[#AE7E56]"
                                             : "border-[#CFCFCF]"
                                     }`}
                                 >
                                     {checked ? (
-                                        <span className="w-3.5 h-3.5 rounded-full bg-[#AE7E56]" />
+                                        <span className="w-3 h-3 rounded-[2px] bg-[#AE7E56]" />
                                     ) : null}
                                 </span>
                                 <span className="text-[14px] text-[#000000] font-medium">
@@ -60,9 +71,9 @@ const Glp2WillingnessStep = ({ userData, setUserData, config, onContinue }) => {
                     <button
                         type="button"
                         onClick={() => onContinue?.()}
-                        disabled={!selectedValue}
+                        disabled={selectedValues.length === 0}
                         className={`w-full py-3 flex items-center justify-center gap-2 rounded-full h-[52px] font-medium border-none focus:outline-none focus:ring-0 ${
-                            selectedValue
+                            selectedValues.length > 0
                                 ? "bg-black text-white"
                                 : "bg-gray-300 text-gray-700 cursor-not-allowed"
                         }`}
