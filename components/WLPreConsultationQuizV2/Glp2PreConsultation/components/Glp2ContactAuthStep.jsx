@@ -123,7 +123,20 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
     });
     if (res.ok) return true;
     const data = await res.json().catch(() => ({}));
-    throw new Error(data?.message || data?.error || "Login failed.");
+
+    let msg = "Login failed. Please try again.";
+    if (data?.code === "incorrect_password") {
+      msg = "The password you entered is incorrect. Please try again.";
+    } else if (
+      data?.code === "invalid_email" ||
+      data?.code === "invalid_username"
+    ) {
+      msg = "No account found with that email address.";
+    } else if (data?.error || data?.message) {
+      msg = (data.error || data.message).replace(/<[^>]*>/g, "").trim();
+    }
+
+    throw new Error(msg);
   };
 
   // Convert MM/DD/YYYY → YYYY-MM-DD (required by /api/register)
