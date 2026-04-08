@@ -26,10 +26,16 @@ const WeightLossResultPasswordPopup = ({
   const [loading, setLoading] = useState(false);
   const [emailExists, setEmailExists] = useState(false);
   const [isCheckingEmail, setIsCheckingEmail] = useState(false);
-  // Password validation
-  const isValidPassword = (pwd) => {
-    return true;
-  };
+  const [passwordError, setPasswordError] = useState("");
+  const hasMinLength = (pwd = "") => pwd.length >= 8;
+  const hasUppercase = (pwd = "") => /[A-Z]/.test(pwd);
+  const hasLowercase = (pwd = "") => /[a-z]/.test(pwd);
+  const hasNumberOrSymbol = (pwd = "") => /[\d\W_]/.test(pwd);
+  const meetsRegistrationPasswordRules = (pwd = "") =>
+    hasMinLength(pwd) &&
+    hasUppercase(pwd) &&
+    hasLowercase(pwd) &&
+    hasNumberOrSymbol(pwd);
 
   // Email validation (simple, robust enough for client-side)
   const isValidEmail = (e) => {
@@ -100,9 +106,9 @@ const WeightLossResultPasswordPopup = ({
   };
 
   const TryLogin = async ({ email, password }) => {
-    // attempt login
     try {
       setLoading(true);
+      setPasswordError("");
 
       // Use password from Context (memory) or fallback to parameter
       const loginPassword = contextPassword || password || "";
@@ -117,7 +123,7 @@ const WeightLossResultPasswordPopup = ({
       });
       if (res.ok) {
         toast.success("Logged in successfully");
-        return 1;
+        return true;
       } else {
         let data = null;
         try {
@@ -125,18 +131,19 @@ const WeightLossResultPasswordPopup = ({
         } catch (e) {}
         const msg = (data && (data.message || data.error)) || "Login failed";
         logger.log("Login failed:", msg);
-        if (msg != "Login failed. Please try again.") {
-          // toast.error(
-          //   "This E-mail associated to an account, please try logging in."
-          // );
-          return 1;
-        }
-        //toast.error(msg);
+        const userFacingError =
+          "Wrong password. Please try again or reset your password.";
+        setPasswordError(userFacingError);
+        toast.error(userFacingError);
+        return false;
       }
     } catch (e) {
       console.error(e);
-      toast.error("Login failed. Please try again.");
-      return 1;
+      const fallbackError =
+        "Unable to verify your password right now. Please try again.";
+      setPasswordError(fallbackError);
+      toast.error(fallbackError);
+      return false;
     } finally {
       setLoading(false);
     }
@@ -152,8 +159,10 @@ const WeightLossResultPasswordPopup = ({
         agreePrivacy,
       }));
 
-      const goNext = await TryLogin({ email, password });
-      if (goNext == 0) return;
+      if (emailExists) {
+        const loggedIn = await TryLogin({ email, password });
+        if (!loggedIn) return;
+      }
       triggerNext();
     }
   };
@@ -163,7 +172,7 @@ const WeightLossResultPasswordPopup = ({
     !isValidEmail(email) ||
     !password ||
     !agreePrivacy ||
-    !isValidPassword(password) ||
+    (!emailExists && !meetsRegistrationPasswordRules(password)) ||
     disabled;
 
   return (
@@ -202,6 +211,7 @@ const WeightLossResultPasswordPopup = ({
                   }
                   setEmailExists(false);
                   setPassword("");
+                  setPasswordError("");
                   setContextPassword("");
                   // mark touched as user types so errors can show after interaction
                   if (!emailTouched) setEmailTouched(true);
@@ -228,6 +238,11 @@ const WeightLossResultPasswordPopup = ({
                   Please enter a valid email address (e.g. name@domain.com)
                 </p>
               )}
+              {isCheckingEmail && (
+                <p className="mt-2 text-[12px] text-[#666]">
+                  Checking email ...
+                </p>
+              )}
             </div>
             {/* Password field appears once email is validated and checked. */}
             {showPasswordSection && (
@@ -247,6 +262,7 @@ const WeightLossResultPasswordPopup = ({
                     value={password}
                     onChange={(e) => {
                       setPassword(e.target.value);
+                      if (passwordError) setPasswordError("");
                       // Store in Context (memory) for use in registration/login
                       setContextPassword(e.target.value);
                     }}
@@ -301,10 +317,53 @@ const WeightLossResultPasswordPopup = ({
                     )}
                   </button>
                 </div>
+                {emailExists && passwordError && (
+                  <p className="mt-2 text-[12px] text-red-600" role="alert">
+                    {passwordError}
+                  </p>
+                )}
                 {!emailExists && (
-                  <ul className="mt-2 text-[12px] text-[#000] list-disc pl-5 space-y-1">
-                    <li>Password must be at least 8 characters</li>
-                    <li>Include at least one uppercase or number or symbol</li>
+                  <ul className="mt-2 text-[12px] text-[#000] list-none pl-0 space-y-1">
+                    <li
+                      className={`flex items-center gap-2 ${
+                        hasMinLength(password) ? "text-green-600" : "text-[#000]"
+                      }`}
+                    >
+                      {hasMinLength(password) ? (
+                        <span className="text-[12px] leading-none text-green-600">
+                          ✓
+                        </span>
+                      ) : (
+                        <span className="text-[12px] leading-none text-black">
+                          ○
+                        </span>
+                      )}
+                      <span>Password must be at least 8 characters</span>
+                    </li>
+                    <li
+                      className={`flex items-center gap-2 ${
+                        hasUppercase(password) &&
+                        hasLowercase(password) &&
+                        hasNumberOrSymbol(password)
+                          ? "text-green-600"
+                          : "text-[#000]"
+                      }`}
+                    >
+                      {hasUppercase(password) &&
+                      hasLowercase(password) &&
+                      hasNumberOrSymbol(password) ? (
+                        <span className="text-[12px] leading-none text-green-600">
+                          ✓
+                        </span>
+                      ) : (
+                        <span className="text-[12px] leading-none text-black">
+                          ○
+                        </span>
+                      )}
+                      <span>
+                        Include uppercase, lowercase, and a number or symbol
+                      </span>
+                    </li>
                   </ul>
                 )}
               </div>
@@ -329,7 +388,7 @@ const WeightLossResultPasswordPopup = ({
                   </Link>{" "}
                   and{" "}
                   <Link
-                    href="/telehealth-consent"
+                    href="/terms-of-use"
                     className="text-[#00000080] font-bold underline"
                   >
                     Telehealth Consent
