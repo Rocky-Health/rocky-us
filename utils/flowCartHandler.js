@@ -19,7 +19,7 @@ import {
 import { refreshCartNonceClient } from "./nonceManager";
 import { analyticsService } from "@/utils/analytics/analyticsService";
 import { getOrCreateSessionId } from "@/utils/dataLayerHelper";
-import { trackMetaStartCheckout } from "@/utils/metaQuestionnaireTracking";
+import { trackMetaStartCheckout, logMetaTrackingError } from "@/utils/metaQuestionnaireTracking";
 
 /**
  * Helper function to clean and parse price strings
@@ -492,7 +492,9 @@ async function handleUnauthenticatedEarlyAddition(
         content_id: String(extractProductId(mainProduct) || mainProduct.variationId || ""),
         value: parsePrice(mainProduct.price),
       });
-    } catch (_) {}
+    } catch (err) {
+      logMetaTrackingError(err, { flow_id: flowType, milestone: "START_CHECKOUT" });
+    }
 
     // Return success with cart data for display
     return {
@@ -1227,7 +1229,9 @@ async function handleAuthenticatedEarlyAddition(
           content_id: String(extractProductId(mainProduct) || mainProduct.variationId || ""),
           value: parsePrice(mainProduct.price),
         });
-      } catch (_) {}
+      } catch (err) {
+        logMetaTrackingError(err, { flow_id: flowType, milestone: "START_CHECKOUT" });
+      }
 
       // Generate checkout URL (but don't redirect yet)
       const checkoutUrl = generateFlowCheckoutUrl(flowType, true);

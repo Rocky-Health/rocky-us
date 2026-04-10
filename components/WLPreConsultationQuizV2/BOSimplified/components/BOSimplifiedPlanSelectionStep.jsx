@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
 import { logger } from "@/utils/devLogger";
 import Loader from "@/components/Loader";
-import { trackMetaPlanSelection } from "@/utils/metaQuestionnaireTracking";
+import { trackMetaPlanSelection, logMetaTrackingError } from "@/utils/metaQuestionnaireTracking";
 
 const BOSimplifiedPlanSelectionStep = ({
     product,
@@ -55,7 +55,9 @@ const BOSimplifiedPlanSelectionStep = ({
                 selection_type: "plan",
                 selection_value: selectedPlan?.id || "",
             });
-        } catch (_) {}
+        } catch (err) {
+            logMetaTrackingError(err, { flow_id: "weight-loss", questionnaire_id: "bo-simplified", milestone: "PLAN_SELECTION" });
+        }
 
         try {
             setIsCheckoutLoading(true);
