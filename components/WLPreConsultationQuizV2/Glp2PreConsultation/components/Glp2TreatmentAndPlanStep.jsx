@@ -10,6 +10,7 @@ import { WLProducts } from "../../data/PreConsultationProductsData";
 import Glp2TreatmentCard from "./Glp2TreatmentCard";
 import Glp2PlanOptionsSection from "./Glp2PlanOptionsSection";
 import useDailyPatientCounter from "../hooks/useDailyPatientCounter";
+import { trackMetaPlanSelection } from "@/utils/metaQuestionnaireTracking";
 
 const ALLOWED_PRODUCT_IDS = ["489798", "489523"];
 const COUNTER_BASE_BY_PRODUCT = {
@@ -163,6 +164,17 @@ const Glp2TreatmentAndPlanStep = ({
     try {
       setIsCheckoutLoading(true);
       setSelectedPlan(plan);
+
+      try {
+        trackMetaPlanSelection({
+          flow_id: "weight-loss",
+          questionnaire_id: "glp2-pre-consultation",
+          content_id: String(selectedProduct.id || ""),
+          selection_type: "plan",
+          selection_value: plan?.id || "",
+        });
+      } catch (_) {}
+
       if (typeof onContinue === "function") {
         await onContinue(plan);
         return;
