@@ -21,6 +21,24 @@ const DEBUG =
   process.env.NEXT_PUBLIC_META_QUIZ_DEBUG === "1";
 
 /* ------------------------------------------------------------------ */
+/*  Debug error helper                                                 */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Non-blocking error logger for Meta tracking.
+ * Silent in production; only logs when NEXT_PUBLIC_META_QUIZ_DEBUG=1.
+ */
+export function logMetaTrackingError(err, context = {}) {
+  if (DEBUG) {
+    try {
+      console.warn("[META_TRACKING_ERROR]", { error: err, ...context });
+    } catch (_) {
+      // absolute last resort — never break the app
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /*  Core emission                                                      */
 /* ------------------------------------------------------------------ */
 
@@ -78,10 +96,12 @@ function emitMetaFunnelEvent(milestone, flowId, questionnaireId, params = {}) {
     if (DEBUG) {
       try {
         console.log("[META_QUIZ]", milestone, obfuscatedName, basePayload);
-      } catch (_) {}
+      } catch (err) {
+        logMetaTrackingError(err, { flow_id: flowId, questionnaire_id: questionnaireId, milestone, scope: "debug_log" });
+      }
     }
-  } catch (_) {
-    // tracking must never break the app
+  } catch (err) {
+    logMetaTrackingError(err, { flow_id: flowId, questionnaire_id: questionnaireId, milestone });
   }
 }
 

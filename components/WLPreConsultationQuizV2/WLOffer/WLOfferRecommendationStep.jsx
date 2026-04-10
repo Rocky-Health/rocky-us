@@ -7,7 +7,7 @@ import { wlFlowAddToCart, addToCartDirectly } from "@/utils/flowCartHandler";
 import CustomImage from "@/components/utils/CustomImage";
 import { addRequiredConsultation } from "@/utils/requiredConsultation";
 import Loader from "@/components/Loader";
-import { trackMetaProductSelection } from "@/utils/metaQuestionnaireTracking";
+import { trackMetaProductSelection, logMetaTrackingError } from "@/utils/metaQuestionnaireTracking";
 
 // Weight loss product IDs that require consultation
 const WEIGHT_LOSS_PRODUCT_IDS = [
@@ -154,7 +154,9 @@ const WLOfferRecommendationStep = ({
         selection_type: "product",
         selection_value: selectedProduct.id || "",
       });
-    } catch (_) {}
+    } catch (err) {
+      logMetaTrackingError(err, { flow_id: "weight-loss", questionnaire_id: "wl-offer", milestone: "PRODUCT_SELECTION" });
+    }
 
     try {
       setIsCheckoutLoading(true);

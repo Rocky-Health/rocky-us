@@ -10,7 +10,7 @@ import { addRequiredConsultation } from "@/utils/requiredConsultation";
 import { WLProducts } from "../../data/PreConsultationProductsData";
 import Glp2TreatmentCard from "./Glp2TreatmentCard";
 import useDailyPatientCounter from "../hooks/useDailyPatientCounter";
-import { trackMetaProductSelection } from "@/utils/metaQuestionnaireTracking";
+import { trackMetaProductSelection, logMetaTrackingError } from "@/utils/metaQuestionnaireTracking";
 
 const ALLOWED_PRODUCT_IDS = ["489798", "489523"];
 const COUNTER_BASE_BY_PRODUCT = {
@@ -158,7 +158,9 @@ const Glp2RecommendationStep = ({
         selection_type: "product",
         selection_value: selectedProduct.id || "",
       });
-    } catch (_) {}
+    } catch (err) {
+      logMetaTrackingError(err, { flow_id: "weight-loss", questionnaire_id: "glp2-pre-consultation", milestone: "PRODUCT_SELECTION" });
+    }
 
     if (
       typeof onBeforeCheckout === "function" &&

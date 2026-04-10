@@ -29,7 +29,7 @@ import ProductRecommendationsStep from "./steps/ProductRecommendationsStep";
 import WarningPopupWrapper from "./popups/WarningPopupWrapper";
 import CrossSellPopupWrapper from "./popups/CrossSellPopupWrapper";
 import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
-import { trackMetaProductSelection } from "@/utils/metaQuestionnaireTracking";
+import { trackMetaProductSelection, logMetaTrackingError } from "@/utils/metaQuestionnaireTracking";
 
 const WeightQuestionnaire = () => {
   // Core navigation state
@@ -470,7 +470,9 @@ const WeightQuestionnaire = () => {
         selection_type: "product",
         selection_value: productState.selected?.id || "",
       });
-    } catch (_) {}
+    } catch (err) {
+      logMetaTrackingError(err, { flow_id: "weight-loss", questionnaire_id: "wl-pre-consultation-v1", milestone: "PRODUCT_SELECTION" });
+    }
 
     // The direct checkout handling will now be managed by the CrossSellPopupBase component
     // using the enhanced addToCartAndRedirect function with the "wl" flow type

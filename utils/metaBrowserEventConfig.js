@@ -118,7 +118,9 @@ export function resolveCategory(flowId, questionnaireId) {
         flowId,
         questionnaireId,
       });
-    } catch (_) {}
+    } catch (err) {
+      // Guarded: only reachable if console.warn itself throws (e.g. test env)
+    }
   }
 
   return "OTHERS";
