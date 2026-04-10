@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
 import { logger } from "@/utils/devLogger";
 import Loader from "@/components/Loader";
+import { trackMetaPlanSelection } from "@/utils/metaQuestionnaireTracking";
 
 const Glp2PlanSelectionStep = ({
     product,
@@ -45,6 +46,17 @@ const Glp2PlanSelectionStep = ({
 
     const handleContinue = async () => {
         if (!selectedPlan) return;
+
+        try {
+            trackMetaPlanSelection({
+                flow_id: "weight-loss",
+                questionnaire_id: "glp2-pre-consultation",
+                content_id: String(product?.id || ""),
+                selection_type: "plan",
+                selection_value: selectedPlan?.id || "",
+            });
+        } catch (_) {}
+
         try {
             setIsCheckoutLoading(true);
             await onContinue(selectedPlan);

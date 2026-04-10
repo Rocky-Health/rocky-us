@@ -10,6 +10,7 @@ import { addRequiredConsultation } from "@/utils/requiredConsultation";
 import { WLProducts } from "../../data/PreConsultationProductsData";
 import Glp2TreatmentCard from "./Glp2TreatmentCard";
 import useDailyPatientCounter from "../hooks/useDailyPatientCounter";
+import { trackMetaProductSelection } from "@/utils/metaQuestionnaireTracking";
 
 const ALLOWED_PRODUCT_IDS = ["489798", "489523"];
 const COUNTER_BASE_BY_PRODUCT = {
@@ -148,6 +149,16 @@ const Glp2RecommendationStep = ({
 
   const handleCheckout = async () => {
     if (!selectedProduct) return;
+
+    try {
+      trackMetaProductSelection({
+        flow_id: "weight-loss",
+        questionnaire_id: "glp2-pre-consultation",
+        content_id: String(selectedProduct.id || ""),
+        selection_type: "product",
+        selection_value: selectedProduct.id || "",
+      });
+    } catch (_) {}
 
     if (
       typeof onBeforeCheckout === "function" &&
