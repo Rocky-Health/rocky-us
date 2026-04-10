@@ -14,7 +14,7 @@ import { addToCartDirectly } from "../../utils/flowCartHandler";
 import { getConsultationProduct } from "../../utils/hairProductsConfig";
 import ProductRecommendationCard from "./ProductRecommendationCard";
 import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
-import { trackMetaProductSelection } from "@/utils/metaQuestionnaireTracking";
+import { trackMetaProductSelection, logMetaTrackingError } from "@/utils/metaQuestionnaireTracking";
 
 const HairPreConsultationQuiz = () => {
   // Next.js router for navigation
@@ -299,7 +299,9 @@ const HairPreConsultationQuiz = () => {
         selection_type: "product",
         selection_value: recommendedProduct?.id || "",
       });
-    } catch (_) {}
+    } catch (err) {
+      logMetaTrackingError(err, { flow_id: "hair", questionnaire_id: "hair-pre-consultation", milestone: "PRODUCT_SELECTION" });
+    }
 
     setIsCheckoutLoading(true);
 
