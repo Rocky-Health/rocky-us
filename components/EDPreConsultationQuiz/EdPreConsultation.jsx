@@ -28,6 +28,7 @@ import {
 } from "./productData";
 import FaqsSection from "../FaqsSection";
 import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
+import { trackMetaProductSelection } from "@/utils/metaQuestionnaireTracking";
 
 const EDPreConsultationQuiz = () => {
     const router = useRouter();
@@ -81,6 +82,16 @@ const EDPreConsultationQuiz = () => {
     const handleProductSelect = (product, options) => {
         setSelectedProduct(product);
         setSelectedProductOptions(options);
+
+        try {
+            trackMetaProductSelection({
+                flow_id: "ed",
+                questionnaire_id: "ed-pre-consultation",
+                content_id: String(product?.id || ""),
+                selection_type: "product",
+                selection_value: product?.id || "",
+            });
+        } catch (_) {}
 
         // Set default dose if not already set
         if (!selectedDose) {

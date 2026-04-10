@@ -4,6 +4,7 @@ import Variations from "./Variations";
 import { addToCartAndRedirect } from "@/utils/crossSellCheckout";
 import { skincareFlowAddToCart } from "@/utils/flowCartHandler";
 import { logger } from "@/utils/devLogger";
+import { trackMetaProductSelection } from "@/utils/metaQuestionnaireTracking";
 
 const GenericRecommendationStep = ({
   recommended,
@@ -63,6 +64,16 @@ const GenericRecommendationStep = ({
       alert("Please select a product to continue");
       return;
     }
+
+    try {
+      trackMetaProductSelection({
+        flow_id: "skincare",
+        questionnaire_id: "skincare-quiz",
+        content_id: String(selectedProduct.id || ""),
+        selection_type: "product",
+        selection_value: selectedProduct.id || "",
+      });
+    } catch (_) {}
 
     try {
       setIsCheckoutLoading(true);
