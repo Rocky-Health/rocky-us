@@ -1,10 +1,7 @@
 import Logo from "@/components/Navbar/Logo";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 
 const QuestionnaireNavbar = ({ onBackClick, currentPage }) => {
-  const router = useRouter();
   const isThankYouPage = currentPage === 22;
   const showBackButton = currentPage > 1 && !isThankYouPage;
 
@@ -41,7 +38,7 @@ const QuestionnaireNavbar = ({ onBackClick, currentPage }) => {
         <div className="mx-auto scale-125 flex justify-center items-center min-w-[120px] ">
           {isThankYouPage ? (
             <button
-              onClick={() => router.push("/")}
+              onClick={() => (window.location.href = "/")}
               className="cursor-pointer mr-[18px] md:mr-0"
               aria-label="Go to home"
             >
@@ -49,7 +46,7 @@ const QuestionnaireNavbar = ({ onBackClick, currentPage }) => {
             </button>
           ) : (
             <button
-              onClick={() => router.push("/")}
+              onClick={() => (window.location.href = "/")}
               className="cursor-pointer md:mr-0"
               aria-label="Go to home"
             >

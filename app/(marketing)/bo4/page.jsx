@@ -17,16 +17,14 @@ import WlFaqs from "@/components/Bo4/WlFaqs";
 import Footer from "@/components/Bo4/Footer";
 import ChangingResults from "@/components/Bo4/ChangingResults";
 
-
 export default function Bo4() {
-    const consultationHref = "/wl-pre-consultation/";
+    const consultationHref = "/glp2-pre-consultation";
 
-  return (
-  
-    <main>
-    <style jsx global>{`
-        /* Hide ALL headers by default */
-        header,
+    return (
+        <main>
+            <style jsx global>{`
+                /* Hide ALL headers by default */
+                header,
         nav,
         .header,
         .navbar,
@@ -71,67 +69,61 @@ export default function Bo4() {
         #colophon,
         .footer-area,
         .footer-container {
-          display: none !important;
-        }
+                    display: none !important;
+                }
 
-        
-        body {
-          padding-top: 0 !important;
-          margin-top: 0 !important;
-          padding-bottom: 0 !important;
-          margin-bottom: 0 !important;
-        }
+                body {
+                    padding-top: 0 !important;
+                    margin-top: 0 !important;
+                    padding-bottom: 0 !important;
+                    margin-bottom: 0 !important;
+                }
+            `}</style>
 
-       
-      `}</style>
+            <Trustpilot />
+            <MinimalHeader />
+            <Section bg={`py-4 pb-[40px]`}>
+                <MarketingHeroSection />
+            </Section>
+            <section className="bg-[#F0EEEA] py-14 md:py-24 w-full overflow-hidden">
+                <ChangingResults href={consultationHref} />
+            </section>
+            <TreatmentPlans />
 
-      <Trustpilot />
-      <MinimalHeader />
-      <Section bg={`py-4 pb-[40px]`}>
-        <MarketingHeroSection />
-      </Section>
-      <section className="bg-[#F0EEEA] py-14 md:py-24 w-full overflow-hidden">
-        <ChangingResults  />
-      </section>
-      <TreatmentPlans />
+            <Comprehensive />
 
-      <Comprehensive />
-      
-       <Section >
-        <ExclusiveFeatures consultationHref={consultationHref} />
-      </Section>
+            <Section>
+                <ExclusiveFeatures consultationHref={consultationHref} />
+            </Section>
 
-      <Section>
-        <HowItWorks consultationHref={consultationHref} />
-      </Section>
-      <hr className="max-w-[1200px] mx-auto px-5 md:px-0"/>
-      <Section> 
-          <MoneyBack />
-      </Section>
+            <Section>
+                <HowItWorks consultationHref={consultationHref} />
+            </Section>
+            <hr className="max-w-[1200px] mx-auto px-5 md:px-0" />
+            <Section>
+                <MoneyBack />
+            </Section>
 
+            <Section bg={`bg-[#F8F7F3]`}>
+                <UnmatchedResults consultationHref={consultationHref} />
+            </Section>
 
-      <Section bg={`bg-[#F8F7F3]`}>
-        <UnmatchedResults consultationHref={consultationHref} />
-      </Section>
+            <Section>
+                <AsSeenOn />
+            </Section>
 
-      <Section>
-        <AsSeenOn />
-      </Section>
+            <Section>
+                <DifferentThisTime href={consultationHref} />
+            </Section>
 
+            <Section bg={`bg-[#F0EEEA]`}>
+                <WlFaqs
+                    moreQTitle="Convenient, researched, trusted."
+                    href={consultationHref}
+                />
+            </Section>
 
-    <Section>
-      <DifferentThisTime  />
-    </Section>
-
-
-      <Section bg={`bg-[#F0EEEA]`}>
-        <WlFaqs moreQTitle="Convenient, researched, trusted." />
-      </Section>
- 
-
-
-       <Footer />
-    
-    </main>
-  );
+            <Footer />
+        </main>
+    );
 }

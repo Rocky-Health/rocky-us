@@ -13,6 +13,11 @@ import {
   isWordPressCriticalError,
   transformPaymentError,
 } from "@/utils/paymentErrorHandler";
+import {
+  clearStoredPasswordSecurely,
+  restorePasswordSecurely,
+  storePasswordSecurely,
+} from "@/utils/quizPasswordVault";
 
 const Form = ({
   config,
@@ -429,6 +434,12 @@ const Form = ({
   // Reusable registration logic for both WLFlow1 and WLFlow2
   const registerUser = async (mergedUserData) => {
     setLoading(true);
+    let registrationPassword = mergedUserData.password;
+
+    if (!registrationPassword) {
+      registrationPassword = await restorePasswordSecurely();
+    }
+
     // Step 1 validation (name, email, password)
     if (!mergedUserData.firstName || !mergedUserData.lastName) {
       toast.error("Please enter your full name");
@@ -445,12 +456,12 @@ const Form = ({
       setLoading(false);
       return false;
     }
-    if (!mergedUserData.password) {
+    if (!registrationPassword) {
       toast.error("Password is required");
       setLoading(false);
       return false;
     }
-    if (mergedUserData.password.length < requiredPasswordLength) {
+    if (registrationPassword.length < requiredPasswordLength) {
       toast.error(
         `Password must be at least ${requiredPasswordLength} characters`
       );
@@ -503,7 +514,7 @@ const Form = ({
           first_name: mergedUserData.firstName,
           last_name: mergedUserData.lastName,
           email: mergedUserData.email,
-          password: mergedUserData.password,
+          password: registrationPassword,
           register_step: 1,
         }),
       });
@@ -522,7 +533,7 @@ const Form = ({
           first_name: mergedUserData.firstName,
           last_name: mergedUserData.lastName,
           email: mergedUserData.email,
-          password: mergedUserData.password,
+          password: registrationPassword,
           phone: mergedUserData.phone,
           date_of_birth: formattedDOB,
           province: mergedUserData.province,
@@ -537,6 +548,7 @@ const Form = ({
         return false;
       }
       //toast.success(data2.message || "Registration successful!");
+      clearStoredPasswordSecurely();
       setLoading(false);
       return true;
     } catch (err) {
@@ -583,12 +595,22 @@ const Form = ({
 
     // If this is the contact info step (step 17), show password modal before continuing
     if (config.id === "contactInfo") {
+      let availablePassword =
+        typeof userData["password"] === "string" ? userData["password"] : "";
+      if (!availablePassword) {
+        availablePassword = await restorePasswordSecurely();
+      }
+
       if (
-        typeof userData["password"] === "string" &&
-        userData["password"].trim().length > 0
+        typeof availablePassword === "string" &&
+        availablePassword.trim().length > 0
       ) {
         // Merge latest form fields and password into userData
-        const mergedUserData = { ...userData, ...fieldsState };
+        const mergedUserData = {
+          ...userData,
+          ...fieldsState,
+          password: availablePassword,
+        };
         setUserData(mergedUserData);
 
         if (mergedUserData.phone) {
@@ -652,6 +674,7 @@ const Form = ({
   const handlePasswordSubmit = async (password) => {
     setShowPasswordModal(false);
     setPendingContinue(false);
+    await storePasswordSecurely(password);
     // Merge latest form fields and password into userData
     const mergedUserData = { ...userData, ...fieldsState, password };
     setUserData(mergedUserData);

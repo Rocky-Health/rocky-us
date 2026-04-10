@@ -1,18 +1,38 @@
 "use client";
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import {
+  clearStoredPasswordSecurely,
+  restorePasswordSecurely,
+  storePasswordSecurely,
+} from "@/utils/quizPasswordVault";
 
-/**
- * Password Context - Stores password in memory only (React state)
- * This password is NOT persisted to localStorage and will be cleared on page refresh
- * Perfect for temporary multi-step flows where security is important
- */
 const PasswordContext = createContext(undefined);
 
 export const PasswordProvider = ({ children }) => {
-  const [password, setPassword] = useState('');
+  const [password, setPasswordState] = useState("");
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const restored = await restorePasswordSecurely();
+      if (mounted && restored) {
+        setPasswordState(restored);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const setPassword = async (nextPassword) => {
+    const value = typeof nextPassword === "string" ? nextPassword : "";
+    setPasswordState(value);
+    await storePasswordSecurely(value);
+  };
 
   const clearPassword = () => {
-    setPassword('');
+    setPasswordState("");
+    clearStoredPasswordSecurely();
   };
 
   return (
@@ -25,7 +45,7 @@ export const PasswordProvider = ({ children }) => {
 export const usePassword = () => {
   const context = useContext(PasswordContext);
   if (context === undefined) {
-    throw new Error('usePassword must be used within a PasswordProvider');
+    throw new Error("usePassword must be used within a PasswordProvider");
   }
   return context;
 };
