@@ -171,7 +171,9 @@ export default function RootLayout({ children }) {
           <MetaCookieInitializer />
         </Suspense>
         <LoadingOverlay />
-        <FBPixelLoader />
+        <Suspense fallback={null}>
+          <FBPixelLoader />
+        </Suspense>
         {/* <CronHitHandler /> */}
         <GoogleOAuthProvider>
           <Navbar className="navbar-main" />

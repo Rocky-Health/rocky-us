@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 const PIXEL_IDS = {
@@ -35,6 +35,17 @@ const PRODUCT_KEYWORDS = {
   HL: ["finasteride", "minoxidil", "propecia", "hair", "hair-kit"],
   SMOKING: ["zonnic", "smoking", "nicotine"],
   SKINCARE: ["acne", "anti-aging", "anti-ageing", "hyperpigmentation", "hyper-pigmentation", "skincare", "skin-care"],
+};
+
+// Maps checkout/thank-you query params to pixel categories.
+// Checkout URLs carry the flow as ?wl-flow=1, ?ed-flow=1, etc.
+const FLOW_QUERY_MAP = {
+  "ed-flow": "ED",
+  "wl-flow": "WL",
+  "hair-flow": "HL",
+  "smoking-flow": "SMOKING",
+  "skincare-flow": "SKINCARE",
+  "mh-flow": "OTHERS",
 };
 
 const hasPrefixMatch = (segments, prefixes) =>
@@ -75,16 +86,63 @@ const getPixelKeyForPath = (pathname, categories = []) => {
 
 const ALL_PIXEL_IDS = [...new Set(Object.values(PIXEL_IDS))];
 
+/* ------------------------------------------------------------------ */
+/*  Module-level fbq stub initialization                               */
+/*                                                                     */
+/*  React fires child useEffects before parent useEffects. Components  */
+/*  like useQuestionnaireStepTracking call window.fbq("trackSingle-    */
+/*  Custom", ...) in their effects — which run before FBPixelLoader's  */
+/*  mount effect. If the stub doesn't exist yet, those calls are       */
+/*  silently lost (the "typeof window.fbq === 'function'" guard in     */
+/*  emitMetaFunnelEvent fails).                                        */
+/*                                                                     */
+/*  By creating the stub at module load time, all fbq calls are        */
+/*  queued immediately and processed when fbevents.js loads.            */
+/* ------------------------------------------------------------------ */
+if (typeof window !== "undefined") {
+  if (!window.fbq) {
+    const n = (window.fbq = function () {
+      n.callMethod
+        ? n.callMethod.apply(n, arguments)
+        : n.queue.push(arguments);
+    });
+    if (!window._fbq) window._fbq = n;
+    n.push = n;
+    n.loaded = !0;
+    n.version = "2.0";
+    n.queue = [];
+  }
+
+  window.fbq.disablePushState = true;
+
+  ALL_PIXEL_IDS.forEach((id) => {
+    window.fbq("init", id);
+  });
+}
+
 export default function FBPixelLoader() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  // Synchronous pixel resolution — updates in the same render as pathname,
-  // so the PageView effect always sees the correct pixel for the current page.
+  // Query-param flow detection for checkout / thank-you / order pages.
+  // These pages carry the flow as ?wl-flow=1, ?ed-flow=1, etc.
+  const flowFromQuery = useMemo(() => {
+    if (!searchParams) return null;
+    for (const [param, category] of Object.entries(FLOW_QUERY_MAP)) {
+      if (searchParams.get(param) === "1") return category;
+    }
+    if (searchParams.get("glp2-checkout") === "1") return "WL";
+    return null;
+  }, [searchParams]);
+
+  // Synchronous pixel resolution — updates in the same render as pathname.
+  // Query-param flow takes priority (for checkout/thank-you pages).
   const syncPixelId = useMemo(() => {
+    if (flowFromQuery) return PIXEL_IDS[flowFromQuery];
     if (!pathname) return PIXEL_IDS.OTHERS;
     const pixelKey = getPixelKeyForPath(pathname) || "OTHERS";
     return PIXEL_IDS[pixelKey];
-  }, [pathname]);
+  }, [pathname, flowFromQuery]);
 
   // Async refinement for /product/* pages using server-side category data.
   // Falls back to slug-based matching (syncPixelId) if the lookup fails.
@@ -127,56 +185,19 @@ export default function FBPixelLoader() {
 
   const resolvedPixelId = asyncPixelId || syncPixelId;
 
-  // Load fbevents.js base code once on mount.
-  // GTM or other tools may have already created the fbq stub but loaded
-  // fbevents.js from a broken proxy (e.g. sGTM). We always ensure the
-  // stub exists AND that fbevents.js is loaded from connect.facebook.net.
+  // Load fbevents.js once on mount.
+  // The fbq stub and pixel inits are already set up at module level,
+  // so this effect only needs to inject the SDK script.
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    console.log("[FBPixelLoader] Mount effect running. window.fbq exists:", !!window.fbq, "type:", typeof window.fbq);
-
-    if (!window.fbq) {
-      const n = (window.fbq = function () {
-        n.callMethod
-          ? n.callMethod.apply(n, arguments)
-          : n.queue.push(arguments);
-      });
-      if (!window._fbq) window._fbq = n;
-      n.push = n;
-      n.loaded = !0;
-      n.version = "2.0";
-      n.queue = [];
-      console.log("[FBPixelLoader] Created fbq stub");
-    }
-
-    // With multiple pixels across categories, the built-in pushState listener
-    // fires track('PageView') for ALL initialized pixels — causing
-    // cross-category contamination. We disable it and fire targeted
-    // trackSingle('PageView') manually on each navigation instead.
-    // See: https://developers.facebook.com/docs/meta-pixel/guides/track-multiple-events/
-    window.fbq.disablePushState = true;
-
-    // Pre-init ALL pixels so their configs are fetched and cached upfront.
-    // Without this, the first SPA navigation to a new category would call
-    // init() + trackSingle() back-to-back, and trackSingle can be silently
-    // dropped while fbevents.js is still fetching the pixel's config.
-    ALL_PIXEL_IDS.forEach((id) => {
-      window.fbq("init", id);
-    });
-    console.log("[FBPixelLoader] Pre-initialized all pixels:", ALL_PIXEL_IDS);
-
-    // Ensure fbevents.js is loaded directly from Meta, even if another tool
-    // (e.g. GTM with a broken sGTM proxy) already created the stub.
     const fbScript = document.querySelector(
       'script[src*="connect.facebook.net"][src*="fbevents.js"]'
     );
-    console.log("[FBPixelLoader] Existing fbevents script found:", !!fbScript);
     if (!fbScript) {
       const t = document.createElement("script");
       t.async = !0;
       t.src = "https://connect.facebook.net/en_US/fbevents.js";
-      t.onload = () => console.log("[FBPixelLoader] fbevents.js loaded successfully");
       t.onerror = (e) => console.warn("[FBPixelLoader] fbevents.js FAILED to load", e);
       const s = document.getElementsByTagName("script")[0];
       if (s && s.parentNode) {
@@ -184,21 +205,16 @@ export default function FBPixelLoader() {
       } else {
         document.head.appendChild(t);
       }
-      console.log("[FBPixelLoader] Injected fbevents.js script tag");
     }
   }, []);
 
   // Fire a targeted PageView on every navigation.
-  // All pixels are pre-initialized on mount, so we only need trackSingle here.
-  // Both resolvedPixelId and pathname are deps so that same-category navigations
-  // (e.g. /ed → /ed-consultation where pixel stays the same) still fire a PageView.
+  // All pixels are pre-initialized at module level, so we only need trackSingle here.
   useEffect(() => {
-    console.log("[FBPixelLoader] PageView effect. resolvedPixelId:", resolvedPixelId, "pathname:", pathname, "fbq type:", typeof window?.fbq);
     if (!resolvedPixelId || typeof window === "undefined") return;
     if (typeof window.fbq !== "function") return;
 
     window.fbq("trackSingle", resolvedPixelId, "PageView");
-    console.log("[FBPixelLoader] Called fbq('trackSingle',", resolvedPixelId, ", 'PageView')");
   }, [resolvedPixelId, pathname]);
 
   if (!resolvedPixelId) return null;
