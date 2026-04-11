@@ -133,6 +133,8 @@ export default function FBPixelLoader() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    console.log("[FBPixelLoader] Mount effect running. window.fbq exists:", !!window.fbq, "type:", typeof window.fbq);
+
     if (!window.fbq) {
       const n = (window.fbq = function () {
         n.callMethod
@@ -144,6 +146,7 @@ export default function FBPixelLoader() {
       n.loaded = !0;
       n.version = "2.0";
       n.queue = [];
+      console.log("[FBPixelLoader] Created fbq stub");
     }
 
     // With multiple pixels across categories, the built-in pushState listener
@@ -158,16 +161,20 @@ export default function FBPixelLoader() {
     const fbScript = document.querySelector(
       'script[src*="connect.facebook.net"][src*="fbevents.js"]'
     );
+    console.log("[FBPixelLoader] Existing fbevents script found:", !!fbScript);
     if (!fbScript) {
       const t = document.createElement("script");
       t.async = !0;
       t.src = "https://connect.facebook.net/en_US/fbevents.js";
+      t.onload = () => console.log("[FBPixelLoader] fbevents.js loaded successfully");
+      t.onerror = (e) => console.warn("[FBPixelLoader] fbevents.js FAILED to load", e);
       const s = document.getElementsByTagName("script")[0];
       if (s && s.parentNode) {
         s.parentNode.insertBefore(t, s);
       } else {
         document.head.appendChild(t);
       }
+      console.log("[FBPixelLoader] Injected fbevents.js script tag");
     }
   }, []);
 
@@ -175,14 +182,17 @@ export default function FBPixelLoader() {
   // Both resolvedPixelId and pathname are deps so that same-category navigations
   // (e.g. /ed → /ed-consultation where pixel stays the same) still fire a PageView.
   useEffect(() => {
+    console.log("[FBPixelLoader] PageView effect. resolvedPixelId:", resolvedPixelId, "pathname:", pathname, "fbq type:", typeof window?.fbq);
     if (!resolvedPixelId || typeof window === "undefined") return;
     if (typeof window.fbq !== "function") return;
 
     if (currentPixelRef.current !== resolvedPixelId) {
       currentPixelRef.current = resolvedPixelId;
       window.fbq("init", resolvedPixelId);
+      console.log("[FBPixelLoader] Called fbq('init',", resolvedPixelId, ")");
     }
     window.fbq("trackSingle", resolvedPixelId, "PageView");
+    console.log("[FBPixelLoader] Called fbq('trackSingle',", resolvedPixelId, ", 'PageView')");
   }, [resolvedPixelId, pathname]);
 
   if (!resolvedPixelId) return null;
