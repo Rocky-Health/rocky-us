@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const PIXEL_IDS = {
   ED: process.env.NEXT_PUBLIC_FB_PIXEL_ID_ED || "522677764108011",
@@ -73,9 +73,10 @@ const getPixelKeyForPath = (pathname, categories = []) => {
   return "OTHERS";
 };
 
+const ALL_PIXEL_IDS = [...new Set(Object.values(PIXEL_IDS))];
+
 export default function FBPixelLoader() {
   const pathname = usePathname();
-  const currentPixelRef = useRef(null);
 
   // Synchronous pixel resolution — updates in the same render as pathname,
   // so the PageView effect always sees the correct pixel for the current page.
@@ -156,6 +157,15 @@ export default function FBPixelLoader() {
     // See: https://developers.facebook.com/docs/meta-pixel/guides/track-multiple-events/
     window.fbq.disablePushState = true;
 
+    // Pre-init ALL pixels so their configs are fetched and cached upfront.
+    // Without this, the first SPA navigation to a new category would call
+    // init() + trackSingle() back-to-back, and trackSingle can be silently
+    // dropped while fbevents.js is still fetching the pixel's config.
+    ALL_PIXEL_IDS.forEach((id) => {
+      window.fbq("init", id);
+    });
+    console.log("[FBPixelLoader] Pre-initialized all pixels:", ALL_PIXEL_IDS);
+
     // Ensure fbevents.js is loaded directly from Meta, even if another tool
     // (e.g. GTM with a broken sGTM proxy) already created the stub.
     const fbScript = document.querySelector(
@@ -178,7 +188,8 @@ export default function FBPixelLoader() {
     }
   }, []);
 
-  // Init pixel (only when it changes) and fire targeted PageView on every navigation.
+  // Fire a targeted PageView on every navigation.
+  // All pixels are pre-initialized on mount, so we only need trackSingle here.
   // Both resolvedPixelId and pathname are deps so that same-category navigations
   // (e.g. /ed → /ed-consultation where pixel stays the same) still fire a PageView.
   useEffect(() => {
@@ -186,11 +197,6 @@ export default function FBPixelLoader() {
     if (!resolvedPixelId || typeof window === "undefined") return;
     if (typeof window.fbq !== "function") return;
 
-    if (currentPixelRef.current !== resolvedPixelId) {
-      currentPixelRef.current = resolvedPixelId;
-      window.fbq("init", resolvedPixelId);
-      console.log("[FBPixelLoader] Called fbq('init',", resolvedPixelId, ")");
-    }
     window.fbq("trackSingle", resolvedPixelId, "PageView");
     console.log("[FBPixelLoader] Called fbq('trackSingle',", resolvedPixelId, ", 'PageView')");
   }, [resolvedPixelId, pathname]);
