@@ -121,27 +121,35 @@ export default function FBPixelLoader() {
     };
   }, [pathname]);
 
-  // Load fbevents.js base code once, then init/reinit pixel on every change
+  // Load fbevents.js base code once on mount
+  useEffect(() => {
+    if (typeof window === "undefined" || window.fbq) return;
+
+    const n = (window.fbq = function () {
+      n.callMethod
+        ? n.callMethod.apply(n, arguments)
+        : n.queue.push(arguments);
+    });
+    if (!window._fbq) window._fbq = n;
+    n.push = n;
+    n.loaded = !0;
+    n.version = "2.0";
+    n.queue = [];
+    const t = document.createElement("script");
+    t.async = !0;
+    t.src = "https://connect.facebook.net/en_US/fbevents.js";
+    const s = document.getElementsByTagName("script")[0];
+    if (s && s.parentNode) {
+      s.parentNode.insertBefore(t, s);
+    } else {
+      document.head.appendChild(t);
+    }
+  }, []);
+
+  // Init/reinit pixel and fire PageView on every resolved pixel change
   useEffect(() => {
     if (!resolvedPixelId || typeof window === "undefined") return;
-
-    if (!window.fbq) {
-      const n = (window.fbq = function () {
-        n.callMethod
-          ? n.callMethod.apply(n, arguments)
-          : n.queue.push(arguments);
-      });
-      if (!window._fbq) window._fbq = n;
-      n.push = n;
-      n.loaded = !0;
-      n.version = "2.0";
-      n.queue = [];
-      const t = document.createElement("script");
-      t.async = !0;
-      t.src = "https://connect.facebook.net/en_US/fbevents.js";
-      const s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(t, s);
-    }
+    if (typeof window.fbq !== "function") return;
 
     if (currentPixelRef.current !== resolvedPixelId) {
       currentPixelRef.current = resolvedPixelId;
