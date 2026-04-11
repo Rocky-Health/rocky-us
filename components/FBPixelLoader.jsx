@@ -1,8 +1,7 @@
 "use client";
 
-import Script from "next/script";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const PIXEL_IDS = {
   ED: process.env.NEXT_PUBLIC_FB_PIXEL_ID_ED || "522677764108011",
@@ -15,7 +14,7 @@ const PIXEL_IDS = {
 
 const ROUTE_PREFIXES = {
   ED: ["pre-ed", "ed", "ed-pre", "ed-flow", "ed-consultation", "ed-prequiz", "erectile-dysfunction", "sex"],
-  WL: ["pre-wl", "wl", "wl-pre", "wl-consultation", "weight-loss", "body-optimization", "bo", "glp1", "glp2"],
+  WL: ["pre-wl", "wl", "wl-pre", "wl-consultation", "new-bo-wl", "old-wl", "weight-loss", "body-optimization", "bo", "glp1", "glp2"],
   HL: ["hair", "hairloss", "hair-loss", "hair-main-questionnaire", "hair-pre-consultation", "hair-flow", "hair-products"],
   SMOKING: ["smoking", "smoking-consultation", "zonnic"],
   SKINCARE: ["skincare", "skin-care", "acne", "anti-aging", "anti-ageing", "hyperpigmentation", "hyper-pigmentation"],
@@ -77,7 +76,9 @@ const getPixelKeyForPath = (pathname, categories = []) => {
 export default function FBPixelLoader() {
   const pathname = usePathname();
   const [resolvedPixelId, setResolvedPixelId] = useState("");
+  const currentPixelRef = useRef(null);
 
+  // Resolve pixel key on every pathname change
   useEffect(() => {
     let isActive = true;
 
@@ -120,36 +121,46 @@ export default function FBPixelLoader() {
     };
   }, [pathname]);
 
-  const pixelId = resolvedPixelId;
+  // Load fbevents.js base code once, then init/reinit pixel on every change
+  useEffect(() => {
+    if (!resolvedPixelId || typeof window === "undefined") return;
 
-  if (!pixelId) return null;
+    if (!window.fbq) {
+      const n = (window.fbq = function () {
+        n.callMethod
+          ? n.callMethod.apply(n, arguments)
+          : n.queue.push(arguments);
+      });
+      if (!window._fbq) window._fbq = n;
+      n.push = n;
+      n.loaded = !0;
+      n.version = "2.0";
+      n.queue = [];
+      const t = document.createElement("script");
+      t.async = !0;
+      t.src = "https://connect.facebook.net/en_US/fbevents.js";
+      const s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(t, s);
+    }
+
+    if (currentPixelRef.current !== resolvedPixelId) {
+      currentPixelRef.current = resolvedPixelId;
+      window.fbq("init", resolvedPixelId);
+    }
+    window.fbq("trackSingle", resolvedPixelId, "PageView");
+  }, [resolvedPixelId]);
+
+  if (!resolvedPixelId) return null;
 
   return (
-    <>
-      <Script id="facebook-pixel" strategy="afterInteractive">
-        {`
-          !function(f,b,e,v,n,t,s)
-          {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-          n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-          if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-          n.queue=[];t=b.createElement(e);t.async=!0;
-          t.src=v;s=b.getElementsByTagName(e)[0];
-          s.parentNode.insertBefore(t,s)}(window, document,'script',
-          'https://connect.facebook.net/en_US/fbevents.js');
-          fbq('init', '${pixelId}');
-          fbq('track', 'PageView');
-        `}
-      </Script>
-
-      <noscript>
-        <img
-          height="1"
-          width="1"
-          style={{ display: "none" }}
-          src={`https://www.facebook.com/tr?id=${pixelId}&ev=PageView&noscript=1`}
-          alt=""
-        />
-      </noscript>
-    </>
+    <noscript>
+      <img
+        height="1"
+        width="1"
+        style={{ display: "none" }}
+        src={`https://www.facebook.com/tr?id=${resolvedPixelId}&ev=PageView&noscript=1`}
+        alt=""
+      />
+    </noscript>
   );
 }
