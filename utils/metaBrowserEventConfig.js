@@ -11,6 +11,19 @@ const META_DEBUG =
   process.env.NEXT_PUBLIC_META_QUIZ_DEBUG === "1";
 
 /* ------------------------------------------------------------------ */
+/*  Pixel IDs per category (mirrors FBPixelLoader PIXEL_IDS)           */
+/* ------------------------------------------------------------------ */
+
+export const CATEGORY_PIXEL_MAP = {
+  ED: process.env.NEXT_PUBLIC_FB_PIXEL_ID_ED || "522677764108011",
+  WL: process.env.NEXT_PUBLIC_FB_PIXEL_ID_WL || "1451450365779499",
+  SMOKING: process.env.NEXT_PUBLIC_FB_PIXEL_ID_SMOKING || "1311848663202831",
+  HL: process.env.NEXT_PUBLIC_FB_PIXEL_ID_HL || "754893718769214",
+  SKINCARE: process.env.NEXT_PUBLIC_FB_PIXEL_ID_SKINCARE || "1843271713209245",
+  OTHERS: process.env.NEXT_PUBLIC_FB_PIXEL_ID_OTHERS || "799609076328562",
+};
+
+/* ------------------------------------------------------------------ */
 /*  Category base codes (aligned with CAPI CUSTOM_EVENT_NAMES)         */
 /* ------------------------------------------------------------------ */
 

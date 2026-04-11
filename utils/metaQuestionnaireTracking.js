@@ -2,7 +2,7 @@
  * Meta questionnaire funnel tracking — emission helpers.
  *
  * Sends THREE targets per milestone:
- *   1. window.fbq("trackCustom", obfuscatedName, payload)  — Meta Pixel
+ *   1. window.fbq("trackSingleCustom", pixelId, name, payload) — Meta Pixel (targeted)
  *   2. dataLayer meta mirror   (e.g. meta_quiz_step)        — GTM / debug
  *   3. dataLayer generic event (e.g. quiz_step)             — heatmap.com / SPA funnel tools
  *
@@ -12,6 +12,8 @@
 import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
 import {
   resolveMetaEventName,
+  resolveCategory,
+  CATEGORY_PIXEL_MAP,
   DATALAYER_EVENT_NAMES,
   GENERIC_EVENT_NAMES,
 } from "@/utils/metaBrowserEventConfig";
@@ -60,11 +62,13 @@ function emitMetaFunnelEvent(milestone, flowId, questionnaireId, params = {}) {
       ...params,
     };
 
-    // 1. Meta Pixel — obfuscated, no content_name
+    // 1. Meta Pixel — obfuscated, targeted at the correct pixel
     if (typeof window.fbq === "function") {
+      const category = resolveCategory(flowId, questionnaireId);
+      const pixelId = CATEGORY_PIXEL_MAP[category] || CATEGORY_PIXEL_MAP.OTHERS;
       const fbqPayload = { ...basePayload };
       delete fbqPayload.content_name;
-      window.fbq("trackCustom", obfuscatedName, fbqPayload);
+      window.fbq("trackSingleCustom", pixelId, obfuscatedName, fbqPayload);
     }
 
     // 2. dataLayer — Meta-readable internal mirror
