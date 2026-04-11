@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const PIXEL_IDS = {
   ED: process.env.NEXT_PUBLIC_FB_PIXEL_ID_ED || "522677764108011",
@@ -75,78 +75,105 @@ const getPixelKeyForPath = (pathname, categories = []) => {
 
 export default function FBPixelLoader() {
   const pathname = usePathname();
-  const [resolvedPixelId, setResolvedPixelId] = useState("");
   const currentPixelRef = useRef(null);
 
-  // Resolve pixel key on every pathname change
+  // Synchronous pixel resolution — updates in the same render as pathname,
+  // so the PageView effect always sees the correct pixel for the current page.
+  const syncPixelId = useMemo(() => {
+    if (!pathname) return PIXEL_IDS.OTHERS;
+    const pixelKey = getPixelKeyForPath(pathname) || "OTHERS";
+    return PIXEL_IDS[pixelKey];
+  }, [pathname]);
+
+  // Async refinement for /product/* pages using server-side category data.
+  // Falls back to slug-based matching (syncPixelId) if the lookup fails.
+  const [asyncPixelId, setAsyncPixelId] = useState(null);
+
   useEffect(() => {
+    if (!pathname) return;
+    const cleanedPath = pathname.toLowerCase();
+
+    if (!cleanedPath.startsWith("/product/")) {
+      setAsyncPixelId(null);
+      return;
+    }
+
     let isActive = true;
+    const slug = cleanedPath.split("/").filter(Boolean)[1];
+    if (!slug) return;
 
-    const resolvePixel = async () => {
-      if (!pathname) {
-        if (isActive) setResolvedPixelId("");
-        return;
-      }
+    fetch(`/api/products/${slug}/basic`, { cache: "no-store" })
+      .then((res) => {
+        if (!res.ok) throw new Error("not found");
+        return res.json();
+      })
+      .then((data) => {
+        if (!isActive) return;
+        const categorySlugs = (data.categories || [])
+          .map((c) => c.slug)
+          .filter(Boolean);
+        const pixelKey = getPixelKeyForPath(pathname, categorySlugs) || "OTHERS";
+        setAsyncPixelId(PIXEL_IDS[pixelKey]);
+      })
+      .catch(() => {
+        if (isActive) setAsyncPixelId(null);
+      });
 
-      const cleanedPath = pathname.toLowerCase();
-      if (cleanedPath.startsWith("/product/")) {
-        const slug = cleanedPath.split("/").filter(Boolean)[1];
-        if (slug) {
-          try {
-            const response = await fetch(`/api/products/${slug}/basic`, { cache: "no-store" });
-            if (response.ok) {
-              const data = await response.json();
-              const categorySlugs = (data.categories || [])
-                .map((category) => category.slug)
-                .filter(Boolean);
-              const pixelKey = getPixelKeyForPath(pathname, categorySlugs);
-              if (isActive) {
-                setResolvedPixelId(pixelKey ? PIXEL_IDS[pixelKey] : "");
-              }
-              return;
-            }
-          } catch (error) {
-            // Fall back to slug-based matching if product lookup fails.
-          }
-        }
-      }
-
-      const pixelKey = getPixelKeyForPath(pathname);
-      if (isActive) setResolvedPixelId(pixelKey ? PIXEL_IDS[pixelKey] : "");
-    };
-
-    resolvePixel();
     return () => {
       isActive = false;
     };
   }, [pathname]);
 
-  // Load fbevents.js base code once on mount
-  useEffect(() => {
-    if (typeof window === "undefined" || window.fbq) return;
+  const resolvedPixelId = asyncPixelId || syncPixelId;
 
-    const n = (window.fbq = function () {
-      n.callMethod
-        ? n.callMethod.apply(n, arguments)
-        : n.queue.push(arguments);
-    });
-    if (!window._fbq) window._fbq = n;
-    n.push = n;
-    n.loaded = !0;
-    n.version = "2.0";
-    n.queue = [];
-    const t = document.createElement("script");
-    t.async = !0;
-    t.src = "https://connect.facebook.net/en_US/fbevents.js";
-    const s = document.getElementsByTagName("script")[0];
-    if (s && s.parentNode) {
-      s.parentNode.insertBefore(t, s);
-    } else {
-      document.head.appendChild(t);
+  // Load fbevents.js base code once on mount.
+  // GTM or other tools may have already created the fbq stub but loaded
+  // fbevents.js from a broken proxy (e.g. sGTM). We always ensure the
+  // stub exists AND that fbevents.js is loaded from connect.facebook.net.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    if (!window.fbq) {
+      const n = (window.fbq = function () {
+        n.callMethod
+          ? n.callMethod.apply(n, arguments)
+          : n.queue.push(arguments);
+      });
+      if (!window._fbq) window._fbq = n;
+      n.push = n;
+      n.loaded = !0;
+      n.version = "2.0";
+      n.queue = [];
+    }
+
+    // With multiple pixels across categories, the built-in pushState listener
+    // fires track('PageView') for ALL initialized pixels — causing
+    // cross-category contamination. We disable it and fire targeted
+    // trackSingle('PageView') manually on each navigation instead.
+    // See: https://developers.facebook.com/docs/meta-pixel/guides/track-multiple-events/
+    window.fbq.disablePushState = true;
+
+    // Ensure fbevents.js is loaded directly from Meta, even if another tool
+    // (e.g. GTM with a broken sGTM proxy) already created the stub.
+    const fbScript = document.querySelector(
+      'script[src*="connect.facebook.net"][src*="fbevents.js"]'
+    );
+    if (!fbScript) {
+      const t = document.createElement("script");
+      t.async = !0;
+      t.src = "https://connect.facebook.net/en_US/fbevents.js";
+      const s = document.getElementsByTagName("script")[0];
+      if (s && s.parentNode) {
+        s.parentNode.insertBefore(t, s);
+      } else {
+        document.head.appendChild(t);
+      }
     }
   }, []);
 
-  // Init/reinit pixel and fire PageView on every resolved pixel change
+  // Init pixel (only when it changes) and fire targeted PageView on every navigation.
+  // Both resolvedPixelId and pathname are deps so that same-category navigations
+  // (e.g. /ed → /ed-consultation where pixel stays the same) still fire a PageView.
   useEffect(() => {
     if (!resolvedPixelId || typeof window === "undefined") return;
     if (typeof window.fbq !== "function") return;
@@ -156,7 +183,7 @@ export default function FBPixelLoader() {
       window.fbq("init", resolvedPixelId);
     }
     window.fbq("trackSingle", resolvedPixelId, "PageView");
-  }, [resolvedPixelId]);
+  }, [resolvedPixelId, pathname]);
 
   if (!resolvedPixelId) return null;
 
