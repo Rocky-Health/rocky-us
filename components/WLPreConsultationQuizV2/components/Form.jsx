@@ -90,29 +90,52 @@ const Form = ({
   const requiredPasswordLength = hasPasswordField ? 9 : 6;
 
   useEffect(() => {
-    const updatedState = {};
-    config.fields.forEach((field) => {
-      if (field.type === "checkbox") {
-        if (Array.isArray(field.options)) {
-          updatedState[field.id] = userData?.[field.id] || [];
+    // Use functional updates to avoid overwriting fields the user is actively editing.
+    // When userData changes (e.g. the sex radio calls setUserData so navigation logic
+    // sees the latest value), we must NOT wipe other fields (dateOfBirth, post_code)
+    // that are only tracked in local fieldsState and not yet in userData.
+    setFieldsState((prev) => {
+      const updatedState = {};
+      config.fields.forEach((field) => {
+        const uVal = userData?.[field.id];
+        if (field.type === "checkbox") {
+          if (Array.isArray(field.options)) {
+            // Sync from userData when it has a value; otherwise keep what the user typed
+            updatedState[field.id] =
+              uVal !== undefined && uVal !== null ? uVal : prev[field.id] || [];
+          } else {
+            updatedState[field.id] =
+              uVal !== undefined && uVal !== null
+                ? uVal
+                : (prev[field.id] ?? false);
+          }
         } else {
-          updatedState[field.id] = userData?.[field.id] ?? false;
+          // Only overwrite with the userData value when it is actually set (non-empty).
+          // This prevents clearing fields like dateOfBirth / post_code when an
+          // unrelated field (sex) triggers a userData update.
+          updatedState[field.id] =
+            uVal !== undefined && uVal !== null && uVal !== ""
+              ? uVal
+              : prev[field.id] || "";
         }
-      } else {
-        updatedState[field.id] = userData?.[field.id] || "";
-      }
+      });
+      return updatedState;
     });
-    setFieldsState(updatedState);
-    // Update completedFields according to new userData
-    const updatedCompleted = {};
-    config.fields.forEach((f) => {
-      const v = updatedState[f.id];
-      if (Array.isArray(v)) updatedCompleted[f.id] = v.length > 0;
-      else if (typeof v === "string")
-        updatedCompleted[f.id] = v.trim().length > 0;
-      else updatedCompleted[f.id] = !!v;
+    // Update completedFields only for fields that have values in userData
+    setCompletedFields((prev) => {
+      const updatedCompleted = { ...prev };
+      config.fields.forEach((f) => {
+        const uVal = userData?.[f.id];
+        if (uVal !== undefined && uVal !== null) {
+          if (Array.isArray(uVal)) updatedCompleted[f.id] = uVal.length > 0;
+          else if (typeof uVal === "string")
+            updatedCompleted[f.id] = uVal.trim().length > 0;
+          else updatedCompleted[f.id] = !!uVal;
+        }
+        // If userData has no value for this field, leave completedFields as-is
+      });
+      return updatedCompleted;
     });
-    setCompletedFields(updatedCompleted);
   }, [userData, config]);
 
   // Clear debounce timers on unmount
@@ -126,7 +149,7 @@ const Form = ({
   // Detect autofilled inputs and sync with state
   useEffect(() => {
     const checkAutofill = () => {
-      const inputs = document.querySelectorAll('input, select, textarea');
+      const inputs = document.querySelectorAll("input, select, textarea");
       const updates = {};
       let hasUpdates = false;
 
@@ -135,7 +158,7 @@ const Form = ({
         if (!name) return;
 
         // Check if field exists in config
-        const field = config.fields.find(f => f.id === name);
+        const field = config.fields.find((f) => f.id === name);
         if (!field) return;
 
         // Get current value from DOM
@@ -150,11 +173,11 @@ const Form = ({
       });
 
       if (hasUpdates) {
-        setFieldsState(prev => ({ ...prev, ...updates }));
+        setFieldsState((prev) => ({ ...prev, ...updates }));
         // Mark updated fields as completed
-        setCompletedFields(prev => {
+        setCompletedFields((prev) => {
           const newCompleted = { ...prev };
-          Object.keys(updates).forEach(key => {
+          Object.keys(updates).forEach((key) => {
             newCompleted[key] = true;
           });
           return newCompleted;
@@ -167,16 +190,20 @@ const Form = ({
 
     // Listen for autofill animation (webkit browsers)
     const handleAnimationStart = (e) => {
-      if (e.animationName === 'onAutoFillStart') {
+      if (e.animationName === "onAutoFillStart") {
         checkAutofill();
       }
     };
 
-    document.addEventListener('animationstart', handleAnimationStart, true);
+    document.addEventListener("animationstart", handleAnimationStart, true);
 
     return () => {
       clearTimeout(timer);
-      document.removeEventListener('animationstart', handleAnimationStart, true);
+      document.removeEventListener(
+        "animationstart",
+        handleAnimationStart,
+        true,
+      );
     };
   }, [config.fields, fieldsState]);
 
@@ -212,7 +239,7 @@ const Form = ({
       } catch (e) {
         logger.error(
           "Error triggering conditionalAction for consent checkbox:",
-          e
+          e,
         );
       }
       return next;
@@ -234,7 +261,7 @@ const Form = ({
       "key:",
       key,
       "found:",
-      actionCfg
+      actionCfg,
     );
     if (!actionCfg) {
       // try stringified
@@ -263,9 +290,9 @@ const Form = ({
     if (actionCfg && typeof onAction === "function") {
       logger.log(
         `Triggering conditional action for field ${field.id} key=${String(
-          value
+          value,
         )}`,
-        actionCfg
+        actionCfg,
       );
       onAction(actionCfg.action, actionCfg.popupType || actionCfg);
       return actionCfg;
@@ -277,7 +304,6 @@ const Form = ({
     // Return the parsed object or extract specific error message
     if (typeof response !== "string" || response !== null) {
       switch (response.code) {
-
         case "incorrect_password":
           return "The password you entered is incorrect. Please try again.";
         default:
@@ -289,29 +315,23 @@ const Form = ({
   };
 
   const handleChange = (id, value) => {
-    // Apply signup-style formatting for phone field
-    let nextValue = value;
-    if (id === "phone") {
-      nextValue = formatPhoneNumber(value || "");
-    }
+    setFieldsState((prev) => ({ ...prev, [id]: value }));
 
-    setFieldsState((prev) => ({ ...prev, [id]: nextValue }));
-    
     // Update userData immediately ONLY for fields that control conditional navigation
     // This ensures conditional navigation has the latest value without interfering with other inputs
     const field = config.fields.find((f) => f.id === id);
     const textLike =
       field &&
       ["text", "email", "tel", "number", "textarea"].includes(field.type);
-    
+
     // Check if this field is used for conditional navigation
     const isConditionalField = config.field === id;
-    
+
     if (!textLike && isConditionalField) {
       // For radio, select fields that control navigation - update userData immediately
       setUserData((prev) => ({ ...prev, [id]: value }));
     }
-    
+
     // Debounce text-like inputs to mark completed when user pauses
     if (textLike) {
       setCompletedFields((prev) => ({ ...prev, [id]: false }));
@@ -328,7 +348,7 @@ const Form = ({
     try {
       const field = config.fields.find((f) => f.id === id);
       if (field && field.conditionalActions) {
-        triggerConditionalActionForField(field, nextValue);
+        triggerConditionalActionForField(field, value);
       }
     } catch (e) {
       logger.error("Error checking conditionalActions in handleChange:", e);
@@ -376,7 +396,7 @@ const Form = ({
         birthDate = new Date(
           parseInt(parts[2]),
           parseInt(parts[1]) - 1,
-          parseInt(parts[0])
+          parseInt(parts[0]),
         );
       } else {
         // Fallback
@@ -405,102 +425,87 @@ const Form = ({
     return /\S+@\S+\.\S+/.test(email.trim());
   };
 
-  // Helper: format phone number like signup (e.g. (123) 456-7890)
-  const formatPhoneNumber = (value) => {
-    if (!value) return "";
-    const phoneNumber = String(value).replace(/\D/g, "");
-
-    if (phoneNumber.length <= 3) {
-      return `(${phoneNumber}`;
-    } else if (phoneNumber.length <= 6) {
-      return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`;
-    }
-
-    return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(
-      3,
-      6
-    )}-${phoneNumber.slice(6, 10)}`;
-  };
-
-  // Helper: validate phone number like signup
+  // Helper: check if phone is valid format (basic, but better than non-empty)
   const isValidPhone = (phone) => {
     if (!phone || typeof phone !== "string") return false;
     const digitsOnly = phone.replace(/\D/g, "");
+    // Require at least 10 digits and not all zeros
     if (digitsOnly.length < 10) return false;
-    if (digitsOnly.length > 0 && /^0+$/.test(digitsOnly)) return false;
+    if (/^0+$/.test(digitsOnly)) return false;
     return true;
   };
 
   // Reusable registration logic for both WLFlow1 and WLFlow2
   const registerUser = async (mergedUserData) => {
     setLoading(true);
-    let registrationPassword = mergedUserData.password;
-
-    if (!registrationPassword) {
-      registrationPassword = await restorePasswordSecurely();
+    // Restore password from encrypted storage after refresh when needed
+    let resolvedPassword = mergedUserData.password;
+    if (!resolvedPassword) {
+      resolvedPassword = await restorePasswordSecurely();
     }
+    const registrationData = { ...mergedUserData, password: resolvedPassword };
 
     // Step 1 validation (name, email, password)
-    if (!mergedUserData.firstName || !mergedUserData.lastName) {
+    if (!registrationData.firstName || !registrationData.lastName) {
       toast.error("Please enter your full name");
       setLoading(false);
       return false;
     }
-    if (!mergedUserData.email) {
+    if (!registrationData.email) {
       toast.error("Email address is required");
       setLoading(false);
       return false;
     }
-    if (!/\S+@\S+\.\S+/.test(mergedUserData.email)) {
+    if (!/\S+@\S+\.\S+/.test(registrationData.email)) {
       toast.error("Please enter a valid email address");
       setLoading(false);
       return false;
     }
-    if (!registrationPassword) {
+    if (!registrationData.password) {
       toast.error("Password is required");
       setLoading(false);
       return false;
     }
-    if (registrationPassword.length < requiredPasswordLength) {
+    if (registrationData.password.length < requiredPasswordLength) {
       toast.error(
-        `Password must be at least ${requiredPasswordLength} characters`
+        `Password must be at least ${requiredPasswordLength} characters`,
       );
       setLoading(false);
       return false;
     }
 
     // Step 2 validation (phone, dob, province)
-    if (!mergedUserData.phone) {
+    if (!registrationData.phone) {
       toast.error("Phone number is required");
       setLoading(false);
       return false;
     }
     // Check if phone number contains only zeros
-    const digitsOnly = mergedUserData.phone.replace(/\D/g, "");
+    const digitsOnly = registrationData.phone.replace(/\D/g, "");
     if (digitsOnly.length > 0 && /^0+$/.test(digitsOnly)) {
       toast.error("Please enter a valid phone number");
       setLoading(false);
       return false;
     }
-    if (!mergedUserData.dateOfBirth) {
+    if (!registrationData.dateOfBirth) {
       toast.error("Date of birth is required");
       setLoading(false);
       return false;
     }
-    if (!mergedUserData.province) {
+    if (!registrationData.province) {
       toast.error("Province is required");
       setLoading(false);
       return false;
     }
 
     // Format date_of_birth to YYYY-MM-DD if needed
-    let formattedDOB = mergedUserData.dateOfBirth;
+    let formattedDOB = registrationData.dateOfBirth;
     if (formattedDOB && formattedDOB.includes("/")) {
       const parts = formattedDOB.split("/");
       if (parts.length === 3) {
         formattedDOB = `${parts[2]}-${parts[1].padStart(
           2,
-          "0"
+          "0",
         )}-${parts[0].padStart(2, "0")}`;
       }
     }
@@ -513,8 +518,8 @@ const Form = ({
         body: JSON.stringify({
           first_name: mergedUserData.firstName,
           last_name: mergedUserData.lastName,
-          email: mergedUserData.email,
-          password: registrationPassword,
+          email: registrationData.email,
+          password: registrationData.password,
           register_step: 1,
         }),
       });
@@ -532,12 +537,12 @@ const Form = ({
         body: JSON.stringify({
           first_name: mergedUserData.firstName,
           last_name: mergedUserData.lastName,
-          email: mergedUserData.email,
-          password: registrationPassword,
-          phone: mergedUserData.phone,
+          email: registrationData.email,
+          password: registrationData.password,
+          phone: registrationData.phone,
           date_of_birth: formattedDOB,
-          province: mergedUserData.province,
-          gender: mergedUserData.gender,
+          province: registrationData.province,
+          gender: mergedUserData.sex,
           register_step: 2,
         }),
       });
@@ -595,21 +600,27 @@ const Form = ({
 
     // If this is the contact info step (step 17), show password modal before continuing
     if (config.id === "contactInfo") {
-      let availablePassword =
-        typeof userData["password"] === "string" ? userData["password"] : "";
-      if (!availablePassword) {
-        availablePassword = await restorePasswordSecurely();
+      let resolvedPassword = userData["password"] || "";
+      if (
+        (typeof resolvedPassword !== "string" ||
+          resolvedPassword.trim().length === 0) &&
+        typeof window !== "undefined"
+      ) {
+        resolvedPassword = await restorePasswordSecurely();
+        if (resolvedPassword) {
+          setUserData((prev) => ({ ...prev, password: resolvedPassword }));
+        }
       }
 
       if (
-        typeof availablePassword === "string" &&
-        availablePassword.trim().length > 0
+        typeof resolvedPassword === "string" &&
+        resolvedPassword.trim().length > 0
       ) {
         // Merge latest form fields and password into userData
         const mergedUserData = {
           ...userData,
           ...fieldsState,
-          password: availablePassword,
+          password: resolvedPassword,
         };
         setUserData(mergedUserData);
 
@@ -640,7 +651,7 @@ const Form = ({
       // Prompt for password if not present
       if (!mergedUserData.password) {
         toast.error(
-          "Password is required. Please go back and enter your password."
+          "Password is required. Please go back and enter your password.",
         );
         return;
       }
@@ -734,7 +745,7 @@ const Form = ({
   useEffect(() => {
     const has = visibleFields.some(
       (f) =>
-        f.conditionalActions && Object.keys(f.conditionalActions).length > 0
+        f.conditionalActions && Object.keys(f.conditionalActions).length > 0,
     );
     setHasConditionalActions(has);
     logger.log("Form step", config.id, "hasConditionalActions:", has);
@@ -755,8 +766,8 @@ const Form = ({
     if (field.type === "email") {
       return value && isValidEmail(value);
     }
-    if (field.id === "phone") {
-      return isValidPhone(value);
+    if (field.type === "tel") {
+      return value && isValidPhone(value);
     }
     if (field.type === "checkbox") {
       if (Array.isArray(field.options)) {
@@ -818,13 +829,39 @@ const Form = ({
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
                   {showPassword ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-5 h-5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"
+                      />
                     </svg>
                   ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-5 h-5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
                     </svg>
                   )}
                 </button>
@@ -899,13 +936,17 @@ const Form = ({
           animation-name: onAutoFillStart;
         }
         @keyframes onAutoFillStart {
-          from { opacity: 0.99; }
-          to { opacity: 1; }
+          from {
+            opacity: 0.99;
+          }
+          to {
+            opacity: 1;
+          }
         }
       `}</style>
 
       <form
-        className="flex flex-col gap-1 w-full pb-24"
+        className="flex flex-col gap-1 w-full pb-20"
         onSubmit={(e) => {
           e.preventDefault();
           handleContinue();
@@ -974,7 +1015,7 @@ const Form = ({
                             </Link>{" "}
                             and{" "}
                             <Link
-                              href="/telehealth-consent"
+                              href="/terms-of-use"
                               className="text-[#00000080] font-bold underline"
                             >
                               Telehealth Consent
@@ -1046,14 +1087,31 @@ const Form = ({
                       name={field.id}
                       id={field.id}
                       type={field.type}
-                      autoComplete={field.type === "email" ? "email" : field.type === "tel" ? "tel" : field.id === "firstName" ? "given-name" : field.id === "lastName" ? "family-name" : field.id === "password" ? "new-password" : "on"}
+                      autoComplete={
+                        field.type === "email"
+                          ? "email"
+                          : field.type === "tel"
+                            ? "tel"
+                            : field.id === "firstName"
+                              ? "given-name"
+                              : field.id === "lastName"
+                                ? "family-name"
+                                : field.id === "password"
+                                  ? "new-password"
+                                  : "on"
+                      }
                       className={`w-full h-[60px] border rounded-lg px-4 py-3 text-[16px] focus:outline-none transition-colors ${
                         field.type === "email" &&
                         fieldsState[field.id] &&
                         completedFields[field.id] &&
                         !isValidEmail(fieldsState[field.id])
                           ? "border-red-500 focus:border-red-500"
-                          : "border-[#E5E5E5] focus:border-black"
+                          : field.type === "tel" &&
+                              fieldsState[field.id] &&
+                              completedFields[field.id] &&
+                              !isValidPhone(fieldsState[field.id])
+                            ? "border-red-500 focus:border-red-500"
+                            : "border-[#E5E5E5] focus:border-black"
                       }`}
                       placeholder={field.placeholder}
                       value={fieldsState[field.id] ?? ""}
@@ -1066,6 +1124,14 @@ const Form = ({
                       !isValidEmail(fieldsState[field.id]) && (
                         <p className="text-red-500 text-sm mt-1">
                           Please enter a valid email address
+                        </p>
+                      )}
+                    {field.type === "tel" &&
+                      fieldsState[field.id] &&
+                      completedFields[field.id] &&
+                      !isValidPhone(fieldsState[field.id]) && (
+                        <p className="text-red-500 text-sm mt-1">
+                          Please enter a valid phone number
                         </p>
                       )}
                   </>
