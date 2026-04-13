@@ -126,8 +126,8 @@ export const boSimplifiedConfig = {
             title: "Let’s start with the basics",
             field: "sex",
             conditionalNavigation: {
-                Male: 5,
-                Female: 5,
+                male: 5,
+                female: 5,
             },
             fields: [
                 {
@@ -135,8 +135,8 @@ export const boSimplifiedConfig = {
                     label: "Sex assigned at birth",
                     type: "radio",
                     options: [
-                        { value: "Male", label: "Male" },
-                        { value: "Female", label: "Female" },
+                        { value: "male", label: "Male" },
+                        { value: "female", label: "Female" },
                     ],
                 },
                 {

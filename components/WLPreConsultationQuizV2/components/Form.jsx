@@ -542,7 +542,7 @@ const Form = ({
           phone: registrationData.phone,
           date_of_birth: formattedDOB,
           province: registrationData.province,
-          gender: registrationData.gender,
+          gender: mergedUserData.sex,
           register_step: 2,
         }),
       });
