@@ -429,7 +429,7 @@ const Form = ({
   // Reusable registration logic for both WLFlow1 and WLFlow2
   const registerUser = async (mergedUserData) => {
     setLoading(true);
-    // Restore password from encrypted storage after refresh when needed
+    // Restore password from encrypted storage after refresh when needed.
     let resolvedPassword = mergedUserData.password;
     if (!resolvedPassword) {
       resolvedPassword = await restorePasswordSecurely();
@@ -1081,10 +1081,7 @@ const Form = ({
                     onBlur={() => handleBlurMark(field.id)}
                     placeholder={field.placeholder}
                     showError={
-                      !!(
-                        fieldsState[field.id] &&
-                        completedFields[field.id]
-                      )
+                      !!(fieldsState[field.id] && completedFields[field.id])
                     }
                     inputClassName={`w-full h-[60px] border rounded-lg px-4 py-3 text-[16px] focus:outline-none transition-colors ${
                       fieldsState[field.id] &&
