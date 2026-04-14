@@ -6,26 +6,11 @@ import Loader from "@/components/Loader";
 import { toast } from "react-toastify";
 import { logger } from "@/utils/devLogger";
 import { usePassword } from "@/components/WLPreConsultationQuizV2/contexts/PasswordContext";
+import PhoneInput, { isValidPhone } from "@/components/PhoneInput";
 
 const isValidEmail = (e) => {
   if (!e || typeof e !== "string") return false;
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim());
-};
-
-const formatPhoneNumber = (value) => {
-  if (!value) return "";
-  const digits = String(value).replace(/\D/g, "");
-  if (digits.length <= 3) return `(${digits}`;
-  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
-  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
-};
-
-const isValidPhone = (value) => {
-  if (!value || typeof value !== "string") return false;
-  const digits = value.replace(/\D/g, "");
-  if (digits.length < 10) return false;
-  if (/^0+$/.test(digits)) return false;
-  return true;
 };
 
 const EyeIcon = ({ open }) =>
@@ -62,7 +47,6 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
   const [agreePrivacy, setAgreePrivacy] = useState(false);
 
   const [emailTouched, setEmailTouched] = useState(false);
-  const [phoneTouched, setPhoneTouched] = useState(false);
   const [isCheckingEmail, setIsCheckingEmail] = useState(false);
   const [showPasswordSection, setShowPasswordSection] = useState(false);
   const [emailExists, setEmailExists] = useState(false);
@@ -296,26 +280,18 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
               <label className="block text-[14px] font-medium text-[#251F20] mb-2">
                 Phone
               </label>
-              <input
-                type="tel"
+              <PhoneInput
+                id="glp2-phone"
+                name="phone"
                 value={phone}
-                onChange={(e) => {
-                  setPhone(formatPhoneNumber(e.target.value));
-                  if (!phoneTouched) setPhoneTouched(true);
-                }}
-                onBlur={() => setPhoneTouched(true)}
+                onChange={(formatted) => setPhone(formatted)}
                 placeholder="(123) 456-7890"
-                className={`w-full h-[52px] border rounded-[8px] px-4 bg-white text-[15px] text-[#251F20] focus:outline-none ${
-                  phoneTouched && !isValidPhone(phone)
+                inputClassName={`w-full h-[52px] border rounded-[8px] px-4 bg-white text-[15px] text-[#251F20] focus:outline-none ${
+                  !isValidPhone(phone) && phone
                     ? "border-red-400 focus:border-red-400"
                     : "border-[#E2E2E1] focus:border-[#AE7E56]"
                 }`}
               />
-              {phoneTouched && !isValidPhone(phone) && (
-                <p className="mt-1 text-[12px] text-red-500">
-                  Please enter a valid 10-digit phone number.
-                </p>
-              )}
             </div>
           )}
 

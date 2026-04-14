@@ -6,6 +6,7 @@ import { checkAgeRestriction } from "@/utils/ageValidation";
 import { logger } from "@/utils/devLogger";
 import { US_STATES_WITH_CODES, PHASE_1_STATES } from "@/lib/constants/usStates";
 import { validateField } from "@/utils/checkoutValidation";
+import PhoneInput from "@/components/PhoneInput";
 
 const BillingDetails = ({
   formData,
@@ -113,72 +114,26 @@ const BillingDetails = ({
     }
   };
 
-  // Format phone number to (XXX) XXX-XXXX format
-  const formatPhoneNumber = (value) => {
-    if (!value || typeof value !== "string") {
-      return "";
-    }
-
-    // Remove all non-digit characters
-    const phoneNumber = value.replace(/\D/g, "");
-
-    // Limit to 10 digits (US phone number format)
-    const limitedDigits = phoneNumber.slice(0, 10);
-
-    // Format as (XXX) XXX-XXXX
-    if (limitedDigits.length === 0) {
-      return "";
-    } else if (limitedDigits.length <= 3) {
-      return `(${limitedDigits}`;
-    } else if (limitedDigits.length <= 6) {
-      return `(${limitedDigits.slice(0, 3)}) ${limitedDigits.slice(3)}`;
-    } else {
-      return `(${limitedDigits.slice(0, 3)}) ${limitedDigits.slice(
-        3,
-        6
-      )}-${limitedDigits.slice(6, 10)}`;
-    }
-  };
-
-  // Handle phone number change with validation
-  const handlePhoneChange = (e) => {
-    // Use formatPhoneNumber (single source of truth)
-    const formattedPhoneNumber = formatPhoneNumber(e.target.value);
-
-    // Update form data
+  // Handle phone number change — PhoneInput delivers already-masked string
+  const handlePhoneChange = (formatted) => {
     handleBillingAddressChange({
-      target: {
-        name: "phone",
-        value: formattedPhoneNumber,
-      },
+      target: { name: "phone", value: formatted },
     });
 
-    // Validate dynamically as user types using checkoutValidation
-    const digitsOnly = formattedPhoneNumber.replace(/\D/g, "");
+    const digitsOnly = formatted.replace(/\D/g, "");
     if (digitsOnly.length >= 10) {
-      // Only validate if we have enough digits (complete phone number)
-      const validation = validateField("phone", formattedPhoneNumber);
-      if (!validation.isValid) {
-        setPhoneError(validation.message);
-      } else {
-        setPhoneError("");
-      }
-    } else if (phoneError && digitsOnly.length < 10) {
-      // Clear error if user is still typing and hasn't reached 10 digits yet
+      const validation = validateField("phone", formatted);
+      setPhoneError(validation.isValid ? "" : validation.message);
+    } else if (phoneError) {
       setPhoneError("");
     }
   };
 
-  // Handle phone blur (when user leaves the field)
+  // Handle phone blur
   const handlePhoneBlur = () => {
     if (formData.billing_address.phone) {
-      // Use checkoutValidation to validate
       const validation = validateField("phone", formData.billing_address.phone);
-      if (!validation.isValid) {
-        setPhoneError(validation.message);
-      } else {
-        setPhoneError("");
-      }
+      setPhoneError(validation.isValid ? "" : validation.message);
     }
   };
 
@@ -378,17 +333,28 @@ const BillingDetails = ({
           onChange={handleBillingAddressChange}
         />
       </div>
-      <div className="mb-4">
-        <FormInput
-          title="Phone Number"
+      <div className="mb-4 md:mb-0 w-full">
+        <label
+          htmlFor="phone"
+          className="block text-[14px] leading-[19.6px] font-[500] text-[#212121] mb-2"
+        >
+          Phone Number
+          <span className="text-red-500 ml-1">*</span>
+        </label>
+        <PhoneInput
+          id="phone"
           name="phone"
           value={formData.billing_address.phone}
-          placeholder="(XXX) XXX-XXXX"
-          required
           onChange={handlePhoneChange}
           onBlur={handlePhoneBlur}
-          error={phoneError}
-          maxLength={14}
+          error={phoneError || undefined}
+          placeholder="(XXX) XXX-XXXX"
+          required
+          inputClassName={`w-full !bg-white !rounded-[8px] !border !border-solid !px-[16px] py-[12px] h-[44px] !focus:outline-none ${
+            phoneError
+              ? "!border-red-500 focus:!border-red-600"
+              : "!border-[#E2E2E1] !focus:border-gray-500"
+          }`}
         />
       </div>
       <div className="mb-4">
