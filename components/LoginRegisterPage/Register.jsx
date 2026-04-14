@@ -33,6 +33,7 @@ import {
 } from "@/lib/constants/usStates";
 import Logo from "../Navbar/Logo";
 import Image from "next/image";
+import PhoneInput from "@/components/PhoneInput";
 
 const RegisterContent = ({ setActiveTab, registerRef }) => {
   const router = useRouter();
@@ -55,6 +56,7 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [phoneError, setPhoneError] = useState("");
+  const [phoneTouched, setPhoneTouched] = useState(false);
   const redirectTo = searchParams.get("redirect_to");
   const isEdFlow = searchParams.get("ed-flow") === "1";
 
@@ -166,18 +168,16 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
   };
 
   const validateStep2 = () => {
-    if (!formData.phone) {
-      toast.error("Phone number is required");
-      setPhoneError("Phone number is required");
+    const digitsOnly = (formData.phone || "").replace(/\D/g, "");
+    if (!formData.phone || digitsOnly.length < 10 || /^0+$/.test(digitsOnly)) {
+      const msg = formData.phone
+        ? "Please enter a valid phone number"
+        : "Phone number is required";
+      toast.error(msg);
+      setPhoneError(msg);
+      setPhoneTouched(true);
       return false;
     }
-    // Check if phone number contains only zeros
-    const digitsOnly = formData.phone.replace(/\D/g, "");
-    if (digitsOnly.length > 0 && /^0+$/.test(digitsOnly)) {
-      setPhoneError("Please enter a valid phone number");
-      return false;
-    }
-    // Clear phone error if validation passes
     setPhoneError("");
     if (!formData.date_of_birth) {
       toast.error("Date of birth is required");
@@ -242,55 +242,11 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
     setCurrentStep(1);
   };
 
-  const formatPhoneNumber = (value) => {
-    const phoneNumber = value.replace(/\D/g, "");
-
-    if (phoneNumber.length <= 3) {
-      return `(${phoneNumber}`;
-    } else if (phoneNumber.length <= 6) {
-      return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`;
-    } else {
-      return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(
-        3,
-        6,
-      )}-${phoneNumber.slice(6, 10)}`;
-    }
-  };
-
-  const handlePhoneChange = (e) => {
-    const formattedPhoneNumber = formatPhoneNumber(e.target.value);
-    setFormData((prev) => ({
-      ...prev,
-      phone: formattedPhoneNumber,
-    }));
-
-    // Validate dynamically as user types
-    const digitsOnly = formattedPhoneNumber.replace(/\D/g, "");
-    if (digitsOnly.length >= 10) {
-      // Only validate if we have enough digits (complete phone number)
-      if (/^0+$/.test(digitsOnly)) {
-        setPhoneError("Please enter a valid phone number");
-      } else {
-        setPhoneError("");
-      }
-    } else if (phoneError) {
-      // Clear error if user is still typing and hasn't reached 10 digits yet
-      setPhoneError("");
-    }
-  };
-
-  const handlePhoneBlur = () => {
-    // Validate on blur (when user leaves the field)
-    if (formData.phone) {
-      const digitsOnly = formData.phone.replace(/\D/g, "");
-      if (digitsOnly.length > 0 && /^0+$/.test(digitsOnly)) {
-        setPhoneError("Please enter a valid phone number");
-      } else if (digitsOnly.length > 0 && digitsOnly.length < 10) {
-        setPhoneError("Please enter a valid phone number");
-      } else {
-        setPhoneError("");
-      }
-    }
+  const handlePhoneChange = (formatted) => {
+    setFormData((prev) => ({ ...prev, phone: formatted }));
+    setPhoneTouched(true);
+    // Clear external error while user is typing
+    if (phoneError) setPhoneError("");
   };
 
   const handleDateChange = (value) => {
@@ -662,24 +618,15 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
               </div>
               <div className="w-full flex flex-col items-start justify-center gap-2">
                 <label htmlFor="phone">Phone Number</label>
-                <input
-                  type="tel"
+                <PhoneInput
                   id="phone"
                   name="phone"
-                  className={`block w-[100%] rounded-[8px] h-[40px] text-md m-auto border px-4 focus:outline focus:outline-2 focus:outline-black focus:ring-0 focus:border-transparent ${
-                    phoneError ? "border-red-500" : "border-gray-500"
-                  }`}
-                  placeholder="(___) ___-____"
                   value={formData.phone}
                   onChange={handlePhoneChange}
-                  onBlur={handlePhoneBlur}
-                  style={{ outlineColor: "black" }}
+                  error={phoneError || undefined}
                   required
-                  maxLength={14}
+                  className="w-full"
                 />
-                {phoneError && (
-                  <p className="text-red-500 text-sm mt-1">{phoneError}</p>
-                )}
               </div>
               <div className="w-full flex flex-col items-start justify-center gap-2">
                 <label htmlFor="date_of_birth">Date of Birth</label>

@@ -9,6 +9,7 @@ import Link from "next/link";
 import SignInLink from "./SignInLink";
 import StickyButton from "./StickyButton";
 import DOBInput from "@/components/shared/DOBInput";
+import PhoneInput, { isValidPhone } from "@/components/PhoneInput";
 import {
   isWordPressCriticalError,
   transformPaymentError,
@@ -423,16 +424,6 @@ const Form = ({
   const isValidEmail = (email) => {
     if (!email || typeof email !== "string") return false;
     return /\S+@\S+\.\S+/.test(email.trim());
-  };
-
-  // Helper: check if phone is valid format (basic, but better than non-empty)
-  const isValidPhone = (phone) => {
-    if (!phone || typeof phone !== "string") return false;
-    const digitsOnly = phone.replace(/\D/g, "");
-    // Require at least 10 digits and not all zeros
-    if (digitsOnly.length < 10) return false;
-    if (/^0+$/.test(digitsOnly)) return false;
-    return true;
   };
 
   // Reusable registration logic for both WLFlow1 and WLFlow2
@@ -1081,6 +1072,28 @@ const Form = ({
                       </button>
                     ))}
                   </div>
+                ) : field.type === "tel" ? (
+                  <PhoneInput
+                    id={field.id}
+                    name={field.id}
+                    value={fieldsState[field.id] ?? ""}
+                    onChange={(formatted) => handleChange(field.id, formatted)}
+                    onBlur={() => handleBlurMark(field.id)}
+                    placeholder={field.placeholder}
+                    showError={
+                      !!(
+                        fieldsState[field.id] &&
+                        completedFields[field.id]
+                      )
+                    }
+                    inputClassName={`w-full h-[60px] border rounded-lg px-4 py-3 text-[16px] focus:outline-none transition-colors ${
+                      fieldsState[field.id] &&
+                      completedFields[field.id] &&
+                      !isValidPhone(fieldsState[field.id])
+                        ? "border-red-500 focus:border-red-500"
+                        : "border-[#E5E5E5] focus:border-black"
+                    }`}
+                  />
                 ) : (
                   <>
                     <input
@@ -1090,15 +1103,13 @@ const Form = ({
                       autoComplete={
                         field.type === "email"
                           ? "email"
-                          : field.type === "tel"
-                            ? "tel"
-                            : field.id === "firstName"
-                              ? "given-name"
-                              : field.id === "lastName"
-                                ? "family-name"
-                                : field.id === "password"
-                                  ? "new-password"
-                                  : "on"
+                          : field.id === "firstName"
+                            ? "given-name"
+                            : field.id === "lastName"
+                              ? "family-name"
+                              : field.id === "password"
+                                ? "new-password"
+                                : "on"
                       }
                       className={`w-full h-[60px] border rounded-lg px-4 py-3 text-[16px] focus:outline-none transition-colors ${
                         field.type === "email" &&
@@ -1106,12 +1117,7 @@ const Form = ({
                         completedFields[field.id] &&
                         !isValidEmail(fieldsState[field.id])
                           ? "border-red-500 focus:border-red-500"
-                          : field.type === "tel" &&
-                              fieldsState[field.id] &&
-                              completedFields[field.id] &&
-                              !isValidPhone(fieldsState[field.id])
-                            ? "border-red-500 focus:border-red-500"
-                            : "border-[#E5E5E5] focus:border-black"
+                          : "border-[#E5E5E5] focus:border-black"
                       }`}
                       placeholder={field.placeholder}
                       value={fieldsState[field.id] ?? ""}
@@ -1124,14 +1130,6 @@ const Form = ({
                       !isValidEmail(fieldsState[field.id]) && (
                         <p className="text-red-500 text-sm mt-1">
                           Please enter a valid email address
-                        </p>
-                      )}
-                    {field.type === "tel" &&
-                      fieldsState[field.id] &&
-                      completedFields[field.id] &&
-                      !isValidPhone(fieldsState[field.id]) && (
-                        <p className="text-red-500 text-sm mt-1">
-                          Please enter a valid phone number
                         </p>
                       )}
                   </>
