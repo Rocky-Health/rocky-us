@@ -807,6 +807,8 @@ const CheckoutPageContent = () => {
                 "",
               last_name:
                 data.billing_address?.last_name || profileData.last_name || "",
+              email:
+                data.billing_address?.email || profileData.email || "",
               phone: data.billing_address?.phone || profileData.phone || "",
               date_of_birth:
                 data.billing_address?.date_of_birth ||
