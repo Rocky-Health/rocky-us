@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import { logger } from "@/utils/devLogger";
 import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
@@ -36,6 +36,7 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
 
   const redirectTo = searchParams.get("redirect_to");
   const isEdFlow = searchParams.get("ed-flow") === "1";
+  const sessionExpired = searchParams.get("session_expired") === "1";
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -293,6 +294,7 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
       if (res.ok) {
         // We'll trigger the cart refresh AFTER migration, not here
         logger.log("🎉 LOGIN SUCCESS - About to show toast");
+        sessionStorage.removeItem("sessionExpiredToastShown");
         if (data?.data?.name) {
           toast.success("You logged in successfully, " + data.data.name);
         } else {
@@ -447,6 +449,19 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
       setSubmitting(false);
     }
   };
+
+  // Show session expired notification (only once per browser session)
+  useEffect(() => {
+    if (sessionExpired) {
+      const alreadyShown = sessionStorage.getItem("sessionExpiredToastShown");
+      if (!alreadyShown) {
+        sessionStorage.setItem("sessionExpiredToastShown", "1");
+        toast.info("Your session has expired. Please sign in to continue.", {
+          autoClose: 5000,
+        });
+      }
+    }
+  }, [sessionExpired]);
 
   return (
     <>

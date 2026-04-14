@@ -56,6 +56,18 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [phoneError, setPhoneError] = useState("");
   const redirectTo = searchParams.get("redirect_to");
+
+  // Password strength checks (live feedback)
+  const pwdForRules =
+    typeof formData.password === "string" ? formData.password : "";
+  const passwordHasMinLength = pwdForRules.length >= 8;
+  const passwordHasUppercase = /[A-Z]/.test(pwdForRules);
+  const passwordHasLowercase = /[a-z]/.test(pwdForRules);
+  const passwordHasNumberOrSymbol =
+    /[0-9]/.test(pwdForRules) || /[^A-Za-z0-9]/.test(pwdForRules);
+  const passwordHasCharacterMix =
+    passwordHasUppercase && passwordHasLowercase && passwordHasNumberOrSymbol;
+  const passwordStarted = pwdForRules.length > 0;
   const isEdFlow = searchParams.get("ed-flow") === "1";
 
   const handleChange = (e) => {
@@ -154,8 +166,16 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
       toast.error("Password is required");
       return false;
     }
-    if (formData.password.length < 6) {
-      toast.error("Password must be at least 6 characters");
+    if (formData.password.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return false;
+    }
+    if (!/[A-Z]/.test(formData.password)) {
+      toast.error("Password must contain at least one uppercase letter");
+      return false;
+    }
+    if (!/[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(formData.password)) {
+      toast.error("Password must contain at least one number or symbol");
       return false;
     }
     if (formData.password !== formData.confirm_password) {
@@ -599,7 +619,7 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
                     onChange={handleChange}
                     style={{ outlineColor: "black" }}
                     required
-                    minLength={6}
+                    minLength={8}
                   />
                   {showPassword ? (
                     <MdOutlineVisibilityOff
@@ -615,6 +635,43 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
                     />
                   )}
                 </div>
+                {/* Password requirements checklist */}
+                <ul className="mt-1 text-[12px] list-none space-y-1 pl-0 w-full">
+                  <li
+                    className={`flex gap-2 items-start ${
+                      passwordHasMinLength ? "text-green-600" : "text-black"
+                    }`}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={`shrink-0 w-4 text-center font-semibold leading-[1.25] ${
+                        passwordHasMinLength ? "text-green-600" : "text-black"
+                      }`}
+                    >
+                      {passwordHasMinLength ? "✓" : "○"}
+                    </span>
+                    <span>At least 8 characters</span>
+                  </li>
+                  <li
+                    className={`flex gap-2 items-start ${
+                      passwordHasCharacterMix ? "text-green-600" : "text-black"
+                    }`}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={`shrink-0 w-4 text-center font-semibold leading-[1.25] ${
+                        passwordHasCharacterMix
+                          ? "text-green-600"
+                          : "text-black"
+                      }`}
+                    >
+                      {passwordHasCharacterMix ? "✓" : "○"}
+                    </span>
+                    <span>
+                      Include uppercase, lowercase, and a number or symbol
+                    </span>
+                  </li>
+                </ul>
               </div>
               <div className="w-full flex flex-col items-start justify-center gap-2 password-field">
                 <label htmlFor="confirm_password">Confirm Password</label>
