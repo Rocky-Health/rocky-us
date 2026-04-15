@@ -18,6 +18,7 @@ import ZendeskWidget from "@/components/Layout/ZendeskWidget";
 import GoogleOAuthProvider from "@/components/Layout/GoogleOAuthProvider";
 import MetaCookieInitializer from "@/components/Layout/MetaCookieInitializer";
 import FBPixelLoader from "@/components/FBPixelLoader";
+import InactivityTimeoutHandler from "@/components/InactivityTimeoutHandler";
 import { Suspense } from "react";
 
 // Layout will use client-side path detection to avoid forcing dynamic rendering
@@ -75,7 +76,11 @@ export default function RootLayout({ children }) {
         {/* AWIN Consent and MasterTag - only load if tracking is enabled */}
         {(() => {
           const awinEnabled = process.env.NEXT_PUBLIC_AWIN_ENABLED;
-          const isEnabled = awinEnabled === undefined || awinEnabled === "" || awinEnabled === "true" || awinEnabled === "1";
+          const isEnabled =
+            awinEnabled === undefined ||
+            awinEnabled === "" ||
+            awinEnabled === "true" ||
+            awinEnabled === "1";
           if (!isEnabled) return null;
           return (
             <>
@@ -91,8 +96,9 @@ export default function RootLayout({ children }) {
               <Script
                 id="awin-mastertag"
                 strategy="beforeInteractive"
-                src={`https://www.dwin1.com/${process.env.AWIN_MERCHANT_ID || "101159"
-                  }.js`}
+                src={`https://www.dwin1.com/${
+                  process.env.AWIN_MERCHANT_ID || "101159"
+                }.js`}
               />
             </>
           );
@@ -128,9 +134,10 @@ export default function RootLayout({ children }) {
           {`
             !function (w, d, t) {
               w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
-              ttq.load('${process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID ||
-            "CAFVBSRC77U9MLGRGE10"
-            }');
+              ttq.load('${
+                process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID ||
+                "CAFVBSRC77U9MLGRGE10"
+              }');
               ttq.page();
             }(window, document, 'ttq');
           `}
@@ -176,6 +183,7 @@ export default function RootLayout({ children }) {
         </Suspense>
         {/* <CronHitHandler /> */}
         <GoogleOAuthProvider>
+          <InactivityTimeoutHandler />
           <Navbar className="navbar-main" />
           <ClientLayoutProvider>{children}</ClientLayoutProvider>
           <Footer className="footer-main" />

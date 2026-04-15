@@ -68,12 +68,12 @@ const Glp2BMICalculatorStep = ({
         </h1>
 
         <p className="text-[18px] leading-[140%] font-[400] text-[#00000099] mb-10">
-          Let&apos;s calculate your BMI to make sure you&apos;re good candidate
-          for medical weight loss.
+          Let&apos;s calculate your BMI to make sure you're a good candidate for
+          medical weight loss.
         </p>
 
         <h2 className="text-[24px] leading-[90%] mb-[32px] headers-font">
-          What&apos;s You Height And Weight?
+          What's Your Height And Weight{" "}
         </h2>
 
         <div className="mb-4">
