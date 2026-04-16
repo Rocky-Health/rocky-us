@@ -2,20 +2,26 @@
 
 import Logo from "../Navbar/Logo";
 
-const QuestionnaireNavbar = ({ onBackClick, currentPage = 1, hideBackButton = false, isThankYouPage = false }) => {
+const QuestionnaireNavbar = ({
+  onBackClick,
+  currentPage = 1,
+  hideBackButton = false,
+  isThankYouPage = false,
+}) => {
   const showBackButton = currentPage > 1 && !isThankYouPage && !hideBackButton;
 
   const handleBackClick = (e) => {
     e?.preventDefault();
-    if (onBackClick && typeof onBackClick === 'function') {
+    if (onBackClick && typeof onBackClick === "function") {
       onBackClick();
     }
   };
 
   return (
     <header
-      className={`questionnaire-header w-full py-2 relative  ${isThankYouPage ? "bg-transparent z-10" : ""
-        }`}
+      className={`questionnaire-header w-full py-2 relative  ${
+        isThankYouPage ? "bg-transparent z-10" : ""
+      }`}
       suppressHydrationWarning={true}
     >
       <div className="w-full md:w-[520px] mx-auto px-5 md:px-0 relative h-[40px] flex items-center">
@@ -42,23 +48,7 @@ const QuestionnaireNavbar = ({ onBackClick, currentPage = 1, hideBackButton = fa
         )}
 
         <div className="mx-auto scale-125 flex justify-center items-center min-w-[120px] ">
-          {isThankYouPage ? (
-            <button
-              onClick={() => (window.location.href = "/")}
-              className="cursor-pointer mr-[18px] md:mr-0"
-              aria-label="Go to home"
-            >
-              <Logo withLink={false} />
-            </button>
-          ) : (
-            <button
-              onClick={() => (window.location.href = "/")}
-              className="cursor-pointer md:mr-0"
-              aria-label="Go to home"
-            >
-              <Logo withLink={false} />
-            </button>
-          )}
+          <Logo />
         </div>
       </div>
     </header>

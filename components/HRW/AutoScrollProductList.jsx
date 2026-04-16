@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import CustomContainImage from "../utils/CustomContainImage";
+import { formatPrice } from "@/utils/priceFormatter";
 
 const cards = [
   {
@@ -101,7 +102,7 @@ export default function AnimatedStackScroll() {
                     {card.desc}
                   </p>
                 </div>
-                <div className="md:hidden">${card.price}</div>
+                <div className="md:hidden">${formatPrice(card.price)}</div>
               </div>
             </div>
           </div>

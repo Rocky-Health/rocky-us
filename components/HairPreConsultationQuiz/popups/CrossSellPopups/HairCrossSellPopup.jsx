@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { logger } from "@/utils/devLogger";
 import { analyticsService } from "@/utils/analytics/analyticsService";
+import { formatPrice } from "@/utils/priceFormatter";
 
 import {
   FaInfoCircle,
@@ -486,7 +487,7 @@ const HairCrossSellPopup = ({
                         </small>
                       </div>
                       <p className="font-[500] text-[14px] text-black text-center">
-                        ${addon.price}
+                        ${formatPrice(addon.price)}
                       </p>
                       {/* <button
                         onClick={() => toggleAddon(addon.id)}
@@ -537,8 +538,8 @@ const HairCrossSellPopup = ({
                           {isAddingAddon(addon.id)
                             ? "Adding..."
                             : isAddonInCart(addon.id)
-                            ? "Added ✓"
-                            : "Add To Cart"}
+                              ? "Added ✓"
+                              : "Add To Cart"}
                         </button>
                       </div>
                     </div>
@@ -550,7 +551,7 @@ const HairCrossSellPopup = ({
                         {addon.description}
                       </p>
                       <p className="font-semibold text-sm text-gray-800">
-                        ${addon.price}
+                        ${formatPrice(addon.price)}
                       </p>
                       <p className="font-normal text-[12px] text-gray-500">
                         {addon.frequency}

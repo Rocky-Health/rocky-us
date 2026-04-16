@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import Section from "../utils/Section";
 import WLProgramItem from "./WLProgramItem";
 import CustomImage from "../utils/CustomImage";
@@ -8,7 +9,9 @@ const WLProgram = ({ ProgramWorksData = [] }) => {
     <>
       <Section>
         <div className="text-center">
-          <h1 className="text-3xl lg:text-4xl font-semibold mb-3">How our Weight Loss Program works</h1>
+          <h1 className="text-3xl lg:text-4xl font-semibold mb-3">
+            How our Weight Loss Program works
+          </h1>
           <p className="text-xl">
             Digital Healthcare without the long wait times
           </p>
@@ -23,14 +26,16 @@ const WLProgram = ({ ProgramWorksData = [] }) => {
               {/* Image  */}
               <div className="bg-gray-200 flex content-start items-center w-full overflow-hidden  lg:h-[500px] sm:flex-row">
                 <div className="w-full">
-                  <Image
-                    height="100"
-                    width="100"
-                    src="/ed-prelander-5/rocky-logo.png"
-                    className="lg:mt-64 mt-24 mb-4 px-auto mx-auto"
-                    alt="My rocky logo"
-                    quality="100"
-                  />
+                  <Link href="/" aria-label="MyRocky Homepage">
+                    <Image
+                      height="100"
+                      width="100"
+                      src="/ed-prelander-5/rocky-logo.png"
+                      className="lg:mt-64 mt-24 mb-4 px-auto mx-auto"
+                      alt="My rocky logo"
+                      quality="100"
+                    />
+                  </Link>
                   <CustomImage
                     height="250"
                     width="250"
