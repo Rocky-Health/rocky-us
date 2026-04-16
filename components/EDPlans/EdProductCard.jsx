@@ -10,17 +10,18 @@ import BrandGenericModal from "./BrandGenericModal";
 import CrossSellModal from "./CrossSellModal";
 import { getDosageSelection } from "@/utils/dosageCookieManager";
 import { addToCartEarly, finalizeFlowCheckout } from "@/utils/flowCartHandler";
+import { formatPrice } from "@/utils/priceFormatter";
 
 const EdProductCard = ({ product }) => {
   const router = useRouter();
 
   // State management for user selections
   const [activePreference, setActivePreference] = useState(
-    product.preferences[0]
+    product.preferences[0],
   );
   const [activeFrequency, setActiveFrequency] = useState("monthly-supply");
   const [selectedPillOption, setSelectedPillOption] = useState(
-    product.pillOptions["monthly-supply"][0]
+    product.pillOptions["monthly-supply"][0],
   );
 
   // State for modals
@@ -40,8 +41,8 @@ const EdProductCard = ({ product }) => {
     return product.name === "Viagra"
       ? "50mg"
       : product.name === "Cialis + Viagra"
-      ? "10/50mg"
-      : "10mg";
+        ? "10/50mg"
+        : "10mg";
   });
 
   // Calculate current price based on preferences
@@ -210,7 +211,7 @@ const EdProductCard = ({ product }) => {
       } else {
         logger.error("❌ Failed to add product to cart:", result.error);
         alert(
-          result.error || "Failed to add product to cart. Please try again."
+          result.error || "Failed to add product to cart. Please try again.",
         );
       }
     } catch (error) {
@@ -238,7 +239,7 @@ const EdProductCard = ({ product }) => {
   const handleCheckout = async () => {
     try {
       logger.log(
-        "🎯 ED Flow - Proceeding to checkout (cart already populated)"
+        "🎯 ED Flow - Proceeding to checkout (cart already populated)",
       );
 
       // Product and any addons are already in cart
@@ -381,7 +382,7 @@ const EdProductCard = ({ product }) => {
           onClick={handleProductSelect}
           className="bg-black text-white font-semibold text-center py-3 rounded-full mt-6 w-full"
         >
-          ${currentPrice} - Select
+          ${formatPrice(currentPrice)} - Select
         </button>
 
         <p className="text-[10px] md:text-[12px] leading-[140%] font-[400] mt-[8px]">
