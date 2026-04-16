@@ -1192,6 +1192,7 @@ const Form = ({
           open={showPasswordModal}
           onClose={() => setShowPasswordModal(false)}
           onSubmit={handlePasswordSubmit}
+          email={fieldsState.email ?? userData?.email ?? ""}
         />
       </form>
     </>

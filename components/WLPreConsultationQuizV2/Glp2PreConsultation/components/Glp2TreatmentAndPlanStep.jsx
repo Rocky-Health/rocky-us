@@ -204,6 +204,10 @@ const Glp2TreatmentAndPlanStep = ({
         router.push(result.redirectUrl);
       } else {
         logger.error("GLP2 checkout failed:", result.error);
+        alert(
+          result.error ||
+            "There was an issue processing your checkout. Please try again.",
+        );
       }
     } catch (error) {
       logger.error("Error during GLP2 checkout:", error);

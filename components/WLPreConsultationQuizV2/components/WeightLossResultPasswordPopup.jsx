@@ -5,37 +5,56 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { usePassword } from "@/components/WLPreConsultationQuizV2/contexts/PasswordContext";
+import { restorePasswordSecurely } from "@/utils/quizPasswordVault";
 
 const WeightLossResultPasswordPopup = ({
   onSubmit,
   disabled,
   style,
   setUserData,
-  nextAction = "openPopup",
-  nextPayload = "YourWeightPopup",
 }) => {
-  const { password: contextPassword, setPassword: setContextPassword } =
-    usePassword();
+  const { password: contextPassword, setPassword: setContextPassword } = usePassword();
   const [isAuth, setIsAuth] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
   const [showPasswordSection, setShowPasswordSection] = useState(false);
+  const [checkingEmail, setCheckingEmail] = useState(false);
   const [emailTouched, setEmailTouched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [emailExists, setEmailExists] = useState(false);
-  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
-  const [passwordError, setPasswordError] = useState("");
-  const hasMinLength = (pwd = "") => pwd.length >= 8;
-  const hasUppercase = (pwd = "") => /[A-Z]/.test(pwd);
-  const hasLowercase = (pwd = "") => /[a-z]/.test(pwd);
-  const hasNumberOrSymbol = (pwd = "") => /[\d\W_]/.test(pwd);
-  const meetsRegistrationPasswordRules = (pwd = "") =>
-    hasMinLength(pwd) &&
-    hasUppercase(pwd) &&
-    hasLowercase(pwd) &&
-    hasNumberOrSymbol(pwd);
+  const lastCheckedEmailRef = React.useRef("");
+
+  const MIN_NEW_PASSWORD_LENGTH = 8;
+
+  /** New account: min length + uppercase + lowercase + (digit or symbol) */
+  const isValidNewAccountPassword = (pwd) => {
+    if (!pwd || typeof pwd !== "string") return false;
+    if (pwd.length < MIN_NEW_PASSWORD_LENGTH) return false;
+    const hasUppercase = /[A-Z]/.test(pwd);
+    const hasLowercase = /[a-z]/.test(pwd);
+    const hasNumber = /[0-9]/.test(pwd);
+    const hasSymbol = /[^A-Za-z0-9]/.test(pwd);
+    return hasUppercase && hasLowercase && (hasNumber || hasSymbol);
+  };
+
+  const passwordMeetsRequirements = (pwd, isExistingAccount) => {
+    if (!pwd || typeof pwd !== "string") return false;
+    if (isExistingAccount) return pwd.trim().length > 0;
+    return isValidNewAccountPassword(pwd);
+  };
+
+  const pwdForRules = typeof password === "string" ? password : "";
+  const passwordHasMinLength = pwdForRules.length >= MIN_NEW_PASSWORD_LENGTH;
+  const passwordHasUppercase = /[A-Z]/.test(pwdForRules);
+  const passwordHasLowercase = /[a-z]/.test(pwdForRules);
+  const passwordHasNumberOrSymbol =
+    /[0-9]/.test(pwdForRules) || /[^A-Za-z0-9]/.test(pwdForRules);
+  const passwordHasCharacterMix =
+    passwordHasUppercase && passwordHasLowercase && passwordHasNumberOrSymbol;
+
+  const passwordStarted = pwdForRules.length > 0;
 
   // Email validation (simple, robust enough for client-side)
   const isValidEmail = (e) => {
@@ -45,22 +64,15 @@ const WeightLossResultPasswordPopup = ({
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
   };
 
-  const triggerNext = () => {
-    if (typeof onSubmit !== "function") return;
-    if (nextPayload !== undefined && nextPayload !== null) {
-      onSubmit(nextAction, nextPayload);
-      return;
-    }
-    onSubmit(nextAction);
-  };
-
   // Run auth check on mount and call onSubmit if authenticated.
   // This must run in a useEffect to avoid updating state during render.
   React.useEffect(() => {
     try {
       if (isAuthenticated()) {
         setIsAuth(true);
-        triggerNext();
+        if (typeof onSubmit === "function") {
+          onSubmit("openPopup", "YourWeightPopup");
+        }
       }
     } catch (e) {
       // ignore
@@ -70,9 +82,11 @@ const WeightLossResultPasswordPopup = ({
 
   const checkEmailExists = async (emailToCheck) => {
     if (!isValidEmail(emailToCheck)) return;
+    lastCheckedEmailRef.current = emailToCheck;
+    setCheckingEmail(true);
+    setShowPasswordSection(false);
 
     try {
-      setIsCheckingEmail(true);
       const res = await fetch("/api/check-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -83,7 +97,6 @@ const WeightLossResultPasswordPopup = ({
         const data = await res.json();
         setEmailExists(data.registered === true);
       } else {
-        // If check fails, default to \"not existing\" behaviour
         setEmailExists(false);
       }
     } catch (error) {
@@ -91,27 +104,19 @@ const WeightLossResultPasswordPopup = ({
       // Default to false if check fails
       setEmailExists(false);
     } finally {
-      // Only show password field AFTER we've done the check
+      setCheckingEmail(false);
       setShowPasswordSection(true);
-      setIsCheckingEmail(false);
     }
   };
 
-  const maybeCheckEmailAndShowPassword = () => {
-    if (isCheckingEmail) return;
-    const trimmedEmail = String(email || "").trim();
-    if (trimmedEmail.length === 0) return;
-    if (!isValidEmail(trimmedEmail)) return;
-    checkEmailExists(trimmedEmail);
-  };
-
   const TryLogin = async ({ email, password }) => {
+    // attempt login
     try {
       setLoading(true);
-      setPasswordError("");
 
       // Use password from Context (memory) or fallback to parameter
-      const loginPassword = contextPassword || password || "";
+      const restoredPassword = contextPassword || (await restorePasswordSecurely());
+      const loginPassword = restoredPassword || password || "";
 
       const res = await fetch("/api/login", {
         method: "POST",
@@ -123,27 +128,29 @@ const WeightLossResultPasswordPopup = ({
       });
       if (res.ok) {
         toast.success("Logged in successfully");
-        return true;
+        return 1;
       } else {
         let data = null;
         try {
           data = await res.json();
         } catch (e) {}
-        const msg = (data && (data.message || data.error)) || "Login failed";
-        logger.log("Login failed:", msg);
-        const userFacingError =
-          "Wrong password. Please try again or reset your password.";
-        setPasswordError(userFacingError);
-        toast.error(userFacingError);
-        return false;
+        const msg = (data && (data.message || data.error)) || "Login failed. Please try again.";
+        const code = data && data.code;
+        logger.log("Login failed:", msg, code);
+
+        // Explicitly block continuation when password is incorrect
+        if (code === "incorrect_password" || code === "[jwt_auth] incorrect_password") {
+          toast.error("The password you entered is incorrect. Please try again.");
+          return 0;
+        }
+
+        toast.error(msg);
+        return 0;
       }
     } catch (e) {
       console.error(e);
-      const fallbackError =
-        "Unable to verify your password right now. Please try again.";
-      setPasswordError(fallbackError);
-      toast.error(fallbackError);
-      return false;
+      toast.error("Login failed. Please try again.");
+      return 0;
     } finally {
       setLoading(false);
     }
@@ -151,6 +158,13 @@ const WeightLossResultPasswordPopup = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (
+      showPasswordSection &&
+      !emailExists &&
+      !isValidNewAccountPassword(password)
+    ) {
+      return;
+    }
     if (onSubmit) {
       setUserData((prev) => ({
         ...prev,
@@ -159,21 +173,23 @@ const WeightLossResultPasswordPopup = ({
         agreePrivacy,
       }));
 
+      // Existing account: must login successfully before continuing.
+      // New account: skip login check and continue to next popup.
       if (emailExists) {
-        const loggedIn = await TryLogin({ email, password });
-        if (!loggedIn) return;
+        const goNext = await TryLogin({ email, password });
+        if (goNext == 0) return;
       }
-      triggerNext();
+      onSubmit("openPopup", "YourWeightPopup");
     }
   };
 
   const isButtonDisabled =
     !email ||
     !isValidEmail(email) ||
-    !password ||
     !agreePrivacy ||
-    (!emailExists && !meetsRegistrationPasswordRules(password)) ||
-    disabled;
+    disabled ||
+    (showPasswordSection &&
+      !passwordMeetsRequirements(password, emailExists));
 
   return (
     <div
@@ -200,72 +216,69 @@ const WeightLossResultPasswordPopup = ({
               </label>
               <input
                 type="email"
-                className="w-full border border-[#E5E5E5] rounded-lg px-4 py-4 text-[14px] focus:outline-none focus:border-black"
+                name="email"
+                autoComplete="email"
+                className="w-full border border-[#E5E5E5] rounded-lg px-4 py-4 text-[16px] focus:outline-none focus:border-black"
                 placeholder="Enter your email address"
                 value={email}
                 onChange={(e) => {
-                  setEmail(e.target.value);
-                  // Email changed: hide password section until we re-check on blur.
-                  if (showPasswordSection) {
+                  const newVal = e.target.value;
+                  setEmail(newVal);
+                  // Only reset the password section if the email actually changed from the last checked value
+                  if (newVal.trim() !== lastCheckedEmailRef.current) {
                     setShowPasswordSection(false);
                   }
-                  setEmailExists(false);
-                  setPassword("");
-                  setPasswordError("");
-                  setContextPassword("");
-                  // mark touched as user types so errors can show after interaction
                   if (!emailTouched) setEmailTouched(true);
                 }}
                 onBlur={() => {
                   if (!emailTouched) setEmailTouched(true);
-                  // Re-check email existence every time user leaves this field.
-                  maybeCheckEmailAndShowPassword();
+                  const trimmed = String(email || "").trim();
+                  // Only re-check if the email changed from the last checked value
+                  if (trimmed.length > 0 && isValidEmail(trimmed) && trimmed !== lastCheckedEmailRef.current) {
+                    checkEmailExists(trimmed);
+                  }
                 }}
                 aria-invalid={emailTouched && !isValidEmail(email)}
-                aria-describedby={
-                  emailTouched && !isValidEmail(email)
-                    ? "email-error"
-                    : undefined
-                }
+                aria-describedby={emailTouched && !isValidEmail(email) ? 'email-error' : undefined}
                 required
               />
               {emailTouched && !isValidEmail(email) && (
-                <p
-                  id="email-error"
-                  className="mt-2 text-[12px] text-red-600"
-                  role="alert"
-                >
+                <p id="email-error" className="mt-2 text-[12px] text-red-600" role="alert">
                   Please enter a valid email address (e.g. name@domain.com)
                 </p>
               )}
-              {isCheckingEmail && (
+              {checkingEmail && (
                 <p className="mt-2 text-[12px] text-[#666]">
                   Checking email ...
                 </p>
               )}
             </div>
-            {/* Password field appears once email is validated and checked. */}
             {showPasswordSection && (
               <div>
                 <label className="block text-[14px] font-medium mb-2">
-                  {emailExists
-                    ? "Enter your password to log in"
-                    : "Create a Password"}
+                  {emailExists ? "Enter your password to log in" : "Create a Password"}
                 </label>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
-                    className="w-full border border-[#E5E5E5] rounded-lg px-4 py-4 text-[14px] focus:outline-none focus:border-black pr-12"
-                    placeholder={
-                      emailExists ? "Password" : "Must be at least 8 characters"
-                    }
+                    name="password"
+                    autoComplete={emailExists ? "current-password" : "new-password"}
+                    className="w-full border border-[#E5E5E5] rounded-lg px-4 py-4 text-[16px] focus:outline-none focus:border-black pr-12"
+                    placeholder={emailExists ? "Password" : "Must be at least 8 characters"}
                     value={password}
                     onChange={(e) => {
                       setPassword(e.target.value);
-                      if (passwordError) setPasswordError("");
                       // Store in Context (memory) for use in registration/login
                       setContextPassword(e.target.value);
                     }}
+                    aria-invalid={
+                      !emailExists &&
+                      password.length > 0 &&
+                      !isValidNewAccountPassword(password)
+                    }
+                    aria-describedby={
+                      !emailExists ? "password-requirements" : undefined
+                    }
                   />
                   <button
                     type="button"
@@ -317,49 +330,54 @@ const WeightLossResultPasswordPopup = ({
                     )}
                   </button>
                 </div>
-                {emailExists && passwordError && (
-                  <p className="mt-2 text-[12px] text-red-600" role="alert">
-                    {passwordError}
-                  </p>
-                )}
+                {/* Password requirements — icons + color (not color-only); shown for new accounts only */}
                 {!emailExists && (
-                  <ul className="mt-2 text-[12px] text-[#000] list-none pl-0 space-y-1">
+                  <ul
+                    id="password-requirements"
+                    className="mt-2 text-[12px] list-none space-y-1.5 pl-0"
+                  >
                     <li
-                      className={`flex items-center gap-2 ${
-                        hasMinLength(password) ? "text-green-600" : "text-[#000]"
+                      className={`flex gap-2 items-start ${
+                        passwordHasMinLength ? "text-green-600" : "text-black"
                       }`}
+                      aria-label={
+                        passwordHasMinLength
+                          ? "Password length: at least 8 characters — satisfied"
+                          : passwordStarted
+                            ? "Password length: at least 8 characters — not satisfied yet"
+                            : "Password length: at least 8 characters — required"
+                      }
                     >
-                      {hasMinLength(password) ? (
-                        <span className="text-[12px] leading-none text-green-600">
-                          ✓
-                        </span>
-                      ) : (
-                        <span className="text-[12px] leading-none text-black">
-                          ○
-                        </span>
-                      )}
+                      <span
+                        aria-hidden="true"
+                        className={`shrink-0 w-4 text-center font-semibold leading-[1.25] ${
+                          passwordHasMinLength ? "text-green-600" : "text-black"
+                        }`}
+                      >
+                        {passwordHasMinLength ? "✓" : "○"}
+                      </span>
                       <span>Password must be at least 8 characters</span>
                     </li>
                     <li
-                      className={`flex items-center gap-2 ${
-                        hasUppercase(password) &&
-                        hasLowercase(password) &&
-                        hasNumberOrSymbol(password)
-                          ? "text-green-600"
-                          : "text-[#000]"
+                      className={`flex gap-2 items-start ${
+                        passwordHasCharacterMix ? "text-green-600" : "text-black"
                       }`}
+                      aria-label={
+                        passwordHasCharacterMix
+                          ? "Character mix: uppercase, lowercase, and a number or symbol — satisfied"
+                          : passwordStarted
+                            ? "Character mix: uppercase, lowercase, and a number or symbol — not satisfied yet"
+                            : "Character mix: uppercase, lowercase, and a number or symbol — required"
+                      }
                     >
-                      {hasUppercase(password) &&
-                      hasLowercase(password) &&
-                      hasNumberOrSymbol(password) ? (
-                        <span className="text-[12px] leading-none text-green-600">
-                          ✓
-                        </span>
-                      ) : (
-                        <span className="text-[12px] leading-none text-black">
-                          ○
-                        </span>
-                      )}
+                      <span
+                        aria-hidden="true"
+                        className={`shrink-0 w-4 text-center font-semibold leading-[1.25] ${
+                          passwordHasCharacterMix ? "text-green-600" : "text-black"
+                        }`}
+                      >
+                        {passwordHasCharacterMix ? "✓" : "○"}
+                      </span>
                       <span>
                         Include uppercase, lowercase, and a number or symbol
                       </span>
@@ -378,7 +396,7 @@ const WeightLossResultPasswordPopup = ({
                 className="w-5 h-5 accent-black"
               />
               <label htmlFor="privacy" className="text-[12px]">
-                <span className="font-medium leading-[140%]">
+                <span className=" font-medium leading-[140%]">
                   By clicking "Continue" I agree to the{" "}
                   <Link
                     href="/terms-of-use"

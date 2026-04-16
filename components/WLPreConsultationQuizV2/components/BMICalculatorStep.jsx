@@ -73,7 +73,7 @@ const BMICalculatorStep = ({
               type="number"
               min="0"
               enterKeyHint="next"
-              className="h-[60px] w-full p-3 border border-gray-300 rounded-md "
+              className="h-[60px] w-full p-3 border border-gray-300 rounded-md text-[16px]"
               placeholder="Feet"
               value={
                 heightFeet !== undefined && heightFeet !== null
@@ -105,7 +105,7 @@ const BMICalculatorStep = ({
               type="number"
               min="0"
               enterKeyHint="next"
-              className="h-[60px] w-full p-3 border border-gray-300 rounded-md mr-2"
+              className="h-[60px] w-full p-3 border border-gray-300 rounded-md mr-2 text-[16px]"
               placeholder="Inches"
               value={
                 heightInches !== undefined && heightInches !== null
@@ -142,7 +142,7 @@ const BMICalculatorStep = ({
             ref={weightRef}
             type="number"
             enterKeyHint="done"
-            className="h-[60px] w-full p-3 border border-gray-300 rounded-md"
+            className="h-[60px] w-full p-3 border border-gray-300 rounded-md text-[16px]"
             placeholder="Weight (Pounds)"
             value={
               weightPounds !== undefined && weightPounds !== null
