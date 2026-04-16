@@ -24,7 +24,7 @@ const Glp2MedicationPriorityStep = ({
             <div className="w-full md:w-[580px] mx-auto flex-grow pb-32 md:pb-36">
                 <h1 className="headers-font text-[32px] leading-[115%] text-[#251F20] mb-6">
                     <span className="text-[#AE7E56]">Looking Good!</span>{" "}
-                    Let&apos;s Match You With The Best Best Medication.
+                    Let&apos;s Match You With The Best Medication.
                 </h1>
 
                 <div className="space-y-3">
