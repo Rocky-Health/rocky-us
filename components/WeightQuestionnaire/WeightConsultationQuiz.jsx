@@ -397,7 +397,7 @@ export default function WeightLossConsultationQuiz({
 
     try {
       const existingData = JSON.parse(
-        localStorage.getItem("wl_pre_quiz_data") || "{}"
+        localStorage.getItem("wl_pre_quiz_data") || "{}",
       );
 
       const quizData = {
@@ -418,7 +418,7 @@ export default function WeightLossConsultationQuiz({
 
   const updateContinueButtonState = (show = true) => {
     const continueButton = formRef.current?.querySelector(
-      ".quiz-continue-button"
+      ".quiz-continue-button",
     );
     if (continueButton) {
       if (show) {
@@ -434,37 +434,44 @@ export default function WeightLossConsultationQuiz({
 
   const extractPreQuizAttributes = (essentialConsulData) => {
     const attributes = {};
-    
+
     if (essentialConsulData.accomplishment) {
       if (Array.isArray(essentialConsulData.accomplishment)) {
-        attributes.accomplishment = essentialConsulData.accomplishment.join(", ");
+        attributes.accomplishment =
+          essentialConsulData.accomplishment.join(", ");
       } else if (typeof essentialConsulData.accomplishment === "string") {
         attributes.accomplishment = essentialConsulData.accomplishment;
       }
     }
-    
+
     if (essentialConsulData.pregnantOrbreastfeeding) {
-      attributes.pregnantOrbreastfeeding = essentialConsulData.pregnantOrbreastfeeding;
+      attributes.pregnantOrbreastfeeding =
+        essentialConsulData.pregnantOrbreastfeeding;
     }
-    
+
     if (essentialConsulData.weightImpactStatements) {
       if (Array.isArray(essentialConsulData.weightImpactStatements)) {
-        attributes.weightImpactStatements = essentialConsulData.weightImpactStatements.join(", ");
-      } else if (typeof essentialConsulData.weightImpactStatements === "string") {
-        attributes.weightImpactStatements = essentialConsulData.weightImpactStatements;
+        attributes.weightImpactStatements =
+          essentialConsulData.weightImpactStatements.join(", ");
+      } else if (
+        typeof essentialConsulData.weightImpactStatements === "string"
+      ) {
+        attributes.weightImpactStatements =
+          essentialConsulData.weightImpactStatements;
       }
     }
-    
+
     if (essentialConsulData.medications) {
       attributes.medications = essentialConsulData.medications;
     } else if (essentialConsulData.medicalConditions) {
       attributes.medications = essentialConsulData.medicalConditions;
     }
-    
+
     if (essentialConsulData.eatingDisorderDiagnosis) {
-      attributes.eatingDisorderDiagnosis = essentialConsulData.eatingDisorderDiagnosis;
+      attributes.eatingDisorderDiagnosis =
+        essentialConsulData.eatingDisorderDiagnosis;
     }
-    
+
     return attributes;
   };
 
@@ -483,39 +490,54 @@ export default function WeightLossConsultationQuiz({
         if (parsed["603"] && !merged["603"]) {
           merged["603"] = parsed["603"];
         }
-        
+
         if (parsed.weight && parsed.height && parsed.bmi) {
           const weight = parsed.weight;
           const height = parsed.height;
           const bmi = parsed.bmi;
-          
+
           if (!merged.wl_weight && weight) {
             merged.wl_weight = `${weight} lbs`;
           }
-          
-          if (!merged.wl_height && height && height.feet && height.inches !== undefined) {
+
+          if (
+            !merged.wl_height &&
+            height &&
+            height.feet &&
+            height.inches !== undefined
+          ) {
             merged.wl_height = `${height.feet}ft ${height.inches}in`;
           }
-          
+
           if (!merged.wl_BMI && bmi) {
             merged.wl_BMI = typeof bmi === "number" ? bmi.toString() : bmi;
           }
         }
-        
+
         const preQuizAttributes = extractPreQuizAttributes(parsed);
         Object.assign(merged, preQuizAttributes);
-        
+
         if (Object.keys(preQuizAttributes).length > 0) {
           try {
-            const existingAttributes = localStorage.getItem("wl_pre_quiz_attributes");
-            const storedAttributes = existingAttributes ? JSON.parse(existingAttributes) : {};
-            const updatedAttributes = { ...storedAttributes, ...preQuizAttributes };
-            localStorage.setItem("wl_pre_quiz_attributes", JSON.stringify(updatedAttributes));
+            const existingAttributes = localStorage.getItem(
+              "wl_pre_quiz_attributes",
+            );
+            const storedAttributes = existingAttributes
+              ? JSON.parse(existingAttributes)
+              : {};
+            const updatedAttributes = {
+              ...storedAttributes,
+              ...preQuizAttributes,
+            };
+            localStorage.setItem(
+              "wl_pre_quiz_attributes",
+              JSON.stringify(updatedAttributes),
+            );
           } catch (storageError) {
             logger.error("Error storing pre-quiz attributes:", storageError);
           }
         }
-        
+
         return merged;
       }
     } catch (error) {
@@ -601,7 +623,7 @@ export default function WeightLossConsultationQuiz({
               setCurrentPage(storedPage);
               const calculatedProgress = Math.max(
                 0,
-                Math.ceil((storedPage / 26) * 100)
+                Math.ceil((storedPage / 26) * 100),
               );
               setProgress(calculatedProgress);
             }
@@ -656,7 +678,7 @@ export default function WeightLossConsultationQuiz({
 
         let fallbackFormData = getInitialFormData();
         fallbackFormData = mergeEssentialConsulData(fallbackFormData);
-        
+
         if (!checkBMIDataExists(fallbackFormData)) {
           setShowBMICalculator(true);
           return;
@@ -669,7 +691,7 @@ export default function WeightLossConsultationQuiz({
           let quizFormData = JSON.parse(storedData);
           quizFormData = mergeEssentialConsulData(quizFormData);
           setFormData(quizFormData);
-          
+
           if (!checkBMIDataExists(quizFormData)) {
             setShowBMICalculator(true);
             return;
@@ -706,7 +728,7 @@ export default function WeightLossConsultationQuiz({
             setCurrentPage(storedPage);
             const calculatedProgress = Math.max(
               0,
-              Math.ceil((storedPage / 26) * 100)
+              Math.ceil((storedPage / 26) * 100),
             );
             setProgress(calculatedProgress);
           }
@@ -799,8 +821,9 @@ export default function WeightLossConsultationQuiz({
       return e.returnValue;
     };
 
-    const isThankYouPage = currentPage === 23 && formData.completion_state === "Full";
-    
+    const isThankYouPage =
+      currentPage === 23 && formData.completion_state === "Full";
+
     if (currentPage >= 1 && currentPage <= 26 && !isThankYouPage) {
       window.addEventListener("beforeunload", handleBeforeUnload);
     }
@@ -885,7 +908,7 @@ export default function WeightLossConsultationQuiz({
         updateLocalStorage(initialData);
         logger.log("Weight quiz: Initial form data saved to localStorage");
       }
-      
+
       try {
         const storedAttributes = localStorage.getItem("wl_pre_quiz_attributes");
         if (storedAttributes) {
@@ -896,7 +919,10 @@ export default function WeightLossConsultationQuiz({
           }));
         }
       } catch (error) {
-        logger.error("Error loading pre-quiz attributes from localStorage:", error);
+        logger.error(
+          "Error loading pre-quiz attributes from localStorage:",
+          error,
+        );
       }
     }
   }, []);
@@ -961,7 +987,7 @@ export default function WeightLossConsultationQuiz({
     }
 
     const continueButton = formRef.current.querySelector(
-      ".quiz-continue-button"
+      ".quiz-continue-button",
     );
     if (!continueButton) return;
     continueButton.style.display = "block";
@@ -1324,9 +1350,8 @@ export default function WeightLossConsultationQuiz({
     try {
       showLoader();
 
-      const { uploadFileToS3WithProgress } = await import(
-        "@/utils/s3/frontend-upload"
-      );
+      const { uploadFileToS3WithProgress } =
+        await import("@/utils/s3/frontend-upload");
 
       const frontS3Url = await uploadFileToS3WithProgress(
         frontPhotoFile,
@@ -1334,7 +1359,7 @@ export default function WeightLossConsultationQuiz({
         "wl",
         (progress) => {
           setUploadProgress((prev) => ({ ...prev, front: progress }));
-        }
+        },
       );
 
       const sideS3Url = await uploadFileToS3WithProgress(
@@ -1343,7 +1368,7 @@ export default function WeightLossConsultationQuiz({
         "wl",
         (progress) => {
           setUploadProgress((prev) => ({ ...prev, side: progress }));
-        }
+        },
       );
 
       const updatedData = {
@@ -1359,13 +1384,13 @@ export default function WeightLossConsultationQuiz({
         ...updatedData,
         page_step: 23,
       };
-      
+
       setFormData(finalData);
       updateLocalStorage(finalData);
       queueFormSubmission(finalData);
 
       document.querySelector(
-        "label[for=front_photo_upload]"
+        "label[for=front_photo_upload]",
       ).style.borderColor = "green";
       document.querySelector("label[for=side_photo_upload]").style.borderColor =
         "green";
@@ -1374,7 +1399,7 @@ export default function WeightLossConsultationQuiz({
       setUploadSuccess(true);
       setIsUploadingPhotos(false);
       hideLoader();
-      
+
       setTimeout(() => {
         setCurrentPage(23);
         setProgress(100);
@@ -1404,7 +1429,7 @@ export default function WeightLossConsultationQuiz({
       }
 
       document.querySelector(
-        "label[for=front_photo_upload]"
+        "label[for=front_photo_upload]",
       ).style.borderColor = "red";
       document.querySelector("label[for=side_photo_upload]").style.borderColor =
         "red";
@@ -1418,7 +1443,7 @@ export default function WeightLossConsultationQuiz({
   useEffect(() => {
     if (currentPage === 13) {
       const hasSelection = Object.keys(formData).some(
-        (key) => key.startsWith("612_") && formData[key]
+        (key) => key.startsWith("612_") && formData[key],
       );
       setButtonState((state) => ({
         ...state,
@@ -1443,17 +1468,17 @@ export default function WeightLossConsultationQuiz({
     switch (page) {
       case 6:
         return Object.keys(data).some(
-          (key) => key.startsWith("605_") && data[key]
+          (key) => key.startsWith("605_") && data[key],
         );
       case 7:
         return !!data[606];
       case 13:
         return Object.keys(data).some(
-          (key) => key.startsWith("613_") && data[key]
+          (key) => key.startsWith("613_") && data[key],
         );
       case 8:
         return Object.keys(data).some(
-          (key) => (key.startsWith("608_") && data[key]) || key === "608_11"
+          (key) => (key.startsWith("608_") && data[key]) || key === "608_11",
         );
       default:
         return true;
@@ -1514,9 +1539,8 @@ export default function WeightLossConsultationQuiz({
       setUploadProgress((prev) => ({ ...prev, id: 0 }));
       showLoader();
 
-      const { uploadFileToS3WithProgress } = await import(
-        "@/utils/s3/frontend-upload"
-      );
+      const { uploadFileToS3WithProgress } =
+        await import("@/utils/s3/frontend-upload");
 
       const s3Url = await uploadFileToS3WithProgress(
         photoIdFile,
@@ -1524,7 +1548,7 @@ export default function WeightLossConsultationQuiz({
         "wl",
         (progress) => {
           setUploadProgress((prev) => ({ ...prev, id: progress }));
-        }
+        },
       );
 
       const updatedData = {
@@ -1985,7 +2009,7 @@ export default function WeightLossConsultationQuiz({
     queueFormSubmission(newFormData);
 
     const continueButton = formRef.current?.querySelector(
-      ".quiz-continue-button"
+      ".quiz-continue-button",
     );
     if (continueButton) {
       continueButton.style.display = "block";
@@ -2044,7 +2068,7 @@ export default function WeightLossConsultationQuiz({
 
     queueFormSubmission(updatedData);
     const continueButton = formRef.current?.querySelector(
-      ".quiz-continue-button"
+      ".quiz-continue-button",
     );
     if (continueButton) {
       continueButton.style.visibility = "visible";
@@ -2077,7 +2101,7 @@ export default function WeightLossConsultationQuiz({
     const newFormData = { ...formData, ...updates };
 
     const hasAnySelection = Object.keys(newFormData).some(
-      (key) => key.startsWith("612_") && newFormData[key]
+      (key) => key.startsWith("612_") && newFormData[key],
     );
 
     setFormData(newFormData);
@@ -2149,7 +2173,7 @@ export default function WeightLossConsultationQuiz({
     updateLocalStorage(newFormData);
 
     const continueButton = formRef.current?.querySelector(
-      ".quiz-continue-button"
+      ".quiz-continue-button",
     );
     if (continueButton) {
       continueButton.style.visibility = "";
@@ -2185,7 +2209,7 @@ export default function WeightLossConsultationQuiz({
       updateFormDataAndStorage(updates);
 
       const continueButton = formRef.current?.querySelector(
-        ".quiz-continue-button"
+        ".quiz-continue-button",
       );
       if (continueButton) {
         continueButton.style.display = "block";
@@ -2199,7 +2223,7 @@ export default function WeightLossConsultationQuiz({
     clearError();
     const newFormData = { ...formData };
     const isNoOrUnsure = optionId.endsWith("_3") || optionId.endsWith("_4");
-    
+
     if (isNoOrUnsure) {
       if (newFormData[optionId]) {
         newFormData[optionId] = "";
@@ -2222,13 +2246,14 @@ export default function WeightLossConsultationQuiz({
     setFormData(newFormData);
     updateLocalStorage(newFormData);
 
-    const hasSelection = newFormData[`${questionPrefix}_1`] || 
-                        newFormData[`${questionPrefix}_2`] || 
-                        newFormData[`${questionPrefix}_3`] || 
-                        newFormData[`${questionPrefix}_4`];
+    const hasSelection =
+      newFormData[`${questionPrefix}_1`] ||
+      newFormData[`${questionPrefix}_2`] ||
+      newFormData[`${questionPrefix}_3`] ||
+      newFormData[`${questionPrefix}_4`];
 
     const continueButton = formRef.current?.querySelector(
-      ".quiz-continue-button"
+      ".quiz-continue-button",
     );
     if (continueButton) {
       continueButton.style.visibility = hasSelection ? "" : "hidden";
@@ -2268,7 +2293,7 @@ export default function WeightLossConsultationQuiz({
     updateLocalStorage(newFormData);
 
     const continueButton = formRef.current?.querySelector(
-      ".quiz-continue-button"
+      ".quiz-continue-button",
     );
     if (continueButton) {
       continueButton.style.visibility = "";
@@ -2312,7 +2337,7 @@ export default function WeightLossConsultationQuiz({
     updateLocalStorage(newFormData);
 
     const continueButton = formRef.current?.querySelector(
-      ".quiz-continue-button"
+      ".quiz-continue-button",
     );
     if (continueButton) {
       continueButton.style.visibility = "";
@@ -2426,7 +2451,7 @@ export default function WeightLossConsultationQuiz({
 
     queueFormSubmission(updatedData);
     const continueButton = formRef.current?.querySelector(
-      ".quiz-continue-button"
+      ".quiz-continue-button",
     );
     if (continueButton) {
       continueButton.style.visibility = "visible";
@@ -2451,7 +2476,7 @@ export default function WeightLossConsultationQuiz({
     queueFormSubmission(updatedData);
 
     const continueButton = formRef.current?.querySelector(
-      ".quiz-continue-button"
+      ".quiz-continue-button",
     );
     if (continueButton) {
       continueButton.style.visibility = "visible";
@@ -2502,7 +2527,7 @@ export default function WeightLossConsultationQuiz({
     updateLocalStorage(newFormData);
 
     const continueButton = formRef.current?.querySelector(
-      ".quiz-continue-button"
+      ".quiz-continue-button",
     );
     if (continueButton) {
       continueButton.style.visibility = "";
@@ -2522,7 +2547,7 @@ export default function WeightLossConsultationQuiz({
     });
 
     const continueButton = formRef.current?.querySelector(
-      ".quiz-continue-button"
+      ".quiz-continue-button",
     );
     if (continueButton) {
       continueButton.disabled = !isChecked;
@@ -2755,7 +2780,7 @@ export default function WeightLossConsultationQuiz({
     setButtonState((state) => ({
       ...state,
       visible: Object.keys(newFormData).some(
-        (key) => key.startsWith("605_") && newFormData[key]
+        (key) => key.startsWith("605_") && newFormData[key],
       ),
       disabled: false,
       opacity: 1,
@@ -2769,7 +2794,7 @@ export default function WeightLossConsultationQuiz({
     updateLocalStorage(newFormData);
 
     const continueButton = formRef.current?.querySelector(
-      ".quiz-continue-button"
+      ".quiz-continue-button",
     );
     if (continueButton) {
       let isVisible = true;
@@ -2810,7 +2835,10 @@ export default function WeightLossConsultationQuiz({
         essentialConsulData = JSON.parse(essentialConsul);
       }
     } catch (error) {
-      logger.error("Error reading essential-consul in collectCumulativeData:", error);
+      logger.error(
+        "Error reading essential-consul in collectCumulativeData:",
+        error,
+      );
     }
 
     let storedAttributes = {};
@@ -3015,8 +3043,8 @@ export default function WeightLossConsultationQuiz({
       filteredData.wl_BMI = formData.wl_BMI;
     }
 
-   const preQuizAttributes = extractPreQuizAttributes(essentialConsulData);
-    
+    const preQuizAttributes = extractPreQuizAttributes(essentialConsulData);
+
     if (formData.accomplishment) {
       filteredData.accomplishment = formData.accomplishment;
     } else if (preQuizAttributes.accomplishment) {
@@ -3024,23 +3052,27 @@ export default function WeightLossConsultationQuiz({
     } else if (storedAttributes.accomplishment) {
       filteredData.accomplishment = storedAttributes.accomplishment;
     }
-    
+
     if (formData.pregnantOrbreastfeeding) {
       filteredData.pregnantOrbreastfeeding = formData.pregnantOrbreastfeeding;
     } else if (preQuizAttributes.pregnantOrbreastfeeding) {
-      filteredData.pregnantOrbreastfeeding = preQuizAttributes.pregnantOrbreastfeeding;
+      filteredData.pregnantOrbreastfeeding =
+        preQuizAttributes.pregnantOrbreastfeeding;
     } else if (storedAttributes.pregnantOrbreastfeeding) {
-      filteredData.pregnantOrbreastfeeding = storedAttributes.pregnantOrbreastfeeding;
+      filteredData.pregnantOrbreastfeeding =
+        storedAttributes.pregnantOrbreastfeeding;
     }
-    
+
     if (formData.weightImpactStatements) {
       filteredData.weightImpactStatements = formData.weightImpactStatements;
     } else if (preQuizAttributes.weightImpactStatements) {
-      filteredData.weightImpactStatements = preQuizAttributes.weightImpactStatements;
+      filteredData.weightImpactStatements =
+        preQuizAttributes.weightImpactStatements;
     } else if (storedAttributes.weightImpactStatements) {
-      filteredData.weightImpactStatements = storedAttributes.weightImpactStatements;
+      filteredData.weightImpactStatements =
+        storedAttributes.weightImpactStatements;
     }
-    
+
     if (formData.medications) {
       filteredData.medications = formData.medications;
     } else if (preQuizAttributes.medications) {
@@ -3048,13 +3080,15 @@ export default function WeightLossConsultationQuiz({
     } else if (storedAttributes.medications) {
       filteredData.medications = storedAttributes.medications;
     }
-    
+
     if (formData.eatingDisorderDiagnosis) {
       filteredData.eatingDisorderDiagnosis = formData.eatingDisorderDiagnosis;
     } else if (preQuizAttributes.eatingDisorderDiagnosis) {
-      filteredData.eatingDisorderDiagnosis = preQuizAttributes.eatingDisorderDiagnosis;
+      filteredData.eatingDisorderDiagnosis =
+        preQuizAttributes.eatingDisorderDiagnosis;
     } else if (storedAttributes.eatingDisorderDiagnosis) {
-      filteredData.eatingDisorderDiagnosis = storedAttributes.eatingDisorderDiagnosis;
+      filteredData.eatingDisorderDiagnosis =
+        storedAttributes.eatingDisorderDiagnosis;
     }
 
     return filteredData;
@@ -3268,25 +3302,10 @@ export default function WeightLossConsultationQuiz({
 
   const HandleChangeBpWarningAcknowledged = (option) => {
     logger.log(option);
-    if (option === true) {
-      setBpWarningAcknowledged(option);
-
-      setFormData((prev) => ({
-        ...prev,
-        WLBloodPressureWarning: "on",
-      }));
-      updateLocalStorage({
-        ...formData,
-        WLBloodPressureWarning: "on",
-      });
-
-      queueFormSubmission({
-        ...formData,
-        WLBloodPressureWarning: "on",
-      });
-
-      moveToNextSlideWithoutValidation();
-    }
+    // Only toggle the acknowledged state to enable/disable the Continue button.
+    // All form data saving and navigation happen in the onClose handler when
+    // the user explicitly clicks Continue.
+    setBpWarningAcknowledged(!!option);
   };
 
   const moveToPreviousSlide = () => {
@@ -3436,7 +3455,7 @@ export default function WeightLossConsultationQuiz({
     });
 
     const continueButton = formRef.current?.querySelector(
-      ".quiz-continue-button"
+      ".quiz-continue-button",
     );
     if (continueButton) {
       continueButton.style.visibility = value.trim() !== "" ? "" : "hidden";
@@ -3456,7 +3475,7 @@ export default function WeightLossConsultationQuiz({
     });
 
     const continueButton = formRef.current?.querySelector(
-      ".quiz-continue-button"
+      ".quiz-continue-button",
     );
     if (continueButton) {
       continueButton.style.display = "block";
@@ -3860,7 +3879,7 @@ export default function WeightLossConsultationQuiz({
 
           if (formData["615_2"] && !formData["l-615_2-textarea"]) {
             return showError(
-              "Please specify how many drinks you have per week"
+              "Please specify how many drinks you have per week",
             );
           }
           if (formData["615_3"] && !formData["l-615_3-textarea"]) {
@@ -3978,909 +3997,1053 @@ export default function WeightLossConsultationQuiz({
       )}
       {!showBMICalculator && (
         <>
-          {currentPage <= 26 && !(currentPage === 23 && formData.completion_state === "Full") && (
-            <>
-              <QuestionnaireNavbar
-                onBackClick={handleBackClick}
-                currentPage={currentPage}
-                isThankYouPage={currentPage === 23 && formData.completion_state === "Full"}
-              />
+          {currentPage <= 26 &&
+            !(currentPage === 23 && formData.completion_state === "Full") && (
+              <>
+                <QuestionnaireNavbar
+                  onBackClick={handleBackClick}
+                  currentPage={currentPage}
+                  isThankYouPage={
+                    currentPage === 23 && formData.completion_state === "Full"
+                  }
+                />
 
-              <ProgressBar progress={progress} />
-            </>
-          )}
+                <ProgressBar progress={progress} />
+              </>
+            )}
 
-          {currentPage <= 26 && !(currentPage === 23 && formData.completion_state === "Full") && (
-            <div className="flex-1">
-              <div
-                className="quiz-page-wrapper relative md:container md:w-[768px] mx-auto bg-[#FFFFFF]"
-                ref={formRef}
-              >
-                <form
-                  id="wl-quiz-form"
-                  method="post"
-                  action="https://myrocky.com/wp-admin/admin-ajax.php"
+          {currentPage <= 26 &&
+            !(currentPage === 23 && formData.completion_state === "Full") && (
+              <div className="flex-1">
+                <div
+                  className="quiz-page-wrapper relative md:container md:w-[768px] mx-auto bg-[#FFFFFF]"
+                  ref={formRef}
                 >
-                  <input type="hidden" name="form_id" value="6" />
-                  <input
-                    type="hidden"
-                    name="action"
-                    value="wl_questionnaire_data_upload"
-                  />
-                  <input
-                    type="hidden"
-                    name="entrykey"
-                    value={formData.entrykey || ""}
-                  />
-                  <input type="hidden" name="id" value={formData.id || ""} />
-                  <input
-                    type="hidden"
-                    name="token"
-                    value={formData.token || ""}
-                  />
-                  <input
-                    type="hidden"
-                    name="stage"
-                    value="consultation-before-checkout"
-                  />
-                  <input type="hidden" name="page_step" value={currentPage} />
-                  <input
-                    type="hidden"
-                    name="completion_state"
-                    value="Partial"
-                  />
-                  <input
-                    type="hidden"
-                    name="completion_percentage"
-                    value={progress}
-                  />
-                  <input
-                    type="hidden"
-                    name="source_site"
-                    value="https://myrocky.com"
-                  />
-
-                  <input
-                    type="hidden"
-                    name="130_3"
-                    value={formData["130_3"] || "Omkar"}
-                  />
-                  <input
-                    type="hidden"
-                    name="130_6"
-                    value={formData["130_6"] || "Test"}
-                  />
-                  <input
-                    type="hidden"
-                    name="131"
-                    value={formData["131"] || "omkar@w3mg.in"}
-                  />
-                  <input
-                    type="hidden"
-                    name="132"
-                    value={formData["132"] || "(000) 000-0000"}
-                  />
-                  <input
-                    type="hidden"
-                    name="158"
-                    value={formData["158"] || "2000-01-01"}
-                  />
-                  <input
-                    type="hidden"
-                    name="161_4"
-                    value={formData["161_4"] || "Ontario"}
-                  />
-
-                  {/* Weight specific fields */}
-                  <input
-                    type="hidden"
-                    id="wl_weight"
-                    name="wl_weight"
-                    value={formData["wl_weight"] || ""}
-                  />
-                  <input
-                    type="hidden"
-                    id="wl_height"
-                    name="wl_height"
-                    value={formData["wl_height"] || ""}
-                  />
-                  <input
-                    type="hidden"
-                    id="wl_BMI"
-                    name="wl_BMI"
-                    value={formData["wl_BMI"] || ""}
-                  />
-
-                  <div
-                    className="relative min-h-[400px] flex items-start md:w-[520px] mx-auto px-5 md:px-0 md:mb-16"
-                    suppressHydrationWarning={true}
+                  <form
+                    id="wl-quiz-form"
+                    method="post"
+                    action="https://myrocky.com/wp-admin/admin-ajax.php"
                   >
-                    <AnimatePresence mode="wait" custom={isMovingForward}>
-                      <motion.div
-                        key={currentPage}
-                        variants={slideVariants}
-                        initial={isMovingForward ? "hiddenRight" : "hiddenLeft"}
-                        animate="visible"
-                        exit={isMovingForward ? "exitRight" : "exitLeft"}
-                        className="w-full"
-                      >
-                        {/* Question 1: Currently using weight loss medication */}
-                        {currentPage === 1 && (
-                          <QuestionLayout
-                            title="Are you currently using weight loss medication?"
-                            currentPage={currentPage}
-                            pageNo={1}
-                            questionId="601"
-                          >
-                            {["Yes", "No"].map((option, index) => (
-                              <QuestionOption
-                                key={`medication-option-${index}`}
-                                id={`601_${index + 1}`}
-                                name="601"
-                                value={option}
-                                checked={formData["601"] === option}
-                                onChange={() =>
-                                  handleCurrentMedicationSelect(option)
-                                }
-                                type="radio"
-                              />
-                            ))}
-                          </QuestionLayout>
-                        )}
-                        {/* Question 2: Have you ever been on weight loss medication before */}
-                        {currentPage === 2 && (
-                          <QuestionLayout
-                            title="Have you ever been on weight loss medication before?"
-                            currentPage={currentPage}
-                            pageNo={2}
-                            questionId="602"
-                          >
-                            {["Yes", "No"].map((option, index) => (
-                              <QuestionOption
-                                key={`past-medication-option-${index}`}
-                                id={`602_${index + 1}`}
-                                name="602"
-                                value={option}
-                                checked={formData["602"] === option}
-                                onChange={() =>
-                                  handlePreviousMedicationSelect(option)
-                                }
-                                type="radio"
-                              />
-                            ))}
-                          </QuestionLayout>
-                        )}
-                        {/* Question 3: How can we help today */}
-                        {currentPage === 3 && (
-                          <QuestionLayout
-                            title="How can we help today?"
-                            currentPage={currentPage}
-                            pageNo={3}
-                            questionId="603"
-                          >
-                            {[
-                              "I want to start treatment",
-                              "I want to change my medication",
-                            ].map((option, index) => (
-                              <QuestionOption
-                                key={`help-option-${index}`}
-                                id={`603_${index + 1}`}
-                                name="603"
-                                value={option}
-                                checked={formData["603"] === option}
-                                onChange={() => handleHelpOptionSelect(option)}
-                                type="radio"
-                              />
-                            ))}
-                          </QuestionLayout>
-                        )}
-                        {/* Question 4: Which weight loss medication */}
-                        {currentPage === 4 && (
-                          <QuestionLayout
-                            title="Which weight loss medication are you currently taking?"
-                            currentPage={currentPage}
-                            pageNo={4}
-                            questionId="604"
-                            inputType="checkbox"
-                          >
-                            {[
-                              { id: "604_1", value: "Ozempic" },
-                              { id: "604_2", value: "Contrave" },
-                              { id: "604_3", value: "Mounjaro" },
-                              { id: "604_4", value: "Orlistat" },
-                              { id: "604_5", value: "Saxenda" },
-                              { id: "604_6", value: "Other" },
-                            ].map((option) => (
-                              <QuestionOption
-                                key={option.id}
-                                id={option.id}
-                                name={option.id}
-                                value={option.value}
-                                checked={!!formData[option.id]}
-                                onChange={() =>
-                                  handleMedicationSelect(
-                                    option.id,
-                                    option.value
-                                  )
-                                }
-                                type="checkbox"
-                              />
-                            ))}
+                    <input type="hidden" name="form_id" value="6" />
+                    <input
+                      type="hidden"
+                      name="action"
+                      value="wl_questionnaire_data_upload"
+                    />
+                    <input
+                      type="hidden"
+                      name="entrykey"
+                      value={formData.entrykey || ""}
+                    />
+                    <input type="hidden" name="id" value={formData.id || ""} />
+                    <input
+                      type="hidden"
+                      name="token"
+                      value={formData.token || ""}
+                    />
+                    <input
+                      type="hidden"
+                      name="stage"
+                      value="consultation-before-checkout"
+                    />
+                    <input type="hidden" name="page_step" value={currentPage} />
+                    <input
+                      type="hidden"
+                      name="completion_state"
+                      value="Partial"
+                    />
+                    <input
+                      type="hidden"
+                      name="completion_percentage"
+                      value={progress}
+                    />
+                    <input
+                      type="hidden"
+                      name="source_site"
+                      value="https://myrocky.com"
+                    />
 
-                            {formData["604_6"] === "Other" && (
+                    <input
+                      type="hidden"
+                      name="130_3"
+                      value={formData["130_3"] || "Omkar"}
+                    />
+                    <input
+                      type="hidden"
+                      name="130_6"
+                      value={formData["130_6"] || "Test"}
+                    />
+                    <input
+                      type="hidden"
+                      name="131"
+                      value={formData["131"] || "omkar@w3mg.in"}
+                    />
+                    <input
+                      type="hidden"
+                      name="132"
+                      value={formData["132"] || "(000) 000-0000"}
+                    />
+                    <input
+                      type="hidden"
+                      name="158"
+                      value={formData["158"] || "2000-01-01"}
+                    />
+                    <input
+                      type="hidden"
+                      name="161_4"
+                      value={formData["161_4"] || "Ontario"}
+                    />
+
+                    {/* Weight specific fields */}
+                    <input
+                      type="hidden"
+                      id="wl_weight"
+                      name="wl_weight"
+                      value={formData["wl_weight"] || ""}
+                    />
+                    <input
+                      type="hidden"
+                      id="wl_height"
+                      name="wl_height"
+                      value={formData["wl_height"] || ""}
+                    />
+                    <input
+                      type="hidden"
+                      id="wl_BMI"
+                      name="wl_BMI"
+                      value={formData["wl_BMI"] || ""}
+                    />
+
+                    <div
+                      className="relative min-h-[400px] flex items-start md:w-[520px] mx-auto px-5 md:px-0 md:mb-16"
+                      suppressHydrationWarning={true}
+                    >
+                      <AnimatePresence mode="wait" custom={isMovingForward}>
+                        <motion.div
+                          key={currentPage}
+                          variants={slideVariants}
+                          initial={
+                            isMovingForward ? "hiddenRight" : "hiddenLeft"
+                          }
+                          animate="visible"
+                          exit={isMovingForward ? "exitRight" : "exitLeft"}
+                          className="w-full"
+                        >
+                          {/* Question 1: Currently using weight loss medication */}
+                          {currentPage === 1 && (
+                            <QuestionLayout
+                              title="Are you currently using weight loss medication?"
+                              currentPage={currentPage}
+                              pageNo={1}
+                              questionId="601"
+                            >
+                              {["Yes", "No"].map((option, index) => (
+                                <QuestionOption
+                                  key={`medication-option-${index}`}
+                                  id={`601_${index + 1}`}
+                                  name="601"
+                                  value={option}
+                                  checked={formData["601"] === option}
+                                  onChange={() =>
+                                    handleCurrentMedicationSelect(option)
+                                  }
+                                  type="radio"
+                                />
+                              ))}
+                            </QuestionLayout>
+                          )}
+                          {/* Question 2: Have you ever been on weight loss medication before */}
+                          {currentPage === 2 && (
+                            <QuestionLayout
+                              title="Have you ever been on weight loss medication before?"
+                              currentPage={currentPage}
+                              pageNo={2}
+                              questionId="602"
+                            >
+                              {["Yes", "No"].map((option, index) => (
+                                <QuestionOption
+                                  key={`past-medication-option-${index}`}
+                                  id={`602_${index + 1}`}
+                                  name="602"
+                                  value={option}
+                                  checked={formData["602"] === option}
+                                  onChange={() =>
+                                    handlePreviousMedicationSelect(option)
+                                  }
+                                  type="radio"
+                                />
+                              ))}
+                            </QuestionLayout>
+                          )}
+                          {/* Question 3: How can we help today */}
+                          {currentPage === 3 && (
+                            <QuestionLayout
+                              title="How can we help today?"
+                              currentPage={currentPage}
+                              pageNo={3}
+                              questionId="603"
+                            >
+                              {[
+                                "I want to start treatment",
+                                "I want to change my medication",
+                              ].map((option, index) => (
+                                <QuestionOption
+                                  key={`help-option-${index}`}
+                                  id={`603_${index + 1}`}
+                                  name="603"
+                                  value={option}
+                                  checked={formData["603"] === option}
+                                  onChange={() =>
+                                    handleHelpOptionSelect(option)
+                                  }
+                                  type="radio"
+                                />
+                              ))}
+                            </QuestionLayout>
+                          )}
+                          {/* Question 4: Which weight loss medication */}
+                          {currentPage === 4 && (
+                            <QuestionLayout
+                              title="Which weight loss medication are you currently taking?"
+                              currentPage={currentPage}
+                              pageNo={4}
+                              questionId="604"
+                              inputType="checkbox"
+                            >
+                              {[
+                                { id: "604_1", value: "Ozempic" },
+                                { id: "604_2", value: "Contrave" },
+                                { id: "604_3", value: "Mounjaro" },
+                                { id: "604_4", value: "Orlistat" },
+                                { id: "604_5", value: "Saxenda" },
+                                { id: "604_6", value: "Other" },
+                              ].map((option) => (
+                                <QuestionOption
+                                  key={option.id}
+                                  id={option.id}
+                                  name={option.id}
+                                  value={option.value}
+                                  checked={!!formData[option.id]}
+                                  onChange={() =>
+                                    handleMedicationSelect(
+                                      option.id,
+                                      option.value,
+                                    )
+                                  }
+                                  type="checkbox"
+                                />
+                              ))}
+
+                              {formData["604_6"] === "Other" && (
+                                <QuestionAdditionalInput
+                                  id="l-604_6-textarea"
+                                  name="l-604_6-textarea"
+                                  placeholder="Please state the name of the medication and how effective it was"
+                                  value={formData["l-604_6-textarea"] || ""}
+                                  onChange={handleMedicationTextareaChange}
+                                  disabled={formData["604_6"] !== "Other"}
+                                />
+                              )}
+                            </QuestionLayout>
+                          )}
+                          {/* Question 5: How much weight are you hoping to lose */}
+                          {currentPage === 5 && (
+                            <QuestionLayout
+                              title="How much weight are you hoping to lose?"
+                              currentPage={currentPage}
+                              pageNo={5}
+                              questionId="617"
+                            >
                               <QuestionAdditionalInput
-                                id="l-604_6-textarea"
-                                name="l-604_6-textarea"
-                                placeholder="Please state the name of the medication and how effective it was"
-                                value={formData["l-604_6-textarea"] || ""}
-                                onChange={handleMedicationTextareaChange}
-                                disabled={formData["604_6"] !== "Other"}
+                                id="l-617_1-textarea"
+                                name="l-617_1-textarea"
+                                placeholder="e.g. 20lbs"
+                                value={formData["l-617_1-textarea"] || ""}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  if (/^\d*$/.test(val)) {
+                                    handleWeightGoalChange(e);
+                                  }
+                                }}
+                                type="text"
                               />
-                            )}
-                          </QuestionLayout>
-                        )}
-                        {/* Question 5: How much weight are you hoping to lose */}
-                        {currentPage === 5 && (
-                          <QuestionLayout
-                            title="How much weight are you hoping to lose?"
-                            currentPage={currentPage}
-                            pageNo={5}
-                            questionId="617"
-                          >
-                            <QuestionAdditionalInput
-                              id="l-617_1-textarea"
-                              name="l-617_1-textarea"
-                              placeholder="e.g. 20lbs"
-                              value={formData["l-617_1-textarea"] || ""}
-                              onChange={(e) => {
-                                const val = e.target.value;
-                                if (/^\d*$/.test(val)) {
-                                  handleWeightGoalChange(e);
-                                }
-                              }}
-                              type="text"
-                            />
-                          </QuestionLayout>
-                        )}
-                        {/* Question 6: Weight gain contributors */}
-                        {currentPage === 6 && (
-                          <QuestionLayout
-                            title="Have any of the following contributed to your weight gain?"
-                            currentPage={currentPage}
-                            pageNo={6}
-                            questionId="605"
-                            inputType="checkbox"
-                          >
-                            <div className="flex flex-col w-full gap-2">
+                            </QuestionLayout>
+                          )}
+                          {/* Question 6: Weight gain contributors */}
+                          {currentPage === 6 && (
+                            <QuestionLayout
+                              title="Have any of the following contributed to your weight gain?"
+                              currentPage={currentPage}
+                              pageNo={6}
+                              questionId="605"
+                              inputType="checkbox"
+                            >
+                              <div className="flex flex-col w-full gap-2">
+                                {[
+                                  {
+                                    id: "605_1",
+                                    value: "Medications",
+                                    addsTextArea: true,
+                                    placeholder:
+                                      "Please state the name of the medication",
+                                  },
+                                  {
+                                    id: "605_2",
+                                    value: "Illness or injury",
+                                    addsTextArea: true,
+                                    placeholder:
+                                      "Please state the illness or injury",
+                                  },
+                                  { id: "605_3", value: "Unhealthy diet" },
+                                  {
+                                    id: "605_4",
+                                    value: "Mental Health issues",
+                                    addsTextArea: true,
+                                    placeholder: "Please state the issue",
+                                  },
+                                  {
+                                    id: "605_5",
+                                    value: "Surgery",
+                                    addsTextArea: true,
+                                    placeholder:
+                                      "Please state the procedure you had",
+                                  },
+                                  {
+                                    id: "605_6",
+                                    value: "Other",
+                                    addsTextArea: true,
+                                    placeholder: "Please explain...",
+                                  },
+                                  {
+                                    id: "605_7",
+                                    value: "None of the above",
+                                    isNoneOption: true,
+                                  },
+                                ].map((option) => (
+                                  <div
+                                    key={option.id}
+                                    className="option-container"
+                                  >
+                                    <QuestionOption
+                                      id={option.id}
+                                      name={option.id}
+                                      value={option.value}
+                                      checked={!!formData[option.id]}
+                                      onChange={() =>
+                                        handleWeightGainContributorsSelect(
+                                          option.id,
+                                        )
+                                      }
+                                      type="checkbox"
+                                      isNoneOption={option.isNoneOption}
+                                    />{" "}
+                                    {option.addsTextArea &&
+                                      formData[option.id] && (
+                                        <QuestionAdditionalInput
+                                          id={`l-${option.id}-textarea`}
+                                          name={`l-${option.id}-textarea`}
+                                          placeholder={option.placeholder}
+                                          value={
+                                            formData[
+                                              `l-${option.id}-textarea`
+                                            ] || ""
+                                          }
+                                          onChange={(e) =>
+                                            handleWeightGainTextChange(
+                                              option.id,
+                                              e,
+                                            )
+                                          }
+                                        />
+                                      )}
+                                  </div>
+                                ))}
+                              </div>
+                            </QuestionLayout>
+                          )}
+                          {/* Question 7: Blood pressure */}
+                          {currentPage === 7 && (
+                            <QuestionLayout
+                              title="What was your most recent blood pressure reading?"
+                              subtitle="Please provide your blood pressure reading taken within the last 6 months."
+                              notes="Your blood pressure helps us determine if it is safe for you to use certain types of weight loss medication."
+                              currentPage={currentPage}
+                              pageNo={7}
+                              questionId="606"
+                            >
                               {[
                                 {
-                                  id: "605_1",
-                                  value: "Medications",
-                                  addsTextArea: true,
-                                  placeholder:
-                                    "Please state the name of the medication",
+                                  id: "606_1",
+                                  value: "120/80 or lower (Normal)",
                                 },
                                 {
-                                  id: "605_2",
-                                  value: "Illness or injury",
-                                  addsTextArea: true,
-                                  placeholder:
-                                    "Please state the illness or injury",
-                                },
-                                { id: "605_3", value: "Unhealthy diet" },
-                                {
-                                  id: "605_4",
-                                  value: "Mental Health issues",
-                                  addsTextArea: true,
-                                  placeholder: "Please state the issue",
+                                  id: "606_2",
+                                  value: "121/81 to 140/90 (Above Normal)",
                                 },
                                 {
-                                  id: "605_5",
-                                  value: "Surgery",
-                                  addsTextArea: true,
-                                  placeholder:
-                                    "Please state the procedure you had",
+                                  id: "606_3",
+                                  value: "141/91 to 179/99 (High)",
                                 },
                                 {
-                                  id: "605_6",
-                                  value: "Other",
-                                  addsTextArea: true,
-                                  placeholder: "Please explain...",
+                                  id: "606_4",
+                                  value: ">180/100 (Higher)",
+                                  label: "≥180/100 (Higher)",
                                 },
                                 {
-                                  id: "605_7",
-                                  value: "None of the above",
-                                  isNoneOption: true,
+                                  id: "606_5",
+                                  value: "I don't know my blood pressure",
                                 },
                               ].map((option) => (
-                                <div
+                                <QuestionOption
                                   key={option.id}
-                                  className="option-container"
-                                >
-                                  <QuestionOption
-                                    id={option.id}
-                                    name={option.id}
-                                    value={option.value}
-                                    checked={!!formData[option.id]}
-                                    onChange={() =>
-                                      handleWeightGainContributorsSelect(
-                                        option.id
-                                      )
-                                    }
-                                    type="checkbox"
-                                    isNoneOption={option.isNoneOption}
-                                  />{" "}
-                                  {option.addsTextArea &&
-                                    formData[option.id] && (
-                                      <QuestionAdditionalInput
-                                        id={`l-${option.id}-textarea`}
-                                        name={`l-${option.id}-textarea`}
-                                        placeholder={option.placeholder}
-                                        value={
-                                          formData[`l-${option.id}-textarea`] ||
-                                          ""
-                                        }
-                                        onChange={(e) =>
-                                          handleWeightGainTextChange(
+                                  id={option.id}
+                                  name="606"
+                                  value={option.value}
+                                  label={option.label || option.value}
+                                  checked={formData["606"] === option.value}
+                                  onChange={() =>
+                                    handleBloodPressureSelect(option.value)
+                                  }
+                                  type="radio"
+                                />
+                              ))}
+                            </QuestionLayout>
+                          )}
+                          {/* Question 8: Weight loss surgery */}
+                          {currentPage === 8 && (
+                            <QuestionLayout
+                              title="Have you ever had weight loss surgery?"
+                              currentPage={currentPage}
+                              pageNo={8}
+                              questionId="607"
+                              inputType="checkbox"
+                            >
+                              <div className="flex flex-col w-full gap-2">
+                                {[
+                                  { id: "607_1", value: "Sleeve gastrectomy" },
+                                  {
+                                    id: "607_2",
+                                    value:
+                                      "Laparoscopic adjustable gastric band (Lap-Band)",
+                                  },
+                                  {
+                                    id: "607_3",
+                                    value: "Roux-en-Y gastric bypass",
+                                  },
+                                  { id: "607_4", value: "Gastric balloon" },
+                                  {
+                                    id: "607_5",
+                                    value: "Other procedure",
+                                    addsTextArea: true,
+                                  },
+                                  {
+                                    id: "607_6",
+                                    value: "None of the above",
+                                    isNoneOption: true,
+                                  },
+                                ].map((option) => (
+                                  <div
+                                    key={option.id}
+                                    className="option-container"
+                                  >
+                                    <QuestionOption
+                                      id={option.id}
+                                      name={option.id}
+                                      value={option.value}
+                                      checked={!!formData[option.id]}
+                                      onChange={() =>
+                                        handleWeightLossSurgerySelect(option.id)
+                                      }
+                                      type="checkbox"
+                                      isNoneOption={option.isNoneOption}
+                                    />{" "}
+                                    {option.addsTextArea &&
+                                      formData[option.id] && (
+                                        <QuestionAdditionalInput
+                                          id="l-607_5-textarea"
+                                          name="l-607_5-textarea"
+                                          placeholder="Please list the procedure done"
+                                          value={
+                                            formData["l-607_5-textarea"] || ""
+                                          }
+                                          onChange={(e) =>
+                                            handleTextAreaChange("607_5", e)
+                                          }
+                                        />
+                                      )}
+                                  </div>
+                                ))}
+                              </div>
+                            </QuestionLayout>
+                          )}
+                          {currentPage === 9 && (
+                            <QuestionLayout
+                              title="How have you tried to lose weight in the past?"
+                              currentPage={currentPage}
+                              pageNo={9}
+                              questionId="608"
+                              inputType="checkbox"
+                            >
+                              <div className="flex flex-col w-full gap-2">
+                                {[
+                                  {
+                                    id: "608_1",
+                                    value: "Specialized diet (Paleo or Atkins)",
+                                    addsTextArea: true,
+                                    placeholder:
+                                      "How effective was this for losing weight?",
+                                  },
+                                  {
+                                    id: "608_2",
+                                    value:
+                                      "Weight loss plans (Weight Watchers)",
+                                    addsTextArea: true,
+                                    placeholder:
+                                      "How effective was this for losing weight?",
+                                  },
+                                  {
+                                    id: "608_3",
+                                    value: "Therapy or counseling",
+                                    addsTextArea: true,
+                                    placeholder:
+                                      "How effective was this for losing weight?",
+                                  },
+                                  {
+                                    id: "608_4",
+                                    value: "Working with a dietitian",
+                                    addsTextArea: true,
+                                    placeholder:
+                                      "How effective was this for losing weight?",
+                                  },
+                                  {
+                                    id: "608_5",
+                                    value: "Exercise",
+                                    addsTextArea: true,
+                                    placeholder:
+                                      "How effective was this for losing weight?",
+                                  },
+                                  {
+                                    id: "608_6",
+                                    value:
+                                      "Prescription weight loss medication",
+                                    addsTextArea: true,
+                                    placeholder:
+                                      "How effective was this for losing weight?",
+                                  },
+                                  {
+                                    id: "608_7",
+                                    value: "Laxatives or diuretics",
+                                    addsTextArea: true,
+                                    placeholder:
+                                      "How effective was this for losing weight?",
+                                  },
+                                  {
+                                    id: "608_8",
+                                    value: "Weight loss supplements",
+                                    addsTextArea: true,
+                                    placeholder:
+                                      "How effective was this for losing weight?",
+                                  },
+                                  {
+                                    id: "608_9",
+                                    value: "Other",
+                                    addsTextArea: true,
+                                    placeholder:
+                                      "Please specify and share how effective it was",
+                                  },
+                                  {
+                                    id: "608_11",
+                                    value:
+                                      "I have not tried to lose weight in the past",
+                                    isNoneOption: true,
+                                  },
+                                ].map((option) => (
+                                  <div
+                                    key={option.id}
+                                    className="option-container"
+                                  >
+                                    <QuestionOption
+                                      id={option.id}
+                                      name={option.id}
+                                      value={option.value}
+                                      checked={!!formData[option.id]}
+                                      onChange={() =>
+                                        handleWeightLossMethodSelect(option.id)
+                                      }
+                                      type="checkbox"
+                                      isNoneOption={option.isNoneOption}
+                                    />
+
+                                    {option.addsTextArea &&
+                                      formData[option.id] && (
+                                        <QuestionAdditionalInput
+                                          id={`l-${option.id}-textarea`}
+                                          name={`l-${option.id}-textarea`}
+                                          placeholder={option.placeholder}
+                                          value={
+                                            formData[
+                                              `l-${option.id}-textarea`
+                                            ] || ""
+                                          }
+                                          onChange={(e) =>
+                                            handleTextAreaChange(option.id, e)
+                                          }
+                                        />
+                                      )}
+                                  </div>
+                                ))}
+                              </div>
+                            </QuestionLayout>
+                          )}
+                          {currentPage === 10 && (
+                            <QuestionLayout
+                              title="How long have you had concerns about your body weight?"
+                              currentPage={currentPage}
+                              pageNo={10}
+                              questionId="609"
+                            >
+                              <div className="flex flex-col w-full gap-2">
+                                {[
+                                  { id: "609_1", value: "Less than 3 months" },
+                                  { id: "609_2", value: "Less than 6 months" },
+                                  { id: "609_3", value: "6-12 months" },
+                                  { id: "609_4", value: "1-5 years" },
+                                  { id: "609_5", value: "More than 5 years" },
+                                ].map((option) => (
+                                  <div
+                                    key={option.id}
+                                    className="option-container"
+                                  >
+                                    <QuestionOption
+                                      id={option.id}
+                                      name="609"
+                                      value={option.value}
+                                      checked={formData["609"] === option.value}
+                                      onChange={() =>
+                                        handleWeightConcernSelect(option.value)
+                                      }
+                                      type="radio"
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            </QuestionLayout>
+                          )}
+                          {currentPage === 11 && (
+                            <QuestionLayout
+                              title="How would you describe your diet in the past week?"
+                              currentPage={currentPage}
+                              pageNo={11}
+                              questionId="610"
+                            >
+                              <div className="flex flex-col w-full gap-2">
+                                {[
+                                  { id: "610_1", value: "Healthy" },
+                                  { id: "610_2", value: "Somewhat healthy" },
+                                  { id: "610_3", value: "Somewhat unhealthy" },
+                                  { id: "610_4", value: "Very unhealthy" },
+                                ].map((option) => (
+                                  <div
+                                    key={option.id}
+                                    className="option-container"
+                                  >
+                                    <QuestionOption
+                                      id={option.id}
+                                      name="610"
+                                      value={option.value}
+                                      checked={formData["610"] === option.value}
+                                      onChange={() =>
+                                        handleDietDescriptionSelect(
+                                          option.value,
+                                        )
+                                      }
+                                      type="radio"
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            </QuestionLayout>
+                          )}
+                          {currentPage === 12 && (
+                            <QuestionLayout
+                              title="How many days per week do you exercise 30 minutes or more?"
+                              currentPage={currentPage}
+                              pageNo={12}
+                              questionId="611"
+                            >
+                              <div className="flex flex-col w-full gap-2">
+                                {[
+                                  { id: "611_1", value: "1 day per week" },
+                                  { id: "611_2", value: "2 days per week" },
+                                  { id: "611_3", value: "3 days per week" },
+                                  {
+                                    id: "611_4",
+                                    value: "4 or more days per week",
+                                  },
+                                  { id: "611_5", value: "I don't exercise" },
+                                ].map((option) => (
+                                  <div
+                                    key={option.id}
+                                    className="option-container"
+                                  >
+                                    <QuestionOption
+                                      id={option.id}
+                                      name="611"
+                                      value={option.value}
+                                      checked={formData["611"] === option.value}
+                                      onChange={() =>
+                                        handleExerciseFrequencySelect(
+                                          option.value,
+                                        )
+                                      }
+                                      type="radio"
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            </QuestionLayout>
+                          )}
+                          {currentPage === 13 && (
+                            <QuestionLayout
+                              title="What do you hope to achieve by losing weight?"
+                              currentPage={currentPage}
+                              pageNo={13}
+                              questionId="612"
+                              inputType="checkbox"
+                            >
+                              <div className="flex flex-col w-full gap-2">
+                                {[
+                                  { id: "612_1", value: "Have more energy" },
+                                  { id: "612_2", value: "Feel healthier" },
+                                  {
+                                    id: "612_3",
+                                    value: "See changes in my body",
+                                  },
+                                  {
+                                    id: "612_4",
+                                    value: "Other",
+                                    addsTextArea: true,
+                                  },
+                                ].map((option) => (
+                                  <div
+                                    key={option.id}
+                                    className="option-container"
+                                  >
+                                    <QuestionOption
+                                      id={option.id}
+                                      name={option.id}
+                                      value={option.value}
+                                      checked={!!formData[option.id]}
+                                      onChange={() =>
+                                        handleWeightLossGoalsSelect(option.id)
+                                      }
+                                      type="checkbox"
+                                    />
+
+                                    {option.addsTextArea &&
+                                      formData[option.id] && (
+                                        <QuestionAdditionalInput
+                                          id={`l-${option.id}-textarea`}
+                                          name={`l-${option.id}-textarea`}
+                                          placeholder="Please specify..."
+                                          value={
+                                            formData[
+                                              `l-${option.id}-textarea`
+                                            ] || ""
+                                          }
+                                          onChange={(e) =>
+                                            handleTextAreaChange(option.id, e)
+                                          }
+                                        />
+                                      )}
+                                  </div>
+                                ))}
+                              </div>
+                            </QuestionLayout>
+                          )}
+                          {currentPage === 14 && (
+                            <QuestionLayout
+                              title="Would you prefer a version of this medication that's less likely to cause side effects like nausea, stomach discomfort, or diarrhea?"
+                              currentPage={currentPage}
+                              pageNo={14}
+                              questionId="620"
+                            >
+                              <div className="flex flex-col w-full gap-2">
+                                {[
+                                  { id: "620_1", value: "Yes" },
+                                  { id: "620_2", value: "No" },
+                                  { id: "620_3", value: "Not sure" },
+                                ].map((option) => (
+                                  <div
+                                    key={option.id}
+                                    className="option-container"
+                                  >
+                                    <QuestionOption
+                                      id={option.id}
+                                      name="620"
+                                      value={option.value}
+                                      checked={formData["620"] === option.value}
+                                      onChange={() =>
+                                        handleSideEffectsSelect(option.value)
+                                      }
+                                      type="radio"
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            </QuestionLayout>
+                          )}
+                          {currentPage === 15 && (
+                            <QuestionLayout
+                              title="Do you have any of the following medical conditions"
+                              currentPage={currentPage}
+                              pageNo={15}
+                              questionId="613"
+                              inputType="checkbox"
+                            >
+                              <div className="flex flex-col w-full gap-2">
+                                {[
+                                  { id: "613_1", value: "Heart failure" },
+                                  {
+                                    id: "613_2",
+                                    value:
+                                      "Tinea Infections (fungal skin infections)",
+                                  },
+                                  {
+                                    id: "613_3",
+                                    value: "Obstructive Sleep Apnea",
+                                  },
+                                  { id: "613_4", value: "Gout" },
+                                  {
+                                    id: "613_5",
+                                    value: "Diabetes",
+                                    addsTextArea: true,
+                                    placeholder:
+                                      "Please list all medications you take for this",
+                                  },
+                                  { id: "613_6", value: "Gallbladder disease" },
+                                  {
+                                    id: "613_7",
+                                    value: "Gastrointestinal problems",
+                                    addsTextArea: true,
+                                    placeholder: "Please specify",
+                                  },
+                                  { id: "613_8", value: "High blood pressure" },
+                                  { id: "613_9", value: "Depression" },
+                                  {
+                                    id: "613_10",
+                                    value: "Have you had any surgeries",
+                                    addsTextArea: true,
+                                    placeholder: "Please specify",
+                                  },
+                                  {
+                                    id: "613_11",
+                                    value: "Other",
+                                    addsTextArea: true,
+                                    placeholder: "Please specify",
+                                  },
+                                  {
+                                    id: "613_12",
+                                    value: "None of the above.",
+                                    isNoneOption: true,
+                                  },
+                                ].map((option) => (
+                                  <div
+                                    key={option.id}
+                                    className="option-container"
+                                  >
+                                    {" "}
+                                    <QuestionOption
+                                      id={option.id}
+                                      name={option.id}
+                                      value={option.value}
+                                      checked={!!formData[option.id]}
+                                      onChange={() =>
+                                        handleMedicalConditionsSelect(option.id)
+                                      }
+                                      type="checkbox"
+                                      isNoneOption={option.isNoneOption}
+                                    />
+                                    {option.addsTextArea &&
+                                      formData[option.id] && (
+                                        <QuestionAdditionalInput
+                                          id={`l-${option.id}-textarea`}
+                                          name={`l-${option.id}-textarea`}
+                                          placeholder={option.placeholder}
+                                          value={
+                                            formData[
+                                              `l-${option.id}-textarea`
+                                            ] || ""
+                                          }
+                                          onChange={(e) =>
+                                            handleTextAreaChange(option.id, e)
+                                          }
+                                        />
+                                      )}
+                                  </div>
+                                ))}
+                              </div>
+                            </QuestionLayout>
+                          )}{" "}
+                          {currentPage === 16 && (
+                            <QuestionLayout
+                              title="Have you ever had an allergic reaction, sensitivity, or intolerance to any ingredient in approved GLP-1 medications?"
+                              currentPage={currentPage}
+                              pageNo={16}
+                              questionId="621"
+                              inputType="checkbox"
+                            >
+                              <div className="flex flex-col w-full gap-2">
+                                {[
+                                  {
+                                    id: "621_1",
+                                    value:
+                                      "Yes, reaction or intolerance to an ingredient/excipient",
+                                    optionValue: "1",
+                                  },
+                                  {
+                                    id: "621_2",
+                                    value:
+                                      "Yes, issues with the injector pen device",
+                                    optionValue: "2",
+                                  },
+                                  {
+                                    id: "621_3",
+                                    value: "No",
+                                    optionValue: "3",
+                                  },
+                                  {
+                                    id: "621_4",
+                                    value: "Unsure",
+                                    optionValue: "4",
+                                  },
+                                ].map((option) => {
+                                  const isChecked = !!formData[option.id];
+
+                                  return (
+                                    <div
+                                      key={option.id}
+                                      className="option-container"
+                                    >
+                                      <QuestionOption
+                                        id={option.id}
+                                        name={option.id}
+                                        value={option.value}
+                                        checked={isChecked}
+                                        onChange={() =>
+                                          handleGLP1AllergySelect(
                                             option.id,
-                                            e
+                                            option.value,
+                                            "621",
                                           )
                                         }
+                                        type="checkbox"
                                       />
-                                    )}
-                                </div>
-                              ))}
-                            </div>
-                          </QuestionLayout>
-                        )}
-                        {/* Question 7: Blood pressure */}
-                        {currentPage === 7 && (
-                          <QuestionLayout
-                            title="What was your most recent blood pressure reading?"
-                            subtitle="Please provide your blood pressure reading taken within the last 6 months."
-                            notes="Your blood pressure helps us determine if it is safe for you to use certain types of weight loss medication."
-                            currentPage={currentPage}
-                            pageNo={7}
-                            questionId="606"
-                          >
-                            {[
-                              {
-                                id: "606_1",
-                                value: "120/80 or lower (Normal)",
-                              },
-                              {
-                                id: "606_2",
-                                value: "121/81 to 140/90 (Above Normal)",
-                              },
-                              { id: "606_3", value: "141/91 to 179/99 (High)" },
-                              {
-                                id: "606_4",
-                                value: ">180/100 (Higher)",
-                                label: "≥180/100 (Higher)",
-                              },
-                              {
-                                id: "606_5",
-                                value: "I don't know my blood pressure",
-                              },
-                            ].map((option) => (
-                              <QuestionOption
-                                key={option.id}
-                                id={option.id}
-                                name="606"
-                                value={option.value}
-                                label={option.label || option.value}
-                                checked={formData["606"] === option.value}
-                                onChange={() =>
-                                  handleBloodPressureSelect(option.value)
-                                }
-                                type="radio"
-                              />
-                            ))}
-                          </QuestionLayout>
-                        )}
-                        {/* Question 8: Weight loss surgery */}
-                        {currentPage === 8 && (
-                          <QuestionLayout
-                            title="Have you ever had weight loss surgery?"
-                            currentPage={currentPage}
-                            pageNo={8}
-                            questionId="607"
-                            inputType="checkbox"
-                          >
-                            <div className="flex flex-col w-full gap-2">
-                              {[
-                                { id: "607_1", value: "Sleeve gastrectomy" },
-                                {
-                                  id: "607_2",
-                                  value:
-                                    "Laparoscopic adjustable gastric band (Lap-Band)",
-                                },
-                                {
-                                  id: "607_3",
-                                  value: "Roux-en-Y gastric bypass",
-                                },
-                                { id: "607_4", value: "Gastric balloon" },
-                                {
-                                  id: "607_5",
-                                  value: "Other procedure",
-                                  addsTextArea: true,
-                                },
-                                {
-                                  id: "607_6",
-                                  value: "None of the above",
-                                  isNoneOption: true,
-                                },
-                              ].map((option) => (
-                                <div
-                                  key={option.id}
-                                  className="option-container"
-                                >
-                                  <QuestionOption
-                                    id={option.id}
-                                    name={option.id}
-                                    value={option.value}
-                                    checked={!!formData[option.id]}
-                                    onChange={() =>
-                                      handleWeightLossSurgerySelect(option.id)
-                                    }
-                                    type="checkbox"
-                                    isNoneOption={option.isNoneOption}
-                                  />{" "}
-                                  {option.addsTextArea &&
-                                    formData[option.id] && (
-                                      <QuestionAdditionalInput
-                                        id="l-607_5-textarea"
-                                        name="l-607_5-textarea"
-                                        placeholder="Please list the procedure done"
-                                        value={
-                                          formData["l-607_5-textarea"] || ""
-                                        }
-                                        onChange={(e) =>
-                                          handleTextAreaChange("607_5", e)
-                                        }
-                                      />
-                                    )}
-                                </div>
-                              ))}
-                            </div>
-                          </QuestionLayout>
-                        )}
-                        {currentPage === 9 && (
-                          <QuestionLayout
-                            title="How have you tried to lose weight in the past?"
-                            currentPage={currentPage}
-                            pageNo={9}
-                            questionId="608"
-                            inputType="checkbox"
-                          >
-                            <div className="flex flex-col w-full gap-2">
-                              {[
-                                {
-                                  id: "608_1",
-                                  value: "Specialized diet (Paleo or Atkins)",
-                                  addsTextArea: true,
-                                  placeholder:
-                                    "How effective was this for losing weight?",
-                                },
-                                {
-                                  id: "608_2",
-                                  value: "Weight loss plans (Weight Watchers)",
-                                  addsTextArea: true,
-                                  placeholder:
-                                    "How effective was this for losing weight?",
-                                },
-                                {
-                                  id: "608_3",
-                                  value: "Therapy or counseling",
-                                  addsTextArea: true,
-                                  placeholder:
-                                    "How effective was this for losing weight?",
-                                },
-                                {
-                                  id: "608_4",
-                                  value: "Working with a dietitian",
-                                  addsTextArea: true,
-                                  placeholder:
-                                    "How effective was this for losing weight?",
-                                },
-                                {
-                                  id: "608_5",
-                                  value: "Exercise",
-                                  addsTextArea: true,
-                                  placeholder:
-                                    "How effective was this for losing weight?",
-                                },
-                                {
-                                  id: "608_6",
-                                  value: "Prescription weight loss medication",
-                                  addsTextArea: true,
-                                  placeholder:
-                                    "How effective was this for losing weight?",
-                                },
-                                {
-                                  id: "608_7",
-                                  value: "Laxatives or diuretics",
-                                  addsTextArea: true,
-                                  placeholder:
-                                    "How effective was this for losing weight?",
-                                },
-                                {
-                                  id: "608_8",
-                                  value: "Weight loss supplements",
-                                  addsTextArea: true,
-                                  placeholder:
-                                    "How effective was this for losing weight?",
-                                },
-                                {
-                                  id: "608_9",
-                                  value: "Other",
-                                  addsTextArea: true,
-                                  placeholder:
-                                    "Please specify and share how effective it was",
-                                },
-                                {
-                                  id: "608_11",
-                                  value:
-                                    "I have not tried to lose weight in the past",
-                                  isNoneOption: true,
-                                },
-                              ].map((option) => (
-                                <div
-                                  key={option.id}
-                                  className="option-container"
-                                >
-                                  <QuestionOption
-                                    id={option.id}
-                                    name={option.id}
-                                    value={option.value}
-                                    checked={!!formData[option.id]}
-                                    onChange={() =>
-                                      handleWeightLossMethodSelect(option.id)
-                                    }
-                                    type="checkbox"
-                                    isNoneOption={option.isNoneOption}
-                                  />
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </QuestionLayout>
+                          )}{" "}
+                          {currentPage === 17 && (
+                            <QuestionLayout
+                              title="Do you have difficulty using the standard pen-injector devices?"
+                              currentPage={currentPage}
+                              pageNo={17}
+                              questionId="622"
+                              inputType="checkbox"
+                            >
+                              <div className="flex flex-col w-full gap-2">
+                                {[
+                                  {
+                                    id: "622_1",
+                                    value:
+                                      "Yes, due to dexterity, vision, or functional limitations",
+                                    optionValue: "1",
+                                  },
+                                  {
+                                    id: "622_2",
+                                    value:
+                                      "Yes, I require a different delivery format for safe use",
+                                    optionValue: "2",
+                                  },
+                                  {
+                                    id: "622_3",
+                                    value: "No",
+                                    optionValue: "3",
+                                  },
+                                  {
+                                    id: "622_4",
+                                    value: "Unsure",
+                                    optionValue: "4",
+                                  },
+                                ].map((option) => {
+                                  const isChecked = !!formData[option.id];
 
-                                  {option.addsTextArea &&
-                                    formData[option.id] && (
-                                      <QuestionAdditionalInput
-                                        id={`l-${option.id}-textarea`}
-                                        name={`l-${option.id}-textarea`}
-                                        placeholder={option.placeholder}
-                                        value={
-                                          formData[`l-${option.id}-textarea`] ||
-                                          ""
+                                  return (
+                                    <div
+                                      key={option.id}
+                                      className="option-container"
+                                    >
+                                      <QuestionOption
+                                        id={option.id}
+                                        name={option.id}
+                                        value={option.value}
+                                        checked={isChecked}
+                                        onChange={() =>
+                                          handleGLP1AllergySelect(
+                                            option.id,
+                                            option.value,
+                                            "622",
+                                          )
                                         }
-                                        onChange={(e) =>
-                                          handleTextAreaChange(option.id, e)
-                                        }
+                                        type="checkbox"
                                       />
-                                    )}
-                                </div>
-                              ))}
-                            </div>
-                          </QuestionLayout>
-                        )}
-                        {currentPage === 10 && (
-                          <QuestionLayout
-                            title="How long have you had concerns about your body weight?"
-                            currentPage={currentPage}
-                            pageNo={10}
-                            questionId="609"
-                          >
-                            <div className="flex flex-col w-full gap-2">
-                              {[
-                                { id: "609_1", value: "Less than 3 months" },
-                                { id: "609_2", value: "Less than 6 months" },
-                                { id: "609_3", value: "6-12 months" },
-                                { id: "609_4", value: "1-5 years" },
-                                { id: "609_5", value: "More than 5 years" },
-                              ].map((option) => (
-                                <div
-                                  key={option.id}
-                                  className="option-container"
-                                >
-                                  <QuestionOption
-                                    id={option.id}
-                                    name="609"
-                                    value={option.value}
-                                    checked={formData["609"] === option.value}
-                                    onChange={() =>
-                                      handleWeightConcernSelect(option.value)
-                                    }
-                                    type="radio"
-                                  />
-                                </div>
-                              ))}
-                            </div>
-                          </QuestionLayout>
-                        )}
-                        {currentPage === 11 && (
-                          <QuestionLayout
-                            title="How would you describe your diet in the past week?"
-                            currentPage={currentPage}
-                            pageNo={11}
-                            questionId="610"
-                          >
-                            <div className="flex flex-col w-full gap-2">
-                              {[
-                                { id: "610_1", value: "Healthy" },
-                                { id: "610_2", value: "Somewhat healthy" },
-                                { id: "610_3", value: "Somewhat unhealthy" },
-                                { id: "610_4", value: "Very unhealthy" },
-                              ].map((option) => (
-                                <div
-                                  key={option.id}
-                                  className="option-container"
-                                >
-                                  <QuestionOption
-                                    id={option.id}
-                                    name="610"
-                                    value={option.value}
-                                    checked={formData["610"] === option.value}
-                                    onChange={() =>
-                                      handleDietDescriptionSelect(option.value)
-                                    }
-                                    type="radio"
-                                  />
-                                </div>
-                              ))}
-                            </div>
-                          </QuestionLayout>
-                        )}
-                        {currentPage === 12 && (
-                          <QuestionLayout
-                            title="How many days per week do you exercise 30 minutes or more?"
-                            currentPage={currentPage}
-                            pageNo={12}
-                            questionId="611"
-                          >
-                            <div className="flex flex-col w-full gap-2">
-                              {[
-                                { id: "611_1", value: "1 day per week" },
-                                { id: "611_2", value: "2 days per week" },
-                                { id: "611_3", value: "3 days per week" },
-                                {
-                                  id: "611_4",
-                                  value: "4 or more days per week",
-                                },
-                                { id: "611_5", value: "I don't exercise" },
-                              ].map((option) => (
-                                <div
-                                  key={option.id}
-                                  className="option-container"
-                                >
-                                  <QuestionOption
-                                    id={option.id}
-                                    name="611"
-                                    value={option.value}
-                                    checked={formData["611"] === option.value}
-                                    onChange={() =>
-                                      handleExerciseFrequencySelect(
-                                        option.value
-                                      )
-                                    }
-                                    type="radio"
-                                  />
-                                </div>
-                              ))}
-                            </div>
-                          </QuestionLayout>
-                        )}
-                        {currentPage === 13 && (
-                          <QuestionLayout
-                            title="What do you hope to achieve by losing weight?"
-                            currentPage={currentPage}
-                            pageNo={13}
-                            questionId="612"
-                            inputType="checkbox"
-                          >
-                            <div className="flex flex-col w-full gap-2">
-                              {[
-                                { id: "612_1", value: "Have more energy" },
-                                { id: "612_2", value: "Feel healthier" },
-                                {
-                                  id: "612_3",
-                                  value: "See changes in my body",
-                                },
-                                {
-                                  id: "612_4",
-                                  value: "Other",
-                                  addsTextArea: true,
-                                },
-                              ].map((option) => (
-                                <div
-                                  key={option.id}
-                                  className="option-container"
-                                >
-                                  <QuestionOption
-                                    id={option.id}
-                                    name={option.id}
-                                    value={option.value}
-                                    checked={!!formData[option.id]}
-                                    onChange={() =>
-                                      handleWeightLossGoalsSelect(option.id)
-                                    }
-                                    type="checkbox"
-                                  />
-
-                                  {option.addsTextArea &&
-                                    formData[option.id] && (
-                                      <QuestionAdditionalInput
-                                        id={`l-${option.id}-textarea`}
-                                        name={`l-${option.id}-textarea`}
-                                        placeholder="Please specify..."
-                                        value={
-                                          formData[`l-${option.id}-textarea`] ||
-                                          ""
-                                        }
-                                        onChange={(e) =>
-                                          handleTextAreaChange(option.id, e)
-                                        }
-                                      />
-                                    )}
-                                </div>
-                              ))}
-                            </div>
-                          </QuestionLayout>
-                        )}
-                        {currentPage === 14 && (
-                          <QuestionLayout
-                            title="Would you prefer a version of this medication that's less likely to cause side effects like nausea, stomach discomfort, or diarrhea?"
-                            currentPage={currentPage}
-                            pageNo={14}
-                            questionId="620"
-                          >
-                            <div className="flex flex-col w-full gap-2">
-                              {[
-                                { id: "620_1", value: "Yes" },
-                                { id: "620_2", value: "No" },
-                                { id: "620_3", value: "Not sure" },
-                              ].map((option) => (
-                                <div
-                                  key={option.id}
-                                  className="option-container"
-                                >
-                                  <QuestionOption
-                                    id={option.id}
-                                    name="620"
-                                    value={option.value}
-                                    checked={formData["620"] === option.value}
-                                    onChange={() =>
-                                      handleSideEffectsSelect(option.value)
-                                    }
-                                    type="radio"
-                                  />
-                                </div>
-                              ))}
-                            </div>
-                          </QuestionLayout>
-                        )}
-                        {currentPage === 15 && (
-                          <QuestionLayout
-                            title="Do you have any of the following medical conditions"
-                            currentPage={currentPage}
-                            pageNo={15}
-                            questionId="613"
-                            inputType="checkbox"
-                          >
-                            <div className="flex flex-col w-full gap-2">
-                              {[
-                                { id: "613_1", value: "Heart failure" },
-                                {
-                                  id: "613_2",
-                                  value:
-                                    "Tinea Infections (fungal skin infections)",
-                                },
-                                {
-                                  id: "613_3",
-                                  value: "Obstructive Sleep Apnea",
-                                },
-                                { id: "613_4", value: "Gout" },
-                                {
-                                  id: "613_5",
-                                  value: "Diabetes",
-                                  addsTextArea: true,
-                                  placeholder:
-                                    "Please list all medications you take for this",
-                                },
-                                { id: "613_6", value: "Gallbladder disease" },
-                                {
-                                  id: "613_7",
-                                  value: "Gastrointestinal problems",
-                                  addsTextArea: true,
-                                  placeholder: "Please specify",
-                                },
-                                { id: "613_8", value: "High blood pressure" },
-                                { id: "613_9", value: "Depression" },
-                                {
-                                  id: "613_10",
-                                  value: "Have you had any surgeries",
-                                  addsTextArea: true,
-                                  placeholder: "Please specify",
-                                },
-                                {
-                                  id: "613_11",
-                                  value: "Other",
-                                  addsTextArea: true,
-                                  placeholder: "Please specify",
-                                },
-                                {
-                                  id: "613_12",
-                                  value: "None of the above.",
-                                  isNoneOption: true,
-                                },
-                              ].map((option) => (
-                                <div
-                                  key={option.id}
-                                  className="option-container"
-                                >
-                                  {" "}
-                                  <QuestionOption
-                                    id={option.id}
-                                    name={option.id}
-                                    value={option.value}
-                                    checked={!!formData[option.id]}
-                                    onChange={() =>
-                                      handleMedicalConditionsSelect(option.id)
-                                    }
-                                    type="checkbox"
-                                    isNoneOption={option.isNoneOption}
-                                  />
-                                  {option.addsTextArea &&
-                                    formData[option.id] && (
-                                      <QuestionAdditionalInput
-                                        id={`l-${option.id}-textarea`}
-                                        name={`l-${option.id}-textarea`}
-                                        placeholder={option.placeholder}
-                                        value={
-                                          formData[`l-${option.id}-textarea`] ||
-                                          ""
-                                        }
-                                        onChange={(e) =>
-                                          handleTextAreaChange(option.id, e)
-                                        }
-                                      />
-                                    )}
-                                </div>
-                              ))}
-                            </div>
-                          </QuestionLayout>
-                        )}{" "}
-                        {currentPage === 16 && (
-                          <QuestionLayout
-                            title="Have you ever had an allergic reaction, sensitivity, or intolerance to any ingredient in approved GLP-1 medications?"
-                            currentPage={currentPage}
-                            pageNo={16}
-                            questionId="621"
-                            inputType="checkbox"
-                          >
-                            <div className="flex flex-col w-full gap-2">
-                              {[
-                                {
-                                  id: "621_1",
-                                  value: "Yes, reaction or intolerance to an ingredient/excipient",
-                                  optionValue: "1",
-                                },
-                                {
-                                  id: "621_2",
-                                  value: "Yes, issues with the injector pen device",
-                                  optionValue: "2",
-                                },
-                                {
-                                  id: "621_3",
-                                  value: "No",
-                                  optionValue: "3",
-                                },
-                                {
-                                  id: "621_4",
-                                  value: "Unsure",
-                                  optionValue: "4",
-                                },
-                              ].map((option) => {
-                                const isChecked = !!formData[option.id];
-                                
-                                return (
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </QuestionLayout>
+                          )}{" "}
+                          {currentPage === 18 && (
+                            <QuestionLayout
+                              title="Have you previously experienced side effects when starting or increasing doses of weight-loss or similar medications?"
+                              currentPage={currentPage}
+                              pageNo={18}
+                              questionId="624"
+                              inputType="checkbox"
+                            >
+                              <div className="flex flex-col w-full gap-2">
+                                {[
+                                  {
+                                    id: "624_1",
+                                    value:
+                                      "Nausea, vomiting, diarrhea, or other GI symptoms",
+                                  },
+                                  {
+                                    id: "624_2",
+                                    value: "Abdominal pain or cramping",
+                                  },
+                                  {
+                                    id: "624_3",
+                                    value: "Fatigue or low energy",
+                                  },
+                                  {
+                                    id: "624_4",
+                                    value: "Dizziness",
+                                  },
+                                  {
+                                    id: "624_5",
+                                    value:
+                                      "Other side effects that made dose increases difficult",
+                                  },
+                                  {
+                                    id: "624_6",
+                                    value:
+                                      "No, I tolerate dose increases normally",
+                                    isNoneOption: true,
+                                  },
+                                ].map((option) => (
                                   <div
                                     key={option.id}
                                     className="option-container"
@@ -4889,837 +5052,755 @@ export default function WeightLossConsultationQuiz({
                                       id={option.id}
                                       name={option.id}
                                       value={option.value}
-                                      checked={isChecked}
+                                      checked={!!formData[option.id]}
                                       onChange={() =>
-                                        handleGLP1AllergySelect(option.id, option.value, "621")
+                                        handleSideEffectsSelect624(option.id)
                                       }
                                       type="checkbox"
+                                      isNoneOption={option.isNoneOption}
                                     />
                                   </div>
-                                );
-                              })}
-                            </div>
-                          </QuestionLayout>
-                        )}{" "}
-                        {currentPage === 17 && (
-                          <QuestionLayout
-                            title="Do you have difficulty using the standard pen-injector devices?"
-                            currentPage={currentPage}
-                            pageNo={17}
-                            questionId="622"
-                            inputType="checkbox"
-                          >
-                            <div className="flex flex-col w-full gap-2">
-                              {[
-                                {
-                                  id: "622_1",
-                                  value: "Yes, due to dexterity, vision, or functional limitations",
-                                  optionValue: "1",
-                                },
-                                {
-                                  id: "622_2",
-                                  value: "Yes, I require a different delivery format for safe use",
-                                  optionValue: "2",
-                                },
-                                {
-                                  id: "622_3",
-                                  value: "No",
-                                  optionValue: "3",
-                                },
-                                {
-                                  id: "622_4",
-                                  value: "Unsure",
-                                  optionValue: "4",
-                                },
-                              ].map((option) => {
-                                const isChecked = !!formData[option.id];
-                                
-                                return (
+                                ))}
+                              </div>
+                            </QuestionLayout>
+                          )}{" "}
+                          {currentPage === 19 && (
+                            <QuestionLayout
+                              title="Would a personalized dose or smaller dose increments help you better tolerate treatment?"
+                              currentPage={currentPage}
+                              pageNo={19}
+                              questionId="623"
+                              inputType="checkbox"
+                            >
+                              <div className="flex flex-col w-full gap-2">
+                                {[
+                                  {
+                                    id: "623_1",
+                                    value:
+                                      "Yes, I have difficulty with the standard dose steps",
+                                    optionValue: "1",
+                                  },
+                                  {
+                                    id: "623_2",
+                                    value:
+                                      "Yes, I need smaller or more gradual titration than commercial pens provide",
+                                    optionValue: "2",
+                                  },
+                                  {
+                                    id: "623_3",
+                                    value: "No",
+                                    optionValue: "3",
+                                  },
+                                  {
+                                    id: "623_4",
+                                    value: "Unsure",
+                                    optionValue: "4",
+                                  },
+                                ].map((option) => {
+                                  const isChecked = !!formData[option.id];
+
+                                  return (
+                                    <div
+                                      key={option.id}
+                                      className="option-container"
+                                    >
+                                      <QuestionOption
+                                        id={option.id}
+                                        name={option.id}
+                                        value={option.value}
+                                        checked={isChecked}
+                                        onChange={() =>
+                                          handleGLP1AllergySelect(
+                                            option.id,
+                                            option.value,
+                                            "623",
+                                          )
+                                        }
+                                        type="checkbox"
+                                      />
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </QuestionLayout>
+                          )}{" "}
+                          {currentPage === 20 && (
+                            <QuestionLayout
+                              title="Do you have any known allergies?"
+                              currentPage={currentPage}
+                              pageNo={20}
+                              questionId="614"
+                            >
+                              <div className="flex flex-col w-full gap-2">
+                                {[
+                                  {
+                                    id: "614_1",
+                                    value: "Yes",
+                                    addsTextArea: true,
+                                  },
+                                  { id: "614_2", value: "No" },
+                                ].map((option) => (
                                   <div
                                     key={option.id}
                                     className="option-container"
                                   >
                                     <QuestionOption
                                       id={option.id}
-                                      name={option.id}
+                                      name="614"
                                       value={option.value}
-                                      checked={isChecked}
+                                      checked={formData["614"] === option.value}
                                       onChange={() =>
-                                        handleGLP1AllergySelect(option.id, option.value, "622")
+                                        handleAllergiesSelect(option.value)
                                       }
-                                      type="checkbox"
-                                    />
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </QuestionLayout>
-                        )}{" "}
-                        {currentPage === 18 && (
-                          <QuestionLayout
-                            title="Have you previously experienced side effects when starting or increasing doses of weight-loss or similar medications?"
-                            currentPage={currentPage}
-                            pageNo={18}
-                            questionId="624"
-                            inputType="checkbox"
-                          >
-                            <div className="flex flex-col w-full gap-2">
-                              {[
-                                {
-                                  id: "624_1",
-                                  value: "Nausea, vomiting, diarrhea, or other GI symptoms",
-                                },
-                                {
-                                  id: "624_2",
-                                  value: "Abdominal pain or cramping",
-                                },
-                                {
-                                  id: "624_3",
-                                  value: "Fatigue or low energy",
-                                },
-                                {
-                                  id: "624_4",
-                                  value: "Dizziness",
-                                },
-                                {
-                                  id: "624_5",
-                                  value: "Other side effects that made dose increases difficult",
-                                },
-                                {
-                                  id: "624_6",
-                                  value: "No, I tolerate dose increases normally",
-                                  isNoneOption: true,
-                                },
-                              ].map((option) => (
-                                <div
-                                  key={option.id}
-                                  className="option-container"
-                                >
-                                  <QuestionOption
-                                    id={option.id}
-                                    name={option.id}
-                                    value={option.value}
-                                    checked={!!formData[option.id]}
-                                    onChange={() =>
-                                      handleSideEffectsSelect624(option.id)
-                                    }
-                                    type="checkbox"
-                                    isNoneOption={option.isNoneOption}
-                                  />
-                                </div>
-                              ))}
-                            </div>
-                          </QuestionLayout>
-                        )}{" "}
-                        {currentPage === 19 && (
-                          <QuestionLayout
-                            title="Would a personalized dose or smaller dose increments help you better tolerate treatment?"
-                            currentPage={currentPage}
-                            pageNo={19}
-                            questionId="623"
-                            inputType="checkbox"
-                          >
-                            <div className="flex flex-col w-full gap-2">
-                              {[
-                                {
-                                  id: "623_1",
-                                  value: "Yes, I have difficulty with the standard dose steps",
-                                  optionValue: "1",
-                                },
-                                {
-                                  id: "623_2",
-                                  value: "Yes, I need smaller or more gradual titration than commercial pens provide",
-                                  optionValue: "2",
-                                },
-                                {
-                                  id: "623_3",
-                                  value: "No",
-                                  optionValue: "3",
-                                },
-                                {
-                                  id: "623_4",
-                                  value: "Unsure",
-                                  optionValue: "4",
-                                },
-                              ].map((option) => {
-                                const isChecked = !!formData[option.id];
-                                
-                                return (
-                                  <div
-                                    key={option.id}
-                                    className="option-container"
-                                  >
-                                    <QuestionOption
-                                      id={option.id}
-                                      name={option.id}
-                                      value={option.value}
-                                      checked={isChecked}
-                                      onChange={() =>
-                                        handleGLP1AllergySelect(option.id, option.value, "623")
-                                      }
-                                      type="checkbox"
-                                    />
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </QuestionLayout>
-                        )}{" "}
-                        {currentPage === 20 && (
-                          <QuestionLayout
-                            title="Do you have any known allergies?"
-                            currentPage={currentPage}
-                            pageNo={20}
-                            questionId="614"
-                          >
-                            <div className="flex flex-col w-full gap-2">
-                              {[
-                                {
-                                  id: "614_1",
-                                  value: "Yes",
-                                  addsTextArea: true,
-                                },
-                                { id: "614_2", value: "No" },
-                              ].map((option) => (
-                                <div
-                                  key={option.id}
-                                  className="option-container"
-                                >
-                                  <QuestionOption
-                                    id={option.id}
-                                    name="614"
-                                    value={option.value}
-                                    checked={formData["614"] === option.value}
-                                    onChange={() =>
-                                      handleAllergiesSelect(option.value)
-                                    }
-                                    type="radio"
-                                  />{" "}
-                                  {option.addsTextArea &&
-                                    formData["614"] === "Yes" && (
-                                      <QuestionAdditionalInput
-                                        id="l-614_1-textarea"
-                                        name="l-614_1-textarea"
-                                        placeholder="Please state your allergies"
-                                        value={
-                                          formData["l-614_1-textarea"] || ""
-                                        }
-                                        onChange={(e) =>
-                                          handleTextAreaChange("614_1", e)
-                                        }
-                                      />
-                                    )}
-                                </div>
-                              ))}
-                            </div>
-                          </QuestionLayout>
-                        )}{" "}
-                        {currentPage === 21 && (
-                          <QuestionLayout
-                            title="Tell us about your lifestyle."
-                            currentPage={currentPage}
-                            pageNo={21}
-                            questionId="615"
-                            inputType="checkbox"
-                          >
-                            <div className="flex flex-col w-full gap-2">
-                              {[
-                                {
-                                  id: "615_1",
-                                  value: "I am a smoker (tobacco)",
-                                },
-                                {
-                                  id: "615_2",
-                                  value: "I drink alcohol",
-                                  addsTextArea: true,
-                                  placeholder:
-                                    "How many drinks do you have per week?",
-                                },
-                                {
-                                  id: "615_3",
-                                  value: "I use recreational drugs",
-                                  addsTextArea: true,
-                                  placeholder: "Please list all drugs used",
-                                },
-                                {
-                                  id: "615_4",
-                                  value:
-                                    "I get less than 7 hours of sleep per night",
-                                },
-                                {
-                                  id: "615_5",
-                                  value: "None of the above.",
-                                  isNoneOption: true,
-                                },
-                              ].map((option) => (
-                                <div
-                                  key={option.id}
-                                  className="option-container"
-                                >
-                                  <QuestionOption
-                                    id={option.id}
-                                    name={option.id}
-                                    value={option.value}
-                                    checked={!!formData[option.id]}
-                                    onChange={() =>
-                                      handleLifestyleSelect(option.id)
-                                    }
-                                    type="checkbox"
-                                    isNoneOption={option.isNoneOption}
-                                  />
-
-                                  {option.addsTextArea &&
-                                    formData[option.id] && (
-                                      <QuestionAdditionalInput
-                                        id={`l-${option.id}-textarea`}
-                                        name={`l-${option.id}-textarea`}
-                                        placeholder={option.placeholder}
-                                        value={
-                                          formData[`l-${option.id}-textarea`] ||
-                                          ""
-                                        }
-                                        onChange={(e) =>
-                                          handleTextAreaChange(option.id, e)
-                                        }
-                                      />
-                                    )}
-                                </div>
-                              ))}
-                            </div>
-                          </QuestionLayout>
-                        )}
-                        {currentPage === 22 && (
-                          <QuestionLayout
-                            title="Do you have any questions for the healthcare team?"
-                            currentPage={currentPage}
-                            pageNo={22}
-                            questionId="616"
-                          >
-                            <div className="flex flex-col w-full gap-2">
-                              {[
-                                {
-                                  id: "616_1",
-                                  value: "Yes",
-                                  addsTextArea: true,
-                                },
-                                { id: "616_2", value: "No" },
-                              ].map((option, index) => (
-                                <div
-                                  key={option.id}
-                                  className="option-container"
-                                >
-                                  <QuestionOption
-                                    id={option.id}
-                                    name="616"
-                                    value={option.value}
-                                    checked={formData["616"] === option.value}
-                                    onChange={() =>
-                                      handleHealthcareQuestionsSelect(
-                                        option.value
-                                      )
-                                    }
-                                    type="radio"
-                                  />{" "}
-                                  {option.addsTextArea &&
-                                    formData["616"] === "Yes" && (
-                                      <QuestionAdditionalInput
-                                        id="l-616_1-textarea"
-                                        name="l-616_1-textarea"
-                                        placeholder="What do you want to ask?"
-                                        value={
-                                          formData["l-616_1-textarea"] || ""
-                                        }
-                                        onChange={(e) =>
-                                          handleTextAreaChange("616_1", e)
-                                        }
-                                      />
-                                    )}
-                                </div>
-                              ))}
-                            </div>
-                          </QuestionLayout>
-                        )}{" "}
-                        {currentPage === 23 && (
-                          <QuestionLayout
-                            title="Would you like to book an appointment with our health care team?"
-                            currentPage={currentPage}
-                            pageNo={23}
-                            questionId="619"
-                          >
-                            {[
-                              { id: "617_2", value: "Clinician" },
-                              { id: "617_3", value: "Pharmacist" },
-                              { id: "617_1", value: "No", label: "No" },
-                            ].map((option) => (
-                              <QuestionOption
-                                key={option.id}
-                                id={option.id}
-                                name="619"
-                                value={option.value}
-                                label={option.label || option.value}
-                                checked={formData["619"] === option.value}
-                                onChange={() =>
-                                  handleBookAppointmentSelect(option.value)
-                                }
-                                type="radio"
-                              />
-                            ))}
-                          </QuestionLayout>
-                        )}{" "}
-                        {currentPage === 24 && (
-                          <QuestionLayout
-                            title="Upload Photo ID"
-                            currentPage={currentPage}
-                            pageNo={24}
-                            questionId="photo_id_acknowledgment"
-                            inputType="checkbox"
-                          >
-                            <div className="text-left px-4 mb-6">
-                              <p className="text-[#C19A6B] text-lg mb-8">
-                                Please note this step is mandatory. If you are
-                                unable to complete at this time, email your ID
-                                to{" "}
-                                <a
-                                  href="mailto:clinicadmin@myrocky.com"
-                                  className="underline"
-                                >
-                                  clinicadmin@myrocky.com
-                                </a>
-                                .
-                              </p>
-                              <p className="text-lg">
-                                Your questionnaire will not be reviewed without
-                                this. As per our T&C's a{" "}
-                                <span className="font-bold">
-                                  $45 cancellation fee
-                                </span>{" "}
-                                will be charged if we are unable to verify you.
-                              </p>
-                            </div>
-
-                            <div className="border-b border-gray-300 mt-4 mb-8 h-[1px] w-full"></div>
-
-                            <div className="flex items-start mb-6 w-full px-4">
-                              <input
-                                id="photo-id-acknowledge"
-                                type="checkbox"
-                                className="w-6 h-6 border border-gray-300 rounded mt-0.5"
-                                checked={photoIdAcknowledged}
-                                onChange={handlePhotoIdAcknowledgement}
-                              />
-                              <label
-                                htmlFor="photo-id-acknowledge"
-                                className="ml-3 text-md font-medium text-[#000000]"
-                              >
-                                I hereby understand and acknowledge the above
-                                message
-                              </label>
-                            </div>
-                          </QuestionLayout>
-                        )}
-                        {currentPage === 25 && (
-                          <motion.div
-                            key={currentPage}
-                            variants={slideVariants}
-                            initial={
-                              isMovingForward ? "hiddenRight" : "hiddenLeft"
-                            }
-                            animate="visible"
-                            exit={isMovingForward ? "exitRight" : "exitLeft"}
-                            className="w-full"
-                          >
-                            <div className="px-4 pt-6 pb-4">
-                              <h1 className="text-3xl text-center text-[#AE7E56] font-bold mb-6">
-                                Upload Photo ID
-                              </h1>
-                              <h3 className="text-lg text-center font-medium mb-1">
-                                Please upload a photo of your ID
-                              </h3>
-
-                              <div className="flex flex-col items-center justify-center mb-6">
-                                <input
-                                  type="file"
-                                  ref={fileInputRef}
-                                  id="photo-id-file"
-                                  accept="image/jpeg,image/jpg,image/png,image/heif,image/heic"
-                                  className="hidden"
-                                  onChange={handlePhotoIdFileSelect}
-                                />
-
-                                <div
-                                  onClick={handleTapToUpload}
-                                  className="w-full md:w-[80%] max-w-lg h-40 flex items-center justify-center border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 mb-6 mx-auto"
-                                >
-                                  {!photoIdFile ? (
-                                    <div className="flex flex-col items-center">
-                                      <div className="w-20 h-20 flex items-center justify-center mb-2">
-                                        <img
-                                          src="https://myrocky.b-cdn.net/WP%20Images/Questionnaire/ID-icon.png"
-                                          alt="ID"
-                                          className="w-20 h-20"
+                                      type="radio"
+                                    />{" "}
+                                    {option.addsTextArea &&
+                                      formData["614"] === "Yes" && (
+                                        <QuestionAdditionalInput
+                                          id="l-614_1-textarea"
+                                          name="l-614_1-textarea"
+                                          placeholder="Please state your allergies"
+                                          value={
+                                            formData["l-614_1-textarea"] || ""
+                                          }
+                                          onChange={(e) =>
+                                            handleTextAreaChange("614_1", e)
+                                          }
                                         />
+                                      )}
+                                  </div>
+                                ))}
+                              </div>
+                            </QuestionLayout>
+                          )}{" "}
+                          {currentPage === 21 && (
+                            <QuestionLayout
+                              title="Tell us about your lifestyle."
+                              currentPage={currentPage}
+                              pageNo={21}
+                              questionId="615"
+                              inputType="checkbox"
+                            >
+                              <div className="flex flex-col w-full gap-2">
+                                {[
+                                  {
+                                    id: "615_1",
+                                    value: "I am a smoker (tobacco)",
+                                  },
+                                  {
+                                    id: "615_2",
+                                    value: "I drink alcohol",
+                                    addsTextArea: true,
+                                    placeholder:
+                                      "How many drinks do you have per week?",
+                                  },
+                                  {
+                                    id: "615_3",
+                                    value: "I use recreational drugs",
+                                    addsTextArea: true,
+                                    placeholder: "Please list all drugs used",
+                                  },
+                                  {
+                                    id: "615_4",
+                                    value:
+                                      "I get less than 7 hours of sleep per night",
+                                  },
+                                  {
+                                    id: "615_5",
+                                    value: "None of the above.",
+                                    isNoneOption: true,
+                                  },
+                                ].map((option) => (
+                                  <div
+                                    key={option.id}
+                                    className="option-container"
+                                  >
+                                    <QuestionOption
+                                      id={option.id}
+                                      name={option.id}
+                                      value={option.value}
+                                      checked={!!formData[option.id]}
+                                      onChange={() =>
+                                        handleLifestyleSelect(option.id)
+                                      }
+                                      type="checkbox"
+                                      isNoneOption={option.isNoneOption}
+                                    />
+
+                                    {option.addsTextArea &&
+                                      formData[option.id] && (
+                                        <QuestionAdditionalInput
+                                          id={`l-${option.id}-textarea`}
+                                          name={`l-${option.id}-textarea`}
+                                          placeholder={option.placeholder}
+                                          value={
+                                            formData[
+                                              `l-${option.id}-textarea`
+                                            ] || ""
+                                          }
+                                          onChange={(e) =>
+                                            handleTextAreaChange(option.id, e)
+                                          }
+                                        />
+                                      )}
+                                  </div>
+                                ))}
+                              </div>
+                            </QuestionLayout>
+                          )}
+                          {currentPage === 22 && (
+                            <QuestionLayout
+                              title="Do you have any questions for the healthcare team?"
+                              currentPage={currentPage}
+                              pageNo={22}
+                              questionId="616"
+                            >
+                              <div className="flex flex-col w-full gap-2">
+                                {[
+                                  {
+                                    id: "616_1",
+                                    value: "Yes",
+                                    addsTextArea: true,
+                                  },
+                                  { id: "616_2", value: "No" },
+                                ].map((option, index) => (
+                                  <div
+                                    key={option.id}
+                                    className="option-container"
+                                  >
+                                    <QuestionOption
+                                      id={option.id}
+                                      name="616"
+                                      value={option.value}
+                                      checked={formData["616"] === option.value}
+                                      onChange={() =>
+                                        handleHealthcareQuestionsSelect(
+                                          option.value,
+                                        )
+                                      }
+                                      type="radio"
+                                    />{" "}
+                                    {option.addsTextArea &&
+                                      formData["616"] === "Yes" && (
+                                        <QuestionAdditionalInput
+                                          id="l-616_1-textarea"
+                                          name="l-616_1-textarea"
+                                          placeholder="What do you want to ask?"
+                                          value={
+                                            formData["l-616_1-textarea"] || ""
+                                          }
+                                          onChange={(e) =>
+                                            handleTextAreaChange("616_1", e)
+                                          }
+                                        />
+                                      )}
+                                  </div>
+                                ))}
+                              </div>
+                            </QuestionLayout>
+                          )}{" "}
+                          {currentPage === 23 && (
+                            <QuestionLayout
+                              title="Would you like to book an appointment with our health care team?"
+                              currentPage={currentPage}
+                              pageNo={23}
+                              questionId="619"
+                            >
+                              {[
+                                { id: "617_2", value: "Clinician" },
+                                { id: "617_3", value: "Pharmacist" },
+                                { id: "617_1", value: "No", label: "No" },
+                              ].map((option) => (
+                                <QuestionOption
+                                  key={option.id}
+                                  id={option.id}
+                                  name="619"
+                                  value={option.value}
+                                  label={option.label || option.value}
+                                  checked={formData["619"] === option.value}
+                                  onChange={() =>
+                                    handleBookAppointmentSelect(option.value)
+                                  }
+                                  type="radio"
+                                />
+                              ))}
+                            </QuestionLayout>
+                          )}{" "}
+                          {currentPage === 24 && (
+                            <QuestionLayout
+                              title="Upload Photo ID"
+                              currentPage={currentPage}
+                              pageNo={24}
+                              questionId="photo_id_acknowledgment"
+                              inputType="checkbox"
+                            >
+                              <div className="text-left px-4 mb-6">
+                                <p className="text-[#C19A6B] text-lg mb-8">
+                                  Please note this step is mandatory. If you are
+                                  unable to complete at this time, email your ID
+                                  to{" "}
+                                  <a
+                                    href="mailto:clinicadmin@myrocky.com"
+                                    className="underline"
+                                  >
+                                    clinicadmin@myrocky.com
+                                  </a>
+                                  .
+                                </p>
+                                <p className="text-lg">
+                                  Your questionnaire will not be reviewed
+                                  without this. As per our T&C's a{" "}
+                                  <span className="font-bold">
+                                    $45 cancellation fee
+                                  </span>{" "}
+                                  will be charged if we are unable to verify
+                                  you.
+                                </p>
+                              </div>
+
+                              <div className="border-b border-gray-300 mt-4 mb-8 h-[1px] w-full"></div>
+
+                              <div className="flex items-start mb-6 w-full px-4">
+                                <input
+                                  id="photo-id-acknowledge"
+                                  type="checkbox"
+                                  className="w-6 h-6 border border-gray-300 rounded mt-0.5"
+                                  checked={photoIdAcknowledged}
+                                  onChange={handlePhotoIdAcknowledgement}
+                                />
+                                <label
+                                  htmlFor="photo-id-acknowledge"
+                                  className="ml-3 text-md font-medium text-[#000000]"
+                                >
+                                  I hereby understand and acknowledge the above
+                                  message
+                                </label>
+                              </div>
+                            </QuestionLayout>
+                          )}
+                          {currentPage === 25 && (
+                            <motion.div
+                              key={currentPage}
+                              variants={slideVariants}
+                              initial={
+                                isMovingForward ? "hiddenRight" : "hiddenLeft"
+                              }
+                              animate="visible"
+                              exit={isMovingForward ? "exitRight" : "exitLeft"}
+                              className="w-full"
+                            >
+                              <div className="px-4 pt-6 pb-4">
+                                <h1 className="text-3xl text-center text-[#AE7E56] font-bold mb-6">
+                                  Upload Photo ID
+                                </h1>
+                                <h3 className="text-lg text-center font-medium mb-1">
+                                  Please upload a photo of your ID
+                                </h3>
+
+                                <div className="flex flex-col items-center justify-center mb-6">
+                                  <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    id="photo-id-file"
+                                    accept="image/jpeg,image/jpg,image/png,image/heif,image/heic"
+                                    className="hidden"
+                                    onChange={handlePhotoIdFileSelect}
+                                  />
+
+                                  <div
+                                    onClick={handleTapToUpload}
+                                    className="w-full md:w-[80%] max-w-lg h-40 flex items-center justify-center border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 mb-6 mx-auto"
+                                  >
+                                    {!photoIdFile ? (
+                                      <div className="flex flex-col items-center">
+                                        <div className="w-20 h-20 flex items-center justify-center mb-2">
+                                          <img
+                                            src="https://myrocky.b-cdn.net/WP%20Images/Questionnaire/ID-icon.png"
+                                            alt="ID"
+                                            className="w-20 h-20"
+                                          />
+                                        </div>
+                                        <span className="text-[#C19A6B] text-lg">
+                                          Tap to upload the ID photo
+                                        </span>
                                       </div>
-                                      <span className="text-[#C19A6B] text-lg">
-                                        Tap to upload the ID photo
+                                    ) : (
+                                      <img
+                                        id="photo-id-preview"
+                                        src=""
+                                        alt="ID Preview"
+                                        className="max-w-full max-h-36 object-contain"
+                                      />
+                                    )}
+                                  </div>
+                                  {photoIdFile && (
+                                    <div className="mb-6 mt-4 w-full max-w-md mx-auto">
+                                      <p className="text-center text-xs text-gray-500 mb-4 break-words px-2">
+                                        Photo selected: {photoIdFile.name}
+                                      </p>
+                                    </div>
+                                  )}
+
+                                  {!photoIdFile && (
+                                    <div className="w-full max-w-md mx-auto">
+                                      <p className="text-center text-md font-medium mb-2">
+                                        Please capture a selfie of yourself
+                                        holding your ID
+                                      </p>{" "}
+                                      <p className="text-center text-sm text-gray-500 mb-8">
+                                        Only JPG, JPEG, PNG, HEIF, and HEIC
+                                        images are supported.
+                                        <br />
+                                        Maximum file size per image is 20MB
+                                      </p>
+                                    </div>
+                                  )}
+                                </div>
+
+                                <input
+                                  type="hidden"
+                                  name="196"
+                                  value={formData["196"] || ""}
+                                />
+                              </div>
+                            </motion.div>
+                          )}{" "}
+                          {currentPage === 26 && (
+                            <QuestionLayout
+                              title="Provide images from the waist up: Front and Side Views"
+                              subtitle="Your body should be clearly visible"
+                              currentPage={currentPage}
+                              pageNo={26}
+                              questionId="body_photos"
+                              inputType="upload"
+                            >
+                              <div className="w-full space-y-8">
+                                {" "}
+                                <input
+                                  type="hidden"
+                                  id="197"
+                                  name="197"
+                                  value={formData["197"] || ""}
+                                />
+                                <input
+                                  type="hidden"
+                                  id="198"
+                                  name="198"
+                                  value={formData["198"] || ""}
+                                />
+                                {/* Front Photo Upload */}
+                                <div className="w-full md:w-4/5 mx-auto">
+                                  <input
+                                    id="front_photo_upload"
+                                    className="hidden"
+                                    type="file"
+                                    name="front_photo_upload"
+                                    accept="image/*"
+                                    ref={frontPhotoInputRef}
+                                    onChange={handleFrontPhotoSelect}
+                                  />
+                                  <label
+                                    htmlFor="front_photo_upload"
+                                    className="flex items-center cursor-pointer p-5 border-2 border-gray-300 rounded-lg shadow-md hover:bg-gray-50"
+                                  >
+                                    <div className="flex w-full items-center">
+                                      <img
+                                        className="w-16 h-16 object-contain mr-4"
+                                        src="https://myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png"
+                                        id="frontPhotoPreview"
+                                        alt="Upload icon"
+                                      />
+                                      <span className="text-[#C19A6B]">
+                                        Tap to upload Front View photo
                                       </span>
                                     </div>
-                                  ) : (
-                                    <img
-                                      id="photo-id-preview"
-                                      src=""
-                                      alt="ID Preview"
-                                      className="max-w-full max-h-36 object-contain"
-                                    />
-                                  )}
+                                  </label>
+                                  <p className="text-center text-sm mt-2 mb-6">
+                                    Please provide a clear photo of your front
+                                    view.
+                                  </p>
                                 </div>
-                                {photoIdFile && (
-                                  <div className="mb-6 mt-4 w-full max-w-md mx-auto">
-                                    <p className="text-center text-xs text-gray-500 mb-4 break-words px-2">
-                                      Photo selected: {photoIdFile.name}
-                                    </p>
-                                  </div>
-                                )}
-
-                                {!photoIdFile && (
-                                  <div className="w-full max-w-md mx-auto">
-                                    <p className="text-center text-md font-medium mb-2">
-                                      Please capture a selfie of yourself
-                                      holding your ID
-                                    </p>{" "}
-                                    <p className="text-center text-sm text-gray-500 mb-8">
-                                      Only JPG, JPEG, PNG, HEIF, and HEIC images
-                                      are supported.
-                                      <br />
-                                      Maximum file size per image is 20MB
-                                    </p>
-                                  </div>
-                                )}
+                                {/* Side Photo Upload */}
+                                <div className="w-full md:w-4/5 mx-auto">
+                                  <input
+                                    id="side_photo_upload"
+                                    className="hidden"
+                                    type="file"
+                                    name="side_photo_upload"
+                                    accept="image/*"
+                                    ref={sidePhotoInputRef}
+                                    onChange={handleSidePhotoSelect}
+                                  />
+                                  <label
+                                    htmlFor="side_photo_upload"
+                                    className="flex items-center cursor-pointer p-5 border-2 border-gray-300 rounded-lg shadow-md hover:bg-gray-50"
+                                  >
+                                    <div className="flex w-full items-center">
+                                      <img
+                                        className="w-16 h-16 object-contain mr-4"
+                                        src="https://myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png"
+                                        id="sidePhotoPreview"
+                                        alt="Upload icon"
+                                      />
+                                      <span className="text-[#C19A6B]">
+                                        Tap to upload Side View photo
+                                      </span>
+                                    </div>
+                                  </label>
+                                  <p className="text-center text-sm mt-2">
+                                    Please provide a clear photo of your side
+                                    view
+                                  </p>
+                                  <p className="text-center text-xs mt-1 text-gray-500">
+                                    It helps to use a mirror
+                                  </p>
+                                </div>{" "}
+                                <div className="text-center text-xs text-gray-400 mt-6">
+                                  <p>
+                                    Only JPG, JPEG, PNG, HEIF, and HEIC images
+                                    are supported.
+                                  </p>
+                                  <p>Max allowed file size per image is 20MB</p>
+                                </div>
+                                <div className="text-center mt-6 hidden">
+                                  <button
+                                    type="button"
+                                    onClick={handleBodyPhotosUpload}
+                                    className="upload-button bg-gray-300 hover:bg-gray-400 text-black font-medium py-3 px-6 rounded-full w-full max-w-md"
+                                    disabled={isUploadingPhotos}
+                                  >
+                                    {isUploadingPhotos ? (
+                                      <span className="flex items-center justify-center">
+                                        <svg
+                                          className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          fill="none"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                          ></circle>
+                                          <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                          ></path>
+                                        </svg>
+                                        {`Uploading... ${Math.round(
+                                          (uploadProgress.front +
+                                            uploadProgress.side) /
+                                            2,
+                                        )}%`}
+                                      </span>
+                                    ) : (
+                                      "Upload and Continue"
+                                    )}
+                                  </button>
+                                </div>
                               </div>
-
-                              <input
-                                type="hidden"
-                                name="196"
-                                value={formData["196"] || ""}
-                              />
-                            </div>
-                          </motion.div>
-                        )}{" "}
-                        {currentPage === 26 && (
-                          <QuestionLayout
-                            title="Provide images from the waist up: Front and Side Views"
-                            subtitle="Your body should be clearly visible"
-                            currentPage={currentPage}
-                            pageNo={26}
-                            questionId="body_photos"
-                            inputType="upload"
-                          >
-                            <div className="w-full space-y-8">
-                              {" "}
-                              <input
-                                type="hidden"
-                                id="197"
-                                name="197"
-                                value={formData["197"] || ""}
-                              />
-                              <input
-                                type="hidden"
-                                id="198"
-                                name="198"
-                                value={formData["198"] || ""}
-                              />
-                              {/* Front Photo Upload */}
-                              <div className="w-full md:w-4/5 mx-auto">
-                                <input
-                                  id="front_photo_upload"
-                                  className="hidden"
-                                  type="file"
-                                  name="front_photo_upload"
-                                  accept="image/*"
-                                  ref={frontPhotoInputRef}
-                                  onChange={handleFrontPhotoSelect}
-                                />
-                                <label
-                                  htmlFor="front_photo_upload"
-                                  className="flex items-center cursor-pointer p-5 border-2 border-gray-300 rounded-lg shadow-md hover:bg-gray-50"
-                                >
-                                  <div className="flex w-full items-center">
-                                    <img
-                                      className="w-16 h-16 object-contain mr-4"
-                                      src="https://myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png"
-                                      id="frontPhotoPreview"
-                                      alt="Upload icon"
-                                    />
-                                    <span className="text-[#C19A6B]">
-                                      Tap to upload Front View photo
-                                    </span>
-                                  </div>
-                                </label>
-                                <p className="text-center text-sm mt-2 mb-6">
-                                  Please provide a clear photo of your front
-                                  view.
+                            </QuestionLayout>
+                          )}
+                          {/* Warning Popups */}
+                          <WarningPopup
+                            isOpen={showPhotoIdPopup}
+                            onClose={() => {
+                              if (photoIdAcknowledged) {
+                                setShowPhotoIdPopup(false);
+                              }
+                            }}
+                            title="Upload Photo ID"
+                            message={
+                              <>
+                                <p className="mb-5 text-md text-left">
+                                  Please note this step is mandatory. If you are
+                                  unable to complete at this time, email your ID
+                                  to{" "}
+                                  <a
+                                    className="text-gray-600 underline"
+                                    href="mailto:clinicadmin@myrocky.com"
+                                  >
+                                    clinicadmin@myrocky.com
+                                  </a>
+                                  .
                                 </p>
-                              </div>
-                              {/* Side Photo Upload */}
-                              <div className="w-full md:w-4/5 mx-auto">
-                                <input
-                                  id="side_photo_upload"
-                                  className="hidden"
-                                  type="file"
-                                  name="side_photo_upload"
-                                  accept="image/*"
-                                  ref={sidePhotoInputRef}
-                                  onChange={handleSidePhotoSelect}
-                                />
-                                <label
-                                  htmlFor="side_photo_upload"
-                                  className="flex items-center cursor-pointer p-5 border-2 border-gray-300 rounded-lg shadow-md hover:bg-gray-50"
-                                >
-                                  <div className="flex w-full items-center">
-                                    <img
-                                      className="w-16 h-16 object-contain mr-4"
-                                      src="https://myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png"
-                                      id="sidePhotoPreview"
-                                      alt="Upload icon"
-                                    />
-                                    <span className="text-[#C19A6B]">
-                                      Tap to upload Side View photo
-                                    </span>
-                                  </div>
-                                </label>
-                                <p className="text-center text-sm mt-2">
-                                  Please provide a clear photo of your side view
+                                <p className="mb-5 text-md text-left">
+                                  Your questionnaire will not be reviewed
+                                  without this. As per our T&C's a{" "}
+                                  <span className="font-medium">
+                                    $45 cancellation fee
+                                  </span>{" "}
+                                  will be charged if we are unable to verify
+                                  you.
                                 </p>
-                                <p className="text-center text-xs mt-1 text-gray-500">
-                                  It helps to use a mirror
-                                </p>
-                              </div>{" "}
-                              <div className="text-center text-xs text-gray-400 mt-6">
-                                <p>
-                                  Only JPG, JPEG, PNG, HEIF, and HEIC images are
-                                  supported.
-                                </p>
-                                <p>Max allowed file size per image is 20MB</p>
-                              </div>
-                              <div className="text-center mt-6 hidden">
-                                <button
-                                  type="button"
-                                  onClick={handleBodyPhotosUpload}
-                                  className="upload-button bg-gray-300 hover:bg-gray-400 text-black font-medium py-3 px-6 rounded-full w-full max-w-md"
-                                  disabled={isUploadingPhotos}
-                                >
-                                  {isUploadingPhotos ? (
-                                    <span className="flex items-center justify-center">
-                                      <svg
-                                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                      >
-                                        <circle
-                                          className="opacity-25"
-                                          cx="12"
-                                          cy="12"
-                                          r="10"
-                                          stroke="currentColor"
-                                          strokeWidth="4"
-                                        ></circle>
-                                        <path
-                                          className="opacity-75"
-                                          fill="currentColor"
-                                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                        ></path>
-                                      </svg>
-                                      {`Uploading... ${Math.round(
-                                        (uploadProgress.front +
-                                          uploadProgress.side) /
-                                          2
-                                      )}%`}
-                                    </span>
-                                  ) : (
-                                    "Upload and Continue"
-                                  )}
-                                </button>
-                              </div>
-                            </div>
-                          </QuestionLayout>
-                        )}
-                        {/* Warning Popups */}
-                        <WarningPopup
-                          isOpen={showPhotoIdPopup}
-                          onClose={() => {
-                            if (photoIdAcknowledged) {
-                              setShowPhotoIdPopup(false);
+                              </>
                             }
-                          }}
-                          title="Upload Photo ID"
-                          message={
-                            <>
-                              <p className="mb-5 text-md text-left">
-                                Please note this step is mandatory. If you are
-                                unable to complete at this time, email your ID
-                                to{" "}
-                                <a
-                                  className="text-gray-600 underline"
-                                  href="mailto:clinicadmin@myrocky.com"
+                            isAcknowledged={photoIdAcknowledged}
+                            onAcknowledge={(e) =>
+                              setPhotoIdAcknowledged(e.target.checked)
+                            }
+                            buttonText="I Acknowledge"
+                            backgroundColor="bg-white"
+                            titleColor="text-orange-500"
+                          />
+                          <WarningPopup
+                            isOpen={showHighBpWarning}
+                            onClose={(proceed) => {
+                              setShowHighBpWarning(false);
+                              if (proceed) {
+                                // Save acknowledgement data only when the user
+                                // explicitly clicks Continue — not on checkbox change.
+                                const updatedData = {
+                                  ...formData,
+                                  WLBloodPressureWarning: "on",
+                                };
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  WLBloodPressureWarning: "on",
+                                }));
+                                updateLocalStorage(updatedData);
+                                queueFormSubmission(updatedData);
+                                moveToNextSlideWithoutValidation();
+                              }
+                            }}
+                            title="High Blood Pressure"
+                            message="This is considered high. We'll be able to give you your prescription but please speak to your doctor to discuss your blood pressure."
+                            isAcknowledged={bpWarningAcknowledged}
+                            onAcknowledge={
+                              (e) =>
+                                HandleChangeBpWarningAcknowledged(
+                                  e.target.checked,
+                                )
+                              //
+                            }
+                            currentPage={currentPage}
+                          />
+                          <WarningPopup
+                            isOpen={showVeryHighBpWarning}
+                            onClose={() => setShowVeryHighBpWarning(false)}
+                            title="Very High Blood Pressure"
+                            message="This is considered very high and we would not be able to provide you with a prescription today. We strongly advise you seek immediate medical attention."
+                            showCheckbox={false}
+                            backgroundColor="bg-[#F5F4EF]"
+                            currentPage={currentPage}
+                          />
+                          <WarningPopup
+                            isOpen={showUnknownBpWarning}
+                            onClose={() => setShowUnknownBpWarning(false)}
+                            title="Unknown Blood Pressure"
+                            message="Unfortunately it would not be safe to give you a prescription without knowing your blood pressure."
+                            showCheckbox={false}
+                            backgroundColor="bg-[#F5F4EF]"
+                            currentPage={currentPage}
+                          />
+                          {/* No Appointment Acknowledgement Popup */}
+                          <WarningPopup
+                            isOpen={showNoAppointmentAcknowledgement}
+                            onClose={handleNoAppointmentContinue}
+                            title="Acknowledgement"
+                            message="I hereby acknowledge that by foregoing an appointment with a licensed physician or pharmacist, it is my sole responsibility to ensure I am aware of how to appropriately use the medication requested, furthermore I hereby confirm that I am aware of any potential side effects that may occur through the use of the aforementioned medication and hereby confirm that I do not have any medical questions to ask. I will ensure I have read the relevant product page and FAQ prior to use of the prescribed medication. Should I have any questions to ask, I am aware of how to contact the clinical team at MyRocky or get a hold of my primary care provider."
+                            isAcknowledged={noAppointmentAcknowledged}
+                            onAcknowledge={handleNoAppointmentAcknowledgement}
+                            backgroundColor="bg-[#F5F4EF]"
+                            additionalContent={null}
+                            buttonText="OK"
+                            currentPage={currentPage}
+                            afterButtonContent={
+                              <p className="mt-4 text-center font-medium text-md text-[#000000]">
+                                <button
+                                  onClick={handleRequestAppointmentInstead}
+                                  className="underline hover:text-gray-900"
                                 >
-                                  clinicadmin@myrocky.com
-                                </a>
-                                .
+                                  I would like to request the appointment
+                                  instead
+                                </button>
                               </p>
-                              <p className="mb-5 text-md text-left">
-                                Your questionnaire will not be reviewed without
-                                this. As per our T&C's a{" "}
-                                <span className="font-medium">
-                                  $45 cancellation fee
-                                </span>{" "}
-                                will be charged if we are unable to verify you.
-                              </p>
-                            </>
-                          }
-                          isAcknowledged={photoIdAcknowledged}
-                          onAcknowledge={(e) =>
-                            setPhotoIdAcknowledged(e.target.checked)
-                          }
-                          buttonText="I Acknowledge"
-                          backgroundColor="bg-white"
-                          titleColor="text-orange-500"
-                        />
-                        <WarningPopup
-                          isOpen={showHighBpWarning}
-                          onClose={() => setShowHighBpWarning(false)}
-                          title="High Blood Pressure"
-                          message="This is considered high. We'll be able to give you your prescription but please speak to your doctor to discuss your blood pressure."
-                          isAcknowledged={bpWarningAcknowledged}
-                          onAcknowledge={
-                            (e) =>
-                              HandleChangeBpWarningAcknowledged(
-                                e.target.checked
-                              )
-                            //
-                          }
-                          currentPage={currentPage}
-                        />
-                        <WarningPopup
-                          isOpen={showVeryHighBpWarning}
-                          onClose={() => setShowVeryHighBpWarning(false)}
-                          title="Very High Blood Pressure"
-                          message="This is considered very high and we would not be able to provide you with a prescription today. We strongly advise you seek immediate medical attention."
-                          showCheckbox={false}
-                          backgroundColor="bg-[#F5F4EF]"
-                          currentPage={currentPage}
-                        />
-                        <WarningPopup
-                          isOpen={showUnknownBpWarning}
-                          onClose={() => setShowUnknownBpWarning(false)}
-                          title="Unknown Blood Pressure"
-                          message="Unfortunately it would not be safe to give you a prescription without knowing your blood pressure."
-                          showCheckbox={false}
-                          backgroundColor="bg-[#F5F4EF]"
-                          currentPage={currentPage}
-                        />
-                        {/* No Appointment Acknowledgement Popup */}
-                        <WarningPopup
-                          isOpen={showNoAppointmentAcknowledgement}
-                          onClose={handleNoAppointmentContinue}
-                          title="Acknowledgement"
-                          message="I hereby acknowledge that by foregoing an appointment with a licensed physician or pharmacist, it is my sole responsibility to ensure I am aware of how to appropriately use the medication requested, furthermore I hereby confirm that I am aware of any potential side effects that may occur through the use of the aforementioned medication and hereby confirm that I do not have any medical questions to ask. I will ensure I have read the relevant product page and FAQ prior to use of the prescribed medication. Should I have any questions to ask, I am aware of how to contact the clinical team at MyRocky or get a hold of my primary care provider."
-                          isAcknowledged={noAppointmentAcknowledged}
-                          onAcknowledge={handleNoAppointmentAcknowledgement}
-                          backgroundColor="bg-[#F5F4EF]"
-                          additionalContent={null}
-                          buttonText="OK"
-                          currentPage={currentPage}
-                          afterButtonContent={
-                            <p className="mt-4 text-center font-medium text-md text-[#000000]">
-                              <button
-                                onClick={handleRequestAppointmentInstead}
-                                className="underline hover:text-gray-900"
-                              >
-                                I would like to request the appointment instead
-                              </button>
-                            </p>
-                          }
-                        />
-                      </motion.div>
-                    </AnimatePresence>
+                            }
+                          />
+                        </motion.div>
+                      </AnimatePresence>
+                    </div>
+                  </form>
+
+                  <p className="error-box text-red-500 hidden m-2 text-center text-sm mx-auto max-w-[90%] md:max-w-md lg:max-w-lg"></p>
+
+                  <div className="fixed bottom-0 left-0 w-full p-4 z-[9999] bg-white shadow-lg flex items-center justify-center">
+                    <button
+                      type="button"
+                      onClick={handleContinueClick}
+                      className={`bg-black text-white w-full max-w-md py-4 px-4 rounded-full font-medium text-lg ${
+                        !isClient ||
+                        (currentPage === 1
+                          ? !question1ButtonVisible
+                          : !buttonState.visible)
+                          ? "invisible"
+                          : "visible"
+                      }`}
+                      disabled={buttonState.disabled}
+                      style={{ opacity: buttonState.opacity }}
+                      suppressHydrationWarning={true}
+                    >
+                      Continue
+                    </button>
                   </div>
-                </form>
 
-                <p className="error-box text-red-500 hidden m-2 text-center text-sm mx-auto max-w-[90%] md:max-w-md lg:max-w-lg"></p>
-
-                <div className="fixed bottom-0 left-0 w-full p-4 z-[9999] bg-white shadow-lg flex items-center justify-center">
-                  <button
-                    type="button"
-                    onClick={handleContinueClick}
-                    className={`bg-black text-white w-full max-w-md py-4 px-4 rounded-full font-medium text-lg ${
-                      !isClient ||
-                      (currentPage === 1
-                        ? !question1ButtonVisible
-                        : !buttonState.visible)
-                        ? "invisible"
-                        : "visible"
-                    }`}
-                    disabled={buttonState.disabled}
-                    style={{ opacity: buttonState.opacity }}
-                    suppressHydrationWarning={true}
-                  >
-                    Continue
-                  </button>
-                </div>
-
-                <div
-                  id="please-wait-loader-overlay"
-                  className="hidden"
-                  style={{
-                    height: "100%",
-                    width: "100%",
-                    position: "fixed",
-                    top: 0,
-                    left: 0,
-                    background: "rgba(255,255,255,0.9)",
-                  }}
-                >
                   <div
-                    className="text-center p-5 pb-[100px]"
-                    style={{ position: "relative", top: "25%" }}
+                    id="please-wait-loader-overlay"
+                    className="hidden"
+                    style={{
+                      height: "100%",
+                      width: "100%",
+                      position: "fixed",
+                      top: 0,
+                      left: 0,
+                      background: "rgba(255,255,255,0.9)",
+                    }}
                   >
-                    <div className="mb-4">
-                      {uploadProgress.id > 0 && (
-                        <div className="text-lg font-medium text-gray-700">
-                          Uploading... {Math.round(uploadProgress.id)}%
-                        </div>
-                      )}
-                      {uploadProgress.front > 0 && (
-                        <div className="text-lg font-medium text-gray-700">
-                          Uploading front photo...{" "}
-                          {Math.round(uploadProgress.front)}%
-                        </div>
-                      )}
-                      {uploadProgress.side > 0 && (
-                        <div className="text-lg font-medium text-gray-700">
-                          Uploading side photo...{" "}
-                          {Math.round(uploadProgress.side)}%
-                        </div>
-                      )}
-                      {!uploadProgress.id &&
-                        !uploadProgress.front &&
-                        !uploadProgress.side && (
+                    <div
+                      className="text-center p-5 pb-[100px]"
+                      style={{ position: "relative", top: "25%" }}
+                    >
+                      <div className="mb-4">
+                        {uploadProgress.id > 0 && (
                           <div className="text-lg font-medium text-gray-700">
-                            Processing... <br />
-                            Please do not refresh or close the page
+                            Uploading... {Math.round(uploadProgress.id)}%
                           </div>
                         )}
+                        {uploadProgress.front > 0 && (
+                          <div className="text-lg font-medium text-gray-700">
+                            Uploading front photo...{" "}
+                            {Math.round(uploadProgress.front)}%
+                          </div>
+                        )}
+                        {uploadProgress.side > 0 && (
+                          <div className="text-lg font-medium text-gray-700">
+                            Uploading side photo...{" "}
+                            {Math.round(uploadProgress.side)}%
+                          </div>
+                        )}
+                        {!uploadProgress.id &&
+                          !uploadProgress.front &&
+                          !uploadProgress.side && (
+                            <div className="text-lg font-medium text-gray-700">
+                              Processing... <br />
+                              Please do not refresh or close the page
+                            </div>
+                          )}
+                      </div>
+                      <img
+                        src="https://myrocky.com/wp-content/themes/salient-child/img/please_wait_animation.gif"
+                        alt=""
+                        style={{ margin: "0 auto" }}
+                      />
                     </div>
-                    <img
-                      src="https://myrocky.com/wp-content/themes/salient-child/img/please_wait_animation.gif"
-                      alt=""
-                      style={{ margin: "0 auto" }}
-                    />
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
           {currentPage === 23 && formData.completion_state === "Full" && (
             <div className="relative min-h-screen w-full bg-[#F5F4EF] overflow-hidden flex flex-col">

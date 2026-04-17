@@ -2,7 +2,7 @@ import Loader from "@/components/Loader";
 import { isAuthenticated } from "@/lib/cart/cartService";
 import { logger } from "@/utils/devLogger";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { toast } from "react-toastify";
 import { usePassword } from "@/components/WLPreConsultationQuizV2/contexts/PasswordContext";
 import { encryptPasswordWithServerKey } from "@/utils/encryptPasswordWithServerKey";
@@ -25,7 +25,7 @@ const WeightLossResultPasswordPopup = ({
   const [emailTouched, setEmailTouched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [emailExists, setEmailExists] = useState(false);
-  const [lastCheckedEmail, setLastCheckedEmail] = useState("");
+  const lastCheckedEmailRef = useRef("");
   const [passwordError, setPasswordError] = useState("");
 
   const MIN_NEW_PASSWORD_LENGTH = 8;
@@ -116,9 +116,7 @@ const WeightLossResultPasswordPopup = ({
       setLoading(true);
 
       // Use password from Context (memory) or fallback to parameter
-      const restoredPassword =
-        contextPassword || (await restorePasswordSecurely());
-      const loginPassword = restoredPassword || password || "";
+      const loginPassword = contextPassword || password || "";
 
       let isEncryptedPassword = false;
       const encryptResult = await encryptPasswordWithServerKey(loginPassword);
@@ -247,11 +245,12 @@ const WeightLossResultPasswordPopup = ({
                 onChange={(e) => {
                   const newEmail = e.target.value;
                   setEmail(newEmail);
-                  // Only reset the password section when the email genuinely
-                  // changes — Safari autofill re-fills the same address when
-                  // the user picks a saved password, which would otherwise
-                  // hide the password section and trigger a re-check
-                  if (newEmail.trim() !== email.trim()) {
+                  // Compare against the last server-checked email (ref) rather
+                  // than the current email state — this avoids a stale-closure
+                  // bug on iOS Safari where autofill re-fires after a failed
+                  // login, making the comparison incorrectly evaluate to true
+                  // and hiding the password section.
+                  if (newEmail.trim() !== lastCheckedEmailRef.current) {
                     setShowPasswordSection(false);
                   }
                   // mark touched as user types so errors can show after interaction
@@ -263,9 +262,11 @@ const WeightLossResultPasswordPopup = ({
                   if (trimmed.length > 0 && isValidEmail(trimmed)) {
                     // Only call the API if the email actually changed —
                     // prevents Safari/iOS autofill blur from re-triggering
-                    // the check when focus moves to the password field
-                    if (trimmed !== lastCheckedEmail) {
-                      setLastCheckedEmail(trimmed);
+                    // the check when focus moves to the password field.
+                    // Using a ref so the comparison is always against the
+                    // latest value with no stale-closure risk.
+                    if (trimmed !== lastCheckedEmailRef.current) {
+                      lastCheckedEmailRef.current = trimmed;
                       checkEmailExists(trimmed);
                     }
                   }
