@@ -35,7 +35,7 @@ const QuestionnaireNavbar = ({ onBackClick, currentPage }) => {
         )}
 
         <div className="mx-auto scale-125 flex justify-center items-center min-w-[120px] ">
-          <Logo />
+          <Logo hardNavigateToHome />
         </div>
       </div>
     </header>
