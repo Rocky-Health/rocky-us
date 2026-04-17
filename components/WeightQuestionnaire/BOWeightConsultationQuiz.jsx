@@ -927,6 +927,11 @@ export default function NewBOWLConsultationQuiz({
           logger.log("Submitting textarea fields:", textareaFields);
         }
       };
+      const completionPct =
+        dataToSubmit.completion_percentage !== undefined &&
+        dataToSubmit.completion_percentage !== null
+          ? dataToSubmit.completion_percentage
+          : progress;
       const completeData = {
         ...dataToSubmit,
         form_id: 6,
@@ -936,8 +941,8 @@ export default function NewBOWLConsultationQuiz({
         token: formData.token || "",
         stage: dataToSubmit.stage || "consultation-before-checkout",
         page_step: dataToSubmit.page_step || currentPage,
-        completion_state: (dataToSubmit.completion_state && dataToSubmit.completion_state !== "") ? dataToSubmit.completion_state : "Partial",
-        completion_percentage: dataToSubmit.completion_percentage !== undefined && dataToSubmit.completion_percentage !== null ? dataToSubmit.completion_percentage : progress,
+        completion_percentage: completionPct,
+        completion_state: completionPct >= 100 ? "Full" : "Partial",
         source_site: "https://myrocky.com",
       };
 
