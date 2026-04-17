@@ -281,7 +281,7 @@ export default function WeightLossConsultationQuiz({
     setFormData(updatedFormData);
 
     const continueButton = formRef.current?.querySelector(
-      ".quiz-continue-button"
+      ".quiz-continue-button",
     );
     if (continueButton) {
       continueButton.style.visibility = value.trim() !== "" ? "" : "hidden";

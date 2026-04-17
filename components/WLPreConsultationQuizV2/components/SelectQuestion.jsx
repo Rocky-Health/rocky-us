@@ -61,7 +61,7 @@ const SelectQuestion = ({
               config.options.find((opt) => opt.showTextInput)
                 ?.textPlaceholder || "Please specify..."
             }
-            className="w-full p-4 border border-gray-300 rounded-lg min-h-[100px] text-[14px] md:text-[16px] focus:outline-none focus:border-[#A7885A]"
+            className="w-full p-4 border border-gray-300 rounded-lg min-h-[100px] text-[16px] focus:outline-none focus:border-[#A7885A]"
           />
 
           {textInput.trim() && (

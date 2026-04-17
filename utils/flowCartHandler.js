@@ -19,7 +19,10 @@ import {
 import { refreshCartNonceClient } from "./nonceManager";
 import { analyticsService } from "@/utils/analytics/analyticsService";
 import { getOrCreateSessionId } from "@/utils/dataLayerHelper";
-import { trackMetaStartCheckout, logMetaTrackingError } from "@/utils/metaQuestionnaireTracking";
+import {
+  trackMetaStartCheckout,
+  logMetaTrackingError,
+} from "@/utils/metaQuestionnaireTracking";
 
 /**
  * Helper function to clean and parse price strings
@@ -489,11 +492,16 @@ async function handleUnauthenticatedEarlyAddition(
     try {
       trackMetaStartCheckout({
         flow_id: flowType,
-        content_id: String(extractProductId(mainProduct) || mainProduct.variationId || ""),
+        content_id: String(
+          extractProductId(mainProduct) || mainProduct.variationId || "",
+        ),
         value: parsePrice(mainProduct.price),
       });
     } catch (err) {
-      logMetaTrackingError(err, { flow_id: flowType, milestone: "START_CHECKOUT" });
+      logMetaTrackingError(err, {
+        flow_id: flowType,
+        milestone: "START_CHECKOUT",
+      });
     }
 
     // Return success with cart data for display
@@ -634,14 +642,39 @@ async function handleUnauthenticatedAddonAddition(
  */
 async function handleFlowSpecificPreProcessing(flowType, preserveExistingCart) {
   if (flowType === "wl" && !preserveExistingCart) {
-    // Weight Loss flow requires cart clearing
-    logger.log("WL flow: Clearing existing cart...");
-    try {
-      await emptyCart();
-      logger.log("Cart cleared successfully for WL flow");
-    } catch (clearError) {
-      logger.error("Error clearing cart for WL flow:", clearError);
-      // Continue anyway - cart clearing failure shouldn't stop checkout
+    // Weight Loss flow requires a clean cart so the new plan is the only item.
+    // We retry up to 3 times and verify the cart is actually empty after each
+    // attempt — this prevents a race condition where a slow or failed emptyCart
+    // call lets the old plan linger in the cart when the new one is added.
+    const MAX_RETRIES = 3;
+    let cleared = false;
+
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        await emptyCart();
+        // Confirm the cart is truly empty before we proceed
+        const cart = await getCart();
+        const remainingItems = (cart?.items || []).length;
+        if (remainingItems === 0) {
+          logger.log(`WL flow: Cart cleared successfully (attempt ${attempt})`);
+          cleared = true;
+          break;
+        }
+        logger.warn(
+          `WL flow: Cart still has ${remainingItems} item(s) after emptyCart attempt ${attempt} — retrying...`,
+        );
+      } catch (clearError) {
+        logger.error(
+          `WL flow: Error clearing cart (attempt ${attempt}):`,
+          clearError,
+        );
+      }
+    }
+
+    if (!cleared) {
+      throw new Error(
+        "We couldn't update your cart. Please refresh the page and try again.",
+      );
     }
   }
 }
@@ -1226,11 +1259,16 @@ async function handleAuthenticatedEarlyAddition(
       try {
         trackMetaStartCheckout({
           flow_id: flowType,
-          content_id: String(extractProductId(mainProduct) || mainProduct.variationId || ""),
+          content_id: String(
+            extractProductId(mainProduct) || mainProduct.variationId || "",
+          ),
           value: parsePrice(mainProduct.price),
         });
       } catch (err) {
-        logMetaTrackingError(err, { flow_id: flowType, milestone: "START_CHECKOUT" });
+        logMetaTrackingError(err, {
+          flow_id: flowType,
+          milestone: "START_CHECKOUT",
+        });
       }
 
       // Generate checkout URL (but don't redirect yet)
