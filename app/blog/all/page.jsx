@@ -4,6 +4,12 @@ import { logger } from "@/utils/devLogger";
 
 export const dynamic = "force-dynamic";
 
+export const metadata = {
+  alternates: {
+    canonical: "/blog/all",
+  },
+};
+
 export default async function AllBlogsPageRoute({ searchParams }) {
   try {
     // Await searchParams as it's now a promise in Next.js 15+

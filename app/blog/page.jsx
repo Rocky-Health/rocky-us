@@ -6,6 +6,12 @@ import BlogPageSkeleton from "@/components/NewBlogs/components/BlogPageSkeleton"
 
 export const dynamic = "force-dynamic";
 
+export const metadata = {
+  alternates: {
+    canonical: "/blog",
+  },
+};
+
 async function BlogsContent() {
   try {
     const [blogsData, categories] = await Promise.all([
