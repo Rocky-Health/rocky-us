@@ -150,6 +150,14 @@ export async function POST(req) {
       data.completion_percentage = 100;
       data.completion_state = "Full";
     }
+
+    // Allow Full whenever percentage >= 100 and minimum questionnaire fields are present
+    if (
+      data.completion_percentage >= 100 &&
+      rawWlPayloadHasMinimumQuestionnaireForFull(rawData)
+    ) {
+      data.completion_state = "Full";
+    }
     if (
       (data.stage === "consultation-before-checkout" ||
         data.stage === "consultation-after-checkout") &&
@@ -532,6 +540,42 @@ async function postWeightLossQuestionnaireDataToCRM(data) {
 
     throw new Error(`CRM Submission Failed: ${error.message}`);
   }
+}
+
+/**
+ * Returns true when the raw WL payload contains the minimum questionnaire
+ * fields required to mark the submission as "Full".
+ *
+ * Branching rules:
+ *   601 === "Yes"  →  602 and 603 are skipped (not required)
+ *   601 !== "Yes"  →  602 is required
+ *   602 === "Yes"  →  603 is skipped (not required)
+ *   neither "Yes"  →  603 is required
+ *
+ * BMI fields are always required.
+ */
+function rawWlPayloadHasMinimumQuestionnaireForFull(rawData) {
+  if (!rawData.wl_weight) return false;
+  if (!rawData.wl_height) return false;
+  if (!rawData.wl_BMI) return false;
+
+  const q601 = rawData["601"];
+  if (!q601) return false;
+
+  // Currently on medication — 602/603 branching is skipped
+  if (q601 === "Yes") return true;
+
+  const q602 = rawData["602"];
+  if (!q602) return false;
+
+  // Previously used medication — 603 branching is skipped
+  if (q602 === "Yes") return true;
+
+  // Neither condition — 603 is required
+  const q603 = rawData["603"];
+  if (!q603) return false;
+
+  return true;
 }
 
 function generateUniqueId() {

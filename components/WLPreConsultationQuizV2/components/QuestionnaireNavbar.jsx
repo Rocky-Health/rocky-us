@@ -1,6 +1,5 @@
 import Logo from "@/components/Navbar/Logo";
 
-
 const QuestionnaireNavbar = ({ onBackClick, currentPage }) => {
   const isThankYouPage = currentPage === 22;
   const showBackButton = currentPage > 1 && !isThankYouPage;
@@ -36,23 +35,7 @@ const QuestionnaireNavbar = ({ onBackClick, currentPage }) => {
         )}
 
         <div className="mx-auto scale-125 flex justify-center items-center min-w-[120px] ">
-          {isThankYouPage ? (
-            <button
-              onClick={() => (window.location.href = "/")}
-              className="cursor-pointer mr-[18px] md:mr-0"
-              aria-label="Go to home"
-            >
-              <Logo withLink={false} />
-            </button>
-          ) : (
-            <button
-              onClick={() => (window.location.href = "/")}
-              className="cursor-pointer md:mr-0"
-              aria-label="Go to home"
-            >
-              <Logo withLink={false} />
-            </button>
-          )}
+          <Logo hardNavigateToHome />
         </div>
       </div>
     </header>

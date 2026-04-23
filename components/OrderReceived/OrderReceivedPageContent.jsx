@@ -265,7 +265,7 @@ const OrderReceivedContent = ({ userId }) => {
     if (mhFlow === "1") basePath = "/mh-quiz";
     if (edFlow === "1") basePath = "/ed-consultation-quiz";
     if (wlFlow === "1") {
-      basePath = isNewBOFlow ? "/new-bo-wl-consultation" : "/wl-consultation";
+      basePath = "/wl-consultation";
     }
     if (hairFlow === "1") basePath = "/hair-main-questionnaire";
     if (smokingFlow === "1") basePath = "/smoking-consultation/?checked-out=1";

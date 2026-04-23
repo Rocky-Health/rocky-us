@@ -1,6 +1,7 @@
 import React from "react";
 import CustomImage from "../utils/CustomImage";
 import CustomContainImage from "../utils/CustomContainImage";
+import { formatPrice } from "@/utils/priceFormatter";
 
 const ProductRecommendationCard = ({ product }) => {
   return (
@@ -55,7 +56,7 @@ const ProductRecommendationCard = ({ product }) => {
             {product.description}
           </p>
           <p className="text-[16px] font-medium leading-[140%] text-black mb-2">
-            ${product.price}
+            ${formatPrice(product.price)}
           </p>
           {/* Product Description */}
           <p className="text-[#212121] text-[14px] font-normal leading-[140%] mb-3">

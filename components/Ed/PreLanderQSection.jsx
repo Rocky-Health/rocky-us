@@ -1,15 +1,18 @@
 import Image from "next/image";
+import Link from "next/link";
 
 const PreLanderQSection = ({ img, h2, p, UpText = true, question }) => {
   return (
     <div className="max-w-[1184px] mx-auto px-5 py-8 md:py-12 sectionWidth:px-0">
-      <Image
-        src="/ed-prelander-5/rocky-logo.png"
-        alt="Rocky Logo"
-        width={81}
-        height={30}
-        className="mb-3"
-      />
+      <Link href="/" aria-label="MyRocky Homepage">
+        <Image
+          src="/ed-prelander-5/rocky-logo.png"
+          alt="Rocky Logo"
+          width={81}
+          height={30}
+          className="mb-3"
+        />
+      </Link>
       <div className="flex flex-col md:items-center md:flex-row md:justify-between">
         {/* Desktop: Image with text overlay */}
         <div className="hidden md:block relative w-[584px] h-[696px]">
@@ -19,7 +22,13 @@ const PreLanderQSection = ({ img, h2, p, UpText = true, question }) => {
             fill
             className="object-cover rounded-2xl"
           />
-          <div className={ UpText ? `absolute right-0 left-0  text-center text-white top-[56px]` : `absolute right-0 left-0  text-center text-white bottom-[56px]`}>
+          <div
+            className={
+              UpText
+                ? `absolute right-0 left-0  text-center text-white top-[56px]`
+                : `absolute right-0 left-0  text-center text-white bottom-[56px]`
+            }
+          >
             <h2 className="text-[40px] font-[550]">{h2}</h2>
             <p className="text-[40px] font-[550]">{p}</p>
           </div>
@@ -47,7 +56,13 @@ const PreLanderQSection = ({ img, h2, p, UpText = true, question }) => {
               fill
               className="object-cover rounded-2xl"
             />
-            <div className={UpText ? `absolute right-0 left-0 top-[22px] text-center text-[#FFFFFFF2]` : `absolute right-0 left-0 bottom-[22px] text-center text-[#FFFFFFF2]`}>
+            <div
+              className={
+                UpText
+                  ? `absolute right-0 left-0 top-[22px] text-center text-[#FFFFFFF2]`
+                  : `absolute right-0 left-0 bottom-[22px] text-center text-[#FFFFFFF2]`
+              }
+            >
               <h2 className="text-xl font-semibold">{h2}</h2>
               <p className="text-xl font-semibold">{p}</p>
             </div>
