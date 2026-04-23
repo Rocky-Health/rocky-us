@@ -54,6 +54,11 @@ export const viewport = {
 };
 
 export const metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ||
+      process.env.BASE_URL?.replace(/\/$/, "") ||
+      "https://www.myrocky.com"
+  ),
   title: "MyRocky - Your Health Partner",
   description: "Get professional healthcare advice and treatment online",
   openGraph: {

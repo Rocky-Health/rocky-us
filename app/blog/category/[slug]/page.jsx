@@ -4,6 +4,15 @@ import { logger } from "@/utils/devLogger";
 
 export const dynamic = "force-dynamic";
 
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  return {
+    alternates: {
+      canonical: `/blog/category/${slug}`,
+    },
+  };
+}
+
 export default async function CategoryBlogsPage({ params }) {
   try {
     const { slug } = await params;
