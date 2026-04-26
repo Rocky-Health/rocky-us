@@ -55,9 +55,12 @@ export const MILESTONES = {
 const FLOW_ID_MAP = {
   ed: "ED",
   "weight-loss": "WL",
+  wl: "WL",
   hair: "HL",
+  hl: "HL",
   smoking: "SMOKING",
   skincare: "SKINCARE",
+  mh: "OTHERS",
 };
 
 /**
