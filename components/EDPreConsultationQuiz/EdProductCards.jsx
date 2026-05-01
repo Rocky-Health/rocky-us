@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import CustomImage from "../utils/CustomImage";
 import CustomContainImage from "../utils/CustomContainImage";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 const EdProductCards = ({
   product,
@@ -201,16 +202,16 @@ const EdProductCards = ({
           }}
         >
           {isSelected
-            ? `Selected - $${
+            ? `Selected - $${formatPriceUI(
                 selectedPreference === "generic"
                   ? selectedPills.genericPrice
-                  : selectedPills.brandPrice
-              }`
-            : `Select - $${
+                  : selectedPills.brandPrice,
+              )}`
+            : `Select - $${formatPriceUI(
                 selectedPreference === "generic"
                   ? selectedPills.genericPrice
-                  : selectedPills.brandPrice
-              }`}
+                  : selectedPills.brandPrice,
+              )}`}
         </button>
         <p className="text-[10px] md:text-[12px] leading-[140%] font-[400] mt-[8px]">
           *Dose request can be made during questionnaire

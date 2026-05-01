@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./WLProductCard.css";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 const CheckIcon = () => (
     <svg
@@ -30,7 +31,9 @@ const WLProductCard = ({ product, onSelect, isSelected }) => {
 
     if (!product) return null;
 
-    const displayPrice = product.price ? `From ${product.price}` : null;
+    const displayPrice = product.price
+        ? `From $${formatPriceUI(product.price)}`
+        : null;
     const benefits = product.benefits || [];
     const shortDescription =
         product.description ||
