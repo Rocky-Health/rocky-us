@@ -8,6 +8,7 @@ export const layoutExemptRoutes = [
   "/checkout",
   "/ed-pre-consultation-quiz",
   "/wl-pre-consultation",
+  "/wl-pre-consultation-2",
   "/glp2-pre-consultation",
   "/wl-offer-pre-consultation",
   "/ed-consultation-quiz",
