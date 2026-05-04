@@ -77,7 +77,6 @@ const BOSimplifiedFlow2 = () => {
     handleAction,
     closePopup,
     handleRecommendationContinue,
-    handlePlanStepCheckout,
   } = useBOSimplifiedFlow();
 
   useQuestionnaireStepTracking({
@@ -161,7 +160,6 @@ const BOSimplifiedFlow2 = () => {
             handleRecommendationContinue={handleRecommendationContinue}
             handleBack={handleBack}
             goToStep={goToStep}
-            handlePlanStepCheckout={handlePlanStepCheckout}
           />
         </div>
 
