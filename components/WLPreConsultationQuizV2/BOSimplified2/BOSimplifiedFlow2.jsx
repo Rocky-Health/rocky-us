@@ -1,9 +1,9 @@
 "use client";
 
 import { logger } from "@/utils/devLogger";
-import { useBOSimplifiedFlow } from "./hooks/useBOSimplifiedFlow";
-import { boSimplifiedConfig } from "./config/boSimplifiedConfig";
-import GenericPopup from "./components/GenericPopup"; // Use separate GenericPopup for BO
+import { useBOSimplifiedFlow } from "../BOSimplified/hooks/useBOSimplifiedFlow";
+import { boSimplifiedConfig } from "../BOSimplified/config/boSimplifiedConfig";
+import GenericPopup from "../BOSimplified/components/GenericPopup";
 import { PasswordProvider } from "../contexts/PasswordContext";
 import QuizStepRenderer from "./QuizStepRenderer";
 import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
@@ -11,6 +11,7 @@ import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTr
 import { useEffect } from "react";
 import QuestionnaireNavbar from "../components/QuestionnaireNavbar";
 import { ProgressBar } from "@/components/EdQuestionnaire/ProgressBar";
+
 
 const getPopupConfigWithChosenValue = (popupKey, userData) => {
   if (popupKey === "potentialWeightLoss") {
@@ -34,8 +35,6 @@ const getPopupConfigWithChosenValue = (popupKey, userData) => {
     const popupConfig = boSimplifiedConfig.popups[popupKey];
     if (!popupConfig) return null;
 
-    // Extract numeric weight from userData.weight
-    // Weight can be: number (200), string number ("200"), or string with units ("200 lbs")
     let numericWeight = null;
     if (
       userData.weight !== undefined &&
@@ -43,10 +42,8 @@ const getPopupConfigWithChosenValue = (popupKey, userData) => {
       userData.weight !== ""
     ) {
       if (typeof userData.weight === "number") {
-        // Already a number
         numericWeight = userData.weight;
       } else {
-        // String - extract number (handles "200 lbs" or "200")
         const weightStr = String(userData.weight);
         const weightMatch = weightStr.match(/(\d+(?:\.\d+)?)/);
         if (weightMatch) {
@@ -55,18 +52,17 @@ const getPopupConfigWithChosenValue = (popupKey, userData) => {
       }
     }
 
-    // Create a new config object to avoid mutating the original
     return {
       ...popupConfig,
-      weight: numericWeight, // Pass numeric weight to component
-      text: numericWeight ? `${numericWeight} lbs` : "", // For display (backward compatibility)
+      weight: numericWeight,
+      text: numericWeight ? `${numericWeight} lbs` : "",
     };
   }
 
   return boSimplifiedConfig.popups[popupKey] || null;
 };
 
-const BOSimplifiedFlow = () => {
+const BOSimplifiedFlow2 = () => {
   const {
     currentStep,
     progressPercent,
@@ -85,44 +81,41 @@ const BOSimplifiedFlow = () => {
   } = useBOSimplifiedFlow();
 
   useQuestionnaireStepTracking({
-    questionnaireId: "bo-simplified",
+    questionnaireId: "bo-simplified-2",
     stepId: currentStep,
     stepIndex: currentStep,
     flowId: "weight-loss",
     stepType: "pre-consultation",
   });
 
-  // Ensure hooks run in the same order on every render
+
   useEffect(() => {
-    logger.log("[BOSimplifiedFlow] Current step changed:", currentStep);
+    logger.log("[BOSimplifiedFlow2] Current step changed:", currentStep);
   }, [currentStep]);
 
-  // Resolve activePopup to a popup config object
   const activePopupConfig = (() => {
     if (!activePopup) return null;
     if (typeof activePopup === "string") {
       const config = getPopupConfigWithChosenValue(activePopup, userData);
       logger.log(
-        "[BOSimplifiedFlow] Popup config for",
+        "[BOSimplifiedFlow2] Popup config for",
         activePopup,
         ":",
         config,
       );
       return config;
     }
-    return activePopup; // assume object
+    return activePopup;
   })();
 
-  // Debug logging
   useEffect(() => {
     if (activePopup) {
-      logger.log("[BOSimplifiedFlow] Active popup:", activePopup);
-      logger.log("[BOSimplifiedFlow] Popup config:", activePopupConfig);
-      logger.log("[BOSimplifiedFlow] User data:", userData);
+      logger.log("[BOSimplifiedFlow2] Active popup:", activePopup);
+      logger.log("[BOSimplifiedFlow2] Popup config:", activePopupConfig);
+      logger.log("[BOSimplifiedFlow2] User data:", userData);
     }
   }, [activePopup, activePopupConfig, userData]);
 
-  // Only short-circuit the whole flow when the popup is intended to be a full page
   if (activePopup && (activePopupConfig?.asPage ?? true)) {
     return (
       <PasswordProvider>
@@ -146,19 +139,16 @@ const BOSimplifiedFlow = () => {
         <div className="bg-black text-white text-[14px] leading-[140%] font-medium items-center text-center p-2">
           Lose Weight or Your Money Back
         </div>
-        {/* QuestionnaireNavbar */}
         <QuestionnaireNavbar
           onBackClick={handleBack}
           currentPage={currentStep}
         />
-        {/* Progress Bar - Hide for recommendation step only */}
-        {currentStep !== 7 && (
+        {currentStep !== 7 && currentStep !== 8 && (
           <div className="pt-4 pb-6">
             <ProgressBar progress={progressPercent || 100} />
           </div>
         )}
 
-        {/* Main content */}
         <div className="flex-1">
           <QuizStepRenderer
             currentStep={currentStep}
@@ -175,7 +165,6 @@ const BOSimplifiedFlow = () => {
           />
         </div>
 
-        {/* Generic popup */}
         <GenericPopup
           isOpen={!!activePopup}
           onClose={closePopup}
@@ -191,4 +180,4 @@ const BOSimplifiedFlow = () => {
   );
 };
 
-export default BOSimplifiedFlow;
+export default BOSimplifiedFlow2;
