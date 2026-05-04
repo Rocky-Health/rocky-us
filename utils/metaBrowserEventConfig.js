@@ -78,6 +78,7 @@ const QUESTIONNAIRE_ID_MAP = {
   "wl-offer": "WL",
   "glp2-pre-consultation": "WL",
   "bo-simplified": "WL",
+  "bo-simplified-2": "WL",
   "bo-weight-consultation": "WL",
   "acne-quiz": "SKINCARE",
   "anti-aging-quiz": "SKINCARE",
