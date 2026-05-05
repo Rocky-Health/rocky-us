@@ -1,6 +1,6 @@
 "use client";
 
-import { formatPrice } from "@/utils/priceFormatter";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 /**
  * PriceDisplay Component
@@ -31,13 +31,13 @@ const PriceDisplay = ({
     <div className={`flex items-center gap-2 ${className}`}>
       <span className={`text-[#AE7E56] ${sizeClass}`}>
         {showCurrency && "$"}
-        {formatPrice(price)}
+        {formatPriceUI(price)}
       </span>
 
       {hasDiscount && (
         <span className="text-gray-400 line-through text-sm">
           {showCurrency && "$"}
-          {formatPrice(regularPrice)}
+          {formatPriceUI(regularPrice)}
         </span>
       )}
     </div>

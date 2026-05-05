@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { IoClose } from "react-icons/io5";
 import { useState, useEffect } from "react";
-import { formatPrice } from "@/utils/priceFormatter";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 export default function MobileCartPopup({
   open,
@@ -128,10 +128,10 @@ export default function MobileCartPopup({
                         return (
                           <>
                             <div className="text-[#212121] text-sm">
-                              {quantity} × ${formatPrice(unitPrice)}
+                              {quantity} × ${formatPriceUI(unitPrice)}
                             </div>
                             <div className="text-[#212121] text-sm font-semibold">
-                              Total: ${formatPrice(unitPrice * quantity)}
+                              Total: ${formatPriceUI(unitPrice * quantity)}
                             </div>
                           </>
                         );

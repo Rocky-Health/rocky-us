@@ -6,7 +6,7 @@ import {
   isForcedSubscriptionProduct,
   formatSubscriptionOptions,
 } from "@/lib/utils/subscriptionUtils";
-import { formatPrice } from "@/utils/priceFormatter";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 const VariationButton = ({ selected, onClick, children, disabled = false }) => (
   <button
@@ -76,7 +76,7 @@ const SubscriptionOption = ({ option, selected, onSelect }) => {
         </span>
       </label>
       <span className="subscription-price text-black font-semibold">
-        ${formatPrice(option.price)}
+        ${formatPriceUI(option.price)}
       </span>
     </div>
   );
@@ -119,11 +119,11 @@ const ForcedSubscriptionOptions = ({ options, selected, onSelect }) => {
                 id="cart-button-price"
                 className="subscription-price font-semibold"
               >
-                ${formatPrice(option.price)}
+                ${formatPriceUI(option.price)}
                 {option.sale_price &&
                   Number(option.sale_price) < Number(option.regular_price) && (
                     <span className="text-gray-400 line-through text-sm ml-2">
-                      ${formatPrice(option.regular_price)}
+                      ${formatPriceUI(option.regular_price)}
                     </span>
                   )}
               </div>
@@ -401,12 +401,12 @@ const ProductVariations = ({
                 {option.price && (
                   <div className="subscription-price font-semibold">
                     $
-                    {formatPrice(
+                    {formatPriceUI(
                       hasSalePrice(option) ? option.sale_price : option.price,
                     )}
                     {hasSalePrice(option) && (
                       <span className="text-gray-400 line-through text-sm ml-2">
-                        ${formatPrice(option.regular_price)}
+                        ${formatPriceUI(option.regular_price)}
                       </span>
                     )}
                   </div>

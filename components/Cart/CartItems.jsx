@@ -7,7 +7,7 @@ import { useEmptyCart } from "@/lib/cart/cartHooks";
 import { toast } from "react-toastify";
 import { canRemoveItem } from "@/lib/cart/cartService";
 import { analyticsService } from "@/utils/analytics/analyticsService";
-import { formatPrice } from "@/utils/priceFormatter";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 const COMPOUNDED_ORIGINAL_PRICES = {
   tirzepatide: "$389",
@@ -385,7 +385,7 @@ const CartItem = ({ item, setCartItems, allItems, hasCoupon = false }) => {
                 <>
                   <p className="text-[12px] font-[400] text-[#212121] inline">
                     {currencySymbol}
-                    {formatPrice(itemPrice)}{" "}
+                    {formatPriceUI(itemPrice)}{" "}
                   </p>
                   <p className="text-[12px] font-[400] text-[#212121] inline">
                     / {isSubscriptionWithFallback && intervalText}
@@ -413,14 +413,14 @@ const CartItem = ({ item, setCartItems, allItems, hasCoupon = false }) => {
               {compoundedPlanInfo && (
                 <div className="mt-1">
                   <p className="text-[12px] font-[400] text-[#212121]">
-                    {currencySymbol}{formatPrice(itemTotalPrice)} / {intervalText}
+                    {currencySymbol}{formatPriceUI(itemTotalPrice)} / {intervalText}
                   </p>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <span className="text-[11px] text-[#999999] line-through">
                       {compoundedPlanInfo.originalPrice}/mo
                     </span>
                     <span className="text-[11px] font-[600] text-[#212121]">
-                      {currencySymbol}{formatPrice(itemTotalPrice / compoundedPlanInfo.months)}/mo
+                      {currencySymbol}{formatPriceUI(itemTotalPrice / compoundedPlanInfo.months)}/mo
                     </span>
                   </div>
                 </div>
@@ -479,7 +479,7 @@ const CartItem = ({ item, setCartItems, allItems, hasCoupon = false }) => {
                 <><span className="woocommerce-Price-currencySymbol">
                   {currencySymbol}
                 </span>
-                {formatPrice(itemTotalPrice)}</>
+                {formatPriceUI(itemTotalPrice)}</>
               )}
             </bdi>
           </span>
