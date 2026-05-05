@@ -27,7 +27,7 @@ export const useBOSimplifiedFlow = () => {
         clearQuizData,
     } = useBOQuizData();
 
-    // Prevent repeated popups by tracking which popups have been shown in userData.
+    // Prevent, repeated popups by tracking which popups have been shown in userData.
     const handleContinue = () => {
         const stepConfig = boSimplifiedConfig.steps[currentStep];
         // Only show popup if not already shown for this step
