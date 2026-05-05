@@ -5,6 +5,17 @@ const STORAGE_KEY = "wl_flow2_quiz_data";
 
 // Add isAuthenticated param to control step skipping
 export const useStepNavigation = (quizConfig) => {
+  // Helper used only inside lazy initializers — resolves the first eligible step
+  // for an authenticated user starting from `startStep`.
+  const resolveStepForAuth = (startStep) => {
+    if (!isUserAuthenticated()) return startStep;
+    let step = startStep;
+    while (quizConfig.steps[step]?.passIf === "authenticate") {
+      step = quizConfig.navigation[step] || step + 1;
+    }
+    return step;
+  };
+
   // Initialize from localStorage if available
   const [currentStep, setCurrentStep] = useState(() => {
     if (typeof window !== "undefined") {
@@ -12,7 +23,7 @@ export const useStepNavigation = (quizConfig) => {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
           const parsed = JSON.parse(stored);
-          return parsed.currentStep || 1;
+          return resolveStepForAuth(parsed.currentStep || 1);
         }
       } catch (e) {
         console.error("Failed to load currentStep from localStorage:", e);
@@ -27,13 +38,9 @@ export const useStepNavigation = (quizConfig) => {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (parsed.progressPercent !== undefined) {
-            return parsed.progressPercent;
-          }
-          // Fallback to calculate from currentStep
-          if (parsed.currentStep) {
-            return quizConfig.progressMap[parsed.currentStep] || 0;
-          }
+          // Resolve the actual starting step (skip guest-only if authenticated)
+          const resolvedStep = resolveStepForAuth(parsed.currentStep || 1);
+          return quizConfig.progressMap[resolvedStep] || 0;
         }
       } catch (e) {
         console.error("Failed to load progressPercent from localStorage:", e);
