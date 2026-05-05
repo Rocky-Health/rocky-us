@@ -299,6 +299,10 @@ export async function POST(req) {
             }
         }
 
+
+        cookieStore.delete("new-bo-preqiz-data");
+        cookieStore.delete("new-bo-essential-consul"); 
+
         // If no valid register_step provided
         return NextResponse.json(
             {
