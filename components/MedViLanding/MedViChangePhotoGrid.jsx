@@ -41,7 +41,7 @@ export default function MedViChangePhotoGrid({ tiles = defaultTiles }) {
 
     return (
         <div className="w-full">
-            <div className="text-center max-w-3xl mx-auto mb-10 md:mb-12 lg:mb-14 px-4">
+            <div className="text-center max-w-3xl mx-auto mb-10  md:mb-12 lg:mb-14 px-4">
                 <h2 className="headers-font text-[#1a1a1a] sm:text-[28px] text-[24px] leading-[115%] font-[500]  tracking-tight mb-3">
                     The change we&apos;ve all been waiting for.
                 </h2>
