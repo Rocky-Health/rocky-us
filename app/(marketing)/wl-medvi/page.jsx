@@ -32,9 +32,9 @@ export default function WlMedViPage() {
 
     return (
         <>
+            <MedViPromoBanner />
+            <MedViNav ctaHref={ctaHref} />
             <main className="min-h-screen ">
-                <MedViPromoBanner />
-                <MedViNav ctaHref={ctaHref} />
                 <MedViHero ctaHref={ctaHref} />
             </main>
 
@@ -52,7 +52,7 @@ export default function WlMedViPage() {
                 <MedViWeightCalculator ctaHref={ctaHref} />
             </Section>
 
-            <Section bg="bg-white">
+            <Section bg="bg-white !px-0">
                 <MedViChangePhotoGrid />
                 <MedViChangeStatsRow />
             </Section>

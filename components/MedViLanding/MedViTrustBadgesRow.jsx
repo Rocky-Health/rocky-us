@@ -41,7 +41,7 @@ export default function MedViTrustBadgesRow({
 }) {
     return (
         <div
-            className={`border-y border-[#E2E2E1] bg-white px-5 sectionWidth:px-0 ${className}`}
+            className={`border-y border-[#E2E2E1] bg-white px-5 sectionWidth:px-0 ${className} max-w-[2000px] mx-auto`}
         >
             <ul
                 className="mx-auto grid  grid-cols-2 lg:grid-cols-4"
@@ -50,14 +50,14 @@ export default function MedViTrustBadgesRow({
                 {badges.map((badge, i) => (
                     <li
                         key={badge.id}
-                        className={`flex items-center justify-center gap-2.5 border-[#E2E2E1] px-3 py-7 sm:px-5 lg:py-8 ${
+                        className={`flex sm:items-center justify-center sm:flex-row flex-col sm:gap-2.5 gap-3 border-[#E2E2E1] px-3 py-7 sm:px-5 lg:py-8 ${
                             i % 2 === 0 ? "border-r" : ""
                         } ${i < 2 ? "border-b" : ""} lg:border-b-0 ${
                             i < 3 ? "lg:border-r" : ""
                         }`}
                     >
                         <BadgeIcon id={badge.id} />
-                        <span className="poppins-font text-left text-[11px] font-[500] leading-snug text-[#2d2d2d] sm:text-lg">
+                        <span className="poppins-font text-left text-sm font-[500] leading-snug text-[#2d2d2d] sm:text-lg">
                             {badge.label}
                         </span>
                     </li>

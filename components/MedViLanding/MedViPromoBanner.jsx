@@ -12,8 +12,8 @@ const MedViPromoBanner = ({
 }) => {
     return (
         <div className="w-full bg-black py-3 px-4 md:py-3.5">
-            <div className="max-w-4xl mx-auto flex items-center justify-center gap-2 sm:gap-4 md:gap-10">
-                <div className="shrink-0 w-11 h-11 sm:w-14 sm:h-14 md:w-[72px] md:h-[72px] flex items-center justify-center">
+            <div className="max-w-xl mx-auto flex items-center justify-center gap-2 sm:gap-4 md:gap-10 relative">
+                <div className="shrink-0 w-11 h-11 sm:w-14 sm:h-14 md:w-[72px] md:h-[72px] flex items-center justify-center absolute left-0 z-5">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                         src={fireworksLeftSrc}
@@ -22,27 +22,27 @@ const MedViPromoBanner = ({
                     />
                 </div>
 
-                <div className="flex flex-col items-center gap-1 min-w-0 ">
+                <div className="flex flex-col items-center gap-1 min-w-0 relative z-10">
                     <div
-                        className="rounded-full px-4 py-1.5 md:px-8 md:py-2 text-center shadow-sm max-w-[min(100%,520px)]"
+                        className="rounded-full sm:px-6 px-3 py-1.5  md:py-2 text-center shadow-sm max-w-[min(100%,460px)]"
                         style={{
                             background:
-                                "linear-gradient(90deg, #f7e290 0%, #c5a059 100%)",
+                                "linear-gradient(135deg,#fde68a,#c6a673,#c6a673)",
                         }}
                     >
-                        <p className="text-black text-lg font-bold leading-tight tracking-wide">
+                        <p className="text-black sm:text-lg text-base font-bold leading-tight tracking-wide">
                             SPRING Discount Applied!
                         </p>
-                        <p className="text-black text-xs  font-normal leading-snug mt-0.5">
+                        <p className="text-black sm:text-xs text-[10px]  font-normal leading-snug mt-0">
                             Just $149 + Fast, Free Shipping
                         </p>
                     </div>
-                    <p className="text-white text-base text-center leading-tight tracking-normal pt-2">
+                    <p className="text-white sm:text-base text-xs text-center leading-tight tracking-normal pt-2">
                         + Fully backed by our guarantee!
                     </p>
                 </div>
 
-                <div className="shrink-0 w-11 h-11 sm:w-14 sm:h-14 md:w-[72px] md:h-[72px] flex items-center justify-center">
+                <div className="shrink-0 w-11 h-11 sm:w-14 sm:h-14 md:w-[72px] md:h-[72px] flex items-center justify-center absolute right-0 z-5">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                         src={fireworksRightSrc}

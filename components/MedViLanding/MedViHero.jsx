@@ -51,7 +51,7 @@ const CHECK_ITEMS = [
 ];
 
 /** Rocky WL palette (matches GLP1 / body optimization landers) */
-const BTN_PRIMARY = "bg-[#013D3D] hover:bg-[#012a2a] text-white shadow-sm";
+const BTN_PRIMARY = "bg-black hover:bg-[#2d2d2d] text-white shadow-sm";
 const ACCENT_TEXT = "text-[#AE7E56]";
 const CHECK_BG = "bg-[#AE7E56]";
 
@@ -124,7 +124,7 @@ function HeroImageCard({
     return (
         // eslint-disable-next-line @next/next/no-img-element
         <div
-            className={`${containerClassName} ps-0 sm:py-1 py-2 sm:pe-2 pe-3 lg:p-2 overflow-hidden w-full h-full`}
+            className={`${containerClassName} ps-0 sm:pt-2 pt-2 sm:pe-2 pe-2 lg:p-2 overflow-hidden w-full h-full`}
         >
             <div className={`${base} overflow-hidden w-full h-full`}>
                 <CustomImage
@@ -150,10 +150,10 @@ function HeroImageCard({
 
 function ChecklistAndCta({ ctaHref }) {
     return (
-        <div className="flex flex-col gap-7 lg:gap-8 w-full max-w-xl mx-auto lg:max-w-none text-left">
-            <ul className="flex flex-col gap-2 md:gap-2.5 w-fit mx-auto">
+        <div className="flex flex-col gap-7 lg:gap-8 w-full max-w-xl mx-auto lg:max-w-none text-left sm:px-4 px-2">
+            <ul className="flex flex-col gap-1 sm:gap-2 md:gap-2.5 w-fit mx-auto">
                 {CHECK_ITEMS.map(({ key, node }) => (
-                    <li key={key} className="flex items-center gap-3">
+                    <li key={key} className="flex items-center sm:gap-3 gap-2">
                         <CheckIcon />
                         <span className="text-[#38312c] text-[14px] leading-snug">
                             {node}
@@ -185,13 +185,13 @@ const MedViHero = ({ ctaHref = "/wl-pre-consultation" }) => {
     return (
         <section className="bg-[linear-gradient(180deg, #F5F4EF 0%, rgba(255, 255, 255, 0.00) 100%)] pb-12 md:pb-16 pt-8 md:pt-12">
             <div className="max-w-7xl mx-auto ">
-                <div className="text-center max-w-4xl mx-auto px-4 md:px-0">
+                <div className="text-center max-w-4xl mx-auto sm:px-4 px-2 md:px-0">
                     <p className=" text-sm md:text-base mb-4 md:mb-5">
                         Join <strong className=" font-bold">500,000+</strong>{" "}
                         MyRocky patients
                     </p>
 
-                    <h1 className="text-[1.65rem] sm:text-3xl md:text-[2.35rem] lg:text-[3rem] font-medium  !leading-tight subheaders-font tracking-normal">
+                    <h1 className="text-2xl sm:text-3xl md:text-[2.35rem] lg:text-[3rem] font-medium  !leading-tight subheaders-font tracking-normal">
                         Finally serious about weight loss? Shed your fat{" "}
                         <span className={`${ACCENT_TEXT} font-semibold`}>
                             by {headlineDeadlineMonth}

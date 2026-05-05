@@ -10,8 +10,8 @@ import { useRef } from "react";
 
 const TierCard = ({ tier, ctaHref }) => {
     return (
-        <div className="min-w-[280px] md:min-w-[340px] w-full rounded-[40px] pb-4  overflow-visible group bg-[#F5F4EF44] shadow">
-            <div className="relative w-full h-[300px] md:h-[380px] bg-[linear-gradient(180deg,#F0EEEA_0%,#F0EEEA_60%,rgba(255,255,255,0)_60%,rgba(255,255,255,0)_100%)] rounded-t-[40px] overflow-visible">
+        <div className="sm:min-w-[340px] min-w-[300px] w-full rounded-[40px] pb-4  overflow-visible group bg-[#F5F4EF44] shadow">
+            <div className="relative w-full h-[380px] bg-[linear-gradient(180deg,#F0EEEA_0%,#F0EEEA_60%,rgba(255,255,255,0)_60%,rgba(255,255,255,0)_100%)] rounded-t-[40px] overflow-visible">
                 <div className="absolute inset-0 -top-10 -left-4 -right-4 flex items-center justify-center">
                     <CustomImage
                         src={tier.image}
@@ -59,14 +59,14 @@ const MedViProductTiers = ({ ctaHref = "#" }) => {
     return (
         <div className="container mx-auto py-20">
             <ScrollReveal>
-                <div className="flex items-center justify-between px-10 pb-6">
-                    <h2 className="headers-font text-black text-[32px]  leading-[115%] tracking-[-0.72px] md:tracking-[-0.96px] mb-1 text-start">
+                <div className="flex lg:items-center justify-between lg:px-10 pb-6 lg:flex-row flex-col">
+                    <h2 className="headers-font text-black sm:text-[28px] text-[24px] leading-[115%] tracking-[-0.72px] md:tracking-[-0.96px] mb-1 text-start">
                         Trusted by experts.
-                        <span className="headers-font text-[#AE7E56] text-[32px]  leading-[115%] tracking-[-0.72px] md:tracking-[-0.96px] italic mb-4 md:mb-6 block">
+                        <span className="headers-font text-[#AE7E56] leading-[115%] tracking-[-0.72px] md:tracking-[-0.96px] mb-4 md:mb-6 block">
                             priced for you.
                         </span>
                     </h2>
-                    <p className="poppins-font text-[rgba(0,0,0,0.70)] text-sm font-[400] leading-[140%] mb-10 md:mb-14 max-w-[660px] ms-auto text-start">
+                    <p className="poppins-font text-[rgba(0,0,0,0.70)] text-sm font-[400] leading-[140%] mb-10 md:mb-14 lg:max-w-[660px] lg:ms-auto text-start">
                         Find the right GLP-1 medication with the confidence that
                         comes from knowing it is{" "}
                         <span className="text-[#AE7E56] font-[500]">

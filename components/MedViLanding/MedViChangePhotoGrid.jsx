@@ -1,14 +1,16 @@
 import CustomImage from "@/components/utils/CustomImage";
 import { WL_MEDVI_CHANGE_GRID_TILES as defaultTiles } from "@/components/MedViLanding/wlMedViChangeGridImages";
 
-function PhotoCell({ src, alt, className }) {
+function PhotoCell({ src, alt, className, classNameContainer = "" }) {
     const hasSrc = Boolean(src);
     return (
         <div
-            className={`relative overflow-hidden  bg-[#E2E2E1] shadow-sm rounded-[40px] ${className}`}
+            className={`relative lg:pe-0 pe-2 sm:pe-2 lg:pb-0 sm:pb-4 pb-2 overflow-hidden  ${className}`}
         >
             {hasSrc ? (
-                <div className="relative w-full h-full overflow-hidden">
+                <div
+                    className={`relative w-full h-full overflow-hidden rounded-[40px] ${classNameContainer}`}
+                >
                     <CustomImage
                         src={src}
                         alt={alt || "Patient"}
@@ -39,8 +41,8 @@ export default function MedViChangePhotoGrid({ tiles = defaultTiles }) {
 
     return (
         <div className="w-full">
-            <div className="text-center max-w-3xl mx-auto mb-10 md:mb-12 lg:mb-14">
-                <h2 className="headers-font text-[#1a1a1a] text-[1.75rem] sm:text-3xl  font-[500] leading-[1.15] tracking-tight mb-3">
+            <div className="text-center max-w-3xl mx-auto mb-10 md:mb-12 lg:mb-14 px-4">
+                <h2 className="headers-font text-[#1a1a1a] sm:text-[28px] text-[24px] leading-[115%] font-[500]  tracking-tight mb-3">
                     The change we&apos;ve all been waiting for.
                 </h2>
                 <p className="poppins-font text-[#6b6b6b] text-sm leading-[1.5]">
@@ -52,39 +54,44 @@ export default function MedViChangePhotoGrid({ tiles = defaultTiles }) {
             </div>
 
             {/* Desktop: col1 stacked | col2 stacked | tall center rowspan 2 | col4 stacked */}
-            <div className="hidden lg:grid lg:grid-cols-[1fr_1fr_1.12fr_1fr] lg:grid-rows-6 lg:gap-5 lg:h-[clamp(460px,50vw,540px)] ">
+            <div className=" grid sm:grid-cols-[1fr_1.12fr_1.12fr_1fr] grid-cols-[1fr_1.12fr_1fr] sm:grid-rows-6 grid-rows-4 lg:gap-5 h-[clamp(360px,50vw,540px)] ">
                 <PhotoCell
                     {...c1Top}
-                    className="lg:col-start-1 lg:row-start-1 lg:min-h-0 lg:h-full row-span-2"
+                    className="col-start-1 row-start-1 min-h-0 h-full sm:row-span-2 row-span-1 lg:mt-0 sm:mt-10 mt-4"
+                    classNameContainer="lg:rounded-l-[40px] rounded-l-none"
                 />
                 <PhotoCell
                     {...c1Bot}
-                    className="lg:col-start-1 lg:row-start-3 lg:min-h-0 lg:h-full row-span-4"
+                    className="col-start-1 sm:row-start-3 row-start-2 min-h-0 h-full sm:row-span-4 row-span-3 lg:mt-0 sm:mt-10 mt-4"
+                    classNameContainer="lg:rounded-l-[40px] rounded-l-none"
                 />
                 <PhotoCell
                     {...c2Top}
-                    className="lg:col-start-2 lg:row-start-1 lg:min-h-0 lg:h-full row-span-3"
+                    className="col-start-2 row-start-1 sm:min-h-0 sm:h-full sm:row-span-3 row-span-2 lg:mt-0 sm:mt-4 mt-2"
                 />
                 <PhotoCell
                     {...c2Bot}
-                    className="lg:col-start-2 lg:row-start-4 lg:min-h-0 lg:h-full row-span-3"
+                    className="col-start-2 sm:row-start-4 row-start-3 sm:min-h-0 sm:h-full sm:row-span-3 row-span-2 lg:mt-0 sm:mt-4 mt-0"
                 />
                 <PhotoCell
                     {...center}
-                    className="lg:col-start-3 lg:row-start-1 lg:row-span-6 lg:min-h-0 lg:h-full"
+                    className="col-start-3 sm:row-start-1 row-span-6 sm:min-h-0 sm:h-full lg:mt-0 sm:mt-4  sm:!pe-2 !pe-0 "
+                    classNameContainer="sm:rounded-r-[40px] rounded-r-none"
                 />
                 <PhotoCell
                     {...c4Top}
-                    className="lg:col-start-4 lg:row-start-1 lg:min-h-0 lg:h-full row-span-4"
+                    className="sm:col-start-4 sm:row-start-1 sm:min-h-0 sm:h-full row-span-4 !pe-0 sm:block hidden"
+                    classNameContainer="lg:rounded-r-[40px] rounded-r-none"
                 />
                 <PhotoCell
                     {...c4Bot}
-                    className="lg:col-start-4 lg:row-start-5 lg:min-h-0 lg:h-full row-span-2"
+                    className="sm:col-start-4 sm:row-start-5 sm:min-h-0 sm:h-full row-span-2 !pe-0 sm:block hidden"
+                    classNameContainer="lg:rounded-r-[40px] rounded-r-none"
                 />
             </div>
 
             {/* Tablet / mobile: 2-column flow */}
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:hidden">
+            {/* <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:hidden">
                 <PhotoCell {...c1Top} className="aspect-[5/4] min-h-[120px]" />
                 <PhotoCell {...c2Top} className="aspect-[4/5] min-h-[120px]" />
                 <PhotoCell {...c1Bot} className="aspect-[4/5] min-h-[120px]" />
@@ -95,7 +102,7 @@ export default function MedViChangePhotoGrid({ tiles = defaultTiles }) {
                 />
                 <PhotoCell {...c4Top} className="aspect-square min-h-[120px]" />
                 <PhotoCell {...c4Bot} className="aspect-[5/3] min-h-[120px]" />
-            </div>
+            </div> */}
         </div>
     );
 }

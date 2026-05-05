@@ -10,15 +10,15 @@ import TrustpilotReviewsFallback from "@/components/ui/trustpilotFallback/Trustp
 /** Two-column “raving about us” strip — matches MEDVi lander comp (sage + charcoal). */
 function MedViRavingIntro({ ctaHref = "/wl-pre-consultation" }) {
     return (
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8 lg:gap-10 xl:gap-16 mb-10 md:mb-12 lg:mb-14 text-left px-8">
-            <h2 className="headers-font text-[#33302E] text-[1.65rem]  leading-[1.12] tracking-[-0.02em] lg:max-w-[min(100%,520px)] lg:flex-1">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between sm:gap-8 gap-4 lg:gap-10 xl:gap-16 mb-10 md:mb-12 lg:mb-14 text-left sm:px-8 px-0">
+            <h2 className="headers-font text-[#33302E] sm:text-[28px] text-[24px] leading-[115%] tracking-[-0.64px] lg:max-w-[min(100%,520px)] lg:flex-1">
                 There&apos;s a reason people are{" "}
                 <span className="text-[#AE7E56] font-[600] block">
                     raving about us.
                 </span>
             </h2>
             <div className="flex w-full flex-col lg:max-w-[min(100%,600px)]">
-                <p className="poppins-font text-[#666666] text-sm font-[400] leading-[1.55] mb-6">
+                <p className="poppins-font text-[#666666] text-sm font-[400] leading-[150%] mb-6">
                     Join the thousands of people who have trusted{" "}
                     <span className="font-medium text-[#33302E]">MEDVi</span> to
                     help change their lives, achieving significant,{" "}
@@ -28,7 +28,7 @@ function MedViRavingIntro({ ctaHref = "/wl-pre-consultation" }) {
                 </p>
                 <Link
                     href={ctaHref}
-                    className="bg-black text-white rounded-full inline-flex items-center justify-center px-12 py-2.5 text-[14px] font-[600] tracking-[0.5px] uppercase hover:translate-y-[-3px] transition-all duration-300 hover:shadow-xl w-fit"
+                    className="bg-black text-white rounded-full inline-flex items-center justify-center px-12 py-2.5 text-[14px] font-[600] tracking-[0.5px] uppercase hover:translate-y-[-3px] transition-all duration-300 hover:shadow-xl sm:w-fit w-full"
                 >
                     I&apos;M READY, LET&apos;S GO
                 </Link>

@@ -48,7 +48,7 @@ const MedViThreeStepProcess = ({ ctaHref = "#" }) => {
     return (
         <div className="flex flex-col md:flex-row gap-10 md:gap-16">
             <div className="w-full md:w-5/12 md:sticky md:top-24 md:self-start">
-                <h2 className="headers-font text-black text-3xl tracking-[-0.64px] mb-4 md:mb-6 md:pe-28">
+                <h2 className="headers-font text-black sm:text-[28px] text-[24px] leading-[115%] tracking-[-0.64px] mb-4 md:mb-6 md:pe-28">
                     Begin your weight loss journey with Rocky.
                 </h2>
                 <p className="poppins-font text-[rgba(0,0,0,0.70)] text-sm font-[400] leading-[150%] mb-6">
@@ -60,7 +60,7 @@ const MedViThreeStepProcess = ({ ctaHref = "#" }) => {
                 </p>
                 <Link
                     href={ctaHref}
-                    className="bg-black text-white rounded-full inline-flex items-center justify-center px-12 py-2.5 text-[14px] font-[600] tracking-[0.5px] uppercase hover:translate-y-[-3px] transition-all duration-300 hover:shadow-xl"
+                    className="bg-black text-white rounded-full inline-flex items-center justify-center px-12 py-2.5 text-[14px] font-[600] tracking-[0.5px] uppercase hover:translate-y-[-3px] transition-all duration-300 hover:shadow-xl sm:w-fit w-full"
                 >
                     Get Started
                 </Link>
@@ -82,7 +82,7 @@ const MedViThreeStepProcess = ({ ctaHref = "#" }) => {
                                 ref={(el) => {
                                     stepRefs.current[index] = el;
                                 }}
-                                className="relative pl-10 md:pl-14"
+                                className="relative pl-14 md:pl-14"
                             >
                                 <div
                                     className={`absolute left-0 top-0 w-6 h-6 md:w-8 md:h-8 rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
@@ -114,7 +114,7 @@ const MedViThreeStepProcess = ({ ctaHref = "#" }) => {
                                     </p>
 
                                     {step.image && (
-                                        <div className="relative w-full h-[200px] md:h-[280px] rounded-[56px] overflow-hidden">
+                                        <div className="relative w-full h-[200px] md:h-[280px] sm:rounded-[56px] rounded-2xl overflow-hidden">
                                             <CustomImage
                                                 src={step.image}
                                                 alt={step.title}

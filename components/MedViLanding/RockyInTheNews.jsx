@@ -35,21 +35,21 @@ const RockyInTheNews = ({ cards }) => {
     return (
         <div className=" sectionWidth:px-0">
             <div className=" mx-auto relative overflow-hidden w-full  py-10 ">
-                <div className="md:hidden bg-[linear-gradient(270deg,rgba(255,255,255,0)_0%,#ffffff_100%)] absolute -right-[5px] md:right-0 top-[85px] w-[80px] h-[39px] z-10 rotate-[180deg]"></div>
-                <div className="md:hidden bg-[linear-gradient(270deg,rgba(255,255,255,0)_0%,#ffffff_100%)] absolute -left-[5px] md:left-0 top-[85px] w-[80px] h-[39px] z-10"></div>
-                <div className="text-sm leading-[140%] font-medium mb-2 text-center">
+                {/* <div className="md:hidden bg-[linear-gradient(270deg,rgba(255,255,255,0)_0%,#ffffff_100%)] absolute -right-[5px] md:right-0 top-[85px] w-[80px] h-[39px] z-10 rotate-[180deg]"></div>
+                <div className="md:hidden bg-[linear-gradient(270deg,rgba(255,255,255,0)_0%,#ffffff_100%)] absolute -left-[5px] md:left-0 top-[85px] w-[80px] h-[39px] z-10"></div> */}
+                <div className="text-sm leading-[140%] font-normal mb-0.5 text-center">
                     MyRocky IN THE NEWS
                 </div>
                 <div className="relative">
-                    <div className="absolute left-0 top-0 w-[120px] h-full z-10 bg-[linear-gradient(270deg,rgba(255,255,255,0)_10%,#ffffff_100%)]"></div>
-                    <div className="absolute right-0 top-0 w-[120px] h-full z-10 bg-[linear-gradient(90deg,rgba(255,255,255,0)_0%,#ffffff_100%)]"></div>
-                    <div className="flex items-center gap-[40px] md:gap-[82px] whitespace-nowrap w-fit h-[39px]  animate-scroll border-y border-solid border-[#E2E2E199] py-14 relative">
+                    <div className="hidden lg:block absolute left-0 top-0 w-[120px] h-full z-10 bg-[linear-gradient(270deg,rgba(255,255,255,0)_10%,#ffffff_100%)]"></div>
+                    <div className="hidden lg:block absolute right-0 top-0 w-[120px] h-full z-10 bg-[linear-gradient(90deg,rgba(255,255,255,0)_0%,#ffffff_100%)]"></div>
+                    <div className="flex items-center gap-[40px] md:gap-[82px] whitespace-nowrap w-fit h-[39px]  animate-scroll border-y border-solid border-[#E2E2E199] lg:py-14 py-10 relative">
                         {dataToUse.concat(dataToUse).map((card, index) => (
                             <div
                                 key={index}
                                 className="flex-shrink-0 min-w-[150px] max-w-[300px]"
                             >
-                                <div className="relative rounded-2xl overflow-hidden w-full min-h-[30px] flex justify-center items-center filter grayscale brightness-0">
+                                <div className="relative rounded-2xl overflow-hidden w-full lg:min-h-[30px] min-h-[25px] flex justify-center items-center filter grayscale brightness-0">
                                     <CustomContainImage
                                         src={card.image}
                                         // className="object-contain filter brightness-0 grayscale"

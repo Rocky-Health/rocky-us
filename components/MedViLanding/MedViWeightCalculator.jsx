@@ -15,7 +15,7 @@ const MedViWeightCalculator = ({ ctaHref = "#" }) => {
     return (
         <div className="flex flex-col md:flex-row items-center gap-10 md:gap-16">
             <div className="w-full md:w-[38%]">
-                <h2 className="headers-font text-black text-[32px] leading-[115%] tracking-[-0.64px] mb-4 md:mb-6 lg:pe-20">
+                <h2 className="headers-font text-black sm:text-[28px] text-[24px] leading-[115%] tracking-[-0.64px] mb-4 md:mb-6 lg:pe-20">
                     Want to{" "}
                     <span className="text-[#AE7E56] font-[600]">
                         reach your goal
@@ -36,7 +36,7 @@ const MedViWeightCalculator = ({ ctaHref = "#" }) => {
                 </p>
                 <Link
                     href={ctaHref}
-                    className="bg-black text-white rounded-full inline-flex items-center justify-center px-12 py-2.5 text-[14px] font-[600] tracking-[0.5px] uppercase hover:translate-y-[-3px] transition-all duration-300 hover:shadow-xl"
+                    className="bg-black text-white rounded-full  items-center justify-center px-12 py-2.5 text-[14px] font-[600] tracking-[0.5px] uppercase hover:translate-y-[-3px] transition-all duration-300 hover:shadow-xl md:inline-flex hidden"
                 >
                     Get Started
                 </Link>

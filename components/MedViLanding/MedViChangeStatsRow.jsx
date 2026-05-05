@@ -36,8 +36,8 @@ function CheckIcon() {
 
 export default function MedViChangeStatsRow() {
     return (
-        <div className="w-full pt-16 px-10">
-            <ul className="flex flex-col gap-8 md:gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
+        <div className="w-full sm:pt-16 pt-10 sm:px-10 px-6">
+            <ul className="flex flex-col sm:gap-4 gap-2 md:gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
                 {STAT_ITEMS.map(({ key, text }) => (
                     <li
                         key={key}
@@ -50,7 +50,7 @@ export default function MedViChangeStatsRow() {
                     </li>
                 ))}
             </ul>
-            <p className="mt-4 text-left text-[10px] text-[#8a8a8a] leading-relaxed max-w-2xl">
+            <p className="sm:mt-4 mt-2 text-left text-[10px] text-[#8a8a8a] leading-relaxed max-w-2xl">
                 * Data based on MyRocky patients over their first 6 months of
                 treatment
             </p>

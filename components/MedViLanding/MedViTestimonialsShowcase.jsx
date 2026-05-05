@@ -9,10 +9,10 @@ import {
 
 const ScatteredQuote = ({ quote, className }) => (
     <div className={`text-center md:text-left ${className}`}>
-        <p className="headers-font text-[rgba(0,0,0,0.15)] text-[22px] md:text-[26px] font-[500] leading-[130%] mb-1">
+        <p className="headers-font text-[rgba(0,0,0,0.15)] sm:text-[22px] text-[18px] md:text-[26px] font-[500] leading-[130%] mb-1">
             &ldquo;{quote}&rdquo;
         </p>
-        <p className="flex items-center gap-1 justify-center md:justify-start text-[rgba(0,0,0,0.12)] text-[16px] font-medium">
+        <p className="flex items-center gap-1 justify-center md:justify-start text-[rgba(0,0,0,0.12)] sm:text-[16px] text-[14px] font-medium">
             <FaCheckCircle className="text-[rgba(0,0,0,0.12)] w-4 h-4" />
             Verified Rocky Customer
         </p>
@@ -34,27 +34,27 @@ const MedViTestimonialsShowcase = () => {
                 ))}
             </div>
 
-            <div className="w-[70%] mx-auto ">
-                <h2 className="headers-font text-[#000000] text-[28px] md:text-[46px] leading-[115%] tracking-[-0.56px] md:tracking-[-0.84px] mb-4 font-light">
+            <div className="md:w-[70%] mx-auto ">
+                <h2 className="headers-font text-[#000000] sm:text-[28px] text-[24px] md:text-[46px] leading-[115%] tracking-[-0.56px] md:tracking-[-0.84px] sm:mb-4 mb-2 font-light">
                     &quot;{featuredTestimonial.quote}{" "}
                     <span className="text-[#AE7E56] font-bold">
                         {featuredTestimonial.highlight}
                     </span>
                     &quot;
                 </h2>
-                <p className="flex items-center gap-2 justify-end text-[rgba(0,0,0,0.80)] text-[14px] font-medium mb-16 md:mb-20 me-6">
-                    <FaCheckCircle className="text-[#4CAF50] w-4 h-4" />
+                <p className="flex items-center sm:gap-2 gap-1 sm:justify-end justify-center text-[rgba(0,0,0,0.80)] sm:text-[14px] text-[12px] font-medium mb-16 md:mb-20 sm:me-6">
+                    <FaCheckCircle className="text-[#4CAF50] sm:w-4 w-3 sm:h-4 h-3" />
                     {featuredTestimonial.attribution}
                 </p>
             </div>
 
             <div
-                className="hidden md:flex justify-center pointer-events-none"
+                className="flex justify-center pointer-events-none sm:top-[22%] top-[22%]"
                 style={{
                     position: "absolute",
                     left: 0,
                     right: 0,
-                    top: "22%",
+
                     zIndex: 10,
                 }}
             >
@@ -64,55 +64,55 @@ const MedViTestimonialsShowcase = () => {
                         alt="GLP-1 Medication"
                         width={480}
                         height={680}
-                        className="object-contain drop-shadow-xl rotate-12"
+                        className="object-contain drop-shadow-xl rotate-12 md:w-[480px] w-[320px]"
                     />
                 </div>
             </div>
 
-            <div className="relative max-w-[1100px] mx-auto min-h-[500px] md:min-h-[600px] hidden md:block  overflow-hidden">
+            <div className="relative max-w-[1100px] mx-auto sm:min-h-[500px] min-h-[400px] md:min-h-[600px]  block  overflow-hidden">
                 <ScatteredQuote
                     quote={scatteredTestimonials[0]}
-                    className="absolute top-[5%] left-[2%] max-w-[250px]"
+                    className="absolute top-[5%] md:left-[2%] -left-[10%] max-w-[250px]"
                 />
                 <ScatteredQuote
                     quote={scatteredTestimonials[1]}
-                    className="absolute top-[8%] right-[12%] max-w-[260px]"
+                    className="absolute top-[8%] md:right-[12%] -right-[10%] max-w-[260px]"
                 />
                 <ScatteredQuote
                     quote={scatteredTestimonials[2]}
-                    className="absolute top-[30%] left-[10%] max-w-[260px]"
+                    className="absolute top-[30%] md:left-[10%] -left-[10%] max-w-[260px]"
                 />
                 <ScatteredQuote
                     quote={scatteredTestimonials[3]}
-                    className="absolute top-[30%] right-[12%] max-w-[260px]"
+                    className="absolute top-[30%] md:right-[12%] -right-[10%] max-w-[260px]"
                 />
                 <ScatteredQuote
                     quote={scatteredTestimonials[4]}
-                    className="absolute top-[65%] left-[10%] max-w-[260px]"
+                    className="md:block hidden absolute top-[65%] left-[10%] max-w-[260px]"
                 />
                 <ScatteredQuote
                     quote={scatteredTestimonials[5]}
-                    className="absolute top-[65%] right-[10%] max-w-[260px]"
+                    className="md:block hidden absolute top-[65%] right-[10%] max-w-[260px]"
                 />
                 <ScatteredQuote
                     quote={scatteredTestimonials[6]}
-                    className="absolute top-[80%] right-[40%] max-w-[260px]"
+                    className="md:block hidden absolute top-[80%] right-[40%] max-w-[260px]"
                 />
                 <ScatteredQuote
                     quote={scatteredTestimonials[7]}
-                    className="absolute top-[8%] left-[30%] max-w-[250px]"
+                    className="md:block hidden absolute top-[8%] left-[30%] max-w-[250px]"
                 />
                 <ScatteredQuote
                     quote={scatteredTestimonials[8]}
-                    className="absolute top-[36%] right-[40%] max-w-[260px]"
+                    className="md:block hidden absolute top-[36%] right-[40%] max-w-[260px]"
                 />
                 <ScatteredQuote
                     quote={scatteredTestimonials[9]}
-                    className="absolute top-[88%] right-[9%] max-w-[250px]"
+                    className="md:block hidden absolute top-[88%] right-[9%] max-w-[250px]"
                 />
             </div>
 
-            <div className="md:hidden space-y-6 mt-4">
+            <div className="hidden space-y-6 mt-4">
                 <div className="relative w-[200px] h-[300px] mx-auto mb-6 animate-float">
                     <CustomImage
                         src="/products/glp1-vial.png"
@@ -135,7 +135,7 @@ const MedViTestimonialsShowcase = () => {
                 ))}
             </div>
 
-            <div className="flex justify-center pb-10 pt-20">
+            <div className="flex justify-center pb-10 md:pt-20 pt-10">
                 <CustomImage
                     src="/medvi/hsafsa1.png"
                     alt="HSA FSA logo"
