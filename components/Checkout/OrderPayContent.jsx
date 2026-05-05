@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import Image from "next/image";
 import { logger } from "@/utils/devLogger";
-import { formatPrice } from "@/utils/priceFormatter";
+import { formatPriceUI } from "@/utils/priceFormatter";
 import {
   transformPaymentError,
   isWordPressCriticalError,
@@ -214,7 +214,7 @@ function OrderPayForm({
             Processing Payment...
           </span>
         ) : (
-          `Pay ${order?.currency_symbol || "$"}${formatPrice(parseFloat(order?.total || 0))}`
+          `Pay ${order?.currency_symbol || "$"}${formatPriceUI(parseFloat(order?.total || 0))}`
         )}
       </button>
       <p className="text-[10px] text-gray-700 mt-4 text-center w-full lg:max-w-[512px]">
@@ -425,7 +425,7 @@ function OrderItemDisplay({ item }) {
         </h5>
         <p className="text-[12px]">
           {currencySymbol}
-          {formatPrice(itemTotal)}
+          {formatPriceUI(itemTotal)}
         </p>
         <p className="text-gray-500 mt-1 font-thin text-[12px]">
           Quantity: {item.quantity}
@@ -450,7 +450,7 @@ function OrderTotals({ order }) {
           <span className="text-[#212121]">Subtotal</span>
           <span className="font-medium text-[#212121]">
             {currencySymbol}
-            {formatPrice(subtotal)}
+            {formatPriceUI(subtotal)}
           </span>
         </div>
         {parseFloat(order.shipping_total || 0) > 0 && (
@@ -458,7 +458,7 @@ function OrderTotals({ order }) {
             <span className="text-[#212121]">Shipping</span>
             <span className="font-medium text-[#212121]">
               {currencySymbol}
-              {formatPrice(order.shipping_total)}
+              {formatPriceUI(order.shipping_total)}
             </span>
           </div>
         )}
@@ -467,7 +467,7 @@ function OrderTotals({ order }) {
             <span className="text-[#212121]">Discount</span>
             <span className="font-medium text-green-600">
               -{currencySymbol}
-              {formatPrice(order.discount_total)}
+              {formatPriceUI(order.discount_total)}
             </span>
           </div>
         )}
@@ -476,7 +476,7 @@ function OrderTotals({ order }) {
             <span className="text-[#212121]">Tax</span>
             <span className="font-medium text-[#212121]">
               {currencySymbol}
-              {formatPrice(order.total_tax)}
+              {formatPriceUI(order.total_tax)}
             </span>
           </div>
         )}
@@ -484,7 +484,7 @@ function OrderTotals({ order }) {
           <span className="text-[#212121]">Total</span>
           <span className="text-[#212121]">
             {currencySymbol}
-            {formatPrice(order.total)}
+            {formatPriceUI(order.total)}
           </span>
         </div>
       </div>

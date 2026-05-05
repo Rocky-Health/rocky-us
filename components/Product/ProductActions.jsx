@@ -7,7 +7,7 @@ import CartPopup from "../Cart/CartPopup";
 import { addItemToCart } from "@/lib/cart/cartService";
 import { addRequiredConsultation } from "@/utils/requiredConsultation";
 import { analyticsService } from "@/utils/analytics/analyticsService";
-import { formatPrice } from "@/utils/priceFormatter";
+import { formatPriceUI } from "@/utils/priceFormatter";
 import {
   checkShippingRestriction,
   getUserState,
@@ -301,12 +301,12 @@ const ProductActions = ({
   };
 
   // Create button text with sale price if available
-  const buttonText = `$${formatPrice(finalPrice)} Add to Cart`;
+  const buttonText = `$${formatPriceUI(finalPrice)} Add to Cart`;
 
   // For displaying regular price strikethrough when on sale
   const regularPriceDisplay = hasSalePrice ? (
     <span className="text-gray-500 line-through text-sm ml-2">
-      ${formatPrice(selectedVariation.regular_price)}
+      ${formatPriceUI(selectedVariation.regular_price)}
     </span>
   ) : null;
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { formatPrice } from "@/utils/priceFormatter";
+import { formatPriceUI } from "@/utils/priceFormatter";
 import { getCompoundedPlanInfo } from "./CartItems";
 import CustomImage from "@/components/utils/CustomImage";
 import { logger } from "@/utils/devLogger";
@@ -162,12 +162,12 @@ const Glp2TreatmentCheckoutSummary = ({ cartItems, setCartItems }) => {
   const totalDiscountCents = Number(cartItems?.totals?.total_discount || 0);
   const savingsDisplay =
     totalDiscountCents > 0
-      ? `${currencySymbol}${formatPrice(totalDiscountCents / 100)}`
+      ? `${currencySymbol}${formatPriceUI(totalDiscountCents / 100)}`
       : null;
 
   const coupons = cartItems?.coupons || [];
   const totalPriceCents = Number(cartItems?.totals?.total_price || 0);
-  const totalPriceDisplay = `${currencySymbol}${formatPrice(totalPriceCents / 100)}`;
+  const totalPriceDisplay = `${currencySymbol}${formatPriceUI(totalPriceCents / 100)}`;
 
   const totalItemsCents = Number(cartItems?.totals?.total_items || 0);
   const showOrderTotalStrike =
@@ -187,27 +187,27 @@ const Glp2TreatmentCheckoutSummary = ({ cartItems, setCartItems }) => {
       ? lineSubtotalDollars / compounded.months
       : compoundedOrigMonthly;
     if (strikePerMonth != null) {
-      monthlyStrike = `${currencySymbol}${formatPrice(strikePerMonth)}/mo`;
+      monthlyStrike = `${currencySymbol}${formatPriceUI(strikePerMonth)}/mo`;
     }
     // Current uses line_total so it reflects applied coupons
-    monthlyCurrent = `${currencySymbol}${formatPrice(
+    monthlyCurrent = `${currencySymbol}${formatPriceUI(
       lineTotalDollars / compounded.months,
     )}/mo`;
   } else if (primary) {
     // Monthly plan (months = 1 or no compounded info)
     if (couponReducedPrice) {
-      monthlyStrike = `${currencySymbol}${formatPrice(lineSubtotalDollars)}/mo`;
+      monthlyStrike = `${currencySymbol}${formatPriceUI(lineSubtotalDollars)}/mo`;
     } else if (compoundedOrigMonthly != null) {
-      monthlyStrike = `${currencySymbol}${formatPrice(compoundedOrigMonthly)}/mo`;
+      monthlyStrike = `${currencySymbol}${formatPriceUI(compoundedOrigMonthly)}/mo`;
     }
-    monthlyCurrent = `${currencySymbol}${formatPrice(lineTotalDollars)}/mo`;
+    monthlyCurrent = `${currencySymbol}${formatPriceUI(lineTotalDollars)}/mo`;
   }
 
   // Total row strike: coupon active → plan price; no coupon → retail total
   const totalStrikeDisplay = couponReducedPrice
-    ? `${currencySymbol}${formatPrice(lineSubtotalDollars)}`
+    ? `${currencySymbol}${formatPriceUI(lineSubtotalDollars)}`
     : compounded && compounded.months > 0 && compoundedOrigMonthly != null
-      ? `${currencySymbol}${formatPrice(compoundedOrigMonthly * compounded.months)}`
+      ? `${currencySymbol}${formatPriceUI(compoundedOrigMonthly * compounded.months)}`
       : null;
 
   const thumb =
@@ -320,7 +320,7 @@ const Glp2TreatmentCheckoutSummary = ({ cartItems, setCartItems }) => {
                     ) : null}
                     <span style={{ color: ACCENT_GREEN }}>
                       {currencySymbol}
-                      {formatPrice(lineTotalDollars)}
+                      {formatPriceUI(lineTotalDollars)}
                     </span>
                   </span>
                 </div>
@@ -340,7 +340,7 @@ const Glp2TreatmentCheckoutSummary = ({ cartItems, setCartItems }) => {
                     style={{ color: LABEL_MUTED }}
                   >
                     {currencySymbol}
-                    {formatPrice(totalItemsCents / 100)}
+                    {formatPriceUI(totalItemsCents / 100)}
                   </span>
                 ) : null}
                 {totalPriceDisplay}

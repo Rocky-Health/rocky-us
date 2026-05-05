@@ -1,5 +1,5 @@
 "use client";
-import { formatPrice } from "@/utils/priceFormatter";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 const BrandGenericModal = ({
   isOpen,
@@ -42,11 +42,11 @@ const BrandGenericModal = ({
             <p>Price</p>
             <div>
               <span className="text-[24px] fond-semibold text-[#AE7E56]">
-                ${formatPrice(genericPrice)}
+                ${formatPriceUI(genericPrice)}
               </span>
               &nbsp;
               <del className="text-[18px] text-gray-400">
-                ${formatPrice(brandPrice)}
+                ${formatPriceUI(brandPrice)}
               </del>
             </div>
           </div>

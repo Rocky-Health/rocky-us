@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ProductImage } from "@/components/Product";
 import PropTypes from "prop-types";
-import { formatPrice } from "@/utils/priceFormatter";
+import { formatPriceUI } from "@/utils/priceFormatter";
 // import CustomImage from "@/components/utils/CustomImage";
 
 const ProductDisplay = ({ product, productSlug }) => {
@@ -54,7 +54,7 @@ const ProductDisplay = ({ product, productSlug }) => {
               </p>
 
               <p className="text-lg font-medium mb-4">
-                ${formatPrice(productPrice)}
+                ${formatPriceUI(productPrice)}
               </p>
 
               <div
