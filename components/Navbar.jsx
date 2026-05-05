@@ -7,7 +7,11 @@ import Navlinks from "./Navbar/Navlinks"; // Changed from MegaMenu to Navlinks, 
 import { cookies } from "next/headers";
 import HeaderProudPartner from "./Navbar/HeaderProudPartner";
 
-const Navbar = async ({ className }) => {
+const Navbar = async ({
+  className,
+  hideTrustpilot = false,
+  hidePartnerBanner = false,
+}) => {
   const cookieStore = await cookies();
   const token = cookieStore.get("authToken")?.value;
   const userName = cookieStore.get("userName")?.value;
@@ -29,8 +33,8 @@ const Navbar = async ({ className }) => {
 
   return (
     <header className={`${className || ""}`}>
-      <Trustpilot />
-      <HeaderProudPartner />
+      {!hideTrustpilot && <Trustpilot />}
+      {!hidePartnerBanner && <HeaderProudPartner />}
       <NavContainer>
         {/* <MobileMenu
           menuItems={menuItems}
