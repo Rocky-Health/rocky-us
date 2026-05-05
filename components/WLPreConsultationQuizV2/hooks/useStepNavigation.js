@@ -64,7 +64,7 @@ export const useStepNavigation = (quizConfig) => {
     }
     return [];
   });
-
+ 
   const isAuthenticated = isUserAuthenticated();
 
   // Save to localStorage whenever navigation state changes
@@ -107,11 +107,19 @@ export const useStepNavigation = (quizConfig) => {
     const onPopState = (e) => {
       // Only intercept if we have internal history to go back to
       if (history.length > 0) {
-        // Prevent the browser from actually navigating away
-        const last = history[history.length - 1];
-        setHistory((h) => h.slice(0, -1));
-        setCurrentStep(last);
-        setProgressPercent(quizConfig.progressMap[last] || 0);
+        // Walk back through history skipping guest-only steps
+        let newHistory = [...history];
+        let last;
+        do {
+          last = newHistory[newHistory.length - 1];
+          newHistory = newHistory.slice(0, -1);
+        } while (shouldSkipStep(last) && newHistory.length > 0);
+
+        if (!shouldSkipStep(last)) {
+          setHistory(newHistory);
+          setCurrentStep(last);
+          setProgressPercent(quizConfig.progressMap[last] || 0);
+        }
       }
       // If history is empty (step 1), let the browser navigate normally
     };
@@ -193,13 +201,21 @@ export const useStepNavigation = (quizConfig) => {
   };
 
   const handleBack = (userData) => {
-    // If we have a history stack, pop the last visited step and go there
+    // If we have a history stack, pop steps until we find one that shouldn't be skipped
     if (history.length > 0) {
-      const last = history[history.length - 1];
-      setHistory((h) => h.slice(0, -1));
-      setCurrentStep(last);
-      setProgressPercent(quizConfig.progressMap[last] || 0);
-      return;
+      let newHistory = [...history];
+      let last;
+      do {
+        last = newHistory[newHistory.length - 1];
+        newHistory = newHistory.slice(0, -1);
+      } while (shouldSkipStep(last) && newHistory.length > 0);
+
+      if (!shouldSkipStep(last)) {
+        setHistory(newHistory);
+        setCurrentStep(last);
+        setProgressPercent(quizConfig.progressMap[last] || 0);
+        return;
+      }
     }
 
     // Fallback: walk backward to previous non-skipped step
