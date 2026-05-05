@@ -10,7 +10,7 @@ import BrandGenericModal from "./BrandGenericModal";
 import CrossSellModal from "./CrossSellModal";
 import { getDosageSelection } from "@/utils/dosageCookieManager";
 import { addToCartEarly, finalizeFlowCheckout } from "@/utils/flowCartHandler";
-import { formatPrice } from "@/utils/priceFormatter";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 const EdProductCard = ({ product }) => {
   const router = useRouter();
@@ -382,7 +382,7 @@ const EdProductCard = ({ product }) => {
           onClick={handleProductSelect}
           className="bg-black text-white font-semibold text-center py-3 rounded-full mt-6 w-full"
         >
-          ${formatPrice(currentPrice)} - Select
+          ${formatPriceUI(currentPrice)} - Select
         </button>
 
         <p className="text-[10px] md:text-[12px] leading-[140%] font-[400] mt-[8px]">

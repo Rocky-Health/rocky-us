@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import WLProductCard from "../WLProductCard";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 const ProductRecommendationsStep = ({
   products,
@@ -117,7 +118,7 @@ const ProductRecommendationsStep = ({
               <span>Adding to cart...</span>
             </>
           ) : (
-            <>Proceed - ${selectedProduct?.price || ""} →</>
+            <>Proceed - ${selectedProduct ? formatPriceUI(selectedProduct.price) : ""} →</>
           )}
         </button>
         {!isContinueEnabled && (

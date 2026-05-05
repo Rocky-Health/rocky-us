@@ -8,6 +8,7 @@ import CustomImage from "@/components/utils/CustomImage";
 import { addRequiredConsultation } from "@/utils/requiredConsultation";
 import Loader from "@/components/Loader";
 import { trackMetaProductSelection, logMetaTrackingError } from "@/utils/metaQuestionnaireTracking";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 // Weight loss product IDs that require consultation
 const WEIGHT_LOSS_PRODUCT_IDS = [
@@ -506,7 +507,7 @@ const WLOfferRecommendationStep = ({
           >
             {isCheckoutLoading
               ? "Processing..."
-              : `Proceed - ${selectedProduct?.price || ""} →`}
+              : `Proceed - ${selectedProduct?.price ? `$${formatPriceUI(selectedProduct.price)}` : ""} →`}
           </button>
         </div>
       </div>

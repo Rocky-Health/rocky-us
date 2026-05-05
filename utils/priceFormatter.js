@@ -62,3 +62,30 @@ export const toMoney = (n) => {
   if (!Number.isFinite(num)) return 0;
   return Math.round(num * 100) / 100;
 };
+
+/**
+ * Always show exactly two decimal places for UI (product cards, quizzes).
+ * Accepts number or numeric string (integers included). Strips leading "$"
+ * and commas from strings (e.g. "$1,299.50" -> "1299.50").
+ * @param {number|string} price
+ * @returns {string} e.g. 29 -> "29.00", 29.1 -> "29.10", "$359" -> "359.00"
+ */
+export const formatPriceUI = (price) => {
+  if (price === null || price === undefined || price === '') {
+    return '0.00';
+  }
+
+  let raw;
+  if (typeof price === 'string') {
+    const cleaned = price.trim().replace(/^\$/, '').replace(/,/g, '');
+    raw = cleaned === '' ? NaN : parseFloat(cleaned);
+  } else {
+    raw = Number(price);
+  }
+
+  if (!Number.isFinite(raw)) {
+    return '0.00';
+  }
+
+  return toMoney(raw).toFixed(2);
+};

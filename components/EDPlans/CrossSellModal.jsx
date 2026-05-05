@@ -15,7 +15,7 @@ import { IoIosCloseCircleOutline } from "react-icons/io";
 import LidocaineInfoPopup from "./LidocaineInfoPopup";
 import CrossSellCartDisplay from "../shared/CrossSellCartDisplay";
 import { useCrossSellCart } from "@/lib/hooks/useCrossSellCart";
-import { formatPrice } from "@/utils/priceFormatter";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 const CrossSellModal = ({
   isOpen,
@@ -612,7 +612,7 @@ const CrossSellModal = ({
                         </small>
                       </div>
                       <p className="font-[500] text-[16px] text-black text-center">
-                        ${formatPrice(addon.price)}
+                        ${formatPriceUI(addon.price)}
                       </p>
                       {/* <button
                         onClick={() => toggleAddon(addon.id)}
@@ -676,7 +676,7 @@ const CrossSellModal = ({
                         {addon.description}
                       </p>
                       <p className="font-semibold text-sm text-gray-800">
-                        ${formatPrice(addon.price)}
+                        ${formatPriceUI(addon.price)}
                       </p>
                       <p className="font-normal text-[12px] text-gray-500">
                         {addon.frequency}

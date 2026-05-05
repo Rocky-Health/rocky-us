@@ -9,7 +9,7 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import CrossSellCartDisplay from "../../../shared/CrossSellCartDisplay";
 import { useCrossSellCart } from "@/lib/hooks/useCrossSellCart";
-import { formatPrice } from "@/utils/priceFormatter";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 // Weight loss product IDs that require consultation
 const WEIGHT_LOSS_PRODUCT_IDS = [
@@ -381,7 +381,7 @@ const CrossSellPopup = ({
                           </small>
                         </div>
                         <p className="font-[500] text-[14px] text-black text-center">
-                          ${formatPrice(addon.price)}
+                          ${formatPriceUI(addon.price)}
                         </p>
                         <div className="flex items-center gap-2 w-full">
                           <button
@@ -428,7 +428,7 @@ const CrossSellPopup = ({
                           {addon.description}
                         </p>
                         <p className="font-semibold text-sm text-gray-800">
-                          ${formatPrice(addon.price)}
+                          ${formatPriceUI(addon.price)}
                         </p>
                         <p className="font-normal text-[12px] text-gray-500">
                           {addon.frequency || "1-time purchase"}
