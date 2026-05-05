@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 function StepPill({ step, wrapperClassName = "mb-5" }) {
   return (
     <div
@@ -33,6 +35,8 @@ export default function Ed1QuestionCard({
   onSelect,
   variant = "flow",
   flowDesktopHeightClass = "lg:h-[615px]",
+  disableOptions = false,
+  ctaHref = "/ed-pre-consultation-quiz",
 }) {
   const isHeroVariant = variant === "hero";
 
@@ -75,8 +79,11 @@ export default function Ed1QuestionCard({
                 key={option}
                 type="button"
                 onClick={() => onSelect(option)}
+                disabled={disableOptions}
                 className={`poppins-font flex h-14 w-full items-center justify-center rounded-2xl text-base font-medium transition-colors duration-200 ${
-                  isSelected
+                  disableOptions
+                    ? "cursor-not-allowed bg-[#ECE9E2]/70 text-[#1b2431]/50"
+                    : isSelected
                     ? "bg-[#AE7E56] text-white"
                     : "bg-[#ECE9E2] text-[#1b2431] hover:bg-[#E3D8CC] hover:text-[#111827]"
                 }`}
@@ -87,8 +94,8 @@ export default function Ed1QuestionCard({
           })}
         </div>
 
-        <button
-          type="button"
+        <Link
+          href={ctaHref}
           className={`w-full text-center underline underline-offset-2 hover:text-[#AE7E56] ${
             isHeroVariant
               ? "headers-font mt-6 text-base font-semibold text-[#111827]"
@@ -96,7 +103,7 @@ export default function Ed1QuestionCard({
           }`}
         >
           Skip and start online visit
-        </button>
+        </Link>
       </div>
     </article>
   );

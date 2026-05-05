@@ -35,12 +35,20 @@ const FOLLOWUP_QUESTIONS = [
   },
 ];
 
-export default function Ed1DirectMaxQuestionFlowSection() {
+export default function Ed1DirectMaxQuestionFlowSection({
+  ctaHref = "/ed-pre-consultation-quiz",
+}) {
   const [answers, setAnswers] = useState({});
   const cardRefs = useRef([]);
 
   const handleSelect = (stepIndex, option) => {
     setAnswers((prev) => ({ ...prev, [stepIndex]: option }));
+    const isLastQuestion = stepIndex === FOLLOWUP_QUESTIONS.length - 1;
+    if (isLastQuestion) {
+      window.location.href = ctaHref;
+      return;
+    }
+
     const nextIndex = stepIndex + 1;
     if (nextIndex < FOLLOWUP_QUESTIONS.length) {
       window.setTimeout(() => {
@@ -57,6 +65,8 @@ export default function Ed1DirectMaxQuestionFlowSection() {
       <div className="mx-auto max-w-[1440px] space-y-6 px-8 py-24 md:space-y-8 lg:px-10">
         {FOLLOWUP_QUESTIONS.map((question, i) => {
           const step = i + 1;
+          const previousAnswered = i === 0 || Boolean(answers[i - 1]);
+
           return (
             <div
               key={question.id}
@@ -70,6 +80,8 @@ export default function Ed1DirectMaxQuestionFlowSection() {
                 question={question}
                 selected={answers[i]}
                 onSelect={(option) => handleSelect(i, option)}
+                disableOptions={!previousAnswered}
+                ctaHref={ctaHref}
                 variant="flow"
                 flowDesktopHeightClass={question.desktopHeightClass}
               />

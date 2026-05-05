@@ -61,7 +61,9 @@ function HeroBenefitHighlights({ className = "", align = "center" }) {
   );
 }
 
-export default function Ed1DirectMaxHeroSection() {
+export default function Ed1DirectMaxHeroSection({
+  ctaHref = "/ed-pre-consultation-quiz",
+}) {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
 
   const handleFirstQuestionSelect = (option) => {
@@ -137,6 +139,7 @@ export default function Ed1DirectMaxHeroSection() {
                 question={HERO_QUESTION}
                 selected={selectedAnswer}
                 onSelect={handleFirstQuestionSelect}
+                ctaHref={ctaHref}
                 variant="hero"
               />
               <div className="hidden lg:block">{trustLine}</div>
