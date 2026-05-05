@@ -2,7 +2,7 @@
 
 import { ProductImage } from "@/components/Product";
 import Link from "next/link";
-import { formatPrice } from "@/utils/priceFormatter";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 export default function BasicProductInfo({ product }) {
   if (!product) return null;
@@ -16,7 +16,7 @@ export default function BasicProductInfo({ product }) {
 
       {product.price && (
         <div className="text-xl font-medium mb-4">
-          ${formatPrice(product.price)}
+          ${formatPriceUI(product.price)}
         </div>
       )}
 

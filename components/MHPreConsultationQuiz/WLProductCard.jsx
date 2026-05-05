@@ -1,5 +1,5 @@
 import React from "react";
-import { formatPrice } from "@/utils/priceFormatter";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 const WLProductCard = ({ product, isRecommended, onSelect, isSelected }) => {
   return (
@@ -32,7 +32,7 @@ const WLProductCard = ({ product, isRecommended, onSelect, isSelected }) => {
           </div>
           <div className="mt-2">
             <p className="text-lg font-semibold">
-              ${formatPrice(product.price)}
+              ${formatPriceUI(product.price)}
             </p>
             <p className="text-sm text-gray-600 mt-1">{product.details}</p>
             {product.supplyAvailable && (

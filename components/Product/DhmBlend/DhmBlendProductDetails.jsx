@@ -7,7 +7,7 @@ import { useAddItemToCart } from "@/lib/cart/cartHooks";
 import { useRouter } from "next/navigation";
 import { OptionButton } from "@/components/Product/UI";
 import CartPopup from "../../Cart/CartPopup";
-import { formatPrice } from "@/utils/priceFormatter";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 const DhmBlendProductDetails = ({ product, variations, isLoading }) => {
   const router = useRouter();
@@ -370,7 +370,7 @@ const DhmBlendProductDetails = ({ product, variations, isLoading }) => {
             >
               {isAddingToCart
                 ? "Adding to Cart..."
-                : `Add to Cart - $${formatPrice(variationPrice)}`}
+                : `Add to Cart - $${formatPriceUI(variationPrice)}`}
             </button>
 
             {/* Ontario Logo */}

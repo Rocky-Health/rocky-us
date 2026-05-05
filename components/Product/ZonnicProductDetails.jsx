@@ -6,7 +6,7 @@ import Image from "next/image";
 import { ProductImage } from "@/components/Product";
 import { useAddItemToCart } from "@/lib/cart/cartHooks";
 import { useRouter } from "next/navigation";
-import { formatPrice } from "@/utils/priceFormatter";
+import { formatPriceUI } from "@/utils/priceFormatter";
 import CartPopup from "../Cart/CartPopup";
 import { addRequiredConsultation } from "@/utils/requiredConsultation";
 import {
@@ -378,7 +378,7 @@ const ZonnicProductDetails = ({ product, variations, isLoading }) => {
                   >
                     <div className="flex flex-col md:flex-row justify-between items-center gap-2">
                       <span>{pack.label}</span>
-                      <span>${formatPrice(pack.price)}</span>
+                      <span>${formatPriceUI(pack.price)}</span>
                     </div>
                   </button>
                 ))}
@@ -393,7 +393,7 @@ const ZonnicProductDetails = ({ product, variations, isLoading }) => {
             >
               {addToCartLoading
                 ? "Adding to Cart..."
-                : `Add to Cart - $${formatPrice(variationPrice)}`}
+                : `Add to Cart - $${formatPriceUI(variationPrice)}`}
             </button>
 
             {/* Warning notice */}

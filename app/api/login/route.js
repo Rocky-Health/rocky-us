@@ -90,6 +90,10 @@ export async function POST(req) {
 
         const authToken = cookieStore.get("authToken");
 
+
+        cookieStore.delete("new-bo-preqiz-data");
+        cookieStore.delete("new-bo-essential-consul"); 
+
         if (!authToken) {
             return NextResponse.json(
                 {
