@@ -48,6 +48,8 @@ export const layoutExemptRoutes = [
   "/checkoutFlow",
   "/ed-simple-quiz1",
   "/ed-simple-quiz2",
+  "/pr-ed-quiz-2",
+  "/direct-ed-pre-consultation-quiz",
   "/checkout2",
   "/login-register",
   "/bo4",

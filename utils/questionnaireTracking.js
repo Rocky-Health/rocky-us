@@ -101,7 +101,7 @@ export function trackQuestionnaireStepView(payload) {
   if (QS_DEBUG) {
     try {
       console.info("[QS_TRACK]", payload);
-    } catch (_) {}
+    } catch (_) { }
   }
 
   // 1. dataLayer (GTM / GA4)
@@ -112,7 +112,7 @@ export function trackQuestionnaireStepView(payload) {
         ...payload,
       });
     }
-  } catch (_) {}
+  } catch (_) { }
 
   // 2. Clarity -- set fields then fire event (no payload in event call)
   try {
@@ -131,12 +131,12 @@ export function trackQuestionnaireStepView(payload) {
       );
       window.clarity("event", "questionnaire_step_view");
     }
-  } catch (_) {}
+  } catch (_) { }
 
   // 3. CustomEvent for any other listener
   try {
     window.dispatchEvent(
       new CustomEvent("questionnaire_step_view", { detail: payload })
     );
-  } catch (_) {}
+  } catch (_) { }
 }

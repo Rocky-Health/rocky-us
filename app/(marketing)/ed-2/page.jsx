@@ -10,7 +10,7 @@ import Section from "@/components/utils/Section";
 import NewRockyInTheNews from "@/components/BodyOptimization/bo3/NewRockyInTheNews";
 
 export default function Ed1Page() {
-  const quizHref = "/ed-pre-consultation-quiz";
+  const quizHref = "/direct-ed-pre-consultation-quiz";
 
   return (
     <main>
