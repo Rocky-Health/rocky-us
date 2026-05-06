@@ -151,8 +151,8 @@ const BOSimplifiedFlow = () => {
           onBackClick={handleBack}
           currentPage={currentStep}
         />
-        {/* Progress Bar - Hide for recommendation step only */}
-        {currentStep !== 7 && (
+        {/* Progress Bar - Hide for treatment + plan steps */}
+        {currentStep !== 7 && currentStep !== 8 && (
           <div className="pt-4 pb-6">
             <ProgressBar progress={progressPercent || 100} />
           </div>
