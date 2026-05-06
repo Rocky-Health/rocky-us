@@ -437,6 +437,11 @@ const OrderReceivedContent = ({ userId }) => {
               logger.error("[Heatmap] Conversion tracking failed:", err);
             }
           }, 1000);
+        } else {
+          logger.error(
+            "[OrderReceived] Skipped all post-purchase tracking: order payload has no .id",
+            { dataKeys: data && typeof data === "object" ? Object.keys(data) : null }
+          );
         }
 
         // Check if we need to redirect to a questionnaire

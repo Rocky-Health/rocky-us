@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getTikTokGatewayConfig, getTikTokEndpoint } from '@/utils/tiktokCapiConfig';
+import { getTikTokGatewayConfig, getTikTokEndpoint, TIKTOK_CAPI_GATEWAYS } from '@/utils/tiktokCapiConfig';
 import { hashEmail, hashPhone, hashSHA256 } from '@/utils/analytics/hashServerSide';
 import { toMoney } from '@/utils/priceFormatter';
 import axios from 'axios';
@@ -7,6 +7,22 @@ import axios from 'axios';
 const BASE_URL = process.env.BASE_URL;
 const CONSUMER_KEY = process.env.CONSUMER_KEY;
 const CONSUMER_SECRET = process.env.CONSUMER_SECRET;
+
+// Cold-start sanity: surfaces missing TIKTOK_ACCESS_TOKEN_* / TIKTOK_PIXEL_ID_*
+// env vars once per function instance.
+const _missingTiktokConfig = Object.entries(TIKTOK_CAPI_GATEWAYS)
+  .map(([key, cfg]) => {
+    const missing = [];
+    if (!cfg.accessToken) missing.push('accessToken');
+    if (!cfg.pixelId) missing.push('pixelId');
+    return missing.length > 0 ? `${key}(${missing.join(',')})` : null;
+  })
+  .filter(Boolean);
+if (_missingTiktokConfig.length > 0) {
+  console.warn(
+    `[TikTok CAPI] Cold start: missing config for gateways: ${_missingTiktokConfig.join(', ')}`
+  );
+}
 
 const fetchOrderFromWooCommerce = async (orderId) => {
   try {
@@ -56,7 +72,17 @@ export async function POST(req) {
     let { order_id, gateway, value, currency, contents, order_data } = payload;
 
     const gatewayConfig = getTikTokGatewayConfig(gateway);
-    
+
+    if (!gatewayConfig.accessToken || !gatewayConfig.pixelId) {
+      console.error(
+        `[TikTok CAPI] Refusing event for order ${order_id}: gateway "${gateway}" has missing config (accessToken=${!!gatewayConfig.accessToken}, pixelId=${!!gatewayConfig.pixelId}). Check TIKTOK_ACCESS_TOKEN_${gateway} / TIKTOK_PIXEL_ID_${gateway}.`
+      );
+      return NextResponse.json(
+        { error: `Missing TikTok config for gateway: ${gateway}` },
+        { status: 400 }
+      );
+    }
+
     if (!order_data?.billing || !order_data?.line_items) {
       console.log(`[TikTok CAPI] Fetching order ${order_id} from WooCommerce...`);
       order_data = await fetchOrderFromWooCommerce(order_id);

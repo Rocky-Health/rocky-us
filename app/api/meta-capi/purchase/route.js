@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getGatewayConfig, getGatewayUrl } from '@/utils/metaCapiConfig';
+import { getGatewayConfig, getGatewayUrl, META_CAPI_GATEWAYS } from '@/utils/metaCapiConfig';
 import { hashEmail, hashPhone, hashSHA256 } from '@/utils/analytics/hashServerSide';
 import { processMetaParameters } from '@/lib/meta/paramBuilderHelper';
 import { toMoney } from '@/utils/priceFormatter';
@@ -8,6 +8,17 @@ import axios from 'axios';
 const BASE_URL = process.env.BASE_URL;
 const CONSUMER_KEY = process.env.CONSUMER_KEY;
 const CONSUMER_SECRET = process.env.CONSUMER_SECRET;
+
+// Cold-start sanity: surfaces missing FB_ACCESS_TOKEN_* env vars once per
+// function instance. Without this, a missing token returns 400 silently.
+const _missingMetaTokens = Object.entries(META_CAPI_GATEWAYS)
+  .filter(([, cfg]) => !cfg.accessToken)
+  .map(([key]) => key);
+if (_missingMetaTokens.length > 0) {
+  console.warn(
+    `[Meta CAPI] Cold start: missing FB_ACCESS_TOKEN for gateways: ${_missingMetaTokens.join(', ')}`
+  );
+}
 
 const resolveEventTime = (payload, orderData) => {
   const candidates = [
@@ -197,6 +208,9 @@ export async function POST(req) {
     // Validate gateway
     const gatewayConfig = getGatewayConfig(gateway);
     if (!gatewayConfig || !gatewayConfig.accessToken) {
+      console.error(
+        `[Meta CAPI] Refusing event for order ${order_id}: gateway "${gateway}" has no access token (env var FB_ACCESS_TOKEN_${gateway} is empty or missing).`
+      );
       return NextResponse.json(
         { error: `Invalid gateway or missing access token: ${gateway}` },
         { status: 400 }
