@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { logger } from "@/utils/devLogger";
+import { addToCartEarly, finalizeFlowCheckout } from "@/utils/flowCartHandler";
+import EdDosageSelection from "@/components/EDPreConsultationQuiz/EdDosageSelectionModal";
 
 function FlameIcon({ className = "inline-block h-4 w-4 text-[#AE7E56]" }) {
   return (
@@ -144,23 +147,36 @@ const ACC = [
 
 export default function PrEdQuiz2PlanApprovalStep({
   step,
-  onContinue,
   patientInfoAnswer,
+  recommendationAnswer,
 }) {
   const firstRaw = patientInfoAnswer?.firstName?.trim();
   const titleHeading = firstRaw ? `${firstRaw}'s Approval` : "Your Approval";
 
+  const selectedProduct = recommendationAnswer?.product;
+  const selectedProductOptions = recommendationAnswer?.productOptions;
   const productSrc =
+    selectedProduct?.image ||
     step.productImageSrc ||
     "https://assets.directmeds.com/direct-max/1/direct-max-tabs-3.png";
   const doctorSrc =
     step.doctorImageSrc || "https://assets.directmeds.com/direct-max/1/dr1.jpg";
 
   const timerMinutes = typeof step.timerMinutes === "number" ? step.timerMinutes : 15;
+  const selectedPlanName = recommendationAnswer?.label?.trim() || "DirectMax";
+  const selectedPlanStrength =
+    recommendationAnswer?.subtitle?.trim() || "High Strength";
   const initialSeconds = timerMinutes * 60;
   const [secondsLeft, setSecondsLeft] = useState(initialSeconds);
   const [openAcc, setOpenAcc] = useState(() => new Set());
   const [continuing, setContinuing] = useState(false);
+  const [checkoutError, setCheckoutError] = useState("");
+  const [showDosagePopup, setShowDosagePopup] = useState(false);
+  const [selectedDose, setSelectedDose] = useState(() => {
+    if (selectedPlanName === "Cialis") return "10mg";
+    if (selectedPlanName === "Viagra") return "50mg";
+    return "10/50mg";
+  });
 
   useEffect(() => {
     const id = window.setInterval(() => {
@@ -183,12 +199,106 @@ export default function PrEdQuiz2PlanApprovalStep({
   };
 
   const handleContinue = () => {
+    setCheckoutError("");
+    setShowDosagePopup(true);
+  };
+
+  const handleDosageContinue = async () => {
     if (continuing) return;
     setContinuing(true);
-    onContinue?.();
+    setCheckoutError("");
+
+    try {
+      const fallbackByName =
+        selectedPlanName === "Cialis"
+          ? {
+              variationId: "7617",
+              price: 40,
+              preference: "generic",
+              frequency: "monthly-supply",
+              pillCount: 8,
+            }
+          : selectedPlanName === "Viagra"
+            ? {
+                variationId: "7614",
+                price: 45,
+                preference: "generic",
+                frequency: "monthly-supply",
+                pillCount: 8,
+              }
+            : {
+                variationId: "159404,159472",
+                price: 79,
+                preference: "generic",
+                frequency: "monthly-supply",
+                pillCount: 8,
+              };
+
+      const finalOptions = selectedProductOptions || fallbackByName;
+      const variationId = String(finalOptions.variationId || "").trim();
+
+      if (!variationId) {
+        throw new Error("Missing product variation. Please reselect your treatment plan.");
+      }
+
+      const isVarietyPack = variationId.includes(",");
+      const varietyPackId = isVarietyPack
+        ? `variety_pack_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`
+        : null;
+
+      const mainProduct = {
+        id: variationId,
+        name: selectedPlanName,
+        price: Number(finalOptions.price || 0),
+        image: productSrc,
+        isSubscription: finalOptions.frequency === "monthly-supply",
+        variationId,
+        isVarietyPack,
+        varietyPackId,
+        variation: [
+          {
+            attribute: "Subscription Type",
+            value:
+              finalOptions.frequency === "monthly-supply"
+                ? "Monthly Supply"
+                : "Quarterly Supply",
+          },
+          {
+            attribute: "Tabs frequency",
+            value: `${finalOptions.pillCount || 8} ${
+              finalOptions.preference === "brand" ? "(Brand)" : "(Generic)"
+            }`,
+          },
+          {
+            attribute: "Requested dose",
+            value: selectedDose || "",
+          },
+        ],
+      };
+
+      const result = await addToCartEarly(mainProduct, "ed", {
+        requireConsultation: true,
+        varietyPackId,
+      });
+
+      if (!result?.success) {
+        throw new Error(result?.error || "Failed to add product to cart.");
+      }
+
+      const checkoutUrl = finalizeFlowCheckout("ed", true);
+      window.location.href = checkoutUrl;
+    } catch (err) {
+      logger.error("PrEdQuiz2 plan checkout error:", err);
+      setCheckoutError(
+        err?.message ||
+          "There was an issue starting checkout. Please try again.",
+      );
+      setContinuing(false);
+    }
   };
 
   return (
+    <>
     <div className="overflow-x-hidden text-center">
       <div className="mx-auto flex min-h-[calc(100vh-0px)] w-full max-w-2xl flex-col items-center pb-16 pt-4 sm:pt-6 md:pt-8">
         <h1 className="headers-font mb-3 text-4xl font-extrabold text-[#0d1728] sm:text-5xl">
@@ -196,7 +306,7 @@ export default function PrEdQuiz2PlanApprovalStep({
         </h1>
         <p className="poppins-font mb-8 text-lg text-[#1c1b19]/85">
           {step.discountLinePrefix ?? "You're saving 33% on"}{" "}
-          <strong className="headers-font text-[#AE7E56]">DirectMax</strong>{" "}
+          <strong className="headers-font text-[#AE7E56]">{selectedPlanName}</strong>{" "}
           {step.discountLineSuffix ?? "3-in-1 ED treatment plan"}
         </p>
 
@@ -225,7 +335,7 @@ export default function PrEdQuiz2PlanApprovalStep({
         </div>
 
         <p className="poppins-font max-w-xl pb-3 text-lg text-[#1c1b19] md:text-xl">
-          DirectMax <span className="font-semibold text-[#AE7E56]">All-in-one</span>{" "}
+          {selectedPlanName} <span className="font-semibold text-[#AE7E56]">All-in-one</span>{" "}
           Treatment
           <br />
           <span className="text-xs text-[#1c1b19]/60">Performance Guaranteed</span>
@@ -264,8 +374,8 @@ export default function PrEdQuiz2PlanApprovalStep({
             </p>
 
             <p className="headers-font mb-4 text-base font-bold text-[#0d1728]">
-              DirectMax:{" "}
-              <span className="font-normal text-[#AE7E56]">High Strength</span>
+              {selectedPlanName}:{" "}
+              <span className="font-normal text-[#AE7E56]">{selectedPlanStrength}</span>
             </p>
 
             <div className="mb-6 grid grid-cols-3 gap-2 sm:gap-3">
@@ -369,6 +479,9 @@ export default function PrEdQuiz2PlanApprovalStep({
                   <ContinueArrowIcon />
                 </span>
               </button>
+              {checkoutError ? (
+                <p className="poppins-font mt-3 text-sm text-red-600">{checkoutError}</p>
+              ) : null}
             </div>
 
             <div className="my-8 flex flex-wrap justify-center gap-x-6 gap-y-1 text-sm text-[#1c1b19]/75">
@@ -403,5 +516,16 @@ export default function PrEdQuiz2PlanApprovalStep({
         </a>
       </div>
     </div>
+      <EdDosageSelection
+        isOpen={showDosagePopup}
+        onClose={() => setShowDosagePopup(false)}
+        product={{ id: selectedProduct?.id, name: selectedPlanName }}
+        selectedDose={selectedDose}
+        setSelectedDose={setSelectedDose}
+        onContinue={handleDosageContinue}
+        currentPage={0}
+        isLoading={continuing}
+      />
+    </>
   );
 }

@@ -28,6 +28,7 @@ const WIDE_STEP_TYPES = new Set([
   "productPitch",
   "chartPitch",
   "benefitsPitch",
+  "recommendationChoice",
   "planApproval",
 ]);
 
@@ -92,6 +93,13 @@ export default function PrEdQuiz2Flow({ destinationHref }) {
   );
   const eligibilityAnswer =
     eligibilityStepIndex >= 0 ? answers[eligibilityStepIndex] : undefined;
+
+  const recommendationStepIndex = useMemo(
+    () => prEdQuiz2Config.steps.findIndex((s) => s.type === "recommendationChoice"),
+    [],
+  );
+  const recommendationAnswer =
+    recommendationStepIndex >= 0 ? answers[recommendationStepIndex] : undefined;
 
   // Restore patient info from sessionStorage so plan approval works after refresh.
   const [storedPatient, setStoredPatient] = useState(null);
@@ -234,6 +242,7 @@ export default function PrEdQuiz2Flow({ destinationHref }) {
               previousStepAnswer={answers[currentStep - 1]}
               eligibilityAnswer={eligibilityAnswer}
               patientInfoAnswer={patientInfoAnswer}
+              recommendationAnswer={recommendationAnswer}
             />
           </>
         )}

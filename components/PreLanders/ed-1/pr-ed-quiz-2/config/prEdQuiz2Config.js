@@ -75,13 +75,14 @@ export const prEdQuiz2Config = {
       type: "patientInfoForm",
       hideWizardHeader: true,
       showTopProgress: true,
-      eyebrow: "Your myRocky account",
-      headline: "Sign in or join myRocky—last step before your discounts",
+      eyebrow: "Patient info",
+      headline:
+        "This is looking great! Last thing we need before we apply your discounts",
       introLine:
         "Same form whether you're logging in or registering: we'll use it for sign-in or account setup, then continue your intake.",
       privacyLine: "Your information is protected by HIPAA.",
       consentText:
-        "I agree to receive text messages from DirectMax with important updates, including prescription reminders, order updates, exclusive offers and information about new products. Message and data rates may apply. Message frequency varies. Reply STOP to opt-out.",
+        "By continuing, you confirm that you've read and agree to our Terms and Conditions, Professional Disclosure, Privacy Policy, Telehealth Consent and Implied Consent.",
       ctaLabel: "Continue",
     },
     {
@@ -663,6 +664,16 @@ export const prEdQuiz2Config = {
         "Customizing Treatment",
       ],
       durationMs: 4000,
+    },
+    {
+      id: "q32_recommendation",
+      type: "recommendationChoice",
+      hideWizardHeader: true,
+      showTopProgress: true,
+      eyebrow: "Here's what we recommended",
+      headline: "Your treatment plan",
+      recommendedProductName: "Cialis + Viagra",
+      ctaLabel: "Continue",
     },
     {
       id: "q33",

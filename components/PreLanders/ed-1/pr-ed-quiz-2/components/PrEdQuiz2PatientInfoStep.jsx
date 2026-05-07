@@ -48,6 +48,7 @@ export default function PrEdQuiz2PatientInfoStep({
   onContinue,
   onBack,
   selectedValues,
+  eligibilityAnswer,
 }) {
   const [firstName, setFirstName] = useState(selectedValues?.firstName || "");
   const [lastName, setLastName] = useState(selectedValues?.lastName || "");
@@ -69,13 +70,10 @@ export default function PrEdQuiz2PatientInfoStep({
 
   const headline =
     step.headline ||
-    "Sign in or join myRocky—last step before your discounts";
+    "This is looking great! Last thing we need before we apply your discounts";
   const introLine = step.introLine;
   const privacyLine =
     step.privacyLine || "Your information is protected by HIPAA.";
-  const consentText =
-    step.consentText ||
-    "I agree to receive text messages from DirectMax with important updates, including prescription reminders, order updates, exclusive offers and information about new products. Message and data rates may apply. Message frequency varies. Reply STOP to opt-out.";
 
   const pwRule1 = (pw) => pw.length >= 8;
   const pwRule2 = (pw) => /[A-Z]/.test(pw) && /[a-z]/.test(pw);
@@ -161,26 +159,57 @@ export default function PrEdQuiz2PatientInfoStep({
     throw new Error(msg);
   };
 
-  /** Validates new email + password (step 1 only — full profile completed on myRocky if needed). */
-  const registerStepOne = async () => {
+  const formatDobForApi = () => {
+    const y = String(eligibilityAnswer?.year || "").trim();
+    const m = String(eligibilityAnswer?.month || "").trim();
+    const d = String(eligibilityAnswer?.day || "").trim();
+    if (!y || !m || !d) return "";
+    return `${y.padStart(4, "0")}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`;
+  };
+
+  // Match GLP2 behavior: step 1 validate, step 2 create account, then login to set auth cookies.
+  const registerAndLogin = async () => {
     const { payload, isEncryptedPassword } =
       await encryptLoginPassword(password);
+    const baseData = {
+      first_name: firstName.trim(),
+      last_name: lastName.trim(),
+      email: email.trim(),
+      password: payload,
+      phone: phoneDigits,
+      date_of_birth: formatDobForApi(),
+      province: String(eligibilityAnswer?.state || "").trim(),
+      gender: String(eligibilityAnswer?.sexAtBirth || "").trim(),
+      isEncryptedPassword,
+    };
+
     const r1 = await fetch("/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        first_name: firstName.trim(),
-        last_name: lastName.trim(),
-        email: email.trim(),
-        password: payload,
+        ...baseData,
         register_step: 1,
-        isEncryptedPassword,
       }),
     });
     const d1 = await r1.json();
-    if (!r1.ok || !d1.success) {
+    if (!r1.ok || (!d1.success && d1.error)) {
       throw new Error(d1.error || "Could not verify this email and password.");
     }
+
+    const r2 = await fetch("/api/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...baseData,
+        register_step: 2,
+      }),
+    });
+    const d2 = await r2.json();
+    if (!r2.ok || !d2.success) {
+      throw new Error(d2.error || "Could not create your account.");
+    }
+
+    await tryLogin(email, password);
   };
 
   const baseFieldsOk =
@@ -214,8 +243,8 @@ export default function PrEdQuiz2PatientInfoStep({
         await tryLogin(email, password);
         toast.success("Signed in — you’re all set to continue.");
       } else {
-        await registerStepOne();
-        toast.success("Email and password look good — let’s keep going.");
+        await registerAndLogin();
+        toast.success("Account created — you’re signed in.");
       }
       onContinue?.(payload);
     } catch (err) {
@@ -230,7 +259,6 @@ export default function PrEdQuiz2PatientInfoStep({
     "poppins-font w-full rounded-2xl border-2 border-[#e5e2dc] bg-white px-4 pb-3 pt-5 text-[#1c1b19] outline-none transition focus:border-[#AE7E56]";
 
   const isNewUser = showAuthFields && !emailExists;
-  const isReturningUser = showAuthFields && emailExists;
   const passwordInvalid =
     isNewUser && password.length > 0 && !isNewPasswordValid(password);
 
@@ -271,14 +299,6 @@ export default function PrEdQuiz2PatientInfoStep({
         <p className="poppins-font mb-8 text-sm text-[#1b2431]/80">
           {privacyLine}
         </p>
-
-        {isReturningUser ? (
-          <p className="poppins-font mb-4 rounded-2xl border border-[#AE7E56]/35 bg-[#F9F6F1] px-4 py-3 text-sm text-[#1b2431]">
-            <span className="font-semibold text-[#0d1728]">Welcome back — </span>
-            we recognized this email on myRocky. Add your password below to sign
-            in and continue your intake.
-          </p>
-        ) : null}
 
         <div className="space-y-4">
           <div className="relative">
@@ -435,7 +455,28 @@ export default function PrEdQuiz2PatientInfoStep({
               onChange={(e) => setSmsConsent(e.target.checked)}
               className="mt-0.5 h-8 w-8 shrink-0 cursor-pointer rounded-md border-2 border-[#1c1b19] bg-white accent-[#1c1b19]"
             />
-            <span>{consentText}</span>
+            <span>
+              By continuing, you confirm that you've read and agree to our{" "}
+              <Link href="/terms-of-use" className="text-[#AE7E56] underline">
+                Terms and Conditions
+              </Link>
+              ,{" "}
+              <Link href="/terms-of-use" className="text-[#AE7E56] underline">
+                Professional Disclosure
+              </Link>
+              ,{" "}
+              <Link href="/privacy-policy" className="text-[#AE7E56] underline">
+                Privacy Policy
+              </Link>
+              ,{" "}
+              <Link href="/terms-of-use" className="text-[#AE7E56] underline">
+                Telehealth Consent
+              </Link>{" "}
+              and{" "}
+              <Link href="/implied-consent" className="text-[#AE7E56] underline">
+                Implied Consent.
+              </Link>
+            </span>
           </label>
         </div>
 

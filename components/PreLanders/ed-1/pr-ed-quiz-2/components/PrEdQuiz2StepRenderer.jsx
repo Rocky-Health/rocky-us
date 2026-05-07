@@ -24,6 +24,9 @@ const PrEdQuiz2ProcessingLoaderStep = lazy(() =>
 const PrEdQuiz2ProductPitchStep = lazy(() => import("./PrEdQuiz2ProductPitchStep"));
 const PrEdQuiz2ChartPitchStep = lazy(() => import("./PrEdQuiz2ChartPitchStep"));
 const PrEdQuiz2BenefitsPitchStep = lazy(() => import("./PrEdQuiz2BenefitsPitchStep"));
+const PrEdQuiz2RecommendationStep = lazy(() =>
+  import("./PrEdQuiz2RecommendationStep"),
+);
 const PrEdQuiz2PlanApprovalStep = lazy(() => import("./PrEdQuiz2PlanApprovalStep"));
 
 function StepBoundary({ children }) {
@@ -44,6 +47,7 @@ export default function PrEdQuiz2StepRenderer({
   previousStepAnswer,
   eligibilityAnswer,
   patientInfoAnswer,
+  recommendationAnswer,
 }) {
   if (!step) return null;
 
@@ -154,6 +158,7 @@ export default function PrEdQuiz2StepRenderer({
               ? selectedAnswer
               : null
           }
+          eligibilityAnswer={eligibilityAnswer}
           onContinue={onContinueStep}
           onBack={onBack}
         />
@@ -209,6 +214,18 @@ export default function PrEdQuiz2StepRenderer({
     );
   }
 
+  if (step.type === "recommendationChoice") {
+    return (
+      <StepBoundary>
+        <PrEdQuiz2RecommendationStep
+          step={step}
+          onContinue={onContinueStep}
+          onBack={onBack}
+        />
+      </StepBoundary>
+    );
+  }
+
   if (step.type === "planApproval") {
     return (
       <StepBoundary>
@@ -216,6 +233,7 @@ export default function PrEdQuiz2StepRenderer({
           step={step}
           onContinue={onContinueStep}
           patientInfoAnswer={patientInfoAnswer}
+          recommendationAnswer={recommendationAnswer}
         />
       </StepBoundary>
     );
