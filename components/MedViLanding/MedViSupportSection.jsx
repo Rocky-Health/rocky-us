@@ -29,7 +29,7 @@ const MedViSupportSection = () => {
                 <div className="w-full lg:w-[60%] flex gap-2 lg:gap-4 px-6 lg:p-10">
                     <div className="relative w-1/2 h-[200px] sm:h-[250px] lg:h-[350px] rounded-xl overflow-hidden  mt-6">
                         <CustomImage
-                            src="/medvi/support-1.jpg"
+                            src="https://myrocky.b-cdn.net/WP%20Images/wl-med/Unlimited%2024-7%20support%20included.%20-%2001.jpg"
                             alt="Couple cooking together"
                             fill
                             className="object-cover hover:scale-105 transition-all duration-300"
@@ -37,7 +37,7 @@ const MedViSupportSection = () => {
                     </div>
                     <div className="relative w-1/2 h-[200px] sm:h-[250px] lg:h-[350px] rounded-xl overflow-hidden">
                         <CustomImage
-                            src="/medvi/zeplady.png"
+                            src="https://myrocky.b-cdn.net/WP%20Images/wl-med/Unlimited%2024-7%20support%20included.%20-%2002.jpg"
                             alt="Couple relaxing on couch"
                             fill
                             className="object-cover object-[87%_center] lg:object-[93%_center] hover:scale-105 transition-all duration-300"

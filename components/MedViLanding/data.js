@@ -1,31 +1,45 @@
 // ── Product Tiers ──
 export const productTiers = [
     {
-        name: "GLP-1 Injections",
-        subtitle: "One simple injection per week.",
-        price: "149",
-        image: "/products/glp1-vial.png",
-        inStock: true,
-    },
-    {
         name: "GLP-1 + GIP Injections",
-        subtitle: "One simple injection per week.",
+        subtitle: "Trusted by experts. Priced for you.",
         price: "240",
-        image: "/products/glp1-gip-vial.png",
+        image: "https://myrocky.b-cdn.net/WP%20Images/wl-med/Trusted%20by%20experts.%20priced%20for%20you.%20-%20GLP-1%20+%20GIP%20Injections.png",
         inStock: true,
     },
     {
         name: "GLP-1 Injections",
-        subtitle: "One simple injection per week.",
-        price: "149",
-        image: "/products/glp1-vial.png",
+        subtitle: "Trusted by experts. Priced for you.",
+        price: "150",
+        image: "https://myrocky.b-cdn.net/WP%20Images/wl-med/Trusted%20by%20experts.%20priced%20for%20you.%20-%20GLP-1%20Injections.png",
         inStock: true,
     },
     {
-        name: "GLP-1 + GIP Injections",
-        subtitle: "One simple injection per week.",
-        price: "240",
-        image: "/products/glp1-gip-vial.png",
+        name: "Rybelsus®",
+        subtitle: "Trusted by experts. Priced for you.",
+        price: "1409",
+        image: "https://myrocky.b-cdn.net/WP%20Images/wl-med/Trusted%20by%20experts.%20priced%20for%20you.%20-%20Rybelsus.png",
+        inStock: true,
+    },
+    {
+        name: "Wegovy®",
+        subtitle: "Trusted by experts. Priced for you.",
+        price: "1869",
+        image: "https://myrocky.b-cdn.net/WP%20Images/wl-med/Trusted%20by%20experts.%20priced%20for%20you.%20-%20Wegovy.png",
+        inStock: true,
+    },
+    {
+        name: "Mounjaro®",
+        subtitle: "Trusted by experts. Priced for you.",
+        price: "1509",
+        image: "https://myrocky.b-cdn.net/WP%20Images/wl-med/Trusted%20by%20experts.%20priced%20for%20you.%20-%20Mounjaro.png",
+        inStock: true,
+    },
+    {
+        name: "Ozempic®",
+        subtitle: "Trusted by experts. Priced for you.",
+        price: "1409",
+        image: "https://myrocky.b-cdn.net/WP%20Images/wl-med/Trusted%20by%20experts.%20priced%20for%20you.%20-%20Ozempic.png",
         inStock: true,
     },
 ];
@@ -77,21 +91,21 @@ export const steps = [
         title: "Get Approved",
         description:
             "Complete a quick online evaluation to determine if GLP-1 medication is right for you. Our team of licensed professionals will review your information and provide approval in no time.",
-        image: "https://myrocky.b-cdn.net/WP%20Images/bo3/new/Startyour.jpg",
+        image: "https://myrocky.b-cdn.net/WP%20Images/wl-med/Begin%20your%20weight%20loss%20journey%20with%20Rocky.%20-%2001.jpg",
     },
     {
         number: "2",
         title: "Get Prescribed",
         description:
             "Once approved, you\u2019ll receive personalized care and a prescription to support your weight loss and health goals. Your care plan is designed to help you achieve lasting results safely and effectively.",
-        image: "https://myrocky.b-cdn.net/WP%20Images/bo3/new/Provider.jpg",
+        image: "https://myrocky.b-cdn.net/WP%20Images/wl-med/Begin%20your%20weight%20loss%20journey%20with%20Rocky.%20-%2002.jpg",
     },
     {
         number: "3",
         title: "Receive your Rx",
         description:
             "Your medication will be shipped directly to your door for maximum convenience. Starting your treatment is as simple as opening your package and following the easy-to-use instructions.",
-        image: "https://myrocky.b-cdn.net/WP%20Images/bo3/new/Getyourmedication.jpg",
+        image: "https://myrocky.b-cdn.net/WP%20Images/wl-med/Begin%20your%20weight%20loss%20journey%20with%20Rocky.%20-%2003.jpg",
     },
 ];
 

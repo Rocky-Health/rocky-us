@@ -60,11 +60,11 @@ const MedViTestimonialsShowcase = () => {
             >
                 <div className="animate-float">
                     <CustomImage
-                        src="/products/glp1-vial.png"
+                        src="https://myrocky.b-cdn.net/WP%20Images/wl-med/_When%20nothing%20else%20worked,%20Rocky%20did_.png"
                         alt="GLP-1 Medication"
-                        width={480}
-                        height={680}
-                        className="object-contain drop-shadow-xl rotate-12 md:w-[480px] w-[320px]"
+                        width={400}
+                        height={600}
+                        className="object-contain drop-shadow-xl  md:w-[440px] w-[300px]"
                     />
                 </div>
             </div>
@@ -115,7 +115,7 @@ const MedViTestimonialsShowcase = () => {
             <div className="hidden space-y-6 mt-4">
                 <div className="relative w-[200px] h-[300px] mx-auto mb-6 animate-float">
                     <CustomImage
-                        src="/products/glp1-vial.png"
+                        src="https://myrocky.b-cdn.net/WP%20Images/wl-med/_When%20nothing%20else%20worked,%20Rocky%20did_.png"
                         alt="GLP-1 Medication"
                         width={200}
                         height={300}

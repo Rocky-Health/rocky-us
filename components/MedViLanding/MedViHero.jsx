@@ -135,6 +135,14 @@ function HeroImageCard({
                     width={imgWidth}
                     height={imgHeight}
                 />
+                {/* <img
+                    src={src}
+                    alt={alt || ""}
+                    loading="lazy"
+                    className={
+                        "object-cover w-full h-full hover:scale-105 transition-all  duration-500 ease-in-out"
+                    }
+                /> */}
                 {/* <CustomImage
                     src={src}
                     alt={alt || ""}

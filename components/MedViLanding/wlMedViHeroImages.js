@@ -11,62 +11,62 @@
 
 /** @type {WlMedViHeroImage[]} */
 export const WL_MEDVI_HERO_IMAGES = [
-  {
-    id: "leftTop",
-    src: "/medvi/hero-grid-9.jpg",
-    alt: "MyRocky weight loss patient",
-    variant: "tall",
-  },
-  {
-    id: "leftBottom",
-    src: "/medvi/reviews-img-4.jpg",
-    alt: "MyRocky weight loss patient",
-    variant: "wide",
-  },
-  {
-    id: "centerSmall",
-    src: "/medvi/hero-grid-4.jpg",
-    alt: "MyRocky weight loss patient",
-    variant: "square",
-  },
-  {
-    id: "centerTall",
-    src: "/medvi/hero-grid-3.jpg",
-    alt: "MyRocky weight loss patient",
-    variant: "tallMid",
-  },
-  {
-    id: "centerVeryTall",
-    src: "/medvi/hero-grid-8.jpg",
-    alt: "MyRocky weight loss patient",
-    variant: "veryTall",
-  },
-  {
-    id: "rightTop",
-    src: "/medvi/hero-grid-6b.jpg",
-    alt: "MyRocky weight loss patient",
-    variant: "tall",
-  },
-  {
-    id: "rightBottom",
-    src: "/medvi/change-grid-4_1.jpg",
-    alt: "MyRocky weight loss patient",
-    variant: "small",
-  },
+    {
+        id: "leftTop",
+        src: "https://myrocky.b-cdn.net/WP%20Images/wl-med/Hero%20-%2002.jpg",
+        alt: "MyRocky weight loss patient",
+        variant: "tall",
+    },
+    {
+        id: "leftBottom",
+        src: "https://myrocky.b-cdn.net/WP%20Images/wl-med/Hero%20-%2004.jpg",
+        alt: "MyRocky weight loss patient",
+        variant: "wide",
+    },
+    {
+        id: "centerSmall",
+        src: "https://myrocky.b-cdn.net/WP%20Images/wl-med/Hero%20-%2005.jpg",
+        alt: "MyRocky weight loss patient",
+        variant: "square",
+    },
+    {
+        id: "centerTall",
+        src: "https://myrocky.b-cdn.net/WP%20Images/wl-med/Hero%20-%2006.jpg",
+        alt: "MyRocky weight loss patient",
+        variant: "tallMid",
+    },
+    {
+        id: "centerVeryTall",
+        src: "https://myrocky.b-cdn.net/WP%20Images/wl-med/Hero%20-%2007.jpg",
+        alt: "MyRocky weight loss patient",
+        variant: "veryTall",
+    },
+    {
+        id: "rightTop",
+        src: "https://myrocky.b-cdn.net/WP%20Images/wl-med/Hero%20-%2003.jpg",
+        alt: "MyRocky weight loss patient",
+        variant: "tall",
+    },
+    {
+        id: "rightBottom",
+        src: "https://myrocky.b-cdn.net/WP%20Images/wl-med/Hero%20-%2008.jpg",
+        alt: "MyRocky weight loss patient",
+        variant: "small",
+    },
 ];
 
 /** @param {WlMedViHeroImage[]} [images] */
 export function wlMedViHeroImageMap(images = WL_MEDVI_HERO_IMAGES) {
-  return Object.fromEntries(images.map((item) => [item.id, item]));
+    return Object.fromEntries(images.map((item) => [item.id, item]));
 }
 
 /** Mobile grid order (two-column masonry-style read order). */
 export const WL_MEDVI_HERO_MOBILE_ORDER = [
-  "leftTop",
-  "rightTop",
-  "leftBottom",
-  "centerSmall",
-  "centerTall",
-  "centerVeryTall",
-  "rightBottom",
+    "leftTop",
+    "rightTop",
+    "leftBottom",
+    "centerSmall",
+    "centerTall",
+    "centerVeryTall",
+    "rightBottom",
 ];

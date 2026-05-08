@@ -9,27 +9,39 @@
  * @type {WlMedViChangeGridTile[]}
  */
 export const WL_MEDVI_CHANGE_GRID_TILES = [
-    { id: "col1Top", src: "/medvi/change-grid-5.jpg", alt: "MyRocky patient" },
     {
-        id: "col1Bottom",
-        src: "/medvi/reviews-img-1.jpg",
+        id: "col1Top",
+        src: "https://myrocky.b-cdn.net/WP%20Images/wl-med/The%20change%20we've%20all%20been%20waiting%20for.%20-%2001.jpg",
         alt: "MyRocky patient",
     },
-    { id: "col2Top", src: "/medvi/change-grid-10.jpg", alt: "MyRocky patient" },
+    {
+        id: "col1Bottom",
+        src: "https://myrocky.b-cdn.net/WP%20Images/wl-med/The%20change%20we've%20all%20been%20waiting%20for.%20-%2002.jpg",
+        alt: "MyRocky patient",
+    },
+    {
+        id: "col2Top",
+        src: "https://myrocky.b-cdn.net/WP%20Images/wl-med/The%20change%20we've%20all%20been%20waiting%20for.%20-%2003.jpg",
+        alt: "MyRocky patient",
+    },
     {
         id: "col2Bottom",
-        src: "/medvi/hero-grid-2-p-1080.jpg",
+        src: "https://myrocky.b-cdn.net/WP%20Images/wl-med/The%20change%20we've%20all%20been%20waiting%20for.%20-%2004.jpg",
         alt: "MyRocky patient",
     },
     {
         id: "centerTall",
-        src: "/medvi/change-grid-9.jpg",
+        src: "https://myrocky.b-cdn.net/WP%20Images/wl-med/The%20change%20we've%20all%20been%20waiting%20for.%20-%2005.jpg",
         alt: "MyRocky patient",
     },
-    { id: "col4Top", src: "/medvi/change-grid-4.jpg", alt: "MyRocky patient" },
+    {
+        id: "col4Top",
+        src: "https://myrocky.b-cdn.net/WP%20Images/wl-med/The%20change%20we've%20all%20been%20waiting%20for.%20-%2006.jpg",
+        alt: "MyRocky patient",
+    },
     {
         id: "col4Bottom",
-        src: "/medvi/change-grid-11.jpg",
+        src: "https://myrocky.b-cdn.net/WP%20Images/wl-med/The%20change%20we've%20all%20been%20waiting%20for.%20-%2007.jpg",
         alt: "MyRocky patient",
     },
 ];

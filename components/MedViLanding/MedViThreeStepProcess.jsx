@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import CustomImage from "@/components/utils/CustomImage";
-import { steps } from "@/components/GLP1Offer/data";
+import { steps } from "@/components/MedViLanding/data";
 
 const MedViThreeStepProcess = ({ ctaHref = "#" }) => {
     const timelineRef = useRef(null);

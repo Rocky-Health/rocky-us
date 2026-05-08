@@ -11,13 +11,13 @@ import { useRef } from "react";
 const TierCard = ({ tier, ctaHref }) => {
     return (
         <div className="sm:min-w-[340px] min-w-[300px] w-full rounded-[40px] pb-4  overflow-visible group bg-[#F5F4EF44] shadow">
-            <div className="relative w-full h-[380px] bg-[linear-gradient(180deg,#F0EEEA_0%,#F0EEEA_60%,rgba(255,255,255,0)_60%,rgba(255,255,255,0)_100%)] rounded-t-[40px] overflow-visible">
+            <div className="relative w-full h-[300px] bg-[linear-gradient(180deg,#F0EEEA_0%,#F0EEEA_60%,rgba(255,255,255,0)_60%,rgba(255,255,255,0)_100%)] rounded-t-[40px] overflow-visible">
                 <div className="absolute inset-0 -top-10 -left-4 -right-4 flex items-center justify-center">
                     <CustomImage
                         src={tier.image}
                         alt={tier.name}
-                        width={320}
-                        height={400}
+                        width={400}
+                        height={500}
                         className="object-contain drop-shadow-lg scale-110 group-hover:translate-y-[-16px] transition-all duration-300"
                     />
                 </div>

@@ -9,7 +9,7 @@ const MedViMetabolismSection = ({ ctaHref = "#" }) => {
                 <div className="w-full lg:w-[60%] flex gap-2 lg:gap-4 px-6 lg:p-10">
                     <div className="relative w-1/2 h-[200px] sm:h-[250px] lg:h-[350px] rounded-xl overflow-hidden  lg:mt-6">
                         <CustomImage
-                            src="/bo3/gemini.png"
+                            src="https://myrocky.b-cdn.net/WP%20Images/wl-med/We%20will%20fix%20your%20broken%20metabolism.%20-%2002.jpg"
                             alt="Couple cooking together"
                             fill
                             className="object-cover hover:scale-105 transition-all duration-300"
@@ -17,7 +17,7 @@ const MedViMetabolismSection = ({ ctaHref = "#" }) => {
                     </div>
                     <div className="relative w-1/2 h-[200px] sm:h-[250px] lg:h-[350px] rounded-xl overflow-hidden">
                         <CustomImage
-                            src="/bo3/NDWL.jpg"
+                            src="https://myrocky.b-cdn.net/WP%20Images/wl-med/We%20will%20fix%20your%20broken%20metabolism.%20-%2003.jpg"
                             alt="Couple relaxing on couch"
                             fill
                             className="object-cover object-[87%_center] lg:object-[93%_center] hover:scale-105 transition-all duration-300"
