@@ -93,9 +93,9 @@ function FeatureIconTruckCheck(props) {
 const StarRow = () => (
     <div className="flex items-center gap-0 mb-0.5" aria-hidden>
         {[0, 1, 2, 3].map((i) => (
-            <TiStar key={i} className="size-6 text-black" />
+            <TiStar key={i} className="sm:size-6 size-4 text-black" />
         ))}
-        <TiStarHalf className="size-6 text-black" />
+        <TiStarHalf className="sm:size-6 size-4 text-black" />
     </div>
 );
 
@@ -163,23 +163,35 @@ export default function DmOffersHero({
 }) {
     return (
         <section className="w-full px-4 pt-2 md:px-6 ">
-            <div className="rounded-[58px] overflow-hidden w-full bg-gradient-to-br from-yellow-200 via-pink-200 to-purple-300 px-7 py-10 md:py-16">
+            <div className="rounded-[58px] overflow-hidden w-full bg-[linear-gradient(120deg,#f6ea75_0%,#e7c48a_35%,#cb9468_68%,#b27856_100%)] bg-[length:180%_180%] md:px-7 px-4 py-10 md:py-16">
                 <div className="flex sm:flex-row flex-col items-center gap-10 lg:gap-14 max-w-7xl mx-auto">
-                    <div className="order-2 flex flex-col lg:order-1 md:w-[50%]">
-                        <div className="mb-4 flex flex-wrap items-center gap-1 text-[13px] text-[#3d4556] md:text-[14px]">
+                    <div className="flex flex-col order-1 lg:w-[50%]">
+                        <div className="mb-4 flex  items-center gap-1 text-[13px] text-[#3d4556] md:text-[14px]">
                             <StarRow />
-                            <span className="font-poppins font-normal text-sm">
-                                (4.8) Excellent! Over 180,000+ happy customers
+                            <span className="font-poppins font-normal sm:text-sm text-xs">
+                                (4.8) Excellent! Over 350,000+ happy customers
                             </span>
                         </div>
 
-                        <h1 className="headers-font text-3xl font-extrabold leading-[1.12] tracking-wide text-gray-900 md:text-5xl lg:text-6xl lg:leading-[1.1]">
-                            Lose 1-2lbs per week!
-                        </h1>
+                        <div className="flex justify-between items-center">
+                            <div className="lg:w-full w-[60%]">
+                                <h1 className="headers-font text-3xl font-extrabold leading-[100%] md:leading-[1.12] tracking-wide text-gray-900 sm:text-5xl lg:text-6xl lg:leading-[1.1] ">
+                                    Lose 1-2lbs per week!
+                                    <p className="font-poppins text-base font-normal text-gray-900 lg:hidden inline ps-2 leading-[1] md:leading-[1.12]">
+                                        The proven way to lose 15% of your body
+                                        weight fast!
+                                    </p>
+                                </h1>
 
-                        <p className="mt-8 font-poppins text-base font-normal text-gray-900">
-                            The proven way to lose 15% of your body weight fast!
-                        </p>
+                                <p className="mt-8 font-poppins text-base font-normal text-gray-900 lg:block hidden">
+                                    The proven way to lose 15% of your body
+                                    weight fast!
+                                </p>
+                            </div>
+                            <div className=" lg:hidden block lg:w-auto w-[40%]">
+                                <HeroFigure />
+                            </div>
+                        </div>
 
                         <p className="mt-4 font-poppins  leading-relaxed text-sm text-gray-800 md:pe-16">
                             Starting at{" "}
@@ -207,22 +219,22 @@ export default function DmOffersHero({
                             ))}
                         </ul>
 
-                        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center px-4">
+                        <div className="mt-8 flex gap-3 flex-row flex-wrap items-center sm:px-4 sm:justify-start justify-center">
                             <Link
                                 href={getStartedHref}
-                                className="inline-flex py-3 min-w-[180px] items-center justify-center rounded-full bg-black px-8 font-poppins text-[15px] font-semibold text-white transition-colors hover:bg-neutral-800"
+                                className="inline-flex py-3 sm:min-w-[180px] items-center justify-center rounded-full bg-black sm:px-8 px-4 font-poppins text-[15px] font-semibold text-white transition-colors hover:bg-neutral-800"
                             >
                                 Get started
                             </Link>
                             <Link
                                 href={pricingHref}
-                                className="inline-flex py-3 min-w-[180px] items-center justify-center rounded-full border border-neutral-300 bg-white px-8 font-poppins text-[15px] font-semibold transition-all duration-300 hover:bg-neutral-50"
+                                className="inline-flex py-3 sm:min-w-[180px] items-center justify-center rounded-full border border-neutral-300 bg-white sm:px-8 px-4 font-poppins text-[15px] font-semibold transition-all duration-300 hover:bg-neutral-50"
                             >
                                 See pricing
                             </Link>
                         </div>
 
-                        <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-2 pt-2 font-poppins text-xs opacity-90 px-4">
+                        <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-2 pt-2 font-poppins text-xs opacity-90 px-4 sm:justify-start justify-center">
                             {TRUST_ITEMS.map(({ Icon, text }) => (
                                 <span
                                     key={text}
@@ -235,7 +247,7 @@ export default function DmOffersHero({
                         </div>
                     </div>
 
-                    <div className="order-1 lg:order-2 md:w-[50%]">
+                    <div className="hidden lg:block order-2 md:w-[50%]">
                         <HeroFigure />
                     </div>
                 </div>

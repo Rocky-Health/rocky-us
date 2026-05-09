@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import {
     FaCheck,
     FaClipboardList,
@@ -11,31 +10,10 @@ import {
 } from "react-icons/fa";
 import { useCallback, useRef, useState } from "react";
 import { BiSolidLeftArrow, BiSolidRightArrow } from "react-icons/bi";
-import FeaturesNotAnimated from "../FeaturesNotAnimated";
-import { MdDoNotDisturbAlt } from "react-icons/md";
-import { FaRegCircleCheck } from "react-icons/fa6";
+import DmOffersFeaturesCtaBlock from "./DmOffersFeaturesCtaBlock";
 
 const BEFORE_SRC = "/dm-offers/results2b.jpg";
 const AFTER_SRC = "/dm-offers/results1b.jpg";
-
-const rockyFeaturesCards = [
-    {
-        title: "US-Certified Pharmacy",
-        image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/Pre%20Sell/hospital%201.png",
-    },
-    {
-        title: "Personalized Treatments",
-        image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/Pre%20Sell/personalized.png",
-    },
-    {
-        title: "Trusted by 350K+ Canadians",
-        image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/Pre%20Sell/trusted.png",
-    },
-    {
-        title: "1:1 Medical Support",
-        image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/Pre%20Sell/medical.png",
-    },
-];
 
 function BeforeAfterCompare() {
     const [pct, setPct] = useState(50);
@@ -138,8 +116,8 @@ function WeightShedCalculator() {
     const loss = Math.round(weight * 0.2);
 
     return (
-        <div className="grow w-full rounded-3xl border border-neutral-100 bg-white px-6 py-10 shadow-[0_24px_60px_-32px_rgba(0,0,0,0.18)] md:w-auto md:px-10 md:py-20">
-            <h3 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
+        <div className="grow w-full rounded-3xl border border-neutral-100 bg-white px-6 py-10 shadow-[0_24px_60px_-32px_rgba(0,0,0,0.18)] lg:w-auto lg:px-10 lg:py-20">
+            <h3 className="sm:text-3xl text-2xl lg:text-4xl font-bold text-gray-900 mb-4 tracking-tight sm:text-left text-center">
                 Let&apos;s See How much weight can you shed by next spring?
             </h3>
             <hr className="mt-5 border-neutral-200" />
@@ -193,12 +171,12 @@ function WeightShedCalculator() {
             </div>
 
             <div className="w-fit mx-auto">
-                <div className="mt-10 inline-flex h-[102px]  min-w-[229px] max-w-full items-center justify-between gap-8 rounded-[57px] bg-gradient-to-br from-yellow-200 via-pink-200 to-purple-300 px-[52px] py-0 font-poppins text-lg font-bold leading-6 text-[#1a1a1a]">
-                    <span className="min-w-0 leading-6 text-end">
+                <div className="mt-10 inline-flex sm:h-[102px] h-[90px]  min-w-[229px] max-w-full items-center justify-between gap-8 rounded-[57px] bg-[linear-gradient(120deg,#f6ea75_0%,#e7c48a_35%,#cb9468_68%,#b27856_100%)] bg-[length:180%_180%] sm:px-[52px] px-8 py-0 font-poppins text-lg font-bold leading-6 text-[#1a1a1a]">
+                    <span className="min-w-0 leading-6 text-end ">
                         You could
                         <span className="block">easily lose:</span>
                     </span>
-                    <span className="shrink-0 tabular-nums text-4xl">
+                    <span className="shrink-0 tabular-nums text-4xl whitespace-break-spaces ">
                         {loss} lbs
                     </span>
                 </div>
@@ -207,81 +185,27 @@ function WeightShedCalculator() {
     );
 }
 
-const TRUST_ITEMS = [
-    {
-        Icon: MdDoNotDisturbAlt,
-        text: "No Hidden Fees",
-    },
-    {
-        Icon: MdDoNotDisturbAlt,
-        text: "No Monthly Membership",
-    },
-    {
-        Icon: FaRegCircleCheck,
-        text: "Cancel Anytime",
-    },
-];
-
 export default function DmOffersGoalSection({
     getStartedHref = "/glp2-pre-consultation",
     pricingHref = "/glp1-offer-hero",
 }) {
     return (
-        <section className="w-full bg-gray-100  pb-10 pt-2 md:pb-14">
+        <section className="w-full bg-gray-100  pb-10 pt-2 md:pb-12">
             <div className="overflow-hidden py-10  md:py-16">
-                <h2 className="text-center text-4xl md:text-[54px] font-bold tracking-tight text-gray-900 max-w-5xl mx-auto mb-12 leading-tight">
+                <h2 className="text-center sm:text-4xl text-3xl md:text-[54px] font-bold tracking-tight text-gray-900 max-w-5xl mx-auto mb-12 !leading-tight">
                     Finally Lose Weight Without Fighting Hunger, Dieting Harder,
                     or Feeling Miserable
                 </h2>
 
-                <div className="mb-10 flex flex-col md:flex-row items-start gap-10 max-w-7xl mx-auto ">
+                <div className="mb-10 flex flex-col lg:flex-row items-start lg:gap-10 gap-6 lg:max-w-7xl mx-auto ">
                     <BeforeAfterCompare />
                     <WeightShedCalculator />
                 </div>
 
-                <FeaturesNotAnimated
-                    cards={rockyFeaturesCards}
-                    bg="!max-w-7xl"
+                <DmOffersFeaturesCtaBlock
+                    getStartedHref={getStartedHref}
+                    pricingHref={pricingHref}
                 />
-
-                <div className="flex flex-col items-center gap-6 mt-16">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center px-4">
-                        <Link
-                            href={getStartedHref}
-                            className="inline-flex py-3 min-w-[180px] items-center justify-center rounded-full bg-black px-8 font-poppins text-[15px] font-semibold text-white transition-colors hover:bg-neutral-800"
-                        >
-                            Get started
-                        </Link>
-                        <Link
-                            href={pricingHref}
-                            className="inline-flex py-3 min-w-[180px] items-center justify-center rounded-full border border-neutral-300 bg-white px-8 font-poppins text-[15px] font-semibold transition-all duration-300 hover:bg-neutral-50"
-                        >
-                            See pricing
-                        </Link>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-x-5 gap-y-2  font-poppins text-xs opacity-90 px-4">
-                        {TRUST_ITEMS.map(({ Icon, text }) => (
-                            <span
-                                key={text}
-                                className="inline-flex items-center gap-1.5"
-                            >
-                                <Icon className="size-4" />
-                                {text}
-                            </span>
-                        ))}
-                    </div>
-
-                    <div className="w-full px-4">
-                        <Image
-                            src="/dm-offers/trustpilot.png"
-                            alt="Trustpilot rating"
-                            width={270}
-                            height={60}
-                            className="mx-auto block h-auto w-full max-w-[300px] pt-4"
-                        />
-                    </div>
-                </div>
             </div>
         </section>
     );

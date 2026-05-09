@@ -1,9 +1,17 @@
 import DmSpringPromoHeader from "@/components/DmOffers/DmSpringPromoHeader";
 import DmOffersHero from "@/components/DmOffers/DmOffersHero";
+import DmOffersFaqsSection from "@/components/DmOffers/DmOffersFaqsSection";
+import DmOffersGetStartedCtaSection from "@/components/DmOffers/DmOffersGetStartedCtaSection";
 import DmOffersGoalSection from "@/components/DmOffers/DmOffersGoalSection";
+import DmOffersHungerSignalsSection from "@/components/DmOffers/DmOffersHungerSignalsSection";
+import DmOffersInStockMedicationsSection from "@/components/DmOffers/DmOffersInStockMedicationsSection";
+import DmOffersMedicationTimelineSection from "@/components/DmOffers/DmOffersMedicationTimelineSection";
+import DmOffersTestimonialsCarouselBlock from "@/components/DmOffers/DmOffersTestimonialsCarouselBlock";
 import Footer from "@/components/Footer/Footer";
 import DmOffersNav from "@/components/DmOffers/DmOffersNav";
-import RockyInTheNews from "@/components/RockyInTheNews";
+import ReviewsSection from "@/components/ReviewsSection";
+import DmOffersRockyInTheNews from "@/components/DmOffers/DmOffersRockyInTheNews";
+import Section from "@/components/utils/Section";
 
 export const metadata = {
     title: "Spring Offers | Rocky",
@@ -17,8 +25,21 @@ export default function DmOffersPage() {
             <DmSpringPromoHeader />
             <DmOffersNav />
             <DmOffersHero />
-            <RockyInTheNews />
+            <DmOffersRockyInTheNews />
             <DmOffersGoalSection />
+            <DmOffersHungerSignalsSection />
+            <DmOffersTestimonialsCarouselBlock />
+            <DmOffersMedicationTimelineSection />
+            <Section bg="bg-[#FAF3EF] !mb-2">
+                <ReviewsSection />
+            </Section>
+            <Section bg="bg-gray-100 sm:!px-5 !px-0 ">
+                <DmOffersInStockMedicationsSection />
+            </Section>
+            <Section bg="bg-white">
+                <DmOffersFaqsSection />
+            </Section>
+            <DmOffersGetStartedCtaSection />
 
             <Footer />
         </main>

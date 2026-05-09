@@ -444,37 +444,35 @@ input.dm-weight-shed-slider[type="range"] {
     appearance: none;
     width: 100%;
     height: 10px;
-    border-radius: 9999px;
+    border-radius: 2px;
     background: #5eb9f0;
 }
 input.dm-weight-shed-slider[type="range"]::-webkit-slider-runnable-track {
     height: 10px;
-    border-radius: 9999px;
+    border-radius: 2px;
     background: #5eb9f0;
 }
 input.dm-weight-shed-slider[type="range"]::-moz-range-track {
     height: 10px;
-    border-radius: 9999px;
+    border-radius: 2px;
     background: #5eb9f0;
 }
 input.dm-weight-shed-slider[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 50px;
+    width: 60px;
     height: 32px;
     margin-top: -11px;
     border-radius: 6px;
-    border: 1px solid #e5e7eb;
     background-color: #fff;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
     background-image:
         linear-gradient(#9ca3af, #9ca3af), linear-gradient(#9ca3af, #9ca3af),
         linear-gradient(#9ca3af, #9ca3af);
-    background-size: 2px 20px;
+    background-size: 1px 20px;
     background-position:
-        calc(50% - 14px) 50%,
+        calc(50% - 7px) 50%,
         50% 50%,
-        calc(50% + 14px) 50%;
+        calc(50% + 7px) 50%;
     background-repeat: no-repeat;
     cursor: grab;
 }
@@ -482,20 +480,18 @@ input.dm-weight-shed-slider[type="range"]:active::-webkit-slider-thumb {
     cursor: grabbing;
 }
 input.dm-weight-shed-slider[type="range"]::-moz-range-thumb {
-    width: 50px;
+    width: 60px;
     height: 32px;
     border-radius: 6px;
-    border: 1px solid #e5e7eb;
     background-color: #fff;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
     background-image:
         linear-gradient(#9ca3af, #9ca3af), linear-gradient(#9ca3af, #9ca3af),
         linear-gradient(#9ca3af, #9ca3af);
-    background-size: 2px 20px;
+    background-size: 1px 20px;
     background-position:
-        calc(50% - 14px) 50%,
+        calc(50% - 7px) 50%,
         50% 50%,
-        calc(50% + 14px) 50%;
+        calc(50% + 7px) 50%;
     background-repeat: no-repeat;
     cursor: grab;
 }

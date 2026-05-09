@@ -2,14 +2,16 @@ import React from "react";
 import CustomImage from "../utils/CustomImage";
 
 const defaultTheme = {
-    bannerSection: "bg-[#1a2332] px-4 py-4",
-    pill: "w-fiy  rounded-full border border-[#f6d9c8] px-10 py-1.5 md:px-16",
-    headline: "font-poppins text-[20px] font-bold leading-tight text-[#f7e1ab]",
+    bannerSection: "bg-[#1a2332] sm:px-4 px-2 py-4",
+    pill: "w-fiy  rounded-full border border-[#f6d9c8] sm:px-10 px-2 py-1.5 md:px-16 w-full sm:w-fit",
+    headline:
+        "font-poppins text-[16px] sm:text-[20px] font-bold leading-tight text-[#f7e1ab]",
     discountLine:
-        "mt-0 font-poppins font-normal leading-snug text-white text-[12px]",
-    ctaLine: "text-center font-poppins text-[16px] text-white font-medium",
+        "mt-0 font-poppins font-normal leading-snug text-white sm:text-[12px] text-[10px]",
+    ctaLine:
+        "text-center font-poppins sm:text-[16px] text-[12px] text-white font-medium",
     ctaUnderline: "underline decoration-white underline-offset-2",
-    blossomIcon: "shrink-0 text-[#f472b6]",
+    blossomIcon: "shrink-0 text-[#f472b6] sm:w-12 w-8 sm:h-12 h-8",
     tickerSection: "marquee-container bg-[#e8eef5] py-1.5",
     tickerItem:
         "flex items-center gap-2 font-poppins  text-[#000] text-[13px] font-medium",
@@ -20,8 +22,8 @@ const BlossomIcon = ({ className }) => (
     <CustomImage
         src="/dm-offers/sun.png"
         alt="Sun Icon"
-        width={30}
-        height={30}
+        width={40}
+        height={40}
         className={className}
     />
 );
