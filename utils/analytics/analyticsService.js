@@ -209,7 +209,13 @@ export const analyticsService = {
    */
   async trackPurchase(order) {
     try {
-      if (!order || !order.id) return;
+      if (!order || !order.id) {
+        logger.error("[Analytics] trackPurchase aborted: missing order or order.id", {
+          hasOrder: !!order,
+          orderKeys: order && typeof order === "object" ? Object.keys(order) : null,
+        });
+        return;
+      }
 
       // Separate idempotency guards per integration to avoid blocking S2S
       const guardKeyGA4 = `analytics:purchase:ga4:${order.id}`;

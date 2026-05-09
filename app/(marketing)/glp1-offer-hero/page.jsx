@@ -29,7 +29,7 @@ export const metadata = {
 };
 
 export default async function GLP1OfferHeroPage() {
-  const ctaHref = "/wl-pre-consultation";
+  const ctaHref = "/wl-pre-consultation-2";
 
   return (
     <main>
