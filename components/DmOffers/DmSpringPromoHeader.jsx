@@ -32,7 +32,7 @@ const FEATURES = [
     "Personalized Treatment Plans",
     "Certified Medical Professionals",
     "Safe & Effective Medications",
-    "180k+ Happy Customers",
+    "350k+ Happy Customers",
     "Accessible & Affordable",
 ];
 

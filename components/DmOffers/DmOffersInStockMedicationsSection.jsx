@@ -7,14 +7,14 @@ export const DM_OFFERS_INSTOCK_CARDS = [
         badge: "In Stock - Up to $200 OFF",
         imageSrc: "/dm-offers/lp-product.jpg",
         imageAlt:
-            "Rocky compounded Semaglutide and Tirzepatide injection vials",
+            "MyRocky compounded Semaglutide and Tirzepatide injection vials",
     },
     {
         title: "Compounded GLP-1 Oral Drops",
         badge: "In Stock - Up to $200 OFF",
         imageSrc: "/dm-offers/lp-product-sublingual.jpg",
         imageAlt:
-            "Rocky compounded Semaglutide and Tirzepatide sublingual liquid bottles",
+            "MyRocky compounded Semaglutide and Tirzepatide sublingual liquid bottles",
     },
 ];
 

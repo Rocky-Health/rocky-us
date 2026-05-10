@@ -118,7 +118,7 @@ export default function DmOffersHungerSignalsSection() {
                     <p className="font-poppins text-lg sm:text-xl text-gray-600 leading-relaxed my-4">
                         There&apos;s no shame in using medical weight loss to
                         support your health when traditional methods aren&apos;t
-                        cutting it. Rocky pairs you with licensed clinicians
+                        cutting it. MyRocky pairs you with licensed clinicians
                         dedicated to supporting your weight loss — so
                         you&apos;re never left guessing, stuck waiting, or on
                         your own.
@@ -126,7 +126,7 @@ export default function DmOffersHungerSignalsSection() {
 
                     <p className="font-poppins text-[26px] font-light text-gray-800/80">
                         Watch what our customers have to say about losing weight
-                        with Rocky:
+                        with MyRocky:
                     </p>
                 </div>
 

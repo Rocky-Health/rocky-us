@@ -8,27 +8,27 @@ import ScrollArrows from "@/components/ScrollArrows";
 export const DM_OFFERS_VIMEO_VIDEOS = [
     {
         vimeoId: "1123949957",
-        title: "Rocky member testimonial — weight loss journey",
+        title: "MyRocky member testimonial — weight loss journey",
     },
     {
         vimeoId: "1123958880",
-        title: "Rocky member testimonial — weight loss journey",
+        title: "MyRocky member testimonial — weight loss journey",
     },
     {
         vimeoId: "1123965031",
-        title: "Rocky member testimonial — weight loss journey",
+        title: "MyRocky member testimonial — weight loss journey",
     },
     {
         vimeoId: "1123964421",
-        title: "Rocky member testimonial — weight loss journey",
+        title: "MyRocky member testimonial — weight loss journey",
     },
     {
         vimeoId: "1123986623",
-        title: "Rocky member testimonial — weight loss journey",
+        title: "MyRocky member testimonial — weight loss journey",
     },
     {
         vimeoId: "1123988338",
-        title: "Rocky member testimonial — weight loss journey",
+        title: "MyRocky member testimonial — weight loss journey",
     },
 ];
 
@@ -232,7 +232,7 @@ export default function DmOffersVimeoCarousel({
                                         referrerPolicy="strict-origin-when-cross-origin"
                                         title={
                                             title ||
-                                            "Rocky customer testimonial video"
+                                            "MyRocky customer testimonial video"
                                         }
                                         allowFullScreen
                                     />

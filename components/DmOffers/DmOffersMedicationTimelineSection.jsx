@@ -33,7 +33,7 @@ export const DM_OFFERS_MEDICATION_TIMELINE_STEPS = [
         color: "text-[#e7a1d9]",
     },
     {
-        label: "Ongoing care & support with Rocky's nursing staff",
+        label: "Ongoing care & support with MyRocky Team",
         tone: "highlight",
         action: "Begin treatment",
         color: "text-[#c87ad4]",
@@ -53,7 +53,7 @@ export default function DmOffersMedicationTimelineSection({
     steps = DM_OFFERS_MEDICATION_TIMELINE_STEPS,
     logoSrc = DM_OFFERS_MYROCKY_LOGO,
     phoneSrc = DM_OFFERS_TIMELINE_PHONE_SRC,
-    phoneAlt = "Start your Rocky visit on your phone",
+    phoneAlt = "Start your MyRocky visit on your phone",
 }) {
     const [openByIndex, setOpenByIndex] = useState({});
 

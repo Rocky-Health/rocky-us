@@ -158,8 +158,8 @@ function HeroFigure() {
  * DM offers: split hero with gradient card, checklist, and figure + vials.
  */
 export default function DmOffersHero({
-    getStartedHref = "/glp2-pre-consultation",
-    pricingHref = "/glp1-offer-hero",
+    getStartedHref = "/glp1-pre-consultation-3",
+    pricingHref = "/glp1-pre-consultation-3",
 }) {
     return (
         <section className="w-full px-4 pt-2 md:px-6 ">

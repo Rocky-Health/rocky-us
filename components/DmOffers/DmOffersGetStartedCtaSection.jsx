@@ -5,7 +5,7 @@ import Section from "@/components/utils/Section";
  * Bottom funnel CTA — gradient band, headline + promo, primary link.
  */
 export default function DmOffersGetStartedCtaSection({
-    getStartedHref = "/glp2-pre-consultation",
+    getStartedHref = "/glp1-pre-consultation-3",
     eyebrow = "GET STARTED",
 }) {
     return (

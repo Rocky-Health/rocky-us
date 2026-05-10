@@ -41,8 +41,8 @@ const DEFAULT_TRUST_ITEMS = [
 export default function DmOffersFeaturesCtaBlock({
     cards = DEFAULT_FEATURE_CARDS,
     featuresBg = "!max-w-7xl mb-16",
-    getStartedHref = "/glp2-pre-consultation",
-    pricingHref = "/glp1-offer-hero",
+    getStartedHref = "/glp1-pre-consultation-3",
+    pricingHref = "/glp1-pre-consultation-3",
     trustItems = DEFAULT_TRUST_ITEMS,
     trustpilotSrc = "/dm-offers/trustpilot.png",
     trustpilotAlt = "Trustpilot rating",

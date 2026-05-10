@@ -1,25 +1,25 @@
 /**
- * DM Offers FAQ — WL / GLP-1 (adapted from source Q&A; Rocky US branding).
+ * DM Offers FAQ — WL / GLP-1 (adapted from source Q&A; MyRocky US branding).
  * `answer` accepts HTML: `<p>`, `<ol>`, `<li>`, `<a>`, `<u>`, `<strong>`.
  * COA / dosage screenshots from the legacy site paths are summarized in text instead of broken `./img/` links.
  * `avatarSrc` — row header avatar; `onError` falls back to `initials` in `DmOffersFaqAccordion.jsx`.
  */
 export const DM_OFFERS_FAQ_ITEMS = [
     {
-        question: "How does Rocky work?",
-        answer: "<p>Rocky helps you access prescription GLP-1 weight-loss care from home—including compounded semaglutide and tirzepatide options when clinically appropriate. Your visit and plan pricing are presented clearly upfront and typically bundle medication where prescribed, clinician review, and shipping depending on your selected offer.</p><p>After you select a plan and complete checkout, complete your medical intake in your Rocky patient account. Once a licensed provider approves your prescription, a licensed US pharmacy ships your medication, usually within a few business days.</p><p>When you need a refill or dose adjustment, message your clinician through your Rocky account. Your provider reviews your chart, updates your prescription when appropriate, and the pharmacy fulfills the next shipment with tracking.</p><p>*If your prescription cannot be issued, Rocky will refund qualifying fees according to the policy shown at checkout.</p>",
+        question: "How does MyRocky work?",
+        answer: "<p>MyRocky helps you access prescription GLP-1 weight-loss care from home—including compounded semaglutide and tirzepatide options when clinically appropriate. Your visit and plan pricing are presented clearly upfront and typically bundle medication where prescribed, clinician review, and shipping depending on your selected offer.</p><p>After you select a plan and complete checkout, complete your medical intake in your MyRocky patient account. Once a licensed provider approves your prescription, a licensed US pharmacy ships your medication, usually within a few business days.</p><p>When you need a refill or dose adjustment, message your clinician through your MyRocky account. Your provider reviews your chart, updates your prescription when appropriate, and the pharmacy fulfills the next shipment with tracking.</p><p>*If your prescription cannot be issued, MyRocky will refund qualifying fees according to the policy shown at checkout.</p>",
         initials: "RC",
         avatarSrc: "https://i.pravatar.cc/128?img=49",
     },
     {
         question: "How do I know this is safe?",
-        answer: "<p>Rocky is built around licensed US prescribing and partnered 503A compounding pharmacies:</p><ol><li>All prescribing <u>clinicians</u> hold active licenses and prescribe only where permitted in your state.</li><li>Partner <u>pharmacies</u> are US-based 503A compounding pharmacies governed by federal and state board oversight.</li><li>Rocky maintains compliance processes appropriate for telehealth prescribing and fulfillment.</li><li>Our site participates in <u>LegitScript</u> oversight used across telehealth storefronts—you can verify the live seal linked from our homepage footer.</li></ol>",
+        answer: "<p>MyRocky is built around licensed US prescribing and partnered 503A compounding pharmacies:</p><ol><li>All prescribing <u>clinicians</u> hold active licenses and prescribe only where permitted in your state.</li><li>Partner <u>pharmacies</u> are US-based 503A compounding pharmacies governed by federal and state board oversight.</li><li>MyRocky maintains compliance processes appropriate for telehealth prescribing and fulfillment.</li><li>Our site participates in <u>LegitScript</u> oversight used across telehealth storefronts—you can verify the live seal linked from our homepage footer.</li></ol>",
         initials: "SK",
         avatarSrc: "https://i.pravatar.cc/128?img=52",
     },
     {
         question: "So how does the signup process work?",
-        answer: "<ol><li>Complete the health qualifier (usually about 5 minutes).</li><li>Select the treatment path your clinician recommends for your answers.</li><li>Finish checkout for your first fulfillment period.*</li><li>Complete your intake in your Rocky patient account.</li><li>A clinician typically responds within about 24 hours—often sooner.</li><li>Your provider conducts a thorough review and decides whether a prescription is appropriate.</li><li>If approved, the pharmacy prepares and ships your order with courier tracking.</li></ol><p>*If no prescription can be issued, qualifying fees are refunded per the policy disclosed at checkout.</p>",
+        answer: "<ol><li>Complete the health qualifier (usually about 5 minutes).</li><li>Select the treatment path your clinician recommends for your answers.</li><li>Finish checkout for your first fulfillment period.*</li><li>Complete your intake in your MyRocky patient account.</li><li>A clinician typically responds within about 24 hours—often sooner.</li><li>Your provider conducts a thorough review and decides whether a prescription is appropriate.</li><li>If approved, the pharmacy prepares and ships your order with courier tracking.</li></ol><p>*If no prescription can be issued, qualifying fees are refunded per the policy disclosed at checkout.</p>",
         initials: "JP",
         avatarSrc: "https://i.pravatar.cc/128?img=3",
     },

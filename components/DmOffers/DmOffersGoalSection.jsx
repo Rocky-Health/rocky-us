@@ -186,8 +186,8 @@ function WeightShedCalculator() {
 }
 
 export default function DmOffersGoalSection({
-    getStartedHref = "/glp2-pre-consultation",
-    pricingHref = "/glp1-offer-hero",
+    getStartedHref = "/glp1-pre-consultation-3",
+    pricingHref = "/glp1-pre-consultation-3",
 }) {
     return (
         <section className="w-full bg-gray-100  pb-10 pt-2 md:pb-12">
