@@ -404,12 +404,9 @@ const Page = ({
 
       {isCombinedPage &&
         !questions.some(
-          (q) =>
-            q?.type === "form" ||
-            q?.type === "contactIntro" ||
-            q?.type === "glp1ContactAuth",
+          (q) => q?.type === "contactIntro" || q?.type === "glp1ContactAuth",
         ) && (
-          <div className="w-full px-4 pb-4 flex items-center justify-center z-50 ">
+          <div className="w-full pb-4 flex items-center justify-center z-50 ">
             <div className="w-full  md:max-w-[665px]">
               {attemptedContinue && !allCombinedQuestionsValid && (
                 <p className="text-red-500 text-sm mb-2 text-center">

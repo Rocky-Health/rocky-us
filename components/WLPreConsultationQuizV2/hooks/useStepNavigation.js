@@ -139,8 +139,8 @@ export const useStepNavigation = (quizConfig) => {
       if (pageConfig) {
         const stepIds = pageConfig.stepIds || [];
         if (stepIds.length === 0) return false;
-        // Skip the page only if every step on it has passIf === "authenticate" and user is authenticated
-        return stepIds.every((stepId) => {
+        // Skip the page if any step on it has passIf === "authenticate" and user is authenticated
+        return stepIds.some((stepId) => {
           const step = quizConfig.steps[stepId];
           return step?.passIf === "authenticate" && isAuthenticated;
         });

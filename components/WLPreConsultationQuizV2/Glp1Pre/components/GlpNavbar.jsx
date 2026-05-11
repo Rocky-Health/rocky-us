@@ -79,7 +79,7 @@ export default function GlpNavbar({ currentPage, onBack }) {
                   />
                 </div>
                 <span
-                  className={`ml-3 step-name text-base font-normal max-w-[80px] ${activeLabel === "start" ? "block" : "hidden sm:block"}`}
+                  className={`ml-3 step-name md:text-base text-[12px] font-normal max-w-[80px] ${activeLabel === "start" ? "block" : "hidden sm:block"}`}
                 >
                   Start
                 </span>
@@ -103,7 +103,7 @@ export default function GlpNavbar({ currentPage, onBack }) {
                   )}
                 </div>
                 <span
-                  className={`ml-3 step-name text-base font-normal max-w-[80px] ${activeLabel === "details" ? "block" : "hidden sm:block"}`}
+                  className={`ml-3 step-name md:text-base text-[12px] font-normal max-w-[80px] ${activeLabel === "details" ? "block" : "hidden sm:block"}`}
                 >
                   Details
                 </span>
@@ -127,7 +127,7 @@ export default function GlpNavbar({ currentPage, onBack }) {
                   )}
                 </div>
                 <span
-                  className={`ml-3 step-name text-base font-normal max-w-[110px] ${activeLabel === "eligibility" ? "block" : "hidden sm:block"}`}
+                  className={`ml-3 step-name md:text-base text-[12px] font-normal max-w-[110px] ${activeLabel === "eligibility" ? "block" : "hidden sm:block"}`}
                 >
                   Eligibility
                 </span>

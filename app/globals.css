@@ -14,9 +14,9 @@
     }
 }
 
-.scroll-reveal-animate {
+/* .scroll-reveal-animate {
     animation: scrollRevealUp 0.7s ease-out both;
-}
+} */
 
 @media (prefers-reduced-motion: reduce) {
     .scroll-reveal-animate {

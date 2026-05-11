@@ -98,7 +98,7 @@ const Glp1DobStep = ({
 
   return (
     <div className="w-full h-full flex flex-col px-4 md:px-0">
-      <div className="w-full md:w-[580px] mx-auto flex-grow">
+      <div className="w-full md:w-[580px] mx-auto flex-grow pb-12">
         <h1 className="headers-font text-[28px] md:text-[32px] leading-[115%] text-[#251F20] mb-8">
           What is your date of birth?
         </h1>

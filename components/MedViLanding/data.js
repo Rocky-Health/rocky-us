@@ -91,7 +91,7 @@ export const steps = [
         title: "Get Approved",
         description:
             "Complete a quick online evaluation to determine if GLP-1 medication is right for you. Our team of licensed professionals will review your information and provide approval in no time.",
-        image: "https://myrocky.b-cdn.net/WP%20Images/wl-med/Begin%20your%20weight%20loss%20journey%20with%20Rocky.%20-%2001.jpg",
+        image: "/medvi/beginTheJourney.png",
     },
     {
         number: "2",

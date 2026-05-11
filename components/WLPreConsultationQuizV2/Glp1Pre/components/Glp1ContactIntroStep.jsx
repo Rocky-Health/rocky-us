@@ -20,7 +20,7 @@ const Glp1ContactIntroStep = ({ userData, onContinue }) => {
         </p>
       </div>
 
-      <div className="fixed bottom-0 left-0 w-full px-4 pb-4 flex items-center justify-center z-50 bg-[linear-gradient(180deg,rgba(245,244,239,0)_0%,rgba(245,244,239,0.8)_37.51%,#F5F4EF_63.04%)] backdrop-blur-sm">
+      <div className="fixed bottom-0 left-0 w-full px-4 pb-4 flex items-center justify-center z-50 bg-white">
         <div className="w-[335px] md:w-[520px] max-w-xl">
           <button
             type="button"
