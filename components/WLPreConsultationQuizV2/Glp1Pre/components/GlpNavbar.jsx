@@ -85,7 +85,7 @@ export default function GlpNavbar({ currentPage, onBack }) {
                 </span>
               </div>
             </li>
-            {/* Start → Details connector */}
+            {/* Start → Details connecto */}
             <div
               className={`flex-initial border-t-2 w-14 ml-3 mr-3 ${detailsActive ? "border-[#AE7E56]" : "border-gray-900/30"}`}
             ></div>
