@@ -1,15 +1,14 @@
 "use client";
 
 import React from "react";
-import QuizEngine from "@/components/Glp2V2/QuizEngine";
-import { wlPreConsultationConfig } from "@/components/Glp2V2/config/wlPreConsultationConfig";
+import Glp2PreV2SinglePage from "@/components/WLPreConsultationQuizV2/Glp2PreV2/Glp2PreV2SinglePage";
 
 export default function Glp2PreV2Page() {
   return (
     <main>
       <style jsx global>{`
         /* ── Hide site navigation and footer during the quiz ─────────────── */
-        header:not(.questionnaire-header),
+        header:not(.glp2-v2-header),
         nav,
         .site-header,
         .main-header,
@@ -39,9 +38,13 @@ export default function Glp2PreV2Page() {
         .footer {
           display: none !important;
         }
+
+        .glp2-v2-header {
+          display: flex !important;
+        }
       `}</style>
 
-      <QuizEngine config={wlPreConsultationConfig} />
+      <Glp2PreV2SinglePage />
     </main>
   );
 }

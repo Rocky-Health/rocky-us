@@ -1,96 +1,118 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { isUserAuthenticated } from "@/utils/crossSellCheckout";
 
 const STORAGE_KEY = "wl_flow2_quiz_data";
 
 // Add isAuthenticated param to control step skipping
 export const useStepNavigation = (quizConfig) => {
-  // Initialize from localStorage if available
-  const [currentStep, setCurrentStep] = useState(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          return parsed.currentStep || 1;
-        }
-      } catch (e) {
-        console.error("Failed to load currentStep from localStorage:", e);
+  const getPageStepIds = (pageOrStepNumber) => {
+    const pageConfig = quizConfig.pages?.[pageOrStepNumber];
+    return pageConfig?.stepIds?.length ? pageConfig.stepIds : [pageOrStepNumber];
+  };
+
+  const getPrimaryStepNumber = (pageOrStepNumber) => {
+    return getPageStepIds(pageOrStepNumber)[0];
+  };
+
+  const getPrimaryStepConfig = (pageOrStepNumber) => {
+    const primaryStepNumber = getPrimaryStepNumber(pageOrStepNumber);
+    return quizConfig.steps?.[primaryStepNumber];
+  };
+
+  const resolvePageNumber = (stepOrPageNumber) => {
+    if (!quizConfig.pages) return stepOrPageNumber;
+
+    const asNumber = Number(stepOrPageNumber);
+    for (const [pageNumber, pageConfig] of Object.entries(quizConfig.pages)) {
+      if (pageConfig?.stepIds?.includes(asNumber)) {
+        return Number(pageNumber);
       }
     }
-    return 1;
-  });
 
-  const [progressPercent, setProgressPercent] = useState(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          if (parsed.progressPercent !== undefined) {
-            return parsed.progressPercent;
-          }
-          // Fallback to calculate from currentStep
-          if (parsed.currentStep) {
-            return quizConfig.progressMap[parsed.currentStep] || 0;
-          }
-        }
-      } catch (e) {
-        console.error("Failed to load progressPercent from localStorage:", e);
-      }
-    }
-    return quizConfig.progressMap[1] || 0;
-  });
+    return asNumber;
+  };
 
+  // Initialize with server-safe defaults; restore from localStorage after mount
+  const [currentStep, setCurrentStep] = useState(1);
+  const [progressPercent, setProgressPercent] = useState(quizConfig.progressMap[1] || 0);
   // History stack of visited steps to support accurate "Back" behavior
-  const [history, setHistory] = useState(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          return parsed.history || [];
+  const [history, setHistory] = useState([]);
+  // Prevents the save effect from overwriting localStorage before restore completes
+  const hasHydrated = useRef(false);
+
+  useEffect(() => {
+    try {
+      // URL params take priority over localStorage (allows sharing/bookmarking a page)
+      const urlParams = new URLSearchParams(window.location.search);
+      const qsParam = urlParams.get("qs");
+      if (qsParam) {
+        const pageFromUrl = parseInt(qsParam, 10);
+        if (!isNaN(pageFromUrl) && pageFromUrl > 0) {
+          setCurrentStep(pageFromUrl);
+          setProgressPercent(quizConfig.progressMap[pageFromUrl] || 0);
+          hasHydrated.current = true;
+          return;
         }
-      } catch (e) {
-        console.error("Failed to load history from localStorage:", e);
       }
+
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.currentStep) {
+          setCurrentStep(parsed.currentStep);
+        }
+        if (parsed.progressPercent !== undefined) {
+          setProgressPercent(parsed.progressPercent);
+        } else if (parsed.currentStep) {
+          setProgressPercent(quizConfig.progressMap[parsed.currentStep] || 0);
+        }
+        if (parsed.history) {
+          setHistory(parsed.history);
+        }
+      }
+    } catch (e) {
+      console.error("Failed to load navigation state from localStorage:", e);
     }
-    return [];
-  });
+    hasHydrated.current = true;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const isAuthenticated = isUserAuthenticated();
 
   // Save to localStorage whenever navigation state changes
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        const existing = stored ? JSON.parse(stored) : {};
-        
-        localStorage.setItem(
-          STORAGE_KEY,
-          JSON.stringify({
-            ...existing,
-            currentStep,
-            progressPercent,
-            history,
-          })
-        );
-      } catch (e) {
-        console.error("Failed to save navigation state to localStorage:", e);
-      }
+    if (!hasHydrated.current) return;
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      const existing = stored ? JSON.parse(stored) : {};
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          ...existing,
+          currentStep,
+          progressPercent,
+          history,
+        })
+      );
+    } catch (e) {
+      console.error("Failed to save navigation state to localStorage:", e);
     }
   }, [currentStep, progressPercent, history]);
 
   // Browser back button support: push history state on step change,
   // intercept popstate to navigate within the quiz instead of leaving the page.
+  // Also keep the URL ?qs= param in sync so refreshing restores the correct page.
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Push a new browser history entry whenever the step advances beyond 1.
-    // We only push (not replace) so each step gets its own entry.
+    const url = new URL(window.location.href);
+    url.searchParams.set("qs", currentStep);
+
     if (currentStep > 1) {
-      window.history.pushState({ quizStep: currentStep }, "");
+      window.history.pushState({ quizStep: currentStep }, "", url.toString());
+    } else {
+      // On first page use replaceState to avoid creating an extra history entry
+      window.history.replaceState({ quizStep: currentStep }, "", url.toString());
     }
   }, [currentStep]);
 
@@ -117,25 +139,17 @@ export const useStepNavigation = (quizConfig) => {
 
 
   // Helper to check if a step should be skipped
-  const shouldSkipStep = (pageNumber) => {
-    // Page-based config: check all actual step configs within that page
-    if (quizConfig.pages) {
-      const pageConfig = quizConfig.pages[pageNumber];
-      if (pageConfig) {
-        const stepIds = pageConfig.stepIds || [];
-        if (stepIds.length === 0) return false;
-        // Skip the page only if every step on it has passIf === "authenticate" and user is authenticated
-        return stepIds.every((stepId) => {
-          const step = quizConfig.steps[stepId];
-          return step?.passIf === "authenticate" && isAuthenticated;
-        });
-      }
-    }
-    // Fallback: direct step-id lookup (non-page-based configs)
-    const step = quizConfig.steps[pageNumber];
-    if (!step) return false;
-    if (step.passIf === "authenticate" && isAuthenticated) return true;
-    return false;
+  const shouldSkipStep = (stepNumber) => {
+    const pageStepIds = getPageStepIds(stepNumber);
+    const stepConfigs = pageStepIds
+      .map((id) => quizConfig.steps?.[id])
+      .filter(Boolean);
+
+    if (!stepConfigs.length) return false;
+
+    return stepConfigs.every(
+      (step) => step.passIf === "authenticate" && isAuthenticated,
+    );
   };
 
   // Find the next eligible step (forward)
@@ -143,12 +157,12 @@ export const useStepNavigation = (quizConfig) => {
     let nextStep = startStep;
     while (shouldSkipStep(nextStep)) {
       // Use conditionalNavigation if present
-      const stepConfig = quizConfig.steps[nextStep];
+      const stepConfig = getPrimaryStepConfig(nextStep);
       let candidate = quizConfig.navigation[nextStep] || nextStep + 1;
       if (stepConfig?.conditionalNavigation) {
         const userValue = userData?.[stepConfig.field];
         const condNav = stepConfig.conditionalNavigation[userValue];
-        if (condNav) candidate = condNav;
+        if (condNav) candidate = resolvePageNumber(condNav);
       }
       nextStep = candidate;
     }
@@ -178,11 +192,13 @@ export const useStepNavigation = (quizConfig) => {
   };
 
   const getNextStep = (userData) => {
-    const stepConfig = quizConfig.steps[currentStep];
+    const stepConfig = getPrimaryStepConfig(currentStep);
 
     if (stepConfig?.conditionalNavigation) {
       const userValue = userData[stepConfig.field];
-      const nextStep = stepConfig.conditionalNavigation[userValue];
+      const nextStep = resolvePageNumber(
+        stepConfig.conditionalNavigation[userValue],
+      );
       if (nextStep) return findNextStep(nextStep, userData);
     }
 
