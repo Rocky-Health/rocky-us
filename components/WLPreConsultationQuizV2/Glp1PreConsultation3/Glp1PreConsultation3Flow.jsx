@@ -146,7 +146,7 @@ const Glp1PreConsultation3Flow = () => {
 
     return (
         <PasswordProvider>
-            <div className="min-h-screen bg-[#F5F4EF]">
+            <div className="min-h-screen bg-[#F5F4EF] ">
                 {!hideQuizChrome && (
                     <>
                         <Glp1PreConsultation3Navbar />
@@ -161,7 +161,7 @@ const Glp1PreConsultation3Flow = () => {
                     className={
                         hideQuizChrome
                             ? "w-full"
-                            : "mx-auto w-full max-w-4xl px-4 md:px-6"
+                            : "mx-auto w-full max-w-4xl px-6 sm:px-20 lg:px-6 "
                     }
                 >
                     <QuizStepRenderer

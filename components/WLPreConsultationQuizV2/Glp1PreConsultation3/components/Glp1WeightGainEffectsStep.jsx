@@ -140,7 +140,7 @@ const Glp1WeightGainEffectsStep = ({ userData, setUserData, onContinue }) => {
         "flex h-14 w-14 shrink-0 items-center justify-center md:h-16 md:w-16";
 
     return (
-        <div className="w-full px-2 pb-12 pt-6">
+        <div className="w-full px-2 pb-12 lg:pt-6 pt-4">
             <div className="mx-auto w-full max-w-4xl">
                 <h1 className="headers-font text-5xl font-normal leading-[125%] tracking-[-0.02em] text-[#251F20]">
                     {headingPrefix} experience{" "}
@@ -151,7 +151,7 @@ const Glp1WeightGainEffectsStep = ({ userData, setUserData, onContinue }) => {
                     Do you experience any of the following?
                 </p>
 
-                <div className="mt-8 flex flex-wrap justify-start gap-3 md:mt-10 md:gap-4">
+                <div className="lg:mt-10 mt-6 flex flex-wrap justify-start gap-3  md:gap-4">
                     {options.map(({ id, title, sub, image }) => {
                         const isOn = selected.includes(id);
                         return (

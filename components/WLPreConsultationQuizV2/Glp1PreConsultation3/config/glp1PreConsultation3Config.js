@@ -148,7 +148,10 @@ export const glp1PreConsultation3Config = {
             required: true,
             options: [
                 { id: "live-longer", label: "I want to live longer" },
-                { id: "feel-look-better", label: "I want to feel and look better" },
+                {
+                    id: "feel-look-better",
+                    label: "I want to feel and look better",
+                },
                 {
                     id: "reduce-health-issues",
                     label: "I want to reduce current health issues",
@@ -207,10 +210,110 @@ export const glp1PreConsultation3Config = {
             title: "",
             required: false,
         },
-        // Step 16: Willingness
+        // Step 16: GLP-1 safety — conditions that may prevent prescribing
         16: {
+            id: "glp1MedicalContraindications",
+            type: "glp1MedicalContraindications",
+            title: "",
+            field: "glp1MedicalContraindications",
+            required: true,
+            options: [
+                { id: "none", label: "None of these" },
+                { id: "end-stage-kidney", label: "End-stage kidney disease" },
+                {
+                    id: "end-stage-liver",
+                    label: "End-stage liver disease (cirrhosis)",
+                },
+                { id: "anorexia-bulimia", label: "Anorexia/bulimia" },
+                { id: "suicidal-thoughts", label: "Suicidal thoughts" },
+                { id: "active-cancer", label: "Active cancer" },
+                { id: "organ-transplants", label: "Organ transplants" },
+                { id: "pancreatitis", label: "Pancreatitis" },
+                { id: "type-1-diabetes", label: "Type 1 diabetes" },
+                { id: "currently-on-insulin", label: "Currently on insulin" },
+                {
+                    id: "diabetic-retinopathy",
+                    label: "Diabetic retinopathy",
+                },
+                { id: "thyroid-cyst", label: "Thyroid cyst" },
+            ],
+        },
+        // Step 17: Additional health questions (GLP-1–related risks)
+        17: {
+            id: "glp1MoreHealthQuestions",
+            type: "glp1MoreHealthQuestions",
+            title: "",
+            field: "glp1AdditionalHealthQuestions",
+            required: true,
+            options: [
+                { id: "none", label: "None of these" },
+                {
+                    id: "medullary-thyroid-cancer-family",
+                    label: "You or an immediate family member has a history of medullary thyroid cancer",
+                },
+                {
+                    id: "diabetic-insulin-retinopathy",
+                    label: "Diabetic on Insulin or have a history of diabetic retinopathy",
+                },
+                {
+                    id: "men2-family",
+                    label: "You or an immediate family member have a history of multiple endocrine neoplasia type 2",
+                },
+                { id: "kidney-conditions", label: "Kidney Conditions" },
+                {
+                    id: "kidney-specialist-12mo",
+                    label: "Seen a kidney specialist in the past 12 months",
+                },
+                {
+                    id: "solitary-kidney-transplant",
+                    label: "History of solitary kidney, or kidney transplant",
+                },
+                {
+                    id: "kidney-failure-history",
+                    label: "History of kidney failure",
+                },
+                {
+                    id: "gi-disorders-ibd",
+                    label: "You have a history of GI disorders such as inflammatory bowel disease",
+                },
+            ],
+        },
+        // Step 18: Recent GLP-1 / weight-loss meds (past 4 weeks)
+        18: {
+            id: "glp1RecentGlp1WeightLoss",
+            type: "glp1RecentGlp1WeightLoss",
+            title: "",
+            field: "glp1RecentGlp1WeightLoss",
+            required: true,
+            conditionalNavigation: {
+                no: 20,
+                "yes-glp1": 19,
+                "yes-other-weight-med": 19,
+            },
+            options: [
+                {
+                    id: "yes-glp1",
+                    label: "Yes, I've taken GLP-1 medication",
+                },
+                {
+                    id: "yes-other-weight-med",
+                    label: "Yes, I've taken a different medication for weight loss",
+                },
+                { id: "no", label: "No" },
+            ],
+        },
+        // Step 19: Prior medication details (shown only if recent use = GLP-1 or other WL med)
+        19: {
+            id: "glp1PriorWeightLossMedicationDetails",
+            type: "glp1PriorWeightLossMedicationDetails",
+            title: "",
+            required: true,
+            skipIf: { glp1RecentGlp1WeightLoss: "no" },
+        },
+        // Step 20: Willingness
+        20: {
             id: "willingness",
-            type: "willingnessQuestion",
+            type: "glp1WillingnessQuestion",
             title: "",
             field: "willingness",
             required: true,
@@ -226,10 +329,10 @@ export const glp1PreConsultation3Config = {
                 { id: "none", label: "None of the above" },
             ],
         },
-        // Step 17: Weight Changed
-        17: {
+        // Step 21: Weight Changed
+        21: {
             id: "weightChangedLastYear",
-            type: "weightChangedQuestion",
+            type: "glp1WeightChangedQuestion",
             title: "",
             field: "weightChangedLastYear",
             required: true,
@@ -244,27 +347,116 @@ export const glp1PreConsultation3Config = {
                 },
             ],
         },
-        // Step 18: Before & After 3
-        18: {
-            id: "beforeAfter3",
-            type: "beforeAfter3",
+        // Step 22: Before & After 2 (same testimonial for all)
+        22: {
+            id: "beforeAfter2",
+            type: "beforeAfter2",
             title: "",
             required: false,
         },
-        // Step 19: Medication Priority
-        19: {
+        // Step 23: Average blood pressure range
+        23: {
+            id: "glp1BloodPressureRange",
+            type: "glp1BloodPressureQuestion",
+            title: "",
+            field: "glp1BloodPressureRange",
+            required: true,
+            imageSrc: "/glp-3-quiz/blood-pressure.jpg",
+            question: "What is your average blood pressure range?",
+            options: [
+                { id: "normal", label: "<120/80 (Normal)" },
+                { id: "elevated", label: "120-129/<80 (Elevated)" },
+                {
+                    id: "high-stage-1",
+                    label: "130-139/80-89 (High Stage 1)",
+                },
+                { id: "high-stage-2", label: "≥140/90 (High Stage 2)" },
+                { id: "not-sure", label: "I'm not sure" },
+            ],
+        },
+        // Step 24: Resting heart rate
+        24: {
+            id: "glp1RestingHeartRate",
+            type: "glp1HeartRateQuestion",
+            title: "",
+            field: "glp1RestingHeartRate",
+            required: true,
+            imageSrc: "/glp-3-quiz/heart-rate.jpg",
+            imageAlt: "Person using a pulse oximeter on their finger",
+            question: "How about your average resting heart rate?",
+            options: [
+                { id: "slow", label: "<60 beats per minute (Slow)" },
+                {
+                    id: "normal",
+                    label: "60–100 beats per minute (Normal)",
+                },
+                {
+                    id: "slightly-fast",
+                    label: "101–110 beats per minute (Slightly Fast)",
+                },
+                { id: "fast", label: ">110 beats per minute (Fast)" },
+                { id: "not-sure", label: "I'm not sure" },
+            ],
+        },
+        // Step 25: Medication Priority
+        25: {
             id: "medicationPriority",
             type: "medicationPriorityQuestion",
             title: "",
             field: "medicationPriority",
             required: true,
             options: [
-                { id: "affordability", label: "Affordability" },
-                { id: "potency", label: "Potency" },
+                {
+                    id: "affordability",
+                    label: "Affordability",
+                    subtitle: "Lowest price",
+                    icon: "receipt",
+                },
+                {
+                    id: "potency",
+                    label: "Potency",
+                    subtitle: "Stronger dose",
+                    icon: "trend",
+                },
+            ],
+            secondaryQuestion: {
+                field: "glp1AdministrationPreference",
+                prompt: "GLP-1 is available as an injection or drops under the tongue. Which sounds best?",
+                options: [
+                    {
+                        id: "inject",
+                        label: "I prefer to inject",
+                        subtitle: "One injection per week",
+                        icon: "syringe",
+                    },
+                    {
+                        id: "drops",
+                        label: "I prefer drops",
+                        subtitle: "Oral GLP-1 meds",
+                        icon: "dropper",
+                    },
+                ],
+            },
+        },
+        // Step 26: Current medications (yes/no + details if yes)
+        26: {
+            id: "glp1CurrentMedications",
+            type: "glp1CurrentMedicationsQuestion",
+            title: "",
+            field: "glp1CurrentlyTakesMedications",
+            detailsField: "glp1CurrentMedicationsDetails",
+            required: true,
+            imageSrc: "/glp-3-quiz/medications.jpg",
+            question: "Do you currently take any medications?",
+            detailsLabel:
+                "Please add some details about the current medicine you take.",
+            options: [
+                { id: "yes", label: "Yes" },
+                { id: "no", label: "No" },
             ],
         },
-        // Step 20: State of Mind
-        20: {
+        // Step 27: State of Mind
+        27: {
             id: "stateOfMind",
             type: "stateOfMindQuestion",
             title: "",
@@ -276,8 +468,27 @@ export const glp1PreConsultation3Config = {
                 { id: "cautious", label: "I'm cautious" },
             ],
         },
-        // Step 21: Date of Birth (only shown if not authenticated)
-        21: {
+        // Step 28: Additional info for medical team (yes/no + details if yes)
+        28: {
+            id: "glp1MedicalTeamAdditionalInfo",
+            type: "glp1MedicalTeamAdditionalInfoQuestion",
+            title: "",
+            field: "glp1HasInfoForMedicalTeam",
+            detailsField: "glp1MedicalTeamAdditionalInfoDetails",
+            required: true,
+            introLead: "MyRocky medical providers typically review every form",
+            introHighlight: "within 6-24 hours.",
+            question:
+                "Do you have any further information which you would like our medical team to know?",
+            detailsLabel:
+                "Provide details here. Please do not include urgent or emergency medical information.",
+            options: [
+                { id: "yes", label: "Yes" },
+                { id: "no", label: "No" },
+            ],
+        },
+        // Step 29: Date of Birth (only shown if not authenticated)
+        29: {
             id: "dateOfBirth",
             passIf: "authenticate",
             type: "glp2Dob",
@@ -285,27 +496,28 @@ export const glp1PreConsultation3Config = {
             field: "dateOfBirth",
             required: true,
         },
-        // Step 22: Personal Info - First Name, Last Name, State (only shown if not authenticated)
-        22: {
+        // Step 30: Personal Info - Medical review summary + name & state (only shown if not authenticated)
+        30: {
             id: "personalInfo",
             passIf: "authenticate",
-            type: "form",
-            title: "Your medical checkup",
+            type: "glp1MedicalReviewPersonal",
+            title: "Your Medical Review",
+            eligibilityLead: "Let's proceed to check your eligibility.",
             privacyNote:
-                "We respect your privacy. All of your information is securely stored on our HIPAA Compliant server.",
+                "Your information is never shared and is protected by HIPAA.",
             fields: [
                 {
                     id: "firstName",
                     label: "First Name",
                     type: "text",
-                    placeholder: "Enter your first name",
+                    placeholder: "",
                     required: true,
                 },
                 {
                     id: "lastName",
                     label: "Last Name",
                     type: "text",
-                    placeholder: "Enter your last name",
+                    placeholder: "",
                     required: true,
                 },
                 {
@@ -314,7 +526,6 @@ export const glp1PreConsultation3Config = {
                     type: "select",
                     required: true,
                     options: [
-                        { value: "", label: "Select a state" },
                         { value: "AZ", label: "Arizona" },
                         { value: "CA", label: "California" },
                         { value: "CO", label: "Colorado" },
@@ -362,23 +573,23 @@ export const glp1PreConsultation3Config = {
             ],
             required: true,
         },
-        // Step 23: Contact / Auth - Email, Phone, Password (only shown if not authenticated)
-        23: {
+        // Step 31: Contact / Auth - Email, Phone, Password (only shown if not authenticated)
+        31: {
             id: "contactAuth",
             passIf: "authenticate",
             type: "glp2ContactAuth",
             required: true,
         },
-        // Step 24: Product Recommendations
-        24: {
+        // Step 32: Product Recommendations
+        32: {
             id: "productRecommendations",
             type: "recommendation",
             title: "Recommended for you",
             field: "selectedProduct",
             required: true,
         },
-        // Step 25: Select Your Weight Loss Plan (Compounded products only)
-        25: {
+        // Step 33: Select Your Weight Loss Plan (Compounded products only)
+        33: {
             id: "selectWeightLossPlan",
             type: "planSelection",
             title: "Select Your Weight Loss Plan",
@@ -403,17 +614,25 @@ export const glp1PreConsultation3Config = {
         12: 13, // Pace Result -> Sleep Hours
         13: 14, // Sleep quality -> Sleep hours
         14: 15, // Sleep hours -> Before & After (opposite testimonial)
-        15: 16, // Before & After -> Willingness
-        16: 17, // Willingness -> Weight Changed
-        17: 18, // Weight Changed -> Before/After3
-        18: 19, // Before/After3 -> Medication Priority
-        19: 20, // Medication Priority -> State of Mind
-        20: 21, // State of Mind -> DOB (or skip forward if authenticated)
-        21: 22, // DOB -> Personal Info
-        22: 23, // Personal Info -> Contact/Auth
-        23: 24, // Contact/Auth -> Product Recommendations
-        24: 25, // Product Recommendations -> Plan Selection (for compounded only; else checkout)
-        25: 100, // Plan Selection -> Checkout
+        15: 16, // Before & After -> Medical conditions screening
+        16: 17, // Medical conditions -> More health questions
+        17: 18, // More health questions -> Recent GLP-1 / weight-loss meds
+        18: 19, // Recent meds -> prior details (branch) or willingness (see conditionalNavigation)
+        19: 20, // Prior medication details -> Willingness
+        20: 21, // Willingness -> Weight Changed
+        21: 22, // Weight Changed -> Before & After 2
+        22: 23, // Before & After 2 -> Blood pressure
+        23: 24, // Blood pressure -> Heart rate
+        24: 25, // Heart rate -> Medication Priority
+        25: 26, // Medication Priority -> Current medications
+        26: 27, // Current medications -> State of Mind
+        27: 28, // State of Mind -> Medical team additional info
+        28: 29, // Medical team info -> DOB (or skip forward if authenticated)
+        29: 30, // DOB -> Personal Info
+        30: 31, // Personal Info -> Contact/Auth
+        31: 32, // Contact/Auth -> Product Recommendations
+        32: 33, // Product Recommendations -> Plan Selection (for compounded only; else checkout)
+        33: 100, // Plan Selection -> Checkout
     },
 
     // Progress mapping
@@ -433,16 +652,24 @@ export const glp1PreConsultation3Config = {
         13: 44, // Sleep quality
         14: 50, // Sleep hours
         15: 53, // Before & After (opposite testimonial)
-        16: 56, // Willingness
-        17: 62, // Weight Changed
-        18: 68, // Before/After3
-        19: 73, // Medication Priority
-        20: 78, // State of Mind
-        21: 82, // DOB
-        22: 86, // Personal Info
-        23: 90, // Contact/Auth
-        24: 94, // Product Recommendations
-        25: 100, // Plan Selection
+        16: 55, // Medical conditions screening
+        17: 56, // More health questions
+        18: 57, // Recent GLP-1 / weight-loss meds
+        19: 58, // Prior medication details
+        20: 59, // Willingness
+        21: 62, // Weight Changed
+        22: 68, // Before & After 2
+        23: 71, // Blood pressure
+        24: 72, // Heart rate
+        25: 73, // Medication Priority
+        26: 75, // Current medications
+        27: 78, // State of Mind
+        28: 80, // Medical team additional info
+        29: 82, // DOB
+        30: 86, // Personal Info
+        31: 90, // Contact/Auth
+        32: 94, // Product Recommendations
+        33: 100, // Plan Selection
     },
 
     // High-level phases for UI stepper (each phase maps to many concrete steps)
@@ -455,12 +682,15 @@ export const glp1PreConsultation3Config = {
         {
             key: "details",
             label: "Details",
-            steps: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+            steps: [
+                10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
+                26, 27, 28,
+            ],
         },
         {
             key: "eligibility",
             label: "Eligibility",
-            steps: [21, 22, 23, 24, 25],
+            steps: [29, 30, 31, 32, 33],
         },
     ],
 
@@ -481,16 +711,24 @@ export const glp1PreConsultation3Config = {
         13: "Sleep quality",
         14: "Sleep hours",
         15: "Before & After",
-        16: "Willingness",
-        17: "Weight Changed",
-        18: "Before & After",
-        19: "Priority",
-        20: "State Of Mind",
-        21: "Date of Birth",
-        22: "Personal Info",
-        23: "Contact & Account",
-        24: "Product Recommendations",
-        25: "Select Your Weight Loss Plan",
+        16: "Health screening",
+        17: "More health questions",
+        18: "Recent GLP-1 use",
+        19: "Prior medication",
+        20: "Willingness",
+        21: "Weight Changed",
+        22: "Before & After",
+        23: "Blood pressure",
+        24: "Heart rate",
+        25: "Priority",
+        26: "Medications",
+        27: "State Of Mind",
+        28: "Medical team",
+        29: "Date of Birth",
+        30: "Your Medical Review",
+        31: "Contact & Account",
+        32: "Product Recommendations",
+        33: "Select Your Weight Loss Plan",
     },
 
     // WooCommerce variation IDs per plan, keyed by product ID
@@ -659,7 +897,7 @@ export const glp1PreConsultation3Config = {
             nextAction: "continue",
             nextPayload: null,
             passwordPopupMode: "stepElevenSignInGate",
-            authenticatedNavigateTo: 24,
+            authenticatedNavigateTo: 32,
         },
 
         // Your Weight Popup (shown after potential weight loss calculation)

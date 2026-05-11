@@ -38,7 +38,7 @@ const Glp2GoalWeightStep = ({ userData, setUserData, onContinue }) => {
                 </h2>
 
                 <label
-                    className="mb-2 block text-3xl font-medium text-[#000000]"
+                    className="subheaders-font mb-2 block text-3xl font-medium text-[#000000]"
                     htmlFor="glp1-pc3-goal-weight"
                 >
                     What is your goal weight (lbs)?

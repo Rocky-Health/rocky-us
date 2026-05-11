@@ -38,12 +38,12 @@ const Glp2SleepStep = ({ userData, setUserData, config, onContinue }) => {
                     </span>
                 </h1>
 
-                <h2 className="headers-font mt-8 text-2xl font-normal leading-[130%] text-[#251F20]">
+                <h2 className="subheaders-font mt-8 text-3xl font-normal leading-[130%] text-[#251F20]">
                     How is your overall sleep?
                 </h2>
 
                 <div
-                    className="mt-4 grid w-full grid-cols-3 gap-2 sm:gap-3 md:gap-4"
+                    className="lg:mt-4 mt-2 grid w-full grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 md:gap-4"
                     role="group"
                     aria-label="Overall sleep quality"
                 >

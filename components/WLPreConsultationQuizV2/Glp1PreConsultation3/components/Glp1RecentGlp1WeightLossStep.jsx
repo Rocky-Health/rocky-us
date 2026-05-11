@@ -1,17 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FaArrowRight } from "react-icons/fa";
 
 const ACCENT = "#A7885A";
 
-const Glp1PrimaryReasonStep = ({
+const Glp1RecentGlp1WeightLossStep = ({
     userData,
     setUserData,
     config,
     onContinue,
 }) => {
-    const field = config?.field || "glp1PrimaryReason";
+    const field = config?.field || "glp1RecentGlp1WeightLoss";
     const options = config?.options || [];
     const [selected, setSelected] = useState(() => userData?.[field] ?? null);
 
@@ -21,25 +21,23 @@ const Glp1PrimaryReasonStep = ({
 
     const handleNext = () => {
         if (selected == null) return;
-        const next = { ...userData, [field]: selected };
+        let next = { ...userData, [field]: selected };
+        if (selected === "no") {
+            delete next.priorMedNameDoseFrequency;
+            delete next.priorMedLastDose;
+            delete next.priorMedPrescriber;
+            delete next.priorMedPrescriberOther;
+        }
         setUserData(next);
         onContinue?.(next);
     };
 
     return (
-        <div className="flex w-full flex-col px-4 pb-10 md:px-0">
-            <div className="mx-auto w-full max-w-4xl">
-                <h1 className="headers-font text-5xl font-normal leading-[115%] tracking-[-0.02em] text-[#251F20]">
-                    Improving your life requires{" "}
-                    <span className="headers-font " style={{ color: ACCENT }}>
-                        motivation.
-                    </span>
-                </h1>
-
-                <p className="headers-font mt-6 text-3xl font-normal leading-[140%] text-[#251F20]">
-                    What is your{" "}
-                    <span className="font-bold">primary reason</span> for
-                    looking into GLP-1 medication?{" "}
+        <div className="flex h-full w-full flex-col px-4 md:px-0">
+            <div className="mx-auto w-full max-w-4xl flex-grow pb-14">
+                <p className="subheaders-font text-3xl font-normal leading-[130%] text-[#251F20] ">
+                    Have you taken GLP-1 medication for weight loss within the
+                    past 4 weeks?{" "}
                     <span className="text-red-600" aria-hidden>
                         *
                     </span>
@@ -53,7 +51,7 @@ const Glp1PrimaryReasonStep = ({
                                 key={option.id}
                                 type="button"
                                 onClick={() => setSelected(option.id)}
-                                className={`flex min-h-[60px] w-full items-center gap-3 rounded-xl border bg-white px-4 text-left transition-colors ${
+                                className={`flex min-h-[60px] w-full items-center gap-3 rounded-xl border bg-white px-4 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 ${
                                     isSel
                                         ? "border-2"
                                         : "border border-[#E2E2E1]"
@@ -85,20 +83,28 @@ const Glp1PrimaryReasonStep = ({
                         );
                     })}
                 </div>
+            </div>
 
-                <button
-                    type="button"
-                    onClick={handleNext}
-                    disabled={selected == null}
-                    className="mt-10 flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none font-sans text-base font-medium text-white transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    style={{ backgroundColor: ACCENT }}
-                >
-                    <span>Next</span>
-                    <FaArrowRight className="text-sm" />
-                </button>
+            <div className=" bottom-0 left-0 z-50 flex w-full items-center justify-center bg-[linear-gradient(180deg,rgba(245,244,239,0)_0%,rgba(245,244,239,0.8)_37.51%,#F5F4EF_63.04%)]  pb-4 backdrop-blur-sm">
+                <div className="w-full max-w-4xl">
+                    <button
+                        type="button"
+                        onClick={handleNext}
+                        disabled={selected == null}
+                        className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none py-3 text-base font-medium text-white focus:outline-none focus:ring-0 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600"
+                        style={
+                            selected != null
+                                ? { backgroundColor: ACCENT }
+                                : undefined
+                        }
+                    >
+                        <span>Next</span>
+                        <FaArrowRight />
+                    </button>
+                </div>
             </div>
         </div>
     );
 };
 
-export default Glp1PrimaryReasonStep;
+export default Glp1RecentGlp1WeightLossStep;

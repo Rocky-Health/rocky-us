@@ -12,16 +12,15 @@ function buildMaleVariant() {
         quote: (
             <>
                 &quot;I felt stuck before I joined Rocky. Their guidance helped
-                me{" "}
-                <span style={{ color: ACCENT }}>lose over 50 pounds</span> and
-                completely change how I approach health&quot;
+                me <span style={{ color: ACCENT }}>lose over 50 pounds</span>{" "}
+                and completely change how I approach health&quot;
             </>
         ),
         imageSrc: "/glp-quiz/Before%26After3.jpg",
         footer: (
             <>
-                <span style={{ color: ACCENT }}>Denis lost 49 lbs</span> and came
-                off his blood pressure medication
+                <span style={{ color: ACCENT }}>Denis lost 49 lbs</span> and
+                came off his blood pressure medication
             </>
         ),
     };
@@ -34,8 +33,8 @@ function buildFemaleVariant() {
             <>
                 &quot; It really does work. Took about 6 weeks to feel it, but
                 once it kicked in,{" "}
-                <span style={{ color: ACCENT }}>I dropped 35 pounds</span> of fat
-                and haven&apos;t looked back. Thank you MyRocky! &quot;
+                <span style={{ color: ACCENT }}>I dropped 35 pounds</span> of
+                fat and haven&apos;t looked back. Thank you MyRocky! &quot;
             </>
         ),
         imageSrc: "/glp-quiz/Before%26After.png",
@@ -78,7 +77,7 @@ const Glp2BeforeAfterStep = ({
                     </p>
                 </div>
 
-                <div className="relative mb-10 h-[335px] w-full overflow-hidden rounded-[18px] md:h-[580px]">
+                <div className="relative mb-10 h-[440px] w-full overflow-hidden rounded-[18px] lg:h-[580px]">
                     <CustomImage
                         key={`${variant.key}-${invertGenderTestimonial ? "inv" : "std"}`}
                         src={variant.imageSrc}
@@ -94,7 +93,7 @@ const Glp2BeforeAfterStep = ({
             </div>
 
             <div className="fixed bottom-0 left-0 z-50 flex w-full items-center justify-center bg-[linear-gradient(180deg,rgba(245,244,239,0)_0%,rgba(245,244,239,0.8)_37.51%,#F5F4EF_63.04%)] px-4 pb-4 backdrop-blur-sm">
-                <div className="w-full max-w-4xl">
+                <div className="w-full max-w-4xl sm:px-20 lg:px-0">
                     <button
                         className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none bg-[#A7885A] py-3 text-base font-medium text-white focus:outline-none focus:ring-0"
                         onClick={() => onContinue?.()}

@@ -18,7 +18,7 @@ function MetabolicChartImage() {
             alt="Weight over time: greater loss with medication versus without over four months"
             width={880}
             height={460}
-            className="mx-auto h-auto w-full max-h-[280px] object-contain md:max-h-[320px] max-w-2xl"
+            className="mx-auto h-auto w-full max-h-[280px] object-contain lg:max-h-[320px] lg:max-w-2xl max-w-lg"
             sizes="(max-width: 768px) 100vw, 42rem"
             priority
         />
@@ -35,14 +35,14 @@ const Glp1MetabolicScienceStep = ({
     }, [onQuizChromeVisibilityChange]);
 
     return (
-        <div className="flex  w-full flex-col px-2 pb-6 pt-6">
+        <div className="flex  w-full flex-col px-2 pb-6 lg:pt-6 pt-4">
             <div className="mx-auto w-full max-w-4xl flex-1 flex-col mb-16">
                 <h1 className="headers-font text-5xl font-normal leading-[120%] tracking-[-0.02em] text-[#251F20]">
                     It feels like magic, but it&apos;s{" "}
                     <span style={{ color: ACCENT }}>metabolic science.</span>
                 </h1>
 
-                <div className="mt-8 rounded-2xl  bg-white p-4 shadow-sm md:p-6 max-w-2xl mx-auto">
+                <div className="mt-8 rounded-2xl  bg-white p-4 shadow-sm lg:p-6 lg:max-w-2xl max-w-lg mx-auto">
                     <MetabolicChartImage />
                 </div>
 

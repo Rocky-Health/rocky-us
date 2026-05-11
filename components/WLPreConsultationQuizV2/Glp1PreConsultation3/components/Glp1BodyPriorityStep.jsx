@@ -59,7 +59,7 @@ const Glp1BodyPriorityStep = ({
     };
 
     return (
-        <div className="flex  w-full flex-col px-2 pb-12 pt-6">
+        <div className="flex  w-full flex-col px-2 pb-12 lg:pt-6 pt-4">
             <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col justify-center">
                 <h1 className="headers-font text-5xl font-normal leading-[125%] tracking-[-0.02em] text-[#251F20]">
                     We can help with all of these, but choose the{" "}
@@ -74,7 +74,7 @@ const Glp1BodyPriorityStep = ({
                     </span>
                 </p>
 
-                <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-3 md:gap-4">
+                <div className="lg:mt-10 mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-3 md:gap-4">
                     {options.map((option) => {
                         const src =
                             ICON_SRC_BY_KEY[option.icon] ||

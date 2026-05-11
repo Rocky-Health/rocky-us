@@ -15,6 +15,10 @@ import Glp1BodyPriorityStep from "./Glp1BodyPriorityStep";
 import Glp1MetabolicScienceStep from "./Glp1MetabolicScienceStep";
 import Glp1HowGlp1WorksStep from "./Glp1HowGlp1WorksStep";
 import Glp1PrimaryReasonStep from "./Glp1PrimaryReasonStep";
+import Glp1RecentGlp1WeightLossStep from "./Glp1RecentGlp1WeightLossStep";
+import Glp1PriorWeightLossMedicationDetailsStep from "./Glp1PriorWeightLossMedicationDetailsStep";
+import Glp1MedicalContraindicationsStep from "./Glp1MedicalContraindicationsStep";
+import Glp1MoreHealthQuestionsStep from "./Glp1MoreHealthQuestionsStep";
 import Glp2GoalWeightStep from "./Glp2GoalWeightStep";
 import Glp2BeforeAfterStep from "./Glp2BeforeAfterStep";
 import Glp2BeforeAfterStep2 from "./Glp2BeforeAfterStep2";
@@ -24,10 +28,17 @@ import Glp2PaceResultStep from "./Glp2PaceResultStep";
 import Glp2SleepStep from "./Glp2SleepStep";
 import Glp2SleepHoursStep from "./Glp2SleepHoursStep";
 import Glp2WillingnessStep from "./Glp2WillingnessStep";
+import Glp1WillingnessStep from "./Glp1WillingnessStep";
 import Glp2WeightChangedStep from "./Glp2WeightChangedStep";
+import Glp1BloodPressureStep from "./Glp1BloodPressureStep";
+import Glp1HeartRateStep from "./Glp1HeartRateStep";
+import Glp1CurrentMedicationsStep from "./Glp1CurrentMedicationsStep";
+import Glp1MedicalTeamAdditionalInfoStep from "./Glp1MedicalTeamAdditionalInfoStep";
+import Glp1WeightChangedStep from "./Glp1WeightChangedStep";
 import Glp2MedicationPriorityStep from "./Glp2MedicationPriorityStep";
 import Glp2StateOfMindStep from "./Glp2StateOfMindStep";
 import Glp2DobStep from "./Glp2DobStep";
+import Glp1MedicalReviewPersonalStep from "./Glp1MedicalReviewPersonalStep";
 import Glp2ContactAuthStep from "./Glp2ContactAuthStep";
 import Form from "../../components/Form";
 import MessageForQuiz from "../../components/MessageForQuiz";
@@ -122,6 +133,34 @@ const Glp2GenericQuestionStep = ({
       return fieldValue && fieldValue.length > 0;
     }
 
+    if (
+      stepConfig.type === "medicationPriorityQuestion" &&
+      stepConfig.secondaryQuestion?.field
+    ) {
+      const sec = userData[stepConfig.secondaryQuestion.field];
+      return (
+        fieldValue !== null &&
+        fieldValue !== undefined &&
+        fieldValue !== "" &&
+        sec !== null &&
+        sec !== undefined &&
+        sec !== ""
+      );
+    }
+
+    if (
+      (stepConfig.type === "glp1CurrentMedicationsQuestion" ||
+        stepConfig.type === "glp1MedicalTeamAdditionalInfoQuestion") &&
+      stepConfig.detailsField
+    ) {
+      if (fieldValue !== "yes" && fieldValue !== "no") return false;
+      if (fieldValue === "yes") {
+        const d = userData[stepConfig.detailsField];
+        return typeof d === "string" && d.trim().length > 0;
+      }
+      return true;
+    }
+
     if (stepConfig.type === "radio-text") {
       if (fieldValue === false) return true;
       return fieldValue === true && textInput.trim();
@@ -133,6 +172,36 @@ const Glp2GenericQuestionStep = ({
   const handleContinue = (valueToCheck) => {
     const fieldValue =
       valueToCheck !== undefined ? valueToCheck : userData[stepConfig.field];
+
+    if (
+      stepConfig.type === "medicationPriorityQuestion" &&
+      stepConfig.secondaryQuestion?.field
+    ) {
+      const secVal = userData[stepConfig.secondaryQuestion.field];
+      if (
+        fieldValue === null ||
+        fieldValue === undefined ||
+        fieldValue === "" ||
+        secVal === null ||
+        secVal === undefined ||
+        secVal === ""
+      ) {
+        return;
+      }
+    }
+
+    if (
+      (stepConfig.type === "glp1CurrentMedicationsQuestion" ||
+        stepConfig.type === "glp1MedicalTeamAdditionalInfoQuestion") &&
+      stepConfig.detailsField
+    ) {
+      const choice = userData[stepConfig.field];
+      if (choice !== "yes" && choice !== "no") return;
+      if (choice === "yes") {
+        const d = userData[stepConfig.detailsField];
+        if (typeof d !== "string" || !d.trim()) return;
+      }
+    }
 
     const triggerForKey = (key) => {
       if (stepConfig.conditionalActions?.[key]) {
@@ -254,7 +323,24 @@ const Glp2GenericQuestionStep = ({
             userData={userData}
             setUserData={setUserData}
             config={stepConfig}
-            onContinue={handleContinue}
+            onContinue={onContinue}
+          />
+        );
+      case "glp1RecentGlp1WeightLoss":
+        return (
+          <Glp1RecentGlp1WeightLossStep
+            userData={userData}
+            setUserData={setUserData}
+            config={stepConfig}
+            onContinue={onContinue}
+          />
+        );
+      case "glp1PriorWeightLossMedicationDetails":
+        return (
+          <Glp1PriorWeightLossMedicationDetailsStep
+            userData={userData}
+            setUserData={setUserData}
+            onContinue={onContinue}
           />
         );
       case "goalWeight":
@@ -275,7 +361,12 @@ const Glp2GenericQuestionStep = ({
           />
         );
       case "beforeAfter2":
-        return <Glp2BeforeAfterStep2 onContinue={handleContinue} />;
+        return (
+          <Glp2BeforeAfterStep2
+            onContinue={handleContinue}
+            onQuizChromeVisibilityChange={onQuizChromeVisibilityChange}
+          />
+        );
       case "beforeAfter3":
         return <Glp2BeforeAfterStep3 onContinue={handleContinue} />;
       case "paceQuestion":
@@ -308,9 +399,83 @@ const Glp2GenericQuestionStep = ({
             onContinue={handleContinue}
           />
         );
+      case "glp1MedicalContraindications":
+        return (
+          <Glp1MedicalContraindicationsStep
+            userData={userData}
+            setUserData={setUserData}
+            config={stepConfig}
+            onContinue={handleContinue}
+            onAction={onAction}
+          />
+        );
+      case "glp1MoreHealthQuestions":
+        return (
+          <Glp1MoreHealthQuestionsStep
+            userData={userData}
+            setUserData={setUserData}
+            config={stepConfig}
+            onContinue={handleContinue}
+            onAction={onAction}
+          />
+        );
+      case "glp1WillingnessQuestion":
+        return (
+          <Glp1WillingnessStep
+            userData={userData}
+            setUserData={setUserData}
+            config={stepConfig}
+            onContinue={onContinue}
+          />
+        );
       case "willingnessQuestion":
         return (
           <Glp2WillingnessStep
+            userData={userData}
+            setUserData={setUserData}
+            config={stepConfig}
+            onContinue={handleContinue}
+          />
+        );
+      case "glp1WeightChangedQuestion":
+        return (
+          <Glp1WeightChangedStep
+            userData={userData}
+            setUserData={setUserData}
+            config={stepConfig}
+            onContinue={onContinue}
+          />
+        );
+      case "glp1BloodPressureQuestion":
+        return (
+          <Glp1BloodPressureStep
+            userData={userData}
+            setUserData={setUserData}
+            config={stepConfig}
+            onContinue={handleContinue}
+          />
+        );
+      case "glp1HeartRateQuestion":
+        return (
+          <Glp1HeartRateStep
+            userData={userData}
+            setUserData={setUserData}
+            config={stepConfig}
+            onContinue={handleContinue}
+          />
+        );
+      case "glp1CurrentMedicationsQuestion":
+        return (
+          <Glp1CurrentMedicationsStep
+            userData={userData}
+            setUserData={setUserData}
+            config={stepConfig}
+            onContinue={handleContinue}
+          />
+        );
+      case "glp1MedicalTeamAdditionalInfoQuestion":
+        return (
+          <Glp1MedicalTeamAdditionalInfoStep
             userData={userData}
             setUserData={setUserData}
             config={stepConfig}
@@ -347,6 +512,15 @@ const Glp2GenericQuestionStep = ({
       case "glp2Dob":
         return (
           <Glp2DobStep
+            userData={userData}
+            setUserData={setUserData}
+            onContinue={handleContinue}
+          />
+        );
+      case "glp1MedicalReviewPersonal":
+        return (
+          <Glp1MedicalReviewPersonalStep
+            config={stepConfig}
             userData={userData}
             setUserData={setUserData}
             onContinue={handleContinue}
@@ -393,16 +567,38 @@ const Glp2GenericQuestionStep = ({
   const isGlp1MetabolicScienceStep =
     stepConfig?.type === "glp1MetabolicScience";
   const isGlp1PrimaryReasonStep = stepConfig?.type === "glp1PrimaryReason";
+  const isGlp1RecentGlp1WeightLossStep =
+    stepConfig?.type === "glp1RecentGlp1WeightLoss";
+  const isGlp1PriorWeightLossMedicationDetailsStep =
+    stepConfig?.type === "glp1PriorWeightLossMedicationDetails";
   const isPaceQuestionStep = stepConfig?.type === "paceQuestion";
   const isPaceResultStep = stepConfig?.type === "paceResult";
   const isSleepQuestionStep = stepConfig?.type === "sleepQuestion";
   const isSleepHoursQuestionStep = stepConfig?.type === "sleepHoursQuestion";
-  const isWillingnessStep = stepConfig?.type === "willingnessQuestion";
-  const isWeightChangedStep = stepConfig?.type === "weightChangedQuestion";
+  const isGlp1MedicalContraindicationsStep =
+    stepConfig?.type === "glp1MedicalContraindications";
+  const isGlp1MoreHealthQuestionsStep =
+    stepConfig?.type === "glp1MoreHealthQuestions";
+  const isWillingnessStep =
+    stepConfig?.type === "willingnessQuestion" ||
+    stepConfig?.type === "glp1WillingnessQuestion";
+  const isWeightChangedStep =
+    stepConfig?.type === "weightChangedQuestion" ||
+    stepConfig?.type === "glp1WeightChangedQuestion";
+  const isGlp1BloodPressureStep =
+    stepConfig?.type === "glp1BloodPressureQuestion";
+  const isGlp1HeartRateStep =
+    stepConfig?.type === "glp1HeartRateQuestion";
+  const isGlp1CurrentMedicationsStep =
+    stepConfig?.type === "glp1CurrentMedicationsQuestion";
+  const isGlp1MedicalTeamAdditionalInfoStep =
+    stepConfig?.type === "glp1MedicalTeamAdditionalInfoQuestion";
   const isMedicationPriorityStep =
     stepConfig?.type === "medicationPriorityQuestion";
   const isStateOfMindStep = stepConfig?.type === "stateOfMindQuestion";
   const isGlp2DobStep = stepConfig?.type === "glp2Dob";
+  const isGlp1MedicalReviewPersonalStep =
+    stepConfig?.type === "glp1MedicalReviewPersonal";
   const isGlp2ContactAuthStep = stepConfig?.type === "glp2ContactAuth";
   const isCustomFullLayoutStep =
     isBmiStep ||
@@ -413,6 +609,8 @@ const Glp2GenericQuestionStep = ({
     isGlp1BodyPriorityStep ||
     isGlp1MetabolicScienceStep ||
     isGlp1PrimaryReasonStep ||
+    isGlp1RecentGlp1WeightLossStep ||
+    isGlp1PriorWeightLossMedicationDetailsStep ||
     isBeforeAfterStep ||
     isBeforeAfterStep2 ||
     isBeforeAfterStep3 ||
@@ -420,11 +618,18 @@ const Glp2GenericQuestionStep = ({
     isPaceResultStep ||
     isSleepQuestionStep ||
     isSleepHoursQuestionStep ||
+    isGlp1MedicalContraindicationsStep ||
+    isGlp1MoreHealthQuestionsStep ||
     isWillingnessStep ||
     isWeightChangedStep ||
+    isGlp1BloodPressureStep ||
+    isGlp1HeartRateStep ||
+    isGlp1CurrentMedicationsStep ||
+    isGlp1MedicalTeamAdditionalInfoStep ||
     isMedicationPriorityStep ||
     isStateOfMindStep ||
     isGlp2DobStep ||
+    isGlp1MedicalReviewPersonalStep ||
     isGlp2ContactAuthStep;
 
   if (
@@ -435,6 +640,8 @@ const Glp2GenericQuestionStep = ({
     isGlp1BodyPriorityStep ||
     isGlp1MetabolicScienceStep ||
     isGlp1PrimaryReasonStep ||
+    isGlp1RecentGlp1WeightLossStep ||
+    isGlp1PriorWeightLossMedicationDetailsStep ||
     isBeforeAfterStep ||
     isBeforeAfterStep2 ||
     isBeforeAfterStep3 ||
@@ -442,11 +649,18 @@ const Glp2GenericQuestionStep = ({
     isPaceResultStep ||
     isSleepQuestionStep ||
     isSleepHoursQuestionStep ||
+    isGlp1MedicalContraindicationsStep ||
+    isGlp1MoreHealthQuestionsStep ||
     isWillingnessStep ||
     isWeightChangedStep ||
+    isGlp1BloodPressureStep ||
+    isGlp1HeartRateStep ||
+    isGlp1CurrentMedicationsStep ||
+    isGlp1MedicalTeamAdditionalInfoStep ||
     isMedicationPriorityStep ||
     isStateOfMindStep ||
     isGlp2DobStep ||
+    isGlp1MedicalReviewPersonalStep ||
     isGlp2ContactAuthStep
   ) {
     return <>{renderQuestion()}</>;

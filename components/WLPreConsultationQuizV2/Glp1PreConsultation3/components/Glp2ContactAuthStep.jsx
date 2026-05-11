@@ -8,6 +8,7 @@ import { logger } from "@/utils/devLogger";
 import { usePassword } from "@/components/WLPreConsultationQuizV2/contexts/PasswordContext";
 import PhoneInput, { isValidPhone } from "@/components/PhoneInput";
 import { encryptPasswordWithServerKey } from "@/utils/encryptPasswordWithServerKey";
+import CustomImage from "@/components/utils/CustomImage";
 
 const isValidEmail = (e) => {
     if (!e || typeof e !== "string") return false;
@@ -269,13 +270,20 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
                 </div>
             )}
 
-            <div className="w-full mx-auto flex-grow pb-32 md:pb-36">
-                <h1 className="headers-font text-[28px] md:text-[32px] leading-[115%] text-[#251F20] mb-2">
-                    {userData?.firstName
-                        ? `${userData.firstName}, how can we reach you?`
-                        : "How can we reach you?"}
+            <div className="mx-auto w-full max-w-4xl flex-grow pb-10 md:pb-12">
+                <h1 className="subheaders-font text-5xl font-normal leading-[115%] tracking-[-0.02em] text-[#251F20]">
+                    {userData?.firstName ? (
+                        <>
+                            <span className="text-[#AE7E56]">
+                                {userData.firstName},
+                            </span>{" "}
+                            how can you be reached if necessary?
+                        </>
+                    ) : (
+                        "How can you be reached if necessary?"
+                    )}
                 </h1>
-                <p className="text-[14px] text-[#888] mb-8">
+                <p className="text-sm  mt-6 mb-8">
                     Our medical teams and pharmacy use email and text for
                     patient communication.
                 </p>
@@ -287,7 +295,7 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
                 >
                     {/* Email */}
                     <div>
-                        <label className="block text-[14px] font-medium text-[#251F20] mb-2">
+                        <label className="block text-base font-medium text-[#251F20] mb-2">
                             Email
                         </label>
                         <input
@@ -320,7 +328,7 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
                     {/* Phone — only for new users */}
                     {isNewUser && (
                         <div>
-                            <label className="block text-[14px] font-medium text-[#251F20] mb-2">
+                            <label className="block text-base font-medium text-[#251F20] mb-2">
                                 Phone
                             </label>
                             <PhoneInput
@@ -341,7 +349,7 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
                     {/* Password — shown after email check */}
                     {showPasswordSection && (
                         <div>
-                            <label className="block text-[14px] font-medium text-[#251F20] mb-2">
+                            <label className="block text-base font-medium text-[#251F20] mb-2">
                                 {emailExists ? "Password" : "Create a password"}
                             </label>
                             <div className="relative">
@@ -395,7 +403,7 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
                     )}
 
                     {/* Consent checkbox */}
-                    <div className="flex items-start gap-3 mt-1">
+                    <div className="flex items-start gap-3 mt-1 ps-4">
                         <input
                             type="checkbox"
                             id="glp2-privacy"
@@ -405,7 +413,7 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
                         />
                         <label
                             htmlFor="glp2-privacy"
-                            className="text-[12px] leading-[150%]"
+                            className="text-base text-[#00000099] leading-[150%]"
                         >
                             I understand that my information is never shared, is
                             protected by HIPAA and agree to the{" "}
@@ -420,24 +428,38 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
                             medical partners and can opt-out at anytime.
                         </label>
                     </div>
-                </form>
-            </div>
 
-            <div className="fixed bottom-0 left-0 w-full px-4 pb-4 flex items-center justify-center z-50 bg-[linear-gradient(180deg,rgba(245,244,239,0)_0%,rgba(245,244,239,0.8)_37.51%,#F5F4EF_63.04%)] backdrop-blur-sm">
-                <div className="w-full max-w-xl">
                     <button
                         type="submit"
-                        form=""
-                        onClick={handleSubmit}
                         disabled={isDisabled}
-                        className={`w-full py-3 flex items-center justify-center gap-2 rounded-full h-[52px] font-medium border-none focus:outline-none focus:ring-0 ${
+                        className={`mt-2 flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none py-3 font-medium focus:outline-none focus:ring-0 ${
                             !isDisabled
                                 ? "bg-black text-white"
-                                : "bg-gray-300 text-gray-700 cursor-not-allowed"
+                                : "cursor-not-allowed bg-gray-300 text-gray-700"
                         }`}
                     >
                         {loading ? "Please wait…" : "Next →"}
                     </button>
+                </form>
+
+                <div className="mx-auto mt-16 flex w-full max-w-[300px]  aspect-[16/2] justify-center px-2">
+                    <CustomImage
+                        src="/glp-3-quiz/trustpilot.png"
+                        alt="Excellent 4.6 on Trustpilot, 180,000+ happy customers, and Made in the USA premium quality"
+                        width={520}
+                        height={400}
+                        className="h-auto w-full !object-contain object-center"
+                    />
+                </div>
+
+                <div className="mx-auto mt-8 flex w-full max-w-[120px] justify-center px-2">
+                    <CustomImage
+                        src="/glp-3-quiz/made-in-usa.png"
+                        alt="Made in the USA premium quality seal"
+                        width={240}
+                        height={240}
+                        className="h-auto w-full !object-contain object-center"
+                    />
                 </div>
             </div>
         </div>

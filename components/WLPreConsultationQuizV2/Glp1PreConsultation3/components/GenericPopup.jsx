@@ -67,7 +67,7 @@ const GenericPopup = ({
                     onClose();
                     onAction(
                         "navigate",
-                        popupConfig.authenticatedNavigateTo ?? 24,
+                        popupConfig.authenticatedNavigateTo ?? 32,
                     );
                     return;
                 }

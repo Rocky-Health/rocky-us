@@ -92,12 +92,12 @@ const Glp2PaceQuestionStep = ({ userData, setUserData, onContinue }) => {
 
                 <hr className="my-6 border-0 border-t border-[#E2E2E1]" />
 
-                <h2 className="headers-font text-2xl font-normal leading-[115%] text-[#251F20] md:text-[26px] lg:text-[28px]">
+                <h2 className="subheaders-font text-3xl font-normal leading-[115%] text-[#251F20]">
                     How is that pace for you?
                 </h2>
 
                 <div
-                    className="mt-6 grid w-full grid-cols-3 gap-2 sm:gap-3 md:gap-4 max-w-4xl mx-auto"
+                    className="lg:mt-6 mt-2 grid w-full grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 md:gap-4 max-w-4xl mx-auto"
                     role="group"
                     aria-label="Pace preference"
                 >

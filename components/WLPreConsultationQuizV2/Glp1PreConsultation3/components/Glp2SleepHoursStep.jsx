@@ -21,7 +21,7 @@ const Glp2SleepHoursStep = ({ userData, setUserData, config, onContinue }) => {
     return (
         <div className="flex w-full flex-col px-4 pb-10 md:px-0">
             <div className="mx-auto w-full max-w-4xl">
-                <div className="relative mb-8 w-full overflow-hidden rounded-xl max-w-lg mx-auto">
+                <div className="relative mb-8 w-full overflow-hidden rounded-xl lg:max-w-lg max-w-md mx-auto">
                     <div className="relative aspect-[14/8] w-full ">
                         <CustomImage
                             src="/glp-3-quiz/sleep.jpg"
@@ -38,7 +38,7 @@ const Glp2SleepHoursStep = ({ userData, setUserData, config, onContinue }) => {
                     How many hours of sleep do you usually get each night?
                 </h1>
 
-                <div className="mt-8 grid grid-cols-2 gap-3 md:gap-4">
+                <div className="lg:mt-8 mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                     {options.map((option) => {
                         const checked = selectedValue === option.id;
                         return (

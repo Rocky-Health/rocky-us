@@ -48,10 +48,10 @@ const Glp1GenderStep = ({ userData, setUserData, onContinue }) => {
     return (
         <div className="flex w-full flex-col  pb-12 pt-6 px-2">
             <div className="mx-auto w-full max-w-4xl">
-                <h1 className="headers-font text-[1.65rem] font-normal leading-[120%] tracking-[-0.02em] text-[#251F20] md:text-[2rem]">
+                <h1 className="subheaders-font text-[1.65rem] font-normal leading-[120%] tracking-[-0.02em] text-[#251F20] md:text-[2rem]">
                     Are you male or female?
                 </h1>
-                <p className="headers-font mt-4 text-base leading-[150%] text-[#251F20]/70">
+                <p className="subheaders-font mt-4 text-base leading-[150%] text-[#251F20]/70">
                     This helps us understand your body complexity and hormones
                     so we can assess you better.
                 </p>

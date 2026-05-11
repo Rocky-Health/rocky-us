@@ -23,14 +23,14 @@ function getActivePhaseIndex(currentStep) {
 export default function Glp1PreConsultation3PhaseProgress({
     currentStep,
     onBack,
-    thankYouStep = 25,
+    thankYouStep = 33,
 }) {
     const showBack = currentStep > 1 && currentStep !== thankYouStep;
     const activePhaseIndex = getActivePhaseIndex(currentStep);
 
     return (
         <div className="w-full border-b border-[#ccc] mb-6">
-            <div className="relative max-w-7xl mx-auto px-4 md:px-6 pt-4 pb-4 md:pt-4 md:pb-4">
+            <div className="relative max-w-7xl mx-auto px-4 md:px-6 pt-4 pb-4 md:pt-4 md:pb-4 sm:mx-14 lg:mx-auto">
                 {
                     <button
                         type="button"
@@ -109,7 +109,7 @@ export default function Glp1PreConsultation3PhaseProgress({
                                         )}
                                     </div>
                                     <span
-                                        className="text-center text-base font-normal leading-snug  break-words w-full"
+                                        className={`text-center text-base font-normal leading-snug  break-words w-full ${!isActive ? "hidden lg:block" : ""}`}
                                         style={{ color: labelColor }}
                                     >
                                         {phase.label}

@@ -32,25 +32,33 @@ export const useGlp1PreConsultation3Flow = () => {
       setUserData((prev) => {
         const next = { ...prev };
         delete next.femalePregnancySafety;
+        delete next.glp1MedicalContraindications;
+        delete next.glp1AdditionalHealthQuestions;
         return next;
       });
     }
     baseClosePopup();
   };
 
-  const handleContinue = () => {
+  const handleContinue = (freshUserData) => {
+    const data =
+      freshUserData &&
+      typeof freshUserData === "object" &&
+      !Array.isArray(freshUserData)
+        ? freshUserData
+        : userData;
     const stepConfig = glp1PreConsultation3Config.steps[currentStep];
     if (
       stepConfig &&
       stepConfig.showPopupAfterStep &&
-      !userData[`popupShown_${currentStep}`]
+      !data[`popupShown_${currentStep}`]
     ) {
-      setUserData({ ...userData, [`popupShown_${currentStep}`]: true });
+      setUserData({ ...data, [`popupShown_${currentStep}`]: true });
       baseHandleAction("showPopup", stepConfig.showPopupAfterStep, () => {
-        baseHandleContinue(userData);
+        baseHandleContinue(data);
       });
     } else {
-      baseHandleContinue(userData);
+      baseHandleContinue(data);
     }
   };
 

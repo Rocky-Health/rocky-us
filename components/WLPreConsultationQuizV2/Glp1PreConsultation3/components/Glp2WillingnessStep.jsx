@@ -28,7 +28,7 @@ const Glp2WillingnessStep = ({ userData, setUserData, config, onContinue }) => {
     return (
         <div className="w-full h-full flex flex-col px-4 md:px-0">
             <div className="w-full mx-auto flex-grow pb-32 md:pb-36">
-                <h1 className="headers-font text-[32px] leading-[115%] text-[#251F20] mb-6">
+                <h1 className="subheaders-font text-3xl font-normal leading-[130%] text-[#251F20]">
                     If Clinically Appropriate, Are You Willing To:
                 </h1>
 

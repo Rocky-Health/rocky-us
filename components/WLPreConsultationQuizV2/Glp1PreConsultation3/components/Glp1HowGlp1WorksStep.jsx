@@ -30,8 +30,8 @@ const Glp1HowGlp1WorksStep = ({ onContinue, onQuizChromeVisibilityChange }) => {
 
     return (
         <div className="flex w-full flex-col px-2 pb-10 pt-2 md:px-4">
-            <div className="mx-auto w-full max-w-4xl flex-1 flex-col mb-16">
-                <h1 className="headers-font text-3xl font-normal leading-[120%] tracking-[-0.02em] text-[#251F20] md:text-4xl lg:text-[2.75rem]">
+            <div className="mx-auto w-full max-w-4xl flex-1 flex-col lg:mb-16 mb-10">
+                <h1 className="subheaders-font text-5xl font-normal leading-[120%] tracking-[-0.02em] text-[#251F20]">
                     How will GLP-1{" "}
                     <span
                         className="headers-font italic"
@@ -41,7 +41,7 @@ const Glp1HowGlp1WorksStep = ({ onContinue, onQuizChromeVisibilityChange }) => {
                     </span>
                 </h1>
 
-                <div className="mt-6 overflow-hidden rounded-2xl max-w-lg mx-auto md:mt-8 md:p-5">
+                <div className="mt-6 overflow-hidden rounded-2xl max-w-lg mx-auto lg:mt-8 lg:p-5">
                     <CustomImage
                         src="/wl-pre-consultation/wlps.png"
                         alt="How GLP-1 improves metabolic rate and ease of weight loss over 12 weeks"

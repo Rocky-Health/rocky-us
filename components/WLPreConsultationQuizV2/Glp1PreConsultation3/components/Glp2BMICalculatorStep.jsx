@@ -140,8 +140,8 @@ const Glp2BMICalculatorStep = ({
 
     return (
         <div className="flex h-full w-full flex-col">
-            <div className="mx-auto w-full flex-grow pb-10">
-                <div className="rounded-[16px] overflow-hidden mb-10 w-full h-[360px] md:h-[480px] relative">
+            <div className="mx-auto w-full flex-grow pb-4">
+                <div className="rounded-[16px] overflow-hidden lg:mb-10 mb-6 w-full h-[400px] lg:h-[480px] relative">
                     <CustomImage
                         src="/glp-3-quiz/step1-hdr.jpg"
                         alt="Medical weight loss"
@@ -150,7 +150,7 @@ const Glp2BMICalculatorStep = ({
                     />
                 </div>
 
-                <h1 className="text-[45px] leading-[115%] font-[450] mb-4 text-[#251F20] subheaders-font">
+                <h1 className="text-[42px] lg:text-[45px] leading-[115%] font-[450] mb-4 text-[#251F20] subheaders-font">
                     Reach your goal weight fast{" "}
                     <span className="text-[#AE7E56] headers-font">
                         without restrictive diets and exercise.
