@@ -22,74 +22,74 @@ import Section from "@/components/utils/Section";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-    title: "Weight Loss Program | MyRocky",
-    description:
-        "Personalized GLP-1 weight loss care. Start for $149, free shipping, HSA/FSA eligible.",
+  title: "Weight Loss Program | MyRocky",
+  description:
+    "Personalized GLP-1 weight loss care. Start for $149, free shipping, HSA/FSA eligible.",
 };
 
 export default function WlMedViPage() {
-    const ctaHref = "/wl-pre-consultation";
+  const ctaHref = "/glp1-pre";
 
-    return (
-        <>
-            <MedViPromoBanner />
-            <MedViNav ctaHref={ctaHref} />
-            <main className="min-h-screen ">
-                <MedViHero ctaHref={ctaHref} />
-            </main>
+  return (
+    <>
+      <MedViPromoBanner />
+      <MedViNav ctaHref={ctaHref} />
+      <main className="min-h-screen ">
+        <MedViHero ctaHref={ctaHref} />
+      </main>
 
-            <RockyInTheNews />
+      <RockyInTheNews />
 
-            <Section bg="bg-white pt-10 md:pt-12">
-                <MedViProductTiers ctaHref={ctaHref} />
-            </Section>
+      <Section bg="bg-white pt-10 md:pt-12">
+        <MedViProductTiers ctaHref={ctaHref} />
+      </Section>
 
-            <Section bg="bg-white !py-0 md:!py-0">
-                <MedViTestimonialsShowcase />
-            </Section>
+      <Section bg="bg-white !py-0 md:!py-0">
+        <MedViTestimonialsShowcase />
+      </Section>
 
-            <Section bg="bg-white">
-                <MedViWeightCalculator ctaHref={ctaHref} />
-            </Section>
+      <Section bg="bg-white">
+        <MedViWeightCalculator ctaHref={ctaHref} />
+      </Section>
 
-            <Section bg="bg-white !px-0">
-                <MedViChangePhotoGrid />
-                <MedViChangeStatsRow />
-            </Section>
+      <Section bg="bg-white !px-0">
+        <MedViChangePhotoGrid />
+        <MedViChangeStatsRow />
+      </Section>
 
-            <Section bg="bg-white !py-0 md:!py-0">
-                <MedViMetabolismSection ctaHref={ctaHref} />
-            </Section>
+      <Section bg="bg-white !py-0 md:!py-0">
+        <MedViMetabolismSection ctaHref={ctaHref} />
+      </Section>
 
-            <Section>
-                <MedViWhyItWorks />
-            </Section>
+      <Section>
+        <MedViWhyItWorks />
+      </Section>
 
-            <Section bg="bg-white">
-                <MedViThreeStepProcess ctaHref={ctaHref} />
-            </Section>
+      <Section bg="bg-white">
+        <MedViThreeStepProcess ctaHref={ctaHref} />
+      </Section>
 
-            <Section bg="bg-white ">
-                <MedViSupportSection />
-            </Section>
+      <Section bg="bg-white ">
+        <MedViSupportSection />
+      </Section>
 
-            <Section bg="bg-white">
-                <MedViExtendedTestimonials ctaHref={ctaHref} />
-            </Section>
+      <Section bg="bg-white">
+        <MedViExtendedTestimonials ctaHref={ctaHref} />
+      </Section>
 
-            <Section>
-                <MedViFaqsSection />
-            </Section>
+      <Section>
+        <MedViFaqsSection />
+      </Section>
 
-            <MedViMoneyBackCTA ctaHref={ctaHref} />
+      <MedViMoneyBackCTA ctaHref={ctaHref} />
 
-            <Section bg="bg-white">
-                <MedViGoalSelector ctaHref={ctaHref} />
-            </Section>
+      <Section bg="bg-white">
+        <MedViGoalSelector ctaHref={ctaHref} />
+      </Section>
 
-            <MedViTrustBadgesRow className="mt-10 md:mt-12 lg:mt-14" />
+      <MedViTrustBadgesRow className="mt-10 md:mt-12 lg:mt-14" />
 
-            <Footer />
-        </>
-    );
+      <Footer />
+    </>
+  );
 }
