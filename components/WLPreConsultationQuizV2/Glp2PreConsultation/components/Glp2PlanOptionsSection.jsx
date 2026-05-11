@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 const PLAN_SUPPLY_BY_ID = {
   monthly: "4 Week Supply",
@@ -122,12 +123,15 @@ const Glp2PlanOptionsSection = ({
                     Select Plan ·{" "}
                     {plan.originalPrice && (
                       <span className="line-through font-normal opacity-80">
-                        {plan.originalPrice}/month
+                        ${formatPriceUI(plan.originalPrice)}/month
                       </span>
                     )}
                   </p>
                   <p className="text-sm text-white/90 mt-0.5 uppercase tracking-wide">
-                    PAY ONLY <span className="font-bold">{plan.price}</span>{" "}
+                    PAY ONLY{" "}
+                    <span className="font-bold">
+                      ${formatPriceUI(plan.price)}
+                    </span>{" "}
                     LIMITED OFFER
                   </p>
                 </div>
@@ -135,7 +139,9 @@ const Glp2PlanOptionsSection = ({
                 <div className="mt-3 rounded-[4px] bg-[#A7885A] text-center py-3">
                   <p className="text-xl leading-none text-white">
                     Select Plan ·{" "}
-                    <span className="font-normal">{plan.price}/mo</span>
+                    <span className="font-normal">
+                      ${formatPriceUI(plan.price)}/mo
+                    </span>
                   </p>
                 </div>
               )}

@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 import { canRemoveItem } from "@/lib/cart/cartService";
 import MobileCartPopup from "./MobileCartPopup";
 import { IoIosCart } from "react-icons/io";
-import { formatPrice } from "@/utils/priceFormatter";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 const CartIcon = ({ handleToggle }) => {
   const [cartItems, setCartItems] = useState([]);
@@ -385,14 +385,14 @@ const CartItem = ({ item, refreshCart, isLocalCart, allItems }) => {
           <p className="mt-1 text-xs">
           {quantity} × {currencySymbol}
           {typeof itemPrice === "number"
-            ? formatPrice(itemPrice)
-            : formatPrice(itemPrice)}
+            ? formatPriceUI(itemPrice)
+            : formatPriceUI(itemPrice)}
         </p>
         <p className="mt-1 text-xs font-semibold">
           Total: {currencySymbol}
           {typeof itemPrice === "number"
-            ? formatPrice(itemPrice * quantity)
-            : formatPrice(parseFloat(itemPrice || 0) * quantity)}
+            ? formatPriceUI(itemPrice * quantity)
+            : formatPriceUI(parseFloat(itemPrice || 0) * quantity)}
         </p></>}
         {item.name === "Body Optimization Program" && (
           <div className="flex flex-col">

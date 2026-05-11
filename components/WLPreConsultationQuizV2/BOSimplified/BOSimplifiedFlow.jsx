@@ -12,7 +12,6 @@ import { useEffect } from "react";
 import QuestionnaireNavbar from "../components/QuestionnaireNavbar";
 import { ProgressBar } from "@/components/EdQuestionnaire/ProgressBar";
 
-
 const getPopupConfigWithChosenValue = (popupKey, userData) => {
   if (popupKey === "potentialWeightLoss") {
     const popupConfig = boSimplifiedConfig.popups[popupKey];
@@ -92,7 +91,6 @@ const BOSimplifiedFlow = () => {
     flowId: "weight-loss",
     stepType: "pre-consultation",
   });
-
 
   // Ensure hooks run in the same order on every render
   useEffect(() => {

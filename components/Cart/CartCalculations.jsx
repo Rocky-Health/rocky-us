@@ -3,7 +3,7 @@ import { logger } from "@/utils/devLogger";
 import CouponApply from "../CartCheckoutShared/CouponApply";
 import InitialShipping from "../CartCheckoutShared/InitialShipping";
 import { analyticsService } from "@/utils/analytics/analyticsService";
-import { formatPrice } from "@/utils/priceFormatter";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 const CartCalculations = ({ cartItems, setCartItems }) => {
     const currencySymbol = cartItems.totals.currency_symbol || "$";
@@ -139,7 +139,7 @@ const RecurringShipping = ({ currencySymbol, cartItems }) => {
                 </p>
                 <p className="leading-[19.6px] text-[#000000]">
                     {currencySymbol}
-                    {formatPrice(subTotalPrice)}
+                    {formatPriceUI(subTotalPrice)}
                 </p>
             </div>
             <div className="flex justify-between items-start cart-discount coupon-"></div>
@@ -167,7 +167,7 @@ const RecurringShipping = ({ currencySymbol, cartItems }) => {
                                             <span>
                                                 {" "}
                                                 ({currencySymbol}
-                                                {formatPrice(
+                                                {formatPriceUI(
                                                     Number(
                                                         selectedShipping.price,
                                                     ) / 100,
@@ -187,7 +187,7 @@ const RecurringShipping = ({ currencySymbol, cartItems }) => {
                 </p>
                 <p className="leading-[19.6px]">
                     {currencySymbol}
-                    {formatPrice(totalTax)}
+                    {formatPriceUI(totalTax)}
                 </p>
             </div>
             <div className="flex justify-between items-start mb-[24px]">
@@ -196,7 +196,7 @@ const RecurringShipping = ({ currencySymbol, cartItems }) => {
                 </p>
                 <p className="font-[500] text-[#000000] leading-[22px]">
                     {currencySymbol}
-                    {formatPrice(totalPrice)}
+                    {formatPriceUI(totalPrice)}
                 </p>
             </div>
         </div>

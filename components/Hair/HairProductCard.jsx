@@ -12,7 +12,7 @@ import {
   addToCartEarly,
   finalizeFlowCheckout,
 } from "../../utils/flowCartHandler";
-import { formatPrice } from "@/utils/priceFormatter";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 const HairProductCard = ({
   label,
@@ -247,13 +247,13 @@ const HairProductCard = ({
           </>
         ) : isOnSale ? (
           <>
-            Add To Cart - ${formatPrice(price)}{" "}
+            Add To Cart - ${formatPriceUI(price)}{" "}
             <span className="text-gray-300 line-through text-sm">
-              ${formatPrice(regularPrice)}
+              ${formatPriceUI(regularPrice)}
             </span>
           </>
         ) : (
-          <>Add To Cart - ${formatPrice(price)}</>
+          <>Add To Cart - ${formatPriceUI(price)}</>
         )}
       </button>
 

@@ -5,6 +5,17 @@ const STORAGE_KEY = "wl_flow2_quiz_data";
 
 // Add isAuthenticated param to control step skipping
 export const useStepNavigation = (quizConfig) => {
+  // Helper used only inside lazy initializers — resolves the first eligible step
+  // for an authenticated user starting from `startStep`.
+  const resolveStepForAuth = (startStep) => {
+    if (!isUserAuthenticated()) return startStep;
+    let step = startStep;
+    while (quizConfig.steps[step]?.passIf === "authenticate") {
+      step = quizConfig.navigation[step] || step + 1;
+    }
+    return step;
+  };
+
   // Initialize from localStorage if available
   const [currentStep, setCurrentStep] = useState(() => {
     if (typeof window !== "undefined") {
@@ -12,7 +23,7 @@ export const useStepNavigation = (quizConfig) => {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
           const parsed = JSON.parse(stored);
-          return parsed.currentStep || 1;
+          return resolveStepForAuth(parsed.currentStep || 1);
         }
       } catch (e) {
         console.error("Failed to load currentStep from localStorage:", e);
@@ -27,13 +38,9 @@ export const useStepNavigation = (quizConfig) => {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (parsed.progressPercent !== undefined) {
-            return parsed.progressPercent;
-          }
-          // Fallback to calculate from currentStep
-          if (parsed.currentStep) {
-            return quizConfig.progressMap[parsed.currentStep] || 0;
-          }
+          // Resolve the actual starting step (skip guest-only if authenticated)
+          const resolvedStep = resolveStepForAuth(parsed.currentStep || 1);
+          return quizConfig.progressMap[resolvedStep] || 0;
         }
       } catch (e) {
         console.error("Failed to load progressPercent from localStorage:", e);
@@ -57,7 +64,7 @@ export const useStepNavigation = (quizConfig) => {
     }
     return [];
   });
-
+ 
   const isAuthenticated = isUserAuthenticated();
 
   // Save to localStorage whenever navigation state changes
@@ -100,11 +107,19 @@ export const useStepNavigation = (quizConfig) => {
     const onPopState = (e) => {
       // Only intercept if we have internal history to go back to
       if (history.length > 0) {
-        // Prevent the browser from actually navigating away
-        const last = history[history.length - 1];
-        setHistory((h) => h.slice(0, -1));
-        setCurrentStep(last);
-        setProgressPercent(quizConfig.progressMap[last] || 0);
+        // Walk back through history skipping guest-only steps
+        let newHistory = [...history];
+        let last;
+        do {
+          last = newHistory[newHistory.length - 1];
+          newHistory = newHistory.slice(0, -1);
+        } while (shouldSkipStep(last) && newHistory.length > 0);
+
+        if (!shouldSkipStep(last)) {
+          setHistory(newHistory);
+          setCurrentStep(last);
+          setProgressPercent(quizConfig.progressMap[last] || 0);
+        }
       }
       // If history is empty (step 1), let the browser navigate normally
     };
@@ -200,13 +215,21 @@ export const useStepNavigation = (quizConfig) => {
   };
 
   const handleBack = (userData) => {
-    // If we have a history stack, pop the last visited step and go there
+    // If we have a history stack, pop steps until we find one that shouldn't be skipped
     if (history.length > 0) {
-      const last = history[history.length - 1];
-      setHistory((h) => h.slice(0, -1));
-      setCurrentStep(last);
-      setProgressPercent(quizConfig.progressMap[last] || 0);
-      return;
+      let newHistory = [...history];
+      let last;
+      do {
+        last = newHistory[newHistory.length - 1];
+        newHistory = newHistory.slice(0, -1);
+      } while (shouldSkipStep(last) && newHistory.length > 0);
+
+      if (!shouldSkipStep(last)) {
+        setHistory(newHistory);
+        setCurrentStep(last);
+        setProgressPercent(quizConfig.progressMap[last] || 0);
+        return;
+      }
     }
 
     // Fallback: walk backward to previous non-skipped step

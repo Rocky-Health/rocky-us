@@ -43,14 +43,17 @@ const Navlinks = ({ menuItems, userData, token, nameToShow }) => {
 
       logger.log(document.body.style.overflow);
     } else {
-      document.body.style.overflow = "auto";
-      document.documentElement.style.overflow = "auto";
+      // Clear inline overflow so the document uses normal scrolling. Setting
+      // "auto" here was switching the scroll container and breaking position:sticky
+      // on headers after closing the menu (e.g. minimal-layout landing pages).
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
 
       logger.log(document.body.style.overflow);
     }
     return () => {
-      document.body.style.overflow = "auto";
-      document.documentElement.style.overflow = "auto";
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
     };
   }, [isOpen]);
 

@@ -10,7 +10,7 @@ import BrandGenericModal from "../EDPlans/BrandGenericModal";
 import DosageSelectionModal from "../EDPlans/DosageSelectionModal";
 import CrossSellModal from "../EDPlans/CrossSellModal";
 import { edFlowAddToCart } from "@/utils/flowCartHandler";
-import { formatPrice } from "@/utils/priceFormatter";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 const EdTreatment = () => {
   const router = useRouter();
@@ -207,7 +207,7 @@ const EdTreatment = () => {
           className="py-3 mt-6 font-semibold text-center text-white bg-black rounded-full cursor-pointer product-select"
           onClick={handleProductSelect}
         >
-          ${formatPrice(currentPrice)} - Select
+          ${formatPriceUI(currentPrice)} - Select
         </p>
         <p className="mt-4 mb-2 text-xs text-gray-500">
           *Dose request can be made during questionnaire
