@@ -136,11 +136,30 @@ export default function RootLayout({ children }) {
           content="uvvbdeqdbj046v74x0oqaxhl9tyq26"
         />
         {/* End Facebooc Domain Verification */}
-        {/* Start Convert Experiences */}
+        {/* Start Convert Experiences — async load.
+            Inline anti-flicker hides body for up to 500ms while Convert downloads,
+            so the page reveals fast even when Convert is slow. */}
+        <Script id="convert-anti-flicker" strategy="beforeInteractive">
+          {`
+            (function(){
+              var s=document.createElement('style');
+              s.id='__convert-anti-flicker';
+              s.appendChild(document.createTextNode('body{opacity:0!important}'));
+              (document.head||document.documentElement).appendChild(s);
+              function clear(){
+                var n=document.getElementById('__convert-anti-flicker');
+                if(n&&n.parentNode)n.parentNode.removeChild(n);
+              }
+              setTimeout(clear,500);
+              window.__convertClearAntiFlicker=clear;
+            })();
+          `}
+        </Script>
         <Script
           id="convert-experiences"
           strategy="beforeInteractive"
-          src="//cdn-4.convertexperiments.com/v1/js/10045956-10046753.js?environment=production"
+          async
+          src="https://cdn-4.convertexperiments.com/v1/js/10045956-10046753.js?environment=production"
         />
         {/* End Convert Experiences */}
         {/* Start TikTok Pixel — stub installs immediately so ttq.track() calls queue;
