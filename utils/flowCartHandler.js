@@ -180,6 +180,21 @@ async function handleAuthenticatedFlow(mainProduct, addons, flowType, options) {
       // Add flow-specific consultation requirements
       addFlowConsultationRequirements(mainProduct, flowType);
 
+      try {
+        trackMetaStartCheckout({
+          flow_id: flowType,
+          content_id: String(
+            extractProductId(mainProduct) || mainProduct.variationId || "",
+          ),
+          value: parsePrice(mainProduct.price),
+        });
+      } catch (err) {
+        logMetaTrackingError(err, {
+          flow_id: flowType,
+          milestone: "START_CHECKOUT",
+        });
+      }
+
       // Generate clean checkout URL
       const checkoutUrl = generateFlowCheckoutUrl(
         flowType,
@@ -343,6 +358,21 @@ async function handleUnauthenticatedFlow(
 
     // Add flow-specific consultation requirements to localStorage
     addFlowConsultationRequirements(mainProduct, flowType);
+
+    try {
+      trackMetaStartCheckout({
+        flow_id: flowType,
+        content_id: String(
+          extractProductId(mainProduct) || mainProduct.variationId || "",
+        ),
+        value: parsePrice(mainProduct.price),
+      });
+    } catch (err) {
+      logMetaTrackingError(err, {
+        flow_id: flowType,
+        milestone: "START_CHECKOUT",
+      });
+    }
 
     // Get the updated cart from cartService
     const cartData = getLocalCart();
