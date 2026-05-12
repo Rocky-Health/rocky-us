@@ -6,6 +6,7 @@ import Image from "next/image";
 import { ProductImage } from "@/components/Product";
 import { useAddItemToCart } from "@/lib/cart/cartHooks";
 import { useRouter } from "next/navigation";
+import { formatPriceUI } from "@/utils/priceFormatter";
 import CartPopup from "../Cart/CartPopup";
 import { addRequiredConsultation } from "@/utils/requiredConsultation";
 import {
@@ -22,9 +23,9 @@ const ZonnicProductDetails = ({ product, variations, isLoading }) => {
   logger.log("ZonnicProductDetails product:", product);
 
   // Extract flavors from product attributes
-  const flavors =
-    product?.attributes?.find((attr) => attr.slug === "pa_flavors")?.options ||
-    ["Mint", "Peppermint", "Spearmint"];
+  const flavors = product?.attributes?.find(
+    (attr) => attr.slug === "pa_flavors",
+  )?.options || ["Mint", "Peppermint", "Spearmint"];
 
   // State management
   const [variationPrice, setVariationPrice] = useState("");
@@ -61,9 +62,7 @@ const ZonnicProductDetails = ({ product, variations, isLoading }) => {
           const flavorAttr =
             v.attributes["attribute_flavors"] ||
             v.attributes["attribute_pa_flavors"];
-          const flavorMatch =
-            !flavorAttr ||
-            flavorAttr === flavorKey;
+          const flavorMatch = !flavorAttr || flavorAttr === flavorKey;
           return frequencyMatch && flavorMatch;
         })
         .map((v) => {
@@ -159,7 +158,7 @@ const ZonnicProductDetails = ({ product, variations, isLoading }) => {
         }
       } catch (error) {
         logger.log(
-          "Could not fetch user profile, proceeding with cart addition"
+          "Could not fetch user profile, proceeding with cart addition",
         );
       }
 
@@ -226,7 +225,7 @@ const ZonnicProductDetails = ({ product, variations, isLoading }) => {
             ([name, value]) => ({
               name: name.replace("attribute_", "").replace("pa_", ""),
               value: value,
-            })
+            }),
           );
         }
 
@@ -319,10 +318,11 @@ const ZonnicProductDetails = ({ product, variations, isLoading }) => {
               {flavors.map((flavor) => (
                 <button
                   key={flavor}
-                  className={`w-full py-1 px-3 text-sm rounded-[8px] border-2 transition-all duration-200 ${selectedFlavor === flavor
-                    ? "border-[#AE7E56] text-[#AE7E56]"
-                    : "border-[#CECECE] hover:border-gray-400"
-                    }`}
+                  className={`w-full py-1 px-3 text-sm rounded-[8px] border-2 transition-all duration-200 ${
+                    selectedFlavor === flavor
+                      ? "border-[#AE7E56] text-[#AE7E56]"
+                      : "border-[#CECECE] hover:border-gray-400"
+                  }`}
                   onClick={() => handleFlavorChange(flavor)}
                 >
                   {flavor}
@@ -338,10 +338,11 @@ const ZonnicProductDetails = ({ product, variations, isLoading }) => {
               {subscriptionTypes.map((type) => (
                 <button
                   key={type}
-                  className={`border rounded-[8px] py-1 px-3 text-sm text-center font-medium transition-all duration-200 ${selectedFrequency === type
-                    ? " border-[#AE7E56] text-[#AE7E56]"
-                    : "border-[#CECECE] hover:border-gray-400"
-                    }`}
+                  className={`border rounded-[8px] py-1 px-3 text-sm text-center font-medium transition-all duration-200 ${
+                    selectedFrequency === type
+                      ? " border-[#AE7E56] text-[#AE7E56]"
+                      : "border-[#CECECE] hover:border-gray-400"
+                  }`}
                   onClick={() => handleFrequencyChange(type)}
                 >
                   {type}
@@ -356,8 +357,6 @@ const ZonnicProductDetails = ({ product, variations, isLoading }) => {
                   : null}
             </p>
 
-
-
             {/* Packs Selection */}
             <div className="space-y-2 mb-6">
               <h2 className="text-base font-medium">How many packs?</h2>
@@ -370,15 +369,16 @@ const ZonnicProductDetails = ({ product, variations, isLoading }) => {
                 {availablePacks.map((pack) => (
                   <button
                     key={pack.value + "-" + pack.variationId}
-                    className={`w-full py-1 px-3 text-sm rounded-[8px] border-2 transition-all duration-200 ${selectedPacks === pack.value
-                      ? "border-[#AE7E56] text-[#AE7E56]"
-                      : "border-[#CECECE] hover:border-gray-400"
-                      }`}
+                    className={`w-full py-1 px-3 text-sm rounded-[8px] border-2 transition-all duration-200 ${
+                      selectedPacks === pack.value
+                        ? "border-[#AE7E56] text-[#AE7E56]"
+                        : "border-[#CECECE] hover:border-gray-400"
+                    }`}
                     onClick={() => handlePackSelection(pack)}
                   >
                     <div className="flex flex-col md:flex-row justify-between items-center gap-2">
                       <span>{pack.label}</span>
-                      <span>${pack.price}</span>
+                      <span>${formatPriceUI(pack.price)}</span>
                     </div>
                   </button>
                 ))}
@@ -393,7 +393,7 @@ const ZonnicProductDetails = ({ product, variations, isLoading }) => {
             >
               {addToCartLoading
                 ? "Adding to Cart..."
-                : `Add to Cart - $${variationPrice}`}
+                : `Add to Cart - $${formatPriceUI(variationPrice)}`}
             </button>
 
             {/* Warning notice */}

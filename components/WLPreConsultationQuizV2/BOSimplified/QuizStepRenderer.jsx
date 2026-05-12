@@ -1,12 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { boSimplifiedConfig } from "./config/boSimplifiedConfig";
 import GenericQuestionStep from "../components/GenericQuestionStep";
-import GenericRecommendationStep from "../components/GenericRecommendationStep";
-import BOSimplifiedPlanSelectionStep from "./components/BOSimplifiedPlanSelectionStep";
+import Glp2TreatmentAndPlanStep from "../Glp2PreConsultation/components/Glp2TreatmentAndPlanStep";
 import { getProductRecommendation } from "../utils/recommendationEngine";
-import WLProductCard from "../components/WLProductCard";
-
-const COMPOUNDED_PRODUCT_IDS = ["489523", "489798"];
 
 const QuizStepRenderer = ({
   currentStep,
@@ -15,55 +11,25 @@ const QuizStepRenderer = ({
   selectedProduct,
   setSelectedProduct,
   handleContinue,
-  handleBack,
   handleAction,
-  handleRecommendationContinue,
-  goToStep,
   handlePlanStepCheckout,
 }) => {
-  const [selectedPlan, setSelectedPlan] = useState(null);
   const stepConfig = boSimplifiedConfig.steps[currentStep];
 
-  // Handle plan selection step (step 8) - for Compounded Tirzepatide/Semaglutide
-  if (currentStep === 8) {
-    // Pick plan options specific to the selected product (Tirz vs Sema pricing differs)
-    const productPlanOptions = selectedProduct
-      ? boSimplifiedConfig.planOptions[String(selectedProduct.id)]
-      : null;
-
-    return (
-      <BOSimplifiedPlanSelectionStep
-        product={selectedProduct}
-        selectedPlan={selectedPlan}
-        setSelectedPlan={setSelectedPlan}
-        planOptions={productPlanOptions}
-        planInclusions={boSimplifiedConfig.planInclusions}
-        onBack={handleBack}
-        onContinue={handlePlanStepCheckout}
-      />
-    );
-  }
-
-  // Handle recommendation step (step 7)
-  if (currentStep === 7) {
+  // Steps 7 and 8 — combined "Select Treatment" + plan selection
+  if (currentStep === 7 || currentStep === 8) {
     const recommendation = getProductRecommendation(
       userData,
       boSimplifiedConfig.recommendationRules,
     );
 
-    const shouldShowPlanStep = (product) =>
-      product && COMPOUNDED_PRODUCT_IDS.includes(String(product.id));
-
     return (
-      <GenericRecommendationStep
+      <Glp2TreatmentAndPlanStep
         {...recommendation}
         selectedProduct={selectedProduct}
         setSelectedProduct={setSelectedProduct}
-        onContinue={handleRecommendationContinue}
-        ProductCard={WLProductCard}
-        showAlternatives={true}
-        onBeforeCheckout={shouldShowPlanStep}
-        onNavigateToPlanStep={() => goToStep(8)}
+        planOptionsByProduct={boSimplifiedConfig.planOptions}
+        onContinue={handlePlanStepCheckout}
       />
     );
   }

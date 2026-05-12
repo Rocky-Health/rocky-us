@@ -6,6 +6,7 @@ import ProductPopup from "./ProductPopup";
 import ProductCardSkeleton from "./ProductCardSkeleton";
 import MerchBehindTheScene from "./MerchBehindTheScene";
 import { FaCheckCircle, FaInfoCircle } from "react-icons/fa";
+import { formatPrice } from "@/utils/priceFormatter";
 
 const ShopBanner = ({ products = [], loading = false }) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -109,58 +110,57 @@ const ShopBanner = ({ products = [], loading = false }) => {
 
         {/* Main Content Section */}
         <div className="lg:h-[567px] flex items-center justify-start md:justify-center flex-col-reverse lg:flex-row gap-8 ">
-        
           {/* Product Cards - Right Section */}
           <div className="w-full md:w-auto overflow-x-auto custom-scrollbar pb-8 scroll-smooth">
             <div className="flex gap-8 h-full flex-row min-w-max md:justify-center">
-            {featuredProducts.map((product) => (
-              <div
-                key={product.id}
-                className="cursor-pointer flex flex-col h-[527px] w-[280px] md:w-[378px] items-center flex-shrink-0"
-                onClick={() => openProductPopup(product)}
-              >
-                {/* Product Image */}
-                <div className="flex-1 bg-[#F3F3F3]  md:h-[431px]  flex items-center justify-center rounded-2xl mb-4 overflow-hidden relative">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    width={378}
-                    height={431}
-                    className="object-contain"
-                    loading="lazy"
-                    quality={85}
-                    sizes="(max-width: 768px) 100vw, 378px"
-                  />
-                  {/* Info Icon */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openProductPopup(product);
-                    }}
-                    className="absolute top-3 right-3 w-8 h-8  rounded-full flex items-center justify-center"
-                    aria-label="More information"
-                  >
-                    <FaInfoCircle className="text-gray-600 group-hover:text-gray-800 text-sm" />
-                  </button>
-                </div>
-
-                {/* Product Info */}
-                <div className="w-full">
-                  <div className="text-center mb-4">
-                    <h3 className="text-lg font-medium text-black tracking-[0%] leading-[100%] mb-1">
-                      {product.name}
-                    </h3>
-                    <p className="text-lg font-medium text-black tracking-[0%] leading-[140%] ">
-                      ${product.price}
-                    </p>
+              {featuredProducts.map((product) => (
+                <div
+                  key={product.id}
+                  className="cursor-pointer flex flex-col h-[527px] w-[280px] md:w-[378px] items-center flex-shrink-0"
+                  onClick={() => openProductPopup(product)}
+                >
+                  {/* Product Image */}
+                  <div className="flex-1 bg-[#F3F3F3]  md:h-[431px]  flex items-center justify-center rounded-2xl mb-4 overflow-hidden relative">
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      width={378}
+                      height={431}
+                      className="object-contain"
+                      loading="lazy"
+                      quality={85}
+                      sizes="(max-width: 768px) 100vw, 378px"
+                    />
+                    {/* Info Icon */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openProductPopup(product);
+                      }}
+                      className="absolute top-3 right-3 w-8 h-8  rounded-full flex items-center justify-center"
+                      aria-label="More information"
+                    >
+                      <FaInfoCircle className="text-gray-600 group-hover:text-gray-800 text-sm" />
+                    </button>
                   </div>
 
-                  <button className="w-full h-[48px]  bg-white border text-base tracking-[0%] leading-[140%] border-black text-black font-medium rounded-full hover:bg-black hover:text-white transition-colors">
-                    Add to Cart
-                  </button>
+                  {/* Product Info */}
+                  <div className="w-full">
+                    <div className="text-center mb-4">
+                      <h3 className="text-lg font-medium text-black tracking-[0%] leading-[100%] mb-1">
+                        {product.name}
+                      </h3>
+                      <p className="text-lg font-medium text-black tracking-[0%] leading-[140%] ">
+                        ${formatPrice(product.price)}
+                      </p>
+                    </div>
+
+                    <button className="w-full h-[48px]  bg-white border text-base tracking-[0%] leading-[140%] border-black text-black font-medium rounded-full hover:bg-black hover:text-white transition-colors">
+                      Add to Cart
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
             </div>
           </div>
         </div>
@@ -176,7 +176,7 @@ const ShopBanner = ({ products = [], loading = false }) => {
           {/* Left Text Block */}
           <div className="flex-1 lg:flex-none md:w-[55%] font-[450]  headers-font">
             <p className=" text-black  headers-font md:text-[28px] text-[24px] md:tracking-[-2%] tracking-[-1%] leading-[115%]">
-            Designed with premium fabrics, cut with intention, and built on a
+              Designed with premium fabrics, cut with intention, and built on a
               bold aesthetic -
             </p>
             <p className="md:text-[28px] text-[24px] headers-font  text-[#AE7E56] md:tracking-[-2%] tracking-[-1%] leading-[115%]">

@@ -3,38 +3,34 @@
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
+// US bundle: only ED / WL / HL. Smoking, Skincare, and Mental-Health
+// categories are blocked at middleware level and must not be present here.
 const PIXEL_IDS = {
   ED: process.env.NEXT_PUBLIC_FB_PIXEL_ID_ED || "522677764108011",
   WL: process.env.NEXT_PUBLIC_FB_PIXEL_ID_WL || "1451450365779499",
-  SMOKING: process.env.NEXT_PUBLIC_FB_PIXEL_ID_SMOKING || "1311848663202831",
   HL: process.env.NEXT_PUBLIC_FB_PIXEL_ID_HL || "754893718769214",
-  SKINCARE: process.env.NEXT_PUBLIC_FB_PIXEL_ID_SKINCARE || "1843271713209245",
-  OTHERS: process.env.NEXT_PUBLIC_FB_PIXEL_ID_OTHERS || "799609076328562",
 };
+
+// Default pixel for non-categorized pages (homepage, blog, FAQ, etc.).
+// WL is highest volume on US — confirmed as fallback per spec §5.1.
+const FALLBACK_PIXEL_KEY = "WL";
 
 const ROUTE_PREFIXES = {
   ED: ["pre-ed", "ed", "ed-pre", "ed-flow", "ed-consultation", "ed-prequiz", "erectile-dysfunction", "sex"],
   WL: ["pre-wl", "wl", "wl-pre", "wl-consultation", "new-bo-wl", "old-wl", "weight-loss", "body-optimization", "bo", "glp1", "glp2"],
   HL: ["hair", "hairloss", "hair-loss", "hair-main-questionnaire", "hair-pre-consultation", "hair-flow", "hair-products"],
-  SMOKING: ["smoking", "smoking-consultation", "zonnic"],
-  SKINCARE: ["skincare", "skin-care", "acne", "anti-aging", "anti-ageing", "hyperpigmentation", "hyper-pigmentation"],
-  OTHERS: ["mental-health", "mh-quiz", "mh-pre-quiz"],
 };
 
 const CATEGORY_SLUGS = {
   ED: ["ed", "erectile-dysfunction", "sexual-health"],
   WL: ["weight-loss", "wl", "body-optimization"],
   HL: ["hair-loss", "hair", "hairloss"],
-  SMOKING: ["smoking-cessation", "smoking", "zonnic"],
-  SKINCARE: ["skincare", "skin-care", "acne", "anti-ageing", "anti-aging", "hyperpigmentation"],
 };
 
 const PRODUCT_KEYWORDS = {
   ED: ["cialis", "viagra", "tadalafil", "sildenafil", "variety"],
   WL: ["ozempic", "semaglutide", "tirzepatide", "mounjaro", "wegovy", "rybelsus", "weight-loss", "body-optimization"],
   HL: ["finasteride", "minoxidil", "propecia", "hair", "hair-kit"],
-  SMOKING: ["zonnic", "smoking", "nicotine"],
-  SKINCARE: ["acne", "anti-aging", "anti-ageing", "hyperpigmentation", "hyper-pigmentation", "skincare", "skin-care"],
 };
 
 // Maps checkout/thank-you query params to pixel categories.
@@ -43,9 +39,6 @@ const FLOW_QUERY_MAP = {
   "ed-flow": "ED",
   "wl-flow": "WL",
   "hair-flow": "HL",
-  "smoking-flow": "SMOKING",
-  "skincare-flow": "SKINCARE",
-  "mh-flow": "OTHERS",
 };
 
 const hasPrefixMatch = (segments, prefixes) =>
@@ -70,21 +63,14 @@ const getPixelKeyForPath = (pathname, categories = []) => {
     if (hasCategoryMatch(normalizedCategories, CATEGORY_SLUGS.ED)) return "ED";
     if (hasCategoryMatch(normalizedCategories, CATEGORY_SLUGS.WL)) return "WL";
     if (hasCategoryMatch(normalizedCategories, CATEGORY_SLUGS.HL)) return "HL";
-    if (hasCategoryMatch(normalizedCategories, CATEGORY_SLUGS.SMOKING)) return "SMOKING";
-    if (hasCategoryMatch(normalizedCategories, CATEGORY_SLUGS.SKINCARE)) return "SKINCARE";
   }
 
   if (hasPrefixMatch(segments, ROUTE_PREFIXES.ED) || hasKeywordMatch(productSlug, PRODUCT_KEYWORDS.ED)) return "ED";
   if (hasPrefixMatch(segments, ROUTE_PREFIXES.WL) || hasKeywordMatch(productSlug, PRODUCT_KEYWORDS.WL)) return "WL";
   if (hasPrefixMatch(segments, ROUTE_PREFIXES.HL) || hasKeywordMatch(productSlug, PRODUCT_KEYWORDS.HL)) return "HL";
-  if (hasPrefixMatch(segments, ROUTE_PREFIXES.SMOKING) || hasKeywordMatch(productSlug, PRODUCT_KEYWORDS.SMOKING)) return "SMOKING";
-  if (hasPrefixMatch(segments, ROUTE_PREFIXES.SKINCARE) || hasKeywordMatch(productSlug, PRODUCT_KEYWORDS.SKINCARE)) return "SKINCARE";
-  if (hasPrefixMatch(segments, ROUTE_PREFIXES.OTHERS)) return "OTHERS";
 
-  return "OTHERS";
+  return FALLBACK_PIXEL_KEY;
 };
-
-const ALL_PIXEL_IDS = [...new Set(Object.values(PIXEL_IDS))];
 
 /* ------------------------------------------------------------------ */
 /*  Module-level fbq stub initialization                               */
@@ -98,7 +84,19 @@ const ALL_PIXEL_IDS = [...new Set(Object.values(PIXEL_IDS))];
 /*                                                                     */
 /*  By creating the stub at module load time, all fbq calls are        */
 /*  queued immediately and processed when fbevents.js loads.            */
+/*                                                                     */
+/*  IMPORTANT: We deliberately do NOT init any pixels at module load.  */
+/*  Pixels are init'd lazily inside the PageView effect — once per     */
+/*  pixel per session — so that fbevents.js's auto-PageView only fires */
+/*  for the pixel that matches the current route, not all of them.     */
+/*  See `initializedPixels` below and TK-423.                          */
 /* ------------------------------------------------------------------ */
+
+// Tracks pixel IDs already init'd in this client session, so SPA
+// navigation between categories doesn't re-init (and re-PageView)
+// a previously-active pixel.
+const initializedPixels = new Set();
+
 if (typeof window !== "undefined") {
   if (!window.fbq) {
     const n = (window.fbq = function () {
@@ -114,15 +112,6 @@ if (typeof window !== "undefined") {
   }
 
   window.fbq.disablePushState = true;
-
-  // Guard init calls so they run exactly once per session, even if this
-  // module is re-evaluated or GTM also calls fbq("init") for these IDs.
-  if (!window.__fbPixelsInited) {
-    window.__fbPixelsInited = true;
-    ALL_PIXEL_IDS.forEach((id) => {
-      window.fbq("init", id);
-    });
-  }
 }
 
 export default function FBPixelLoader() {
@@ -144,8 +133,8 @@ export default function FBPixelLoader() {
   // Query-param flow takes priority (for checkout/thank-you pages).
   const syncPixelId = useMemo(() => {
     if (flowFromQuery) return PIXEL_IDS[flowFromQuery];
-    if (!pathname) return PIXEL_IDS.OTHERS;
-    const pixelKey = getPixelKeyForPath(pathname) || "OTHERS";
+    if (!pathname) return PIXEL_IDS[FALLBACK_PIXEL_KEY];
+    const pixelKey = getPixelKeyForPath(pathname) || FALLBACK_PIXEL_KEY;
     return PIXEL_IDS[pixelKey];
   }, [pathname, flowFromQuery]);
 
@@ -176,7 +165,7 @@ export default function FBPixelLoader() {
         const categorySlugs = (data.categories || [])
           .map((c) => c.slug)
           .filter(Boolean);
-        const pixelKey = getPixelKeyForPath(pathname, categorySlugs) || "OTHERS";
+        const pixelKey = getPixelKeyForPath(pathname, categorySlugs) || FALLBACK_PIXEL_KEY;
         setAsyncPixelId(PIXEL_IDS[pixelKey]);
       })
       .catch(() => {
@@ -225,11 +214,17 @@ export default function FBPixelLoader() {
     }
   }, []);
 
-  // Fire a targeted PageView on every navigation.
-  // All pixels are pre-initialized at module level, so we only need trackSingle here.
+  // Lazy-init the resolved pixel (once per session) and fire a targeted
+  // PageView. Init must happen here — not at module load — so fbevents.js's
+  // auto-PageView only fires for the pixel that actually matches the route.
   useEffect(() => {
     if (!resolvedPixelId || typeof window === "undefined") return;
     if (typeof window.fbq !== "function") return;
+
+    if (!initializedPixels.has(resolvedPixelId)) {
+      window.fbq("init", resolvedPixelId);
+      initializedPixels.add(resolvedPixelId);
+    }
 
     window.fbq("trackSingle", resolvedPixelId, "PageView");
   }, [resolvedPixelId, pathname]);

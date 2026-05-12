@@ -1,12 +1,10 @@
-import NewBOWLConsultationQuiz from "@/components/WeightQuestionnaire/BOWeightConsultationQuiz";
+import WeightLossConsultationQuiz from "@/components/WeightQuestionnaire/WeightConsultationQuiz";
 import { cookies } from "next/headers";
 
 // Force dynamic rendering for this page
 export const dynamic = "force-dynamic";
 
-// Separate route dedicated ONLY for new BO flows
-// This is completely independent from /wl-consultation
-export default async function NewBOWLConsultationPage() {
+export default async function WeightConsultationPage() {
   const cookieStore = await cookies();
   const pn = cookieStore.get("pn")?.value;
   const userName = cookieStore.get("userName")?.value;
@@ -16,7 +14,7 @@ export default async function NewBOWLConsultationPage() {
 
   return (
     <main className="min-h-screen">
-      <NewBOWLConsultationQuiz
+      <WeightLossConsultationQuiz
         pn={pn}
         userName={userName}
         userEmail={userEmail}

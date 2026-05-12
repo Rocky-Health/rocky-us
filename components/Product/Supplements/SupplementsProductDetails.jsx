@@ -7,6 +7,7 @@ import CustomImage from "@/components/utils/CustomImage";
 import CollapsibleDiv from "@/components/Supplements/CollapsibleDiv";
 import { useAddItemToCart } from "@/lib/cart/cartHooks";
 import CartPopup from "@/components/Cart/CartPopup";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 const SupplementsProductDetails = ({ product, variations, isLoading }) => {
     const addItemToCart = useAddItemToCart();
@@ -194,12 +195,6 @@ const SupplementsProductDetails = ({ product, variations, isLoading }) => {
         } finally {
             setIsAddingToCart(false);
         }
-    };
-
-    const formatPrice = (price) => {
-        return typeof price === "number"
-            ? price.toFixed(2)
-            : parseFloat(price || 0).toFixed(2);
     };
 
     // Calculate price per serving (2 capsules per serving)
@@ -578,7 +573,7 @@ const SupplementsProductDetails = ({ product, variations, isLoading }) => {
                                                       quarterlyPrice && (
                                                       <span className="font-[450] text-[16px] mr-[4px] line-through">
                                                           $
-                                                          {formatPrice(
+                                                          {formatPriceUI(
                                                               quarterlyVariation.display_regular_price
                                                           )}
                                                       </span>
@@ -589,7 +584,7 @@ const SupplementsProductDetails = ({ product, variations, isLoading }) => {
                                                       monthlyPrice && (
                                                       <span className="font-[450] text-[16px] mr-[4px] line-through">
                                                           $
-                                                          {formatPrice(
+                                                          {formatPriceUI(
                                                               monthlyVariation.display_regular_price
                                                           )}
                                                       </span>
@@ -597,7 +592,7 @@ const SupplementsProductDetails = ({ product, variations, isLoading }) => {
                                             {/* Current Price */}
                                             <span className="font-[550] text-[16px]">
                                                 $
-                                                {formatPrice(
+                                                {formatPriceUI(
                                                     selectedDeliveryOption ===
                                                         "each-90-days" &&
                                                         quarterlyPrice
@@ -610,14 +605,14 @@ const SupplementsProductDetails = ({ product, variations, isLoading }) => {
                                                 {selectedDeliveryOption ===
                                                     "each-90-days" &&
                                                 quarterlyPrice
-                                                    ? `${formatPrice(
+                                                    ? `${formatPriceUI(
                                                           calculatePricePerServing(
                                                               quarterlyPrice,
                                                               180
                                                           )
                                                       )}/Serving`
                                                     : monthlyPrice &&
-                                                      `${formatPrice(
+                                                      `${formatPriceUI(
                                                           calculatePricePerServing(
                                                               monthlyPrice,
                                                               60
@@ -717,12 +712,12 @@ const SupplementsProductDetails = ({ product, variations, isLoading }) => {
                                         <div className="text-end">
                                             {/* Current Price */}
                                             <span className="font-[550] text-[16px] pl-1 text-right">
-                                                ${formatPrice(oneTimePrice)}
+                                                ${formatPriceUI(oneTimePrice)}
                                             </span>
                                             {/* Serving Charge */}
                                             <p className="text-[12px] font-[POPPINS] font-normal leading-[100%] tracking-[0px]">
                                                 $
-                                                {formatPrice(
+                                                {formatPriceUI(
                                                     calculatePricePerServing(
                                                         oneTimePrice,
                                                         60
@@ -753,7 +748,7 @@ const SupplementsProductDetails = ({ product, variations, isLoading }) => {
                                               quarterlyPrice && (
                                               <span className="font-[400] text-[16px] mr-[4px] line-through">
                                                   $
-                                                  {formatPrice(
+                                                  {formatPriceUI(
                                                       quarterlyVariation.display_regular_price
                                                   )}
                                               </span>
@@ -764,13 +759,13 @@ const SupplementsProductDetails = ({ product, variations, isLoading }) => {
                                               monthlyPrice && (
                                               <span className="font-[400] text-[16px] mr-[4px] line-through">
                                                   $
-                                                  {formatPrice(
+                                                  {formatPriceUI(
                                                       monthlyVariation.display_regular_price
                                                   )}
                                               </span>
                                           ))}
                                 <span className="font-[600] text-[16px]">
-                                    ${formatPrice(variationPrice)}
+                                    ${formatPriceUI(variationPrice)}
                                 </span>
                             </div>
                         </button>
@@ -960,7 +955,7 @@ const SupplementsProductDetails = ({ product, variations, isLoading }) => {
                                                       quarterlyPrice && (
                                                       <span className="font-[450] text-[16px] mr-[4px] line-through">
                                                           $
-                                                          {formatPrice(
+                                                          {formatPriceUI(
                                                               quarterlyVariation.display_regular_price
                                                           )}
                                                       </span>
@@ -971,7 +966,7 @@ const SupplementsProductDetails = ({ product, variations, isLoading }) => {
                                                       monthlyPrice && (
                                                       <span className="font-[450] text-[16px] mr-[4px] line-through">
                                                           $
-                                                          {formatPrice(
+                                                          {formatPriceUI(
                                                               monthlyVariation.display_regular_price
                                                           )}
                                                       </span>
@@ -979,7 +974,7 @@ const SupplementsProductDetails = ({ product, variations, isLoading }) => {
                                             {/* Current Price */}
                                             <span className="font-[550] text-[16px]">
                                                 $
-                                                {formatPrice(
+                                                {formatPriceUI(
                                                     selectedDeliveryOption ===
                                                         "each-90-days" &&
                                                         quarterlyPrice
@@ -992,14 +987,14 @@ const SupplementsProductDetails = ({ product, variations, isLoading }) => {
                                                 {selectedDeliveryOption ===
                                                     "each-90-days" &&
                                                 quarterlyPrice
-                                                    ? `${formatPrice(
+                                                    ? `${formatPriceUI(
                                                           calculatePricePerServing(
                                                               quarterlyPrice,
                                                               180
                                                           )
                                                       )}/Serving`
                                                     : monthlyPrice &&
-                                                      `${formatPrice(
+                                                      `${formatPriceUI(
                                                           calculatePricePerServing(
                                                               monthlyPrice,
                                                               60
@@ -1087,12 +1082,12 @@ const SupplementsProductDetails = ({ product, variations, isLoading }) => {
                                         <div className="text-end">
                                             {/* Current Price */}
                                             <span className="font-[550] text-[16px] pl-1 text-right">
-                                                ${formatPrice(oneTimePrice)}
+                                                ${formatPriceUI(oneTimePrice)}
                                             </span>
                                             {/* Serving Charge */}
                                             <p className="text-[12px] font-[POPPINS] font-normal leading-[100%] tracking-[0px]">
                                                 $
-                                                {formatPrice(
+                                                {formatPriceUI(
                                                     calculatePricePerServing(
                                                         oneTimePrice,
                                                         60
@@ -1123,7 +1118,7 @@ const SupplementsProductDetails = ({ product, variations, isLoading }) => {
                                               quarterlyPrice && (
                                               <span className="font-[400] text-[16px] mr-[4px] line-through">
                                                   $
-                                                  {formatPrice(
+                                                  {formatPriceUI(
                                                       quarterlyVariation.display_regular_price
                                                   )}
                                               </span>
@@ -1134,13 +1129,13 @@ const SupplementsProductDetails = ({ product, variations, isLoading }) => {
                                               monthlyPrice && (
                                               <span className="font-[400] text-[16px] mr-[4px] line-through">
                                                   $
-                                                  {formatPrice(
+                                                  {formatPriceUI(
                                                       monthlyVariation.display_regular_price
                                                   )}
                                               </span>
                                           ))}
                                 <span className="font-[600] text-[16px]">
-                                    ${formatPrice(variationPrice)}
+                                    ${formatPriceUI(variationPrice)}
                                 </span>
                             </div>
                         </button>

@@ -265,6 +265,9 @@ function isBlockedRoute(pathname) {
     "/hyper-pigmentation-cream",
     "/skincare",
 
+    // Old WL consultation (no longer active)
+    "/old-wl-consultation",
+
     // Mental Health products
     "/product/bupropion",
     "/product/citalopram",

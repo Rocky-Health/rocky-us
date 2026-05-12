@@ -265,7 +265,7 @@ const OrderReceivedContent = ({ userId }) => {
     if (mhFlow === "1") basePath = "/mh-quiz";
     if (edFlow === "1") basePath = "/ed-consultation-quiz";
     if (wlFlow === "1") {
-      basePath = isNewBOFlow ? "/new-bo-wl-consultation" : "/wl-consultation";
+      basePath = "/wl-consultation";
     }
     if (hairFlow === "1") basePath = "/hair-main-questionnaire";
     if (smokingFlow === "1") basePath = "/smoking-consultation/?checked-out=1";
@@ -437,6 +437,11 @@ const OrderReceivedContent = ({ userId }) => {
               logger.error("[Heatmap] Conversion tracking failed:", err);
             }
           }, 1000);
+        } else {
+          logger.error(
+            "[OrderReceived] Skipped all post-purchase tracking: order payload has no .id",
+            { dataKeys: data && typeof data === "object" ? Object.keys(data) : null }
+          );
         }
 
         // Check if we need to redirect to a questionnaire

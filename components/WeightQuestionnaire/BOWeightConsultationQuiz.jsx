@@ -927,6 +927,11 @@ export default function NewBOWLConsultationQuiz({
           logger.log("Submitting textarea fields:", textareaFields);
         }
       };
+      const completionPct =
+        dataToSubmit.completion_percentage !== undefined &&
+        dataToSubmit.completion_percentage !== null
+          ? dataToSubmit.completion_percentage
+          : progress;
       const completeData = {
         ...dataToSubmit,
         form_id: 6,
@@ -936,8 +941,8 @@ export default function NewBOWLConsultationQuiz({
         token: formData.token || "",
         stage: dataToSubmit.stage || "consultation-before-checkout",
         page_step: dataToSubmit.page_step || currentPage,
-        completion_state: (dataToSubmit.completion_state && dataToSubmit.completion_state !== "") ? dataToSubmit.completion_state : "Partial",
-        completion_percentage: dataToSubmit.completion_percentage !== undefined && dataToSubmit.completion_percentage !== null ? dataToSubmit.completion_percentage : progress,
+        completion_percentage: completionPct,
+        completion_state: completionPct >= 100 ? "Full" : "Partial",
         source_site: "https://myrocky.com",
       };
 
@@ -2217,6 +2222,9 @@ export default function NewBOWLConsultationQuiz({
     }
     
     if (currentPage === 12 && !formData["606"]) return showError("Please select an option");
+    // If the High BP popup is open, block the quiz's Continue button entirely.
+    // Navigation for the High BP case is handled exclusively by the popup's Continue button.
+    if (currentPage === 12 && showHighBpWarning) return false;
     if (currentPage === 13) {
       const hasSelection = formData["607_1"] || formData["607_2"] || formData["607_3"] || 
                           formData["607_4"] || formData["607_5"] || formData["607_6"];
@@ -4585,7 +4593,18 @@ export default function NewBOWLConsultationQuiz({
       {/* Blood Pressure Warning Popups */}
       <WarningPopup
         isOpen={showHighBpWarning}
-        onClose={() => setShowHighBpWarning(false)}
+        onClose={(proceed) => {
+          setShowHighBpWarning(false);
+          if (proceed) {
+            // Save acknowledgement data and advance only when the user
+            // explicitly clicks Continue in the popup — not on checkbox change.
+            const updatedData = { ...formData, WLBloodPressureWarning: "on" };
+            setFormData((prev) => ({ ...prev, WLBloodPressureWarning: "on" }));
+            updateLocalStorage(updatedData);
+            queueFormSubmission(updatedData);
+            moveToNextSlideWithoutValidation();
+          }
+        }}
         title="High Blood Pressure"
         message="This is considered high. We'll be able to give you your prescription but please speak to your doctor to discuss your blood pressure."
         isAcknowledged={bpWarningAcknowledged}

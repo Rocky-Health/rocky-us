@@ -6,11 +6,13 @@ const LogoContainer = ({ quizHref }) => {
       <div className="max-w-screen-xl mx-auto px-4 md:px-6 lg:px-8">
         <div className="flex justify-center md:justify-between items-center">
           <div className="flex-shrink-0">
-            <img
-              src="https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp"
-              alt="MyRocky"
-              className="w-[90px] md:w-[116px]"
-            />
+            <Link href="/" aria-label="MyRocky Homepage">
+              <img
+                src="https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp"
+                alt="MyRocky"
+                className="w-[90px] md:w-[116px]"
+              />
+            </Link>
           </div>
           {quizHref && (
             <Link

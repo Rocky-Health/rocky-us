@@ -94,6 +94,19 @@ npm run lint       # next lint
 
 `@/*` maps to project root (`./`) — configured in `jsconfig.json`
 
+## Claude Workflow — In-Depth Tasks and Audits
+
+For any in-depth task or codebase audit, follow this loop every time:
+
+1. **Spawn sub-agents** with the right model + thinking effort:
+   - **Reading docs, exploring, or auditing code** → `model: "haiku"` (Haiku 4.5) with thinking effort set to **Max**.
+   - **Writing or editing code** → `model: "sonnet"` (Sonnet 4.6) with thinking effort set to **Max**.
+2. **Review their output.** Once each sub-agent returns, I (Opus 4.7) review the result. Either approve it or send it back to the same agent with specific instructions to revise. Do not proceed until every result is approved.
+3. **Save the consolidated result to a markdown file:**
+   - **Audits** → `docs/codebase-audit/<finding>.md`
+   - **Other in-depth tasks** → `docs/<task>.md`
+4. **Print a user-friendly summary** at the end — simple, readable, no jargon.
+
 ## Important Notes
 
 - No TypeScript — all `.js` / `.jsx` files

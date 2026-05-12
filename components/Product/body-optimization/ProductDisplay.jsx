@@ -2,12 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { ProductImage } from "@/components/Product";
 import PropTypes from "prop-types";
+import { formatPriceUI } from "@/utils/priceFormatter";
 // import CustomImage from "@/components/utils/CustomImage";
 
 const ProductDisplay = ({ product, productSlug }) => {
   const productImageSrc = product?.images?.[0]?.src || product?.image;
   const productName = product?.name || "";
-  const productPrice = product?.price || "$395";
+  const productPrice = product?.price || "395";
   const isRybelsus = productSlug?.toLowerCase().includes("rybelsus");
   // const productDescription =
   //   product?.short_description ||
@@ -52,7 +53,9 @@ const ProductDisplay = ({ product, productSlug }) => {
                 ({activeIngredient}) {isRybelsus ? "tablets" : "injection"}
               </p>
 
-              <p className="text-lg font-medium mb-4">${productPrice}</p>
+              <p className="text-lg font-medium mb-4">
+                ${formatPriceUI(productPrice)}
+              </p>
 
               <div
                 className="text-base mb-6 text-[#212121]"

@@ -6,6 +6,7 @@ import {
   isForcedSubscriptionProduct,
   formatSubscriptionOptions,
 } from "@/lib/utils/subscriptionUtils";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 const VariationButton = ({ selected, onClick, children, disabled = false }) => (
   <button
@@ -15,8 +16,8 @@ const VariationButton = ({ selected, onClick, children, disabled = false }) => (
       disabled
         ? "border-[#CECECE] text-gray-400 cursor-not-allowed"
         : selected
-        ? "border-[#AE7E56] text-[#AE7E56]"
-        : "border-[#CECECE] hover:border-gray-400"
+          ? "border-[#AE7E56] text-[#AE7E56]"
+          : "border-[#CECECE] hover:border-gray-400"
     }`}
   >
     {children}
@@ -75,7 +76,7 @@ const SubscriptionOption = ({ option, selected, onSelect }) => {
         </span>
       </label>
       <span className="subscription-price text-black font-semibold">
-        ${option.price}
+        ${formatPriceUI(option.price)}
       </span>
     </div>
   );
@@ -118,11 +119,11 @@ const ForcedSubscriptionOptions = ({ options, selected, onSelect }) => {
                 id="cart-button-price"
                 className="subscription-price font-semibold"
               >
-                ${option.price}
+                ${formatPriceUI(option.price)}
                 {option.sale_price &&
                   Number(option.sale_price) < Number(option.regular_price) && (
                     <span className="text-gray-400 line-through text-sm ml-2">
-                      ${option.regular_price}
+                      ${formatPriceUI(option.regular_price)}
                     </span>
                   )}
               </div>
@@ -199,7 +200,7 @@ const ProductVariations = ({
   const subscriptionOptions = isForcedSubscription
     ? formatSubscriptionOptions(
         product,
-        Array.isArray(variations) ? variations : []
+        Array.isArray(variations) ? variations : [],
       )
     : variations;
 
@@ -244,7 +245,7 @@ const ProductVariations = ({
         ) {
           // Sort quantities and select the first one (lowest)
           const sortedQuantities = sortQuantities(
-            subscriptionOptions.quantities[firstFreq.value]
+            subscriptionOptions.quantities[firstFreq.value],
           );
           setSelectedQuantity(sortedQuantities[0]);
         }
@@ -314,7 +315,7 @@ const ProductVariations = ({
     ) {
       // Sort quantities and select the first one (lowest)
       const sortedQuantities = sortQuantities(
-        variations.quantities[frequency.value]
+        variations.quantities[frequency.value],
       );
       setSelectedQuantity(sortedQuantities[0]);
     } else {
@@ -399,10 +400,13 @@ const ProductVariations = ({
                 {/* Display price information for hair products */}
                 {option.price && (
                   <div className="subscription-price font-semibold">
-                    ${hasSalePrice(option) ? option.sale_price : option.price}
+                    $
+                    {formatPriceUI(
+                      hasSalePrice(option) ? option.sale_price : option.price,
+                    )}
                     {hasSalePrice(option) && (
                       <span className="text-gray-400 line-through text-sm ml-2">
-                        ${option.regular_price}
+                        ${formatPriceUI(option.regular_price)}
                       </span>
                     )}
                   </div>
@@ -423,7 +427,7 @@ const ProductVariations = ({
       (subscriptionOptions[0].label === "One Time Purchase" ||
         subscriptionOptions.some(
           (option) =>
-            option.label.includes("(30g)") || option.label.includes("(90g)")
+            option.label.includes("(30g)") || option.label.includes("(90g)"),
         ));
 
     return (

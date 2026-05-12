@@ -9,6 +9,7 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import CrossSellCartDisplay from "../../../shared/CrossSellCartDisplay";
 import { useCrossSellCart } from "@/lib/hooks/useCrossSellCart";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 // Weight loss product IDs that require consultation
 const WEIGHT_LOSS_PRODUCT_IDS = [
@@ -268,7 +269,7 @@ const CrossSellPopup = ({
                   } catch (e) {
                     logger.warn(
                       "[Analytics] begin_checkout (WL cross-sell) skipped:",
-                      e
+                      e,
                     );
                   }
 
@@ -284,14 +285,14 @@ const CrossSellPopup = ({
                   logger.error("WL checkout failed:", result.error);
                   setIsCheckoutLoading(false);
                   alert(
-                    "There was an issue processing your checkout. Please try again."
+                    "There was an issue processing your checkout. Please try again.",
                   );
                 }
               } catch (error) {
                 logger.error("Error in WL checkout process:", error);
                 setIsCheckoutLoading(false);
                 alert(
-                  "There was an issue processing your checkout. Please try again."
+                  "There was an issue processing your checkout. Please try again.",
                 );
               }
             }}
@@ -380,7 +381,7 @@ const CrossSellPopup = ({
                           </small>
                         </div>
                         <p className="font-[500] text-[14px] text-black text-center">
-                          ${addon.price}
+                          ${formatPriceUI(addon.price)}
                         </p>
                         <div className="flex items-center gap-2 w-full">
                           <button
@@ -389,11 +390,13 @@ const CrossSellPopup = ({
                               e.stopPropagation();
                               handleAddProduct(addon);
                             }}
-                            className={`data-addon-id-${addon.id
-                              } add-to-cart-addon-product cursor-pointer border ${isAddonInCart(addon.id) || isAddingAddon(addon.id)
+                            className={`data-addon-id-${
+                              addon.id
+                            } add-to-cart-addon-product cursor-pointer border ${
+                              isAddonInCart(addon.id) || isAddingAddon(addon.id)
                                 ? "border-[#814B00] text-[#814B00]"
                                 : "border-[#D8D8D8] text-black"
-                              } border-solid rounded-full w-full text-center font-[500] text-[14px] flex items-center justify-center gap-2 py-2 mt-2`}
+                            } border-solid rounded-full w-full text-center font-[500] text-[14px] flex items-center justify-center gap-2 py-2 mt-2`}
                             data-addon-id={addon.id}
                             data-title={addon.name}
                             data-price={addon.price}
@@ -425,7 +428,7 @@ const CrossSellPopup = ({
                           {addon.description}
                         </p>
                         <p className="font-semibold text-sm text-gray-800">
-                          ${addon.price}
+                          ${formatPriceUI(addon.price)}
                         </p>
                         <p className="font-normal text-[12px] text-gray-500">
                           {addon.frequency || "1-time purchase"}

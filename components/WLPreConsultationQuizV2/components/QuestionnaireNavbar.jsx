@@ -1,13 +1,12 @@
 import Logo from "@/components/Navbar/Logo";
 
-
 const QuestionnaireNavbar = ({ onBackClick, currentPage }) => {
   const isThankYouPage = currentPage === 22;
   const showBackButton = currentPage > 1 && !isThankYouPage;
 
   return (
     <header
-      className={`questionnaire-header w-full py-2 relative  ${
+      className={`questionnaire-header glp2-v2-header w-full py-2 relative  ${
         isThankYouPage ? "bg-transparent z-10" : ""
       }`}
       suppressHydrationWarning={true}
@@ -36,23 +35,7 @@ const QuestionnaireNavbar = ({ onBackClick, currentPage }) => {
         )}
 
         <div className="mx-auto scale-125 flex justify-center items-center min-w-[120px] ">
-          {isThankYouPage ? (
-            <button
-              onClick={() => (window.location.href = "/")}
-              className="cursor-pointer mr-[18px] md:mr-0"
-              aria-label="Go to home"
-            >
-              <Logo withLink={false} />
-            </button>
-          ) : (
-            <button
-              onClick={() => (window.location.href = "/")}
-              className="cursor-pointer md:mr-0"
-              aria-label="Go to home"
-            >
-              <Logo withLink={false} />
-            </button>
-          )}
+          <Logo hardNavigateToHome />
         </div>
       </div>
     </header>

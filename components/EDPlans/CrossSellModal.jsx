@@ -15,6 +15,7 @@ import { IoIosCloseCircleOutline } from "react-icons/io";
 import LidocaineInfoPopup from "./LidocaineInfoPopup";
 import CrossSellCartDisplay from "../shared/CrossSellCartDisplay";
 import { useCrossSellCart } from "@/lib/hooks/useCrossSellCart";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 const CrossSellModal = ({
   isOpen,
@@ -33,7 +34,7 @@ const CrossSellModal = ({
   ) {
     logger.error(
       "Invalid product data provided to CrossSellModal:",
-      selectedProduct
+      selectedProduct,
     );
     // Close the modal if it was somehow opened with invalid data
     if (typeof onClose === "function") {
@@ -158,7 +159,7 @@ const CrossSellModal = ({
 
         const hours = Math.floor(newTimeDifference / (1000 * 60 * 60));
         const minutes = Math.floor(
-          (newTimeDifference % (1000 * 60 * 60)) / (1000 * 60)
+          (newTimeDifference % (1000 * 60 * 60)) / (1000 * 60),
         );
         const seconds = Math.floor((newTimeDifference % (1000 * 60)) / 1000);
 
@@ -167,7 +168,7 @@ const CrossSellModal = ({
         // Calculate remaining time
         const hours = Math.floor(timeDifference / (1000 * 60 * 60));
         const minutes = Math.floor(
-          (timeDifference % (1000 * 60 * 60)) / (1000 * 60)
+          (timeDifference % (1000 * 60 * 60)) / (1000 * 60),
         );
         const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
 
@@ -382,11 +383,11 @@ const CrossSellModal = ({
         if (answerData["98"] && answerData.source && answerData.timestamp) {
           localStorage.setItem(
             "premature_ejaculation_answer",
-            JSON.stringify(answerData)
+            JSON.stringify(answerData),
           );
           logger.log(
             "Saved premature ejaculation answer for lidocaine addon:",
-            answerData
+            answerData,
           );
         } else {
           logger.error("Invalid lidocaine answer data structure:", answerData);
@@ -488,10 +489,11 @@ const CrossSellModal = ({
           <button
             onClick={handleCheckout}
             disabled={isLoading}
-            className={`block border-0 rounded-full text-white p-2 px-10 mt-2 md:mt-4 w-full text-center md:w-fit flex items-center justify-center gap-2 ${isLoading
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-black hover:bg-gray-800"
-              }`}
+            className={`block border-0 rounded-full text-white p-2 px-10 mt-2 md:mt-4 w-full text-center md:w-fit flex items-center justify-center gap-2 ${
+              isLoading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-black hover:bg-gray-800"
+            }`}
           >
             {isLoading && (
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -610,7 +612,7 @@ const CrossSellModal = ({
                         </small>
                       </div>
                       <p className="font-[500] text-[16px] text-black text-center">
-                        ${addon.price}
+                        ${formatPriceUI(addon.price)}
                       </p>
                       {/* <button
                         onClick={() => toggleAddon(addon.id)}
@@ -636,11 +638,13 @@ const CrossSellModal = ({
                       <div className="flex items-center gap-2 w-full">
                         <button
                           onClick={() => toggleAddon(addon.id)}
-                          className={`data-addon-id-${addon.id
-                            } add-to-cart-addon-product cursor-pointer border ${isAddonInCart(addon.id) || isAddingAddon(addon.id)
+                          className={`data-addon-id-${
+                            addon.id
+                          } add-to-cart-addon-product cursor-pointer border ${
+                            isAddonInCart(addon.id) || isAddingAddon(addon.id)
                               ? "border-[#814B00] text-[#814B00]"
                               : "border-[#D8D8D8] text-black"
-                            } border-solid rounded-full w-full text-center font-[500] text-[16px] flex items-center justify-center gap-2 py-3 mt-2`}
+                          } border-solid rounded-full w-full text-center font-[500] text-[16px] flex items-center justify-center gap-2 py-3 mt-2`}
                           data-addon-id={addon.id}
                           data-title={addon.title}
                           data-price={addon.price}
@@ -672,7 +676,7 @@ const CrossSellModal = ({
                         {addon.description}
                       </p>
                       <p className="font-semibold text-sm text-gray-800">
-                        ${addon.price}
+                        ${formatPriceUI(addon.price)}
                       </p>
                       <p className="font-normal text-[12px] text-gray-500">
                         {addon.frequency}
@@ -699,8 +703,9 @@ const CrossSellModal = ({
       <button
         onClick={isLoading ? undefined : onClose}
         disabled={isLoading}
-        className={`cross-sell-close-popup new-popup-dialog-close-button dialog-lightbox-close-button absolute top-3 md:top-5 right-3 md:right-10 z-[99999] ${isLoading ? "cursor-not-allowed opacity-50" : "cursor-pointer"
-          }`}
+        className={`cross-sell-close-popup new-popup-dialog-close-button dialog-lightbox-close-button absolute top-3 md:top-5 right-3 md:right-10 z-[99999] ${
+          isLoading ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+        }`}
       >
         <IoIosCloseCircleOutline className="text-2xl md:text-4xl" />
       </button>

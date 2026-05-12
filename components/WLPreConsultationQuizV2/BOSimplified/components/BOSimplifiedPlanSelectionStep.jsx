@@ -5,6 +5,7 @@ import { FaTimes } from "react-icons/fa";
 import { logger } from "@/utils/devLogger";
 import Loader from "@/components/Loader";
 import { trackMetaPlanSelection, logMetaTrackingError } from "@/utils/metaQuestionnaireTracking";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 const BOSimplifiedPlanSelectionStep = ({
     product,
@@ -245,10 +246,14 @@ const BOSimplifiedPlanSelectionStep = ({
                                             {" "}
                                             {monthlyPlan?.originalPrice && (
                                                 <span className="text-[16px] text-[#999999] line-through">
-                                                    {monthlyPlan.originalPrice}
+                                                    $
+                                                    {formatPriceUI(
+                                                        monthlyPlan.originalPrice,
+                                                    )}
                                                 </span>
                                             )}{" "}
-                                            {monthlyPlan?.price}/mo
+                                            ${formatPriceUI(monthlyPlan?.price)}
+                                            /mo
                                         </span>
                                     </div>
                                 </div>
@@ -317,9 +322,16 @@ const BOSimplifiedPlanSelectionStep = ({
                                                 <div className="text-right shrink-0">
                                                     <p className="font-[600] text-[#000000] flex md:flex-row flex-col-reverse md:items-center md:gap-2 gap-0.5">
                                                         <span className="text-[16px] text-[#999999] line-through">
-                                                            {plan.originalPrice}
+                                                            $
+                                                            {formatPriceUI(
+                                                                plan.originalPrice,
+                                                            )}
                                                         </span>{" "}
-                                                        {plan.price}/mo
+                                                        $
+                                                        {formatPriceUI(
+                                                            plan.price,
+                                                        )}
+                                                        /mo
                                                     </p>
                                                 </div>
                                             </div>
@@ -366,11 +378,17 @@ const BOSimplifiedPlanSelectionStep = ({
                                 <div className="text-right shrink-0 ml-4">
                                     {selectedPlan?.originalPrice && (
                                         <p className="text-[13px] text-[#999999] line-through">
-                                            {selectedPlan.originalPrice}/mo
+                                            $
+                                            {formatPriceUI(
+                                                selectedPlan.originalPrice,
+                                            )}
+                                            /mo
                                         </p>
                                     )}
                                     <p className="font-[600] text-[#000000]">
-                                        {getOrderSummaryPrice()}/mo
+                                        $
+                                        {formatPriceUI(getOrderSummaryPrice())}
+                                        /mo
                                     </p>
                                 </div>
                             </div>
@@ -397,7 +415,7 @@ const BOSimplifiedPlanSelectionStep = ({
                             <hr className="border-gray-200 mb-4" />
                             <div className="flex justify-between items-center text-[15px] font-[600] text-[#000000] mb-2">
                                 <span>Due today</span>
-                                <span>$0</span>
+                                <span>${formatPriceUI(0)}</span>
                             </div>
                             <p className="text-[13px] text-[#666666] leading-[140%]">
                                 You'll only be charged if your provider
@@ -545,7 +563,7 @@ const BOSimplifiedPlanSelectionStep = ({
                 >
                     {isCheckoutLoading
                         ? "Processing..."
-                        : `Proceed - ${selectedPlan?.price || getOrderSummaryPrice()} `}
+                        : `Proceed - $${formatPriceUI(selectedPlan?.price || getOrderSummaryPrice())} `}
                     {!isCheckoutLoading && (
                         <svg
                             className="w-5 h-5"

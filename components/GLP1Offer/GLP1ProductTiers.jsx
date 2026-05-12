@@ -4,6 +4,7 @@ import Link from "next/link";
 import CustomImage from "@/components/utils/CustomImage";
 import { productTiers } from "./data";
 import ScrollReveal from "@/components/animations/ScrollReveal";
+import { formatPrice } from "@/utils/priceFormatter";
 
 const TierCard = ({ tier, ctaHref }) => {
   return (
@@ -37,7 +38,7 @@ const TierCard = ({ tier, ctaHref }) => {
         <p className="poppins-font text-[16px] font-[400] mb-6">
           Starting at{" "}
           <span className="text-[#AE7E56] font-[700] text-[32px] md:text-[40px] headers-font">
-            ${tier.price}
+            ${formatPrice(tier.price)}
           </span>
         </p>
         <Link

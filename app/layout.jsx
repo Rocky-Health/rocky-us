@@ -44,7 +44,21 @@ const fellixSemiBold = localFont({
   display: "swap",
 });
 
+// Prevent iOS Safari from auto-zooming when focusing on form inputs.
+// Setting maximumScale=1 stops the zoom while keeping user-initiated pinch
+// zoom functional on most modern iOS versions.
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export const metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ||
+      process.env.BASE_URL?.replace(/\/$/, "") ||
+      "https://www.myrocky.com"
+  ),
   title: "MyRocky - Your Health Partner",
   description: "Get professional healthcare advice and treatment online",
   openGraph: {

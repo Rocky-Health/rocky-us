@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { formatPrice } from "@/utils/priceFormatter";
+import { formatPriceUI } from "@/utils/priceFormatter";
 import { useState } from "react";
 import { logger } from "@/utils/devLogger";
 
@@ -91,7 +91,7 @@ const CartItem = ({ item }) => {
         {item.name != "Body Optimization Program" && !isOfferProduct && (
           <p className="text-[12px]">
             {currencySymbol}
-            {formatPrice(itemPrice)} /{" "}
+            {formatPriceUI(itemPrice)} /{" "}
             <span className="text-[12px] font-normal">
               {isSubscriptionWithFallback && intervalText}
               {!isSubscriptionWithFallback &&
@@ -119,7 +119,7 @@ const CartItem = ({ item }) => {
         {isOfferProduct && (
           <p className="text-[12px]">
             {currencySymbol}
-            {formatPrice(itemPrice)} /{" "}
+            {formatPriceUI(itemPrice)} /{" "}
             <span className="text-[12px] font-normal">every 3 months</span>
           </p>
         )}
@@ -357,7 +357,7 @@ const CartITem2 = ({ item, hasCoupon = false }) => {
                   {compoundedPlanInfo.originalPrice}/mo
                 </span>
                 <span className="text-[11px] font-[600] text-[#000000]">
-                  {currencySymbol}{formatPrice(itemPrice / compoundedPlanInfo.months)}/mo
+                  {currencySymbol}{formatPriceUI(itemPrice / compoundedPlanInfo.months)}/mo
                 </span>
               </div>
             </div>
@@ -365,7 +365,7 @@ const CartITem2 = ({ item, hasCoupon = false }) => {
           {isOfferProduct && (
             <p className="text-[12px]">
               {currencySymbol}
-              {formatPrice(itemPrice)} /{" "}
+              {formatPriceUI(itemPrice)} /{" "}
               <span className="text-[12px] font-normal">every 3 months</span>
             </p>
           )}
@@ -480,7 +480,7 @@ const CartITem2 = ({ item, hasCoupon = false }) => {
         {item.name === "Body Optimization Program" ? (
           <span className="text-green-500">FREE</span>
         ) : (
-          currencySymbol + formatPrice(itemPrice)
+          currencySymbol + formatPriceUI(itemPrice)
         )}
       </div>
     </div>

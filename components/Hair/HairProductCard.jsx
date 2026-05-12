@@ -12,6 +12,7 @@ import {
   addToCartEarly,
   finalizeFlowCheckout,
 } from "../../utils/flowCartHandler";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 const HairProductCard = ({
   label,
@@ -109,7 +110,7 @@ const HairProductCard = ({
       } else {
         logger.error("❌ Failed to add product to cart:", result.error);
         alert(
-          result.error || "Failed to add product to cart. Please try again."
+          result.error || "Failed to add product to cart. Please try again.",
         );
       }
     } catch (error) {
@@ -126,7 +127,7 @@ const HairProductCard = ({
 
     try {
       logger.log(
-        "🎯 Hair Flow - Proceeding to checkout (cart already populated)"
+        "🎯 Hair Flow - Proceeding to checkout (cart already populated)",
       );
 
       // Product and any addons are already in cart
@@ -246,13 +247,13 @@ const HairProductCard = ({
           </>
         ) : isOnSale ? (
           <>
-            Add To Cart - ${price}{" "}
+            Add To Cart - ${formatPriceUI(price)}{" "}
             <span className="text-gray-300 line-through text-sm">
-              ${regularPrice}
+              ${formatPriceUI(regularPrice)}
             </span>
           </>
         ) : (
-          <>Add To Cart - ${price}</>
+          <>Add To Cart - ${formatPriceUI(price)}</>
         )}
       </button>
 

@@ -4,6 +4,7 @@ import { logger } from "@/utils/devLogger";
 import { useRouter } from "next/navigation";
 import { CiSearch } from "react-icons/ci";
 import { ImSpinner2 } from "react-icons/im"; // You may install this or replace with any spinner
+import { formatPrice } from "@/utils/priceFormatter";
 
 const SearchIcon = ({ onClose }) => {
   const [searchValue, setSearchValue] = useState("");
@@ -49,7 +50,7 @@ const SearchIcon = ({ onClose }) => {
     const fetchSuggestions = async () => {
       try {
         const res = await fetch(
-          `/api/search?q=${encodeURIComponent(searchValue)}`
+          `/api/search?q=${encodeURIComponent(searchValue)}`,
         );
         const { data } = await res.json();
         logger.log("data", data);
@@ -173,7 +174,7 @@ const SearchIcon = ({ onClose }) => {
                   } else {
                     // Fallback to search page
                     handleSearch(
-                      item.title?.rendered || item.name || item.slug
+                      item.title?.rendered || item.name || item.slug,
                     );
                   }
                   setSearchValue("");
@@ -208,7 +209,7 @@ const SearchIcon = ({ onClose }) => {
                   />
                   {item.price && (
                     <div className="text-xs text-gray-500 mt-1">
-                      ${item.price}
+                      ${formatPrice(item.price)}
                     </div>
                   )}
                 </div>

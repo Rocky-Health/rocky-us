@@ -3,7 +3,7 @@ import { CiTrash } from "react-icons/ci";
 import { logger } from "@/utils/devLogger";
 import { DotsLoader } from "react-loaders-kit";
 import { toast } from "react-toastify";
-import { formatPrice } from "@/utils/priceFormatter";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 const InitialShipping = ({
     currencySymbol = "$",
@@ -119,7 +119,7 @@ const InitialShipping = ({
                 </p>
                 <p className="leading-[19.6px] text-[#000000]">
                     {currencySymbol}
-                    {formatPrice(subTotalPrice)}
+                    {formatPriceUI(subTotalPrice)}
                 </p>
             </div>
             {cartItems?.coupons && cartItems.coupons.length > 0 && (
@@ -151,7 +151,7 @@ const InitialShipping = ({
                                 <div className="flex items-center justify-end gap-4">
                                     <p className="leading-[19.6px] text-[#000000] text-sm justify-self-end">
                                         - {currencySymbol}
-                                        {formatPrice(discountAmount / 100)}
+                                        {formatPriceUI(discountAmount / 100)}
                                     </p>
                                     <button
                                         className="justify-self-end"
@@ -208,7 +208,7 @@ const InitialShipping = ({
                                                         <span>
                                                             {" "}
                                                             ({currencySymbol}
-                                                            {formatPrice(
+                                                            {formatPriceUI(
                                                                 Number(
                                                                     selectedShipping.price
                                                                 ) / 100
@@ -279,7 +279,7 @@ const InitialShipping = ({
                         </p>
                         <p className="leading-[19.6px]">
                             {currencySymbol}
-                            {formatPrice(totalTax)}
+                            {formatPriceUI(totalTax)}
                         </p>
                     </div>
                     <div className="flex justify-between items-start mb-[24px]">
@@ -288,7 +288,7 @@ const InitialShipping = ({
                         </p>
                         <p className="font-[500] text-[#000000] leading-[22px]">
                             {currencySymbol}
-                            {formatPrice(totalPrice)}
+                            {formatPriceUI(totalPrice)}
                         </p>
                     </div>
                 </>
