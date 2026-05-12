@@ -10,6 +10,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { toast } from "react-toastify";
 import { logger } from "@/utils/devLogger";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 // Load Stripe
 const stripePromise = loadStripe(
@@ -139,7 +140,7 @@ function PaymentForm({ orderId, amount, onSuccess, onError }) {
         disabled={!stripe || processing}
         className="submit-payment-btn"
       >
-        {processing ? "Processing..." : `Pay $${(amount / 100).toFixed(2)}`}
+        {processing ? "Processing..." : `Pay $${formatPriceUI(amount / 100)}`}
       </button>
 
       <style jsx>{`

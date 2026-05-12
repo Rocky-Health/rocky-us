@@ -10,6 +10,7 @@ import React from "react";
 import Image from "next/image";
 import { FaTrash, FaSpinner } from "react-icons/fa";
 import { logger } from "@/utils/devLogger";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 const CrossSellCartDisplay = ({
   cartItems = [],
@@ -42,12 +43,7 @@ const CrossSellCartDisplay = ({
     }
   };
 
-  /**
-   * Format price for display
-   */
-  const formatPrice = (price) => {
-    return parseFloat(price || 0).toFixed(2);
-  };
+  const formatPrice = (price) => formatPriceUI(price);
 
   if (isLoading) {
     return (

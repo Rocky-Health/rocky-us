@@ -64,15 +64,16 @@ export const toMoney = (n) => {
 };
 
 /**
- * Always show exactly two decimal places for UI (product cards, quizzes).
- * Accepts number or numeric string (integers included). Strips leading "$"
- * and commas from strings (e.g. "$1,299.50" -> "1299.50").
+ * Format price for UI (product cards, quizzes, cart).
+ * Strips trailing ".00" from whole-number prices so $249.00 renders as $249.
+ * Fractional prices keep exactly 2 decimal places (e.g. $29.99 → "29.99").
+ * Accepts number or numeric string. Strips leading "$" and commas.
  * @param {number|string} price
- * @returns {string} e.g. 29 -> "29.00", 29.1 -> "29.10", "$359" -> "359.00"
+ * @returns {string} e.g. 29 -> "29", 249.00 -> "249", 29.99 -> "29.99"
  */
 export const formatPriceUI = (price) => {
   if (price === null || price === undefined || price === '') {
-    return '0.00';
+    return '0';
   }
 
   let raw;
@@ -84,8 +85,9 @@ export const formatPriceUI = (price) => {
   }
 
   if (!Number.isFinite(raw)) {
-    return '0.00';
+    return '0';
   }
 
-  return toMoney(raw).toFixed(2);
+  const rounded = toMoney(raw);
+  return rounded % 1 === 0 ? rounded.toString() : rounded.toFixed(2);
 };
