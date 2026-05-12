@@ -1,20 +1,35 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
 
 import HeroSection from "@/components/home/HeroSection";
 import Section from "@/components/utils/Section";
 
 import HowRockyWorks from "./HowRockyWorks";
 import DoctorTrustedSolutions from "./DoctorTrustedSolutions";
-import FaqsSection from "./FaqsSection";
 import MenuContainer from "@/components/Navbar/MenuContainer";
 import NavHeader from "@/components/Navbar/NavHeader";
-import ReviewsSection from "./ReviewsSection";
 
 import MoreQuestions from "./MoreQuestions";
 import RockyInTheNews from "@/components/BodyOptimization/bo3/NewRockyInTheNews";
-import TeamSection from "@/components/TeamSection";
-import RockyBlog from "@/components/RockyBlog";
+
+// Below-fold sections — split into separate JS chunks loaded after initial paint.
+// Placeholders reserve approximate vertical space to keep CLS near zero.
+const Placeholder = ({ minHeight }) => (
+  <div aria-hidden="true" style={{ minHeight }} />
+);
+const ReviewsSection = dynamic(() => import("./ReviewsSection"), {
+  loading: () => <Placeholder minHeight="640px" />,
+});
+const TeamSection = dynamic(() => import("@/components/TeamSection"), {
+  loading: () => <Placeholder minHeight="520px" />,
+});
+const RockyBlog = dynamic(() => import("@/components/RockyBlog"), {
+  loading: () => <Placeholder minHeight="365px" />,
+});
+const FaqsSection = dynamic(() => import("./FaqsSection"), {
+  loading: () => <Placeholder minHeight="480px" />,
+});
 
 const HomePageClient = ({ menuItems, token, nameToShow, faqs }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
