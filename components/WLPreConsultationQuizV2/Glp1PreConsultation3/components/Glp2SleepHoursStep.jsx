@@ -24,7 +24,7 @@ const Glp2SleepHoursStep = ({ userData, setUserData, config, onContinue }) => {
                 <div className="relative mb-8 w-full overflow-hidden rounded-xl lg:max-w-lg max-w-md mx-auto">
                     <div className="relative aspect-[14/8] w-full ">
                         <CustomImage
-                            src="/glp-3-quiz/sleep.jpg"
+                            src="https://myrocky.b-cdn.net/WP%20Images/glp-offer/sleep.png"
                             alt="Woman sleeping comfortably in bed"
                             fill
                             className="object-cover object-center"

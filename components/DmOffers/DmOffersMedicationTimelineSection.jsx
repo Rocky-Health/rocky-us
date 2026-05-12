@@ -45,7 +45,7 @@ export const DM_OFFERS_MYROCKY_LOGO =
 
 /** Swap for a WL quiz screenshot when available (`/public/dm-offers/…`). */
 export const DM_OFFERS_TIMELINE_PHONE_SRC =
-    "https://myrocky.b-cdn.net/WP%20Images/Weight%20Loss/EnhancesCover.webp";
+    "https://myrocky.b-cdn.net/WP%20Images/glp-offer/EnhancesCover.png";
 
 export default function DmOffersMedicationTimelineSection({
     headline = "Get your weight loss meds in 1–2 days",

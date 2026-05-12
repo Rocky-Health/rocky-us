@@ -12,8 +12,10 @@ import { useCallback, useRef, useState } from "react";
 import { BiSolidLeftArrow, BiSolidRightArrow } from "react-icons/bi";
 import DmOffersFeaturesCtaBlock from "./DmOffersFeaturesCtaBlock";
 
-const BEFORE_SRC = "/dm-offers/results2b.jpg";
-const AFTER_SRC = "/dm-offers/results1b.jpg";
+const BEFORE_SRC =
+    "https://myrocky.b-cdn.net/WP%20Images/glp-offer/results2b.png";
+const AFTER_SRC =
+    "https://myrocky.b-cdn.net/WP%20Images/glp-offer/results1b.png";
 
 function BeforeAfterCompare() {
     const [pct, setPct] = useState(50);

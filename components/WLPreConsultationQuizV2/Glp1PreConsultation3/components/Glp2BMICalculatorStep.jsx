@@ -143,7 +143,7 @@ const Glp2BMICalculatorStep = ({
             <div className="mx-auto w-full flex-grow pb-4">
                 <div className="rounded-[16px] overflow-hidden lg:mb-10 mb-6 w-full h-[400px] lg:h-[480px] relative">
                     <CustomImage
-                        src="/glp-3-quiz/step1-hdr.jpg"
+                        src="https://myrocky.b-cdn.net/WP%20Images/glp-offer/step1-hdr.jpg"
                         alt="Medical weight loss"
                         fill
                         className="object-contain object-center"

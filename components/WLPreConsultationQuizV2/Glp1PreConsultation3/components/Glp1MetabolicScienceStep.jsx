@@ -14,7 +14,7 @@ const PRESS_LINE =
 function MetabolicChartImage() {
     return (
         <CustomImage
-            src="/glp-3-quiz/withdirectmeds.png"
+            src="https://myrocky.b-cdn.net/WP%20Images/glp-offer/withdirectmeds.png"
             alt="Weight over time: greater loss with medication versus without over four months"
             width={880}
             height={460}

@@ -134,11 +134,12 @@ const TRUST_ITEMS = [
 ];
 
 function HeroFigure() {
-    const heroImage = "/dm-offers/hero2.png";
+    const heroImage =
+        "https://myrocky.b-cdn.net/WP%20Images/glp-offer/hero2.png";
 
     return (
         <div className="relative mx-auto w-full max-w-[440px] lg:max-w-none">
-            <div className="relative z-10 flex justify-center pt-4">
+            <div className="relative flex justify-center pt-4">
                 <div className="relative aspect-square w-[min(100%,580px)] ">
                     <CustomImage
                         src={heroImage}

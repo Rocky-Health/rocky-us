@@ -3,63 +3,50 @@
 import { useLayoutEffect, useEffect, useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import ScrollArrows from "@/components/ScrollArrows";
+import Image from "next/image";
+import CustomImage from "../utils/CustomImage";
 
-/** Portrait testimonial carousel — `{ vimeoId, title }` or `{ iframeSrc, title }` (titles feed iframe accessibility only). */
-export const DM_OFFERS_VIMEO_VIDEOS = [
+/**
+ * Portrait image carousel.
+ * Each entry: `{ src, alt }` — `src` is the image URL/path, `alt` is the
+ * accessible description shown to screen-readers and on broken images.
+ *
+ * Replace the placeholder entries below with your actual images.
+ */
+export const DM_OFFERS_CAROUSEL_IMAGES = [
     {
-        vimeoId: "1123949957",
-        title: "MyRocky member testimonial — weight loss journey",
+        src: "https://myrocky.b-cdn.net/WP%20Images/glp-offer/customers/1.png",
+        alt: "MyRocky member testimonial — weight loss journey",
     },
     {
-        vimeoId: "1123958880",
-        title: "MyRocky member testimonial — weight loss journey",
+        src: "https://myrocky.b-cdn.net/WP%20Images/glp-offer/customers/2.png",
+        alt: "MyRocky member testimonial — weight loss journey",
     },
     {
-        vimeoId: "1123965031",
-        title: "MyRocky member testimonial — weight loss journey",
+        src: "https://myrocky.b-cdn.net/WP%20Images/glp-offer/customers/3.png",
+        alt: "MyRocky member testimonial — weight loss journey",
     },
     {
-        vimeoId: "1123964421",
-        title: "MyRocky member testimonial — weight loss journey",
+        src: "https://myrocky.b-cdn.net/WP%20Images/glp-offer/customers/4.png",
+        alt: "MyRocky member testimonial — weight loss journey",
     },
     {
-        vimeoId: "1123986623",
-        title: "MyRocky member testimonial — weight loss journey",
+        src: "https://myrocky.b-cdn.net/WP%20Images/glp-offer/customers/5.png",
+        alt: "MyRocky member testimonial — weight loss journey",
     },
     {
-        vimeoId: "1123988338",
-        title: "MyRocky member testimonial — weight loss journey",
+        src: "https://myrocky.b-cdn.net/WP%20Images/glp-offer/customers/6.png",
+        alt: "MyRocky member testimonial — weight loss journey",
     },
 ];
 
 /** Fallback if layout not measured yet (e.g. first paint before children mount). */
 const FALLBACK_SCROLL_STEP = 336;
 
-function vimeoPlayerSrc(vimeoId) {
-    const params = new URLSearchParams({
-        badge: "0",
-        autopause: "0",
-        title: "0",
-        byline: "0",
-        portrait: "0",
-        controls: "1",
-        playsinline: "1",
-        quality: "auto",
-        dnt: "1",
-    });
-    return `https://player.vimeo.com/video/${vimeoId}?${params.toString()}`;
-}
-
-function iframeSrc(entry) {
-    if (entry.iframeSrc) return entry.iframeSrc;
-    if (entry.vimeoId) return vimeoPlayerSrc(entry.vimeoId);
-    return "";
-}
-
 /**
  * Small-screen arrows only (`md:hidden`). Desktop uses {@link ScrollArrows} unchanged.
  */
-function VimeoCarouselMobileScrollArrows({
+function ImageCarouselMobileScrollArrows({
     scrollContainerRef,
     scrollAmount,
     resyncKey,
@@ -107,7 +94,7 @@ function VimeoCarouselMobileScrollArrows({
                     type="button"
                     aria-label="Scroll testimonials left"
                     onClick={() => scrollDir("left")}
-                    className="absolute -left-1 top-[50%] z-[99999] flex  -translate-y-1/2 cursor-pointer touch-manipulation md:hidden text-white"
+                    className="absolute -left-1 top-[50%] z-[99999] flex -translate-y-1/2 cursor-pointer touch-manipulation md:hidden text-white"
                 >
                     <FaChevronLeft className="text-4xl" aria-hidden />
                 </button>
@@ -117,7 +104,7 @@ function VimeoCarouselMobileScrollArrows({
                     type="button"
                     aria-label="Scroll testimonials right"
                     onClick={() => scrollDir("right")}
-                    className="absolute -right-1 top-[50%] z-[99999] flex  -translate-y-1/2 cursor-pointer touch-manipulation md:hidden text-white"
+                    className="absolute -right-1 top-[50%] z-[99999] flex -translate-y-1/2 cursor-pointer touch-manipulation md:hidden text-white"
                 >
                     <FaChevronRight className="text-4xl" aria-hidden />
                 </button>
@@ -146,8 +133,15 @@ function measureScrollStep(container) {
     return stride > 0 ? stride : FALLBACK_SCROLL_STEP;
 }
 
+/**
+ * Portrait image testimonial carousel.
+ *
+ * Props:
+ *   images           – array of `{ src, alt }` objects (defaults to DM_OFFERS_CAROUSEL_IMAGES)
+ *   scrollAmount     – optional fixed scroll step in px; auto-measured when omitted
+ */
 export default function DmOffersVimeoCarousel({
-    videos = DM_OFFERS_VIMEO_VIDEOS,
+    images = DM_OFFERS_CAROUSEL_IMAGES,
     scrollAmount: scrollAmountOverride,
 }) {
     const scrollContainerRef = useRef(null);
@@ -187,7 +181,7 @@ export default function DmOffersVimeoCarousel({
 
         window.addEventListener("resize", apply);
 
-        /** iframes can grow scrollWidth slightly after paint */
+        /* images can shift layout slightly after paint */
         const t = window.setTimeout(apply, 400);
 
         return () => {
@@ -196,50 +190,45 @@ export default function DmOffersVimeoCarousel({
             window.removeEventListener("resize", apply);
             lastScrollableRef.current = null;
         };
-    }, [videos.length, scrollAmountOverride]);
+    }, [images.length, scrollAmountOverride]);
 
     return (
-        <div className="relative z-10 mx-auto w-full max-w-[1340px] pb-6  md:pb-10">
+        <div className="relative z-10 mx-auto w-full max-w-[1340px] pb-6 md:pb-10">
             <div className="relative md:px-1">
                 <ScrollArrows
                     key={scrollArrowsKey}
                     scrollContainerRef={scrollContainerRef}
                     scrollAmount={scrollAmount}
                 />
-                <VimeoCarouselMobileScrollArrows
+                <ImageCarouselMobileScrollArrows
                     resyncKey={scrollArrowsKey}
                     scrollContainerRef={scrollContainerRef}
                     scrollAmount={scrollAmount}
                 />
                 <div
                     ref={scrollContainerRef}
-                    className="flex gap-5 overflow-x-auto scroll-smooth  pb-1 pt-1 snap-x snap-mandatory [-webkit-overflow-scrolling:touch] no-scrollbar md:gap-4  lg:gap-4 bg-[#FAF3EF]"
+                    className="flex gap-5 overflow-x-auto scroll-smooth pb-1 pt-1 snap-x snap-mandatory [-webkit-overflow-scrolling:touch] no-scrollbar md:gap-4 lg:gap-4 bg-[#FAF3EF]"
                 >
-                    {videos.map((entry, index) => {
-                        const src = iframeSrc(entry);
-                        if (!src) return null;
-                        const { title } = entry;
-                        return (
-                            <div
-                                key={`${src}-${index}`}
-                                className="sm:w-[min(52vw,300px)] w-full sm:px-0 px-8 shrink-0 snap-center md:w-[268px] lg:w-[300px]"
-                            >
-                                <div className="relative aspect-[9/16] w-full overflow-hidden rounded-3xl bg-neutral-950 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.35)] ring-1 ring-neutral-950/10">
-                                    <iframe
-                                        src={src}
-                                        className="absolute inset-0 h-full w-full border-0"
-                                        allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-                                        referrerPolicy="strict-origin-when-cross-origin"
-                                        title={
-                                            title ||
-                                            "MyRocky customer testimonial video"
-                                        }
-                                        allowFullScreen
-                                    />
-                                </div>
+                    {images.map((entry, index) => (
+                        <div
+                            key={`${entry.src}-${index}`}
+                            className="sm:w-[min(52vw,300px)] w-full sm:px-0 px-8 shrink-0 snap-center md:w-[268px] lg:w-[300px]"
+                        >
+                            <div className="relative aspect-[9/16] w-full overflow-hidden rounded-3xl bg-neutral-950 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.35)] ring-1 ring-neutral-950/10">
+                                <CustomImage
+                                    src={entry.src}
+                                    alt={
+                                        entry.alt ||
+                                        "MyRocky customer testimonial"
+                                    }
+                                    fill
+                                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 52vw, 300px"
+                                    className="object-cover"
+                                    // draggable={false}
+                                />
                             </div>
-                        );
-                    })}
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>

@@ -1,33 +1,36 @@
-import Image from "next/image";
 import DmOffersFeaturesCtaBlock from "./DmOffersFeaturesCtaBlock";
+import CustomImage from "../utils/CustomImage";
 /** Point `imageSrc` at files you add under `/public/dm-offers/…` (WebP or PNG). */
 export const DM_OFFERS_INSTOCK_CARDS = [
     {
-        title: "Compounded GLP-1 Injections",
+        title: (
+            <>
+                Compounded
+                <br className="hidden md:block" /> GLP-1
+            </>
+        ),
         badge: "In Stock - Up to $200 OFF",
-        imageSrc: "/dm-offers/lp-product.jpg",
-        imageAlt:
-            "MyRocky compounded Semaglutide and Tirzepatide injection vials",
+        imageSrc: "https://myrocky.b-cdn.net/WP%20Images/glp-offer/GLP-1.png",
+        imageAlt: "M yRocky compounded GLP-1/GIP injection vials",
     },
     {
-        title: "Compounded GLP-1 Oral Drops",
+        title: "Compounded GLP-1/GIP",
         badge: "In Stock - Up to $200 OFF",
-        imageSrc: "/dm-offers/lp-product-sublingual.jpg",
-        imageAlt:
-            "MyRocky compounded Semaglutide and Tirzepatide sublingual liquid bottles",
+        imageSrc: "https://myrocky.b-cdn.net/WP%20Images/glp-offer/GIP.png",
+        imageAlt: "MyRocky compounded GLP-1 injection vials",
     },
 ];
 
 function InStockCard({ title, badge, imageSrc, imageAlt }) {
     return (
         <article className="flex flex-col rounded-2xl bg-white pt-6 sm:px-6 px-2 shadow-sm ring-1 ring-neutral-200/80  md:rounded-3xl">
-            <h3 className="subheaders-font text-5xl font-light tracking-normal text-gray-800/80 sm:px-10 px-1 mb-4 ">
+            <h3 className="subheaders-font lg:text-5xl text-3xl font-light tracking-normal text-gray-800/80 md:px-10 px-1 mb-4 !leading-tight ">
                 {title}
                 <hr className="w-full border-[rgba(59, 130, 246, 0.5)] mt-6" />
             </h3>
             <div className="relative mt-0 w-full flex-1 overflow-hidden ">
-                <div className="relative aspect-square w-full max-w-[90%] mx-auto">
-                    <Image
+                <div className="relative aspect-square w-full max-w-[90%] mx-auto ">
+                    <CustomImage
                         src={imageSrc}
                         alt={imageAlt}
                         fill
