@@ -2,6 +2,9 @@ import CustomContainImage from "@/components/utils/CustomContainImage";
 
 const rockyInTheNewsCards = [
     {
+        image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/bloomberg-logo.png",
+    },
+    {
         image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/The_Globe_and_Mail_Stretched_grey.png",
     },
     {
@@ -56,6 +59,7 @@ const RockyInTheNews = ({ cards }) => {
                             <div
                                 key={index}
                                 className={`flex-shrink-0 ${
+                                    dataToUse.length % 2 !== 0 &&
                                     index === dataToUse.length - 1
                                         ? "col-span-2"
                                         : ""
@@ -63,6 +67,7 @@ const RockyInTheNews = ({ cards }) => {
                             >
                                 <div
                                     className={`relative rounded-2xl overflow-hidden w-full max-h-[27px] flex justify-center items-center aspect-[3/1] ${
+                                        dataToUse.length % 2 !== 0 &&
                                         index === dataToUse.length - 1
                                             ? "scale-[2]"
                                             : ""
