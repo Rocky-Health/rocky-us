@@ -8,6 +8,7 @@
 - [ ] Confirm WooCommerce REST API is enabled
 - [ ] Confirm WooCommerce version is 9.0+ (HPOS compatible)
 
+
 ---
 
 
