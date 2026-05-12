@@ -220,7 +220,7 @@ const HeroSection = ({ onOpenMenu }) => {
                                             className="absolute inset-0 bg-cover bg-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                             style={{
                                                 backgroundImage:
-                                                    "url('https://myrocky.b-cdn.net/WP%20Images/Global%20Images/card_bg.png')",
+                                                    "url('https://myrocky.b-cdn.net/Other%20Images/card_bg.webp')",
                                             }}
                                             aria-hidden
                                         />
@@ -285,7 +285,7 @@ const HeroSection = ({ onOpenMenu }) => {
                                         className="absolute inset-0 bg-cover bg-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-[20px] md:rounded-[24px]"
                                         style={{
                                             backgroundImage:
-                                                "url('https://myrocky.b-cdn.net/WP%20Images/Global%20Images/card_bg.png')",
+                                                "url('https://myrocky.b-cdn.net/Other%20Images/card_bg.webp')",
                                         }}
                                         aria-hidden
                                     />
@@ -348,7 +348,7 @@ const HeroSection = ({ onOpenMenu }) => {
                                                     className="absolute inset-0 bg-cover bg-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-[20px] md:rounded-[24px]"
                                                     style={{
                                                         backgroundImage:
-                                                            "url('https://myrocky.b-cdn.net/WP%20Images/Global%20Images/card_bg.png')",
+                                                            "url('https://myrocky.b-cdn.net/Other%20Images/card_bg.webp')",
                                                     }}
                                                     aria-hidden
                                                 />
