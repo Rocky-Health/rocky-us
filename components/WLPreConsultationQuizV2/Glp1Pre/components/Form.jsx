@@ -734,7 +734,7 @@ const Form = ({
       return !!v;
     }
     if (typeof cond === "object" && cond.fieldId) {
-      // require the controlling field to be completed.
+      // controlling field to be completed.
       if (!completedFields[cond.fieldId]) return false;
       const target = fieldsState[cond.fieldId];
       if (cond.hasOwnProperty("value")) {
