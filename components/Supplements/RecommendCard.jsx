@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import CustomImage from "../utils/CustomImage";
 import { FaCheckCircle } from "react-icons/fa";
+import { formatPriceUI } from "@/utils/priceFormatter";
 
 const RecommendCard = ({ product }) => {
     const [showTooltip, setShowTooltip] = useState(false);
@@ -116,9 +117,7 @@ const RecommendCard = ({ product }) => {
                 </span>
                 <span className="font-[POPPINS] font-semibold text-[13px] lg:text-[15px] text-[#000000] group-hover:text-white">
                     $
-                    {typeof productPrice === "number"
-                        ? productPrice.toFixed(2)
-                        : productPrice}
+                    {formatPriceUI(productPrice)}
                 </span>
             </Link>
         </div>
