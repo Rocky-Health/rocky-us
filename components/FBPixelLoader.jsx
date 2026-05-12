@@ -115,9 +115,14 @@ if (typeof window !== "undefined") {
 
   window.fbq.disablePushState = true;
 
-  ALL_PIXEL_IDS.forEach((id) => {
-    window.fbq("init", id);
-  });
+  // Guard init calls so they run exactly once per session, even if this
+  // module is re-evaluated or GTM also calls fbq("init") for these IDs.
+  if (!window.__fbPixelsInited) {
+    window.__fbPixelsInited = true;
+    ALL_PIXEL_IDS.forEach((id) => {
+      window.fbq("init", id);
+    });
+  }
 }
 
 export default function FBPixelLoader() {
@@ -185,26 +190,38 @@ export default function FBPixelLoader() {
 
   const resolvedPixelId = asyncPixelId || syncPixelId;
 
-  // Load fbevents.js once on mount.
-  // The fbq stub and pixel inits are already set up at module level,
-  // so this effect only needs to inject the SDK script.
+  // Load fbevents.js exactly once per session.
+  // Uses a window flag (set before insertion) rather than a DOM query so
+  // there is no race window where two callers both see no existing script.
+  // If GTM or another tag already injected fbevents.js, the DOM query below
+  // catches that and marks the flag, preventing a second insertion.
+  // NOTE: if fbevents.js is still loading twice, audit GTM container
+  // GTM-K9PC394B for a Meta pixel tag — remove it and rely solely on this
+  // component for all pixel SDK loading.
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (window.__fbSdkInjected) return;
 
-    const fbScript = document.querySelector(
+    // If another party (e.g. GTM) already inserted the script, claim the
+    // flag and exit without inserting a duplicate.
+    const existing = document.querySelector(
       'script[src*="connect.facebook.net"][src*="fbevents.js"]'
     );
-    if (!fbScript) {
-      const t = document.createElement("script");
-      t.async = !0;
-      t.src = "https://connect.facebook.net/en_US/fbevents.js";
-      t.onerror = (e) => console.warn("[FBPixelLoader] fbevents.js FAILED to load", e);
-      const s = document.getElementsByTagName("script")[0];
-      if (s && s.parentNode) {
-        s.parentNode.insertBefore(t, s);
-      } else {
-        document.head.appendChild(t);
-      }
+    if (existing) {
+      window.__fbSdkInjected = true;
+      return;
+    }
+
+    window.__fbSdkInjected = true;
+    const t = document.createElement("script");
+    t.async = true;
+    t.src = "https://connect.facebook.net/en_US/fbevents.js";
+    t.onerror = (e) => console.warn("[FBPixelLoader] fbevents.js FAILED to load", e);
+    const s = document.getElementsByTagName("script")[0];
+    if (s && s.parentNode) {
+      s.parentNode.insertBefore(t, s);
+    } else {
+      document.head.appendChild(t);
     }
   }, []);
 
