@@ -1,4 +1,5 @@
 import { fetchProductBySlug } from "@/lib/woocommerce";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -45,7 +46,7 @@ export default async function ProductPage({ params }) {
           <p className="text-lg text-gray-600 mb-4">${product.price}</p>
           <div
             className="text-gray-800 mb-6"
-            dangerouslySetInnerHTML={{ __html: product.description }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(product.description) }}
           ></div>
 
           <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">

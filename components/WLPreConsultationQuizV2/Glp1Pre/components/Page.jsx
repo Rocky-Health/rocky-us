@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 import CheckboxQuestion from "./CheckboxQuestion";
 import RadioImagesQuestion from "./RadioImagesQuestion";
 import SelectQuestion from "./SelectQuestion";
@@ -331,7 +332,7 @@ const Page = ({
           <div>
             <h1 key={configToRender.id} className={configToRender.styleClasses}>
               <div
-                dangerouslySetInnerHTML={{ __html: configToRender.title }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(configToRender.title) }}
               ></div>
             </h1>
             {configToRender.description && (

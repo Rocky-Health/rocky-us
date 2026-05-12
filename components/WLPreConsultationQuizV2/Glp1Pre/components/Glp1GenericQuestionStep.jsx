@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import MessageForQuiz from "../../components/MessageForQuiz";
 import InfoIcon from "../../components/InfoIcon";
 import Page from "./Page";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 const Glp1GenericQuestionStep = ({
   stepConfig,
@@ -291,7 +292,7 @@ const Glp1GenericQuestionStep = ({
               } ${activeStepConfig.titleCenter ? "text-center mb-6" : ""} font-medium leading-[120%] `}
             >
               {typeof stepTitle === "string" && /<[^>]+>/.test(stepTitle) ? (
-                <span dangerouslySetInnerHTML={{ __html: stepTitle }} />
+                <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(stepTitle) }} />
               ) : (
                 stepTitle
               )}
@@ -306,7 +307,7 @@ const Glp1GenericQuestionStep = ({
             /<[^>]+>/.test(activeStepConfig.subtitle) ? (
               <p
                 className="text-[14px] text-[#AE7E56] mb-[24px] md:w-full font-medium"
-                dangerouslySetInnerHTML={{ __html: activeStepConfig.subtitle }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(activeStepConfig.subtitle) }}
               />
             ) : (
               <p className="text-[14px] text-[#AE7E56] mb-[24px] md:w-full font-medium">

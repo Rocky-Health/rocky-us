@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { analyticsService } from "@/utils/analytics/analyticsService";
 import { isUserAuthenticated } from "@/utils/crossSellCheckout";
 import { formatPrice } from "@/utils/priceFormatter";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 const CartPopup = ({ isOpen, onClose, productType, onContinueShopping }) => {
   const [cartItems, setCartItems] = useState([]);
@@ -244,7 +245,7 @@ const CartPopup = ({ isOpen, onClose, productType, onContinueShopping }) => {
                   <div className="flex-1">
                     <div className="text-[#212121] text-sm">
                       <span
-                        dangerouslySetInnerHTML={{ __html: item.name }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.name) }}
                       ></span>
                     </div>
                     {/* Display quantity and variations only for merch products */}

@@ -2,6 +2,7 @@ import Image from "next/image";
 import { formatPriceUI } from "@/utils/priceFormatter";
 import { useState } from "react";
 import { logger } from "@/utils/devLogger";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 const CartItems = ({ items, coupons = [] }) => {
   const hasCoupon = coupons.length > 0;
@@ -82,7 +83,7 @@ const CartItem = ({ item }) => {
       />
       <div className="text-[14px] font-semibold">
         <h5>
-          <span dangerouslySetInnerHTML={{ __html: item.name }}></span>{" "}
+          <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.name) }}></span>{" "}
           {!isSubscriptionWithFallback &&
             item.variation[0] &&
             `(${item.variation[0]?.value})`}
@@ -310,10 +311,11 @@ const CartITem2 = ({ item, hasCoupon = false }) => {
           <h5>
             <span
               dangerouslySetInnerHTML={{
-                __html:
+                __html: sanitizeHtml(
                   item.name == "Body Optimization Program"
                     ? "Weight Loss Program"
                     : item.name,
+                ),
               }}
             ></span>{" "}
             {!isSubscriptionWithFallback &&

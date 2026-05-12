@@ -10,6 +10,7 @@ import DateQuestion from "./DateQuestion";
 import BMICalculatorStep from "./BMICalculatorStep";
 import Form from "./Form";
 import MessageForQuiz from "./MessageForQuiz";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 const GenericQuestionStep = ({
   stepConfig,
@@ -261,7 +262,7 @@ const GenericQuestionStep = ({
           } font-medium leading-[120%] `}
         >
           {typeof stepTitle === "string" && /<[^>]+>/.test(stepTitle) ? (
-            <span dangerouslySetInnerHTML={{ __html: stepTitle }} />
+            <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(stepTitle) }} />
           ) : (
             stepTitle
           )}
@@ -277,7 +278,7 @@ const GenericQuestionStep = ({
         /<[^>]+>/.test(stepConfig.subtitle) ? (
           <p
             className="text-[14px] text-[#AE7E56] mb-[24px] md:w-full font-medium"
-            dangerouslySetInnerHTML={{ __html: stepConfig.subtitle }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(stepConfig.subtitle) }}
           />
         ) : (
           <p className="text-[14px] text-[#AE7E56] mb-[24px]  md:w-full font-medium">

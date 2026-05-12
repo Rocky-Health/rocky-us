@@ -1,6 +1,7 @@
 "use client";
 
 import { IoIosArrowDown } from "react-icons/io";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 const CollapsibleDiv = ({ title, description, show = false, onToggle }) => {
   const toggleOpen = () => {
@@ -26,7 +27,7 @@ const CollapsibleDiv = ({ title, description, show = false, onToggle }) => {
       {show && (
         <div
           className="text-[14px] transition-transform mb-[12px] font-[POPPINS] font-normal leading-[140%] tracking-[0px] text-[#000000CC]"
-          dangerouslySetInnerHTML={{ __html: description }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }}
         />
       )}
       <hr className="mt-[16px] mb-[16px] border-[#D9D9D5]" />

@@ -2,6 +2,7 @@ import { FaArrowRight, FaStar } from "react-icons/fa";
 import CustomImage from "../utils/CustomImage";
 import Link from "next/link";
 import Trustpilot from "../Sex/Trustpilot";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 const MarketingHeroSection = () => {
     var list = [
@@ -64,7 +65,7 @@ const MarketingHeroSection = () => {
                                 <span
                                     className="text-[14px] leading-[140%] "
                                     dangerouslySetInnerHTML={{
-                                        __html: item.text,
+                                        __html: sanitizeHtml(item.text),
                                     }}
                                 />
                             </div>
@@ -122,7 +123,7 @@ const MarketingHeroSection = () => {
                                 <span
                                     className="text-[14px] leading-[140%] "
                                     dangerouslySetInnerHTML={{
-                                        __html: item.text,
+                                        __html: sanitizeHtml(item.text),
                                     }}
                                 />
                             </div>

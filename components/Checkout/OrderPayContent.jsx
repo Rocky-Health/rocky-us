@@ -10,6 +10,7 @@ import {
   transformPaymentError,
   isWordPressCriticalError,
 } from "@/utils/paymentErrorHandler";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 import Payment from "./Payment";
 import Loader from "@/components/Loader";
 import CheckoutSkeleton from "@/components/ui/skeletons/CheckoutSkeleton";
@@ -421,7 +422,7 @@ function OrderItemDisplay({ item }) {
       )}
       <div className="text-[14px] font-semibold">
         <h5>
-          <span dangerouslySetInnerHTML={{ __html: item.name }} />
+          <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.name) }} />
         </h5>
         <p className="text-[12px]">
           {currencySymbol}

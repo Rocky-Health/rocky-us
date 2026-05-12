@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 const HtmlContent = ({ html, className, loading = false }) => {
   // Function to normalize HTML entities and clean text
@@ -304,7 +305,7 @@ const HtmlContent = ({ html, className, loading = false }) => {
   return (
     <div
       className={`blog-content ${className || ""}`}
-      dangerouslySetInnerHTML={{ __html: processedHtml }}
+      dangerouslySetInnerHTML={{ __html: sanitizeHtml(processedHtml) }}
     />
   );
 };
