@@ -31,17 +31,24 @@ const poppins = Poppins({
   display: "swap",
 });
 
-// Configure local fonts
+// Configure local fonts.
+// adjustFontFallback: "Arial" tells Next to override Arial's metrics to match
+// Fellix's, so the FOUT swap when the Fellix .woff finishes loading produces
+// minimal layout shift. preload=true keeps the font in <head>.
 const fellixMedium = localFont({
   src: "../fonts/Fellix-Medium.woff",
   variable: "--font-fellix",
   display: "swap",
+  adjustFontFallback: "Arial",
+  preload: true,
 });
 
 const fellixSemiBold = localFont({
   src: "../fonts/Fellix-SemiBold.woff",
   variable: "--font-fellix-bold",
   display: "swap",
+  adjustFontFallback: "Arial",
+  preload: true,
 });
 
 // Prevent iOS Safari from auto-zooming when focusing on form inputs.
