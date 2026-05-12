@@ -1,6 +1,10 @@
+const ONE_YEAR_IMMUTABLE = "public, max-age=31536000, immutable";
+const THIRTY_DAYS = "public, max-age=2592000, stale-while-revalidate=86400";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
+    minimumCacheTTL: 2592000,
     remotePatterns: [
       {
         protocol: "https",
@@ -68,6 +72,27 @@ const nextConfig = {
         pathname: "/**",
       },
     ],
+  },
+  async headers() {
+    return [
+      {
+        source: "/_next/static/:path*",
+        headers: [{ key: "Cache-Control", value: ONE_YEAR_IMMUTABLE }],
+      },
+      {
+        source: "/_next/image:path*",
+        headers: [{ key: "Cache-Control", value: THIRTY_DAYS }],
+      },
+      {
+        source: "/:path(.+\\.(?:woff|woff2|ttf|otf|eot))",
+        headers: [{ key: "Cache-Control", value: ONE_YEAR_IMMUTABLE }],
+      },
+      {
+        source:
+          "/:path(.+\\.(?:png|jpg|jpeg|gif|webp|avif|svg|ico|mp4|webm|m4v|mov))",
+        headers: [{ key: "Cache-Control", value: THIRTY_DAYS }],
+      },
+    ];
   },
 };
 
