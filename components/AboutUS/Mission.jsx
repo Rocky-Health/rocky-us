@@ -1,4 +1,11 @@
-const Mission = ({ title, description, videoRef, videoSrc }) => {
+import Image from "next/image";
+
+const DEFAULT_IMAGE_SRC =
+    "https://myrocky.b-cdn.net/Other%20Images/Measure-your-age-Then-reverse-it-Bottom.jpg.jpeg";
+
+const Mission = ({ title, description, videoRef, videoSrc, imageSrc }) => {
+    const resolvedImageSrc = !videoSrc ? imageSrc || DEFAULT_IMAGE_SRC : null;
+
     return (
         <>
             <section className="max-w-[1184px] mx-auto">
@@ -16,19 +23,26 @@ const Mission = ({ title, description, videoRef, videoSrc }) => {
                     </div>
                 </div>
                 <div className="relative overflow-hidden md:rounded-[16px] w-full h-[214px] md:h-[665px] md:pb-24 ">
-                    <video
-                        ref={videoRef}
-                        loop
-                        muted
-                        autoPlay
-                        playsInline
-                        className="w-full h-full object-cover md:rounded-[16px]"
-                    >
-                        <source
-                            src={`${videoSrc || "https://rockywp.s3.ca-central-1.amazonaws.com/wp-content/uploads/video/Rockyhealth-Ad-V1.mp4"}`}
-                            type="video/mp4"
+                    {resolvedImageSrc ? (
+                        <Image
+                            src={resolvedImageSrc}
+                            alt={title || "Mission"}
+                            fill
+                            sizes="(min-width: 768px) 1184px, 100vw"
+                            className="object-cover md:rounded-[16px]"
                         />
-                    </video>
+                    ) : (
+                        <video
+                            ref={videoRef}
+                            loop
+                            muted
+                            autoPlay
+                            playsInline
+                            className="w-full h-full object-cover md:rounded-[16px]"
+                        >
+                            <source src={videoSrc} type="video/mp4" />
+                        </video>
+                    )}
                 </div>
             </section>
         </>
