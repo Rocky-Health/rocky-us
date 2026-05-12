@@ -30,7 +30,7 @@ const teamCards = [
         name: "Mina Rizk",
         title: "R.Ph. MPharm",
         logo1: {
-            src: "/home/mina-logo1.webp",
+            src: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/New%20Home%20Page/mina-logo1.png",
             width: "w-[56.96px] md-w-[97.39px] ml-2 mt-1",
             obj: "!object-cover scale-150",
         },
