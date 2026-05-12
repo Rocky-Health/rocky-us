@@ -74,24 +74,35 @@ const nextConfig = {
     ],
   },
   async headers() {
+    const immutable = [{ key: "Cache-Control", value: ONE_YEAR_IMMUTABLE }];
+    const thirtyDays = [{ key: "Cache-Control", value: THIRTY_DAYS }];
+    const fontExts = ["woff", "woff2", "ttf", "otf", "eot"];
+    const mediaExts = [
+      "png",
+      "jpg",
+      "jpeg",
+      "gif",
+      "webp",
+      "avif",
+      "svg",
+      "ico",
+      "mp4",
+      "webm",
+      "m4v",
+      "mov",
+    ];
+
     return [
-      {
-        source: "/_next/static/:path*",
-        headers: [{ key: "Cache-Control", value: ONE_YEAR_IMMUTABLE }],
-      },
-      {
-        source: "/_next/image:path*",
-        headers: [{ key: "Cache-Control", value: THIRTY_DAYS }],
-      },
-      {
-        source: "/:path(.+\\.(?:woff|woff2|ttf|otf|eot))",
-        headers: [{ key: "Cache-Control", value: ONE_YEAR_IMMUTABLE }],
-      },
-      {
-        source:
-          "/:path(.+\\.(?:png|jpg|jpeg|gif|webp|avif|svg|ico|mp4|webm|m4v|mov))",
-        headers: [{ key: "Cache-Control", value: THIRTY_DAYS }],
-      },
+      { source: "/_next/static/:path*", headers: immutable },
+      { source: "/_next/image", headers: thirtyDays },
+      ...fontExts.map((ext) => ({
+        source: `/:path*.${ext}`,
+        headers: immutable,
+      })),
+      ...mediaExts.map((ext) => ({
+        source: `/:path*.${ext}`,
+        headers: thirtyDays,
+      })),
     ];
   },
 };
