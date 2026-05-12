@@ -95,6 +95,14 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
+        {/* Preconnect to critical third-party origins to overlap DNS+TLS with HTML parse.
+            Limited to origins fetched on every cold load to avoid wasting handshakes.
+            Zendesk/TikTok/Attentive are intentionally NOT here — they're lazy-loaded. */}
+        <link rel="preconnect" href="https://myrocky.b-cdn.net" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://cdn-4.convertexperiments.com" />
+        <link rel="preconnect" href="https://widget.trustpilot.com" />
+
         {/* AWIN Consent and MasterTag - only load if tracking is enabled */}
         {(() => {
           const awinEnabled = process.env.NEXT_PUBLIC_AWIN_ENABLED;
