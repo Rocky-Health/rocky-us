@@ -126,8 +126,7 @@ export async function POST(req) {
                 `${BASE_URL}/wp-json/wc/v3/customers/${userId}`,
                 {
                     headers: {
-                        Authorization:
-                            process.env.ADMIN_TOKEN || authToken.value,
+                        Authorization: authToken.value,
                     },
                 },
             );
