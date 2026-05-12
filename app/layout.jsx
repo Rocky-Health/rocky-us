@@ -143,16 +143,32 @@ export default function RootLayout({ children }) {
           src="//cdn-4.convertexperiments.com/v1/js/10045956-10046753.js?environment=production"
         />
         {/* End Convert Experiences */}
-        {/* Start TikTok Pixel */}
+        {/* Start TikTok Pixel — stub installs immediately so ttq.track() calls queue;
+            the SDK (events.js + chunks + /inter polling) only loads after first user
+            interaction. Idle fallback ensures pageview attribution still fires for bouncers. */}
         <Script id="tiktok-pixel" strategy="afterInteractive">
           {`
             !function (w, d, t) {
               w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
-              ttq.load('${
+
+              var __ttqId='${
                 process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID ||
                 "CAFVBSRC77U9MLGRGE10"
-              }');
-              ttq.page();
+              }';
+              var __ttqLoaded=false;
+              var __ttqEvents=['pointerdown','touchstart','keydown','scroll','mousemove'];
+              function __ttqBoot(){
+                if(__ttqLoaded)return;
+                __ttqLoaded=true;
+                try{ttq.load(__ttqId);ttq.page();}catch(e){}
+                __ttqEvents.forEach(function(ev){w.removeEventListener(ev,__ttqBoot,true);});
+                if(__ttqIdle&&w.cancelIdleCallback){w.cancelIdleCallback(__ttqIdle);}
+                else if(__ttqIdle){w.clearTimeout(__ttqIdle);}
+              }
+              __ttqEvents.forEach(function(ev){w.addEventListener(ev,__ttqBoot,{passive:true,capture:true,once:true});});
+              var __ttqIdle=w.requestIdleCallback
+                ? w.requestIdleCallback(__ttqBoot,{timeout:15000})
+                : w.setTimeout(__ttqBoot,15000);
             }(window, document, 'ttq');
           `}
         </Script>
