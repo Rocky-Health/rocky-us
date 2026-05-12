@@ -132,8 +132,22 @@ export const useStepNavigation = (quizConfig) => {
 
 
   // Helper to check if a step should be skipped
-  const shouldSkipStep = (stepNumber) => {
-    const step = quizConfig.steps[stepNumber];
+  const shouldSkipStep = (pageNumber) => {
+    // Page-based config: check all actual step configs within that page
+    if (quizConfig.pages) {
+      const pageConfig = quizConfig.pages[pageNumber];
+      if (pageConfig) {
+        const stepIds = pageConfig.stepIds || [];
+        if (stepIds.length === 0) return false;
+        // Skip the page if any step on it has passIf === "authenticate" and user is authenticated
+        return stepIds.some((stepId) => {
+          const step = quizConfig.steps[stepId];
+          return step?.passIf === "authenticate" && isAuthenticated;
+        });
+      }
+    }
+    // Fallback: direct step-id lookup (non-page-based configs)
+    const step = quizConfig.steps[pageNumber];
     if (!step) return false;
     if (step.passIf === "authenticate" && isAuthenticated) return true;
     return false;
