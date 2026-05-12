@@ -1027,6 +1027,22 @@ const Form = ({
             );
           })}
         </div>
+
+        {onContinue && (
+          <div className="w-full pt-4">
+            <button
+              type="submit"
+              disabled={!allFilled}
+              className={`w-full py-3 rounded-full h-[52px] font-medium border-none focus:outline-none focus:ring-0 transition-colors ${
+                allFilled
+                  ? "bg-black text-white"
+                  : "bg-gray-400 text-white cursor-not-allowed"
+              }`}
+            >
+              Continue
+            </button>
+          </div>
+        )}
       </form>
     </>
   );

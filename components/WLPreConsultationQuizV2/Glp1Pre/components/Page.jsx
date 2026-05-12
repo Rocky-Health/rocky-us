@@ -402,10 +402,8 @@ const Page = ({
           ))
         : renderQuestionByType(questionConfig)}
 
-      {isCombinedPage &&
-        !questions.some(
-          (q) => q?.type === "contactIntro" || q?.type === "glp1ContactAuth",
-        ) && (
+      {isCombinedPage && (
+        <>
           <div className="w-full pb-4 flex items-center justify-center z-50 ">
             <div className="w-full  md:max-w-[665px]">
               {attemptedContinue && !allCombinedQuestionsValid && (
@@ -431,7 +429,8 @@ const Page = ({
               </button>
             </div>
           </div>
-        )}
+        </>
+      )}
 
       {/* External "Next" button for single steps that use imperative submit (e.g. glp1ContactAuth).
           The component exposes { submit(), isDisabled } via useImperativeHandle so this button
