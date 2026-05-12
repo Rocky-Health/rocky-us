@@ -4,7 +4,7 @@
  * Sends THREE targets per milestone:
  *   1. window.fbq("trackSingleCustom", pixelId, name, payload) — Meta Pixel (targeted)
  *   2. dataLayer meta mirror   (e.g. meta_quiz_step)        — GTM / debug
- *   3. dataLayer generic event (e.g. quiz_step)             — heatmap.com / SPA funnel tools
+ *   3. dataLayer generic event (e.g. quiz_step)             — SPA funnel tools
  *
  * SSR-safe, never throws, gracefully degrades if fbq is missing.
  */
