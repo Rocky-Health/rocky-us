@@ -32,11 +32,12 @@ const poppins = Poppins({
 });
 
 // Configure local fonts.
-// adjustFontFallback: "Arial" tells Next to override Arial's metrics to match
-// Fellix's, so the FOUT swap when the Fellix .woff finishes loading produces
-// minimal layout shift. preload=true keeps the font in <head>.
+// WOFF2 + Latin subset: ~29 KB per weight (was 61 KB WOFF, 507 glyphs).
+// adjustFontFallback: "Arial" overrides Arial's metrics to match Fellix's, so
+// the FOUT swap on font arrival produces minimal layout shift.
+// preload=true emits <link rel="preload" as="font"> in <head>.
 const fellixMedium = localFont({
-  src: "../fonts/Fellix-Medium.woff",
+  src: "../fonts/Fellix-Medium.woff2",
   variable: "--font-fellix",
   display: "swap",
   adjustFontFallback: "Arial",
@@ -44,7 +45,7 @@ const fellixMedium = localFont({
 });
 
 const fellixSemiBold = localFont({
-  src: "../fonts/Fellix-SemiBold.woff",
+  src: "../fonts/Fellix-SemiBold.woff2",
   variable: "--font-fellix-bold",
   display: "swap",
   adjustFontFallback: "Arial",
