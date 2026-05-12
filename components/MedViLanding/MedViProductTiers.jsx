@@ -57,7 +57,7 @@ const MedViProductTiers = ({ ctaHref = "#" }) => {
   const scrollContainerRef = useRef(null);
 
   return (
-    <div className="container mx-auto py-20">
+    <div className=" mx-auto py-20">
       <ScrollReveal>
         <div className="flex px-5 lg:items-center justify-between lg:px-10 pb-6 lg:flex-row flex-col">
           <h2 className="headers-font text-black sm:text-[28px] text-[24px] leading-[115%] tracking-[-0.72px] md:tracking-[-0.96px] mb-1 text-start">

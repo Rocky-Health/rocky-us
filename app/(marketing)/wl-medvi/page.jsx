@@ -40,11 +40,13 @@ export default function WlMedViPage() {
 
       <RockyInTheNews />
 
-      <Section bg="bg-white pt-10 md:pt-12 !px-0">
-        <MedViProductTiers ctaHref={ctaHref} />
-      </Section>
+      <section className={`bg-white pt-10 md:pt-12 !px-0 `}>
+        <div className="pl-5 md:pl-[120px]">
+          <MedViProductTiers ctaHref={ctaHref} />
+        </div>
+      </section>
 
-      <Section bg="bg-white !py-0 md:!py-0 ">
+      <Section bg="bg-white !py-0 md:!py-0 !px-0">
         <MedViTestimonialsShowcase />
       </Section>
 
