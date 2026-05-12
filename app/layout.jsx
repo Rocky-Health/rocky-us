@@ -133,18 +133,36 @@ export default function RootLayout({ children }) {
             </>
           );
         })()}
-        {/* Google Tag Manager - Changed to beforeInteractive for earlier loading */}
-        {
-          <Script id="google-tag-manager" strategy="beforeInteractive">
-            {`
-            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        {/* Google Tag Manager — dataLayer stub installs immediately so dataLayer.push()
+            calls keep buffering; the gtm.js fetch (and all 4 downstream gtag scripts it
+            injects) waits until first user interaction. Idle fallback at 15s ensures
+            attribution still fires for engaged-but-still users. Bouncers who close the
+            tab within 15s skip ~2.35 MB of Google tag JS entirely. */}
+        <Script id="google-tag-manager" strategy="beforeInteractive">
+          {`
+            (function(w,d,s,l,i){
+              w[l]=w[l]||[];
+              var __gtmLoaded=false;
+              var __gtmEvents=['pointerdown','touchstart','keydown','scroll','mousemove'];
+              function __gtmBoot(){
+                if(__gtmLoaded)return;
+                __gtmLoaded=true;
+                w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
+                j.async=true;
+                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                f.parentNode.insertBefore(j,f);
+                __gtmEvents.forEach(function(ev){w.removeEventListener(ev,__gtmBoot,true);});
+                if(__gtmIdle&&w.cancelIdleCallback){w.cancelIdleCallback(__gtmIdle);}
+                else if(__gtmIdle){w.clearTimeout(__gtmIdle);}
+              }
+              __gtmEvents.forEach(function(ev){w.addEventListener(ev,__gtmBoot,{passive:true,capture:true,once:true});});
+              var __gtmIdle=w.requestIdleCallback
+                ? w.requestIdleCallback(__gtmBoot,{timeout:15000})
+                : w.setTimeout(__gtmBoot,15000);
             })(window,document,'script','dataLayer','GTM-K9PC394B');
           `}
-          </Script>
-        }
+        </Script>
         {/* End Google Tag Manager */}
         {/* Start Facebooc Domain Verification */}
         <meta
