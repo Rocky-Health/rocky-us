@@ -70,7 +70,7 @@ const Glp1MedicalReviewStep = ({ userData, onContinue }) => {
         </p>
       </div>
 
-      <div className="fixed bottom-0 left-0 w-full px-4 pb-4 flex items-center justify-center z-50 bg-white ">
+      {/* <div className="fixed bottom-0 left-0 w-full px-4 pb-4 flex items-center justify-center z-50 bg-white ">
         <div className="w-[335px] md:w-[520px] max-w-xl">
           <button
             type="button"
@@ -81,7 +81,7 @@ const Glp1MedicalReviewStep = ({ userData, onContinue }) => {
             <FaArrowRight />
           </button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
