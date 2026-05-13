@@ -4,7 +4,7 @@ export const productTiers = [
         name: "GLP-1 + GIP Injections",
         subtitle: "Trusted by experts. Priced for you.",
         price: "240",
-        image: "https://myrocky.b-cdn.net/WP%20Images/wl-med/Trusted%20by%20experts.%20priced%20for%20you.%20-%20GLP-1%20+%20GIP%20Injections.png",
+        image: "/products/glp1.png",
         inStock: true,
     },
     {
