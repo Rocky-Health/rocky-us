@@ -7,25 +7,71 @@ import ScrollReveal from "@/components/animations/ScrollReveal";
 import { formatPrice } from "@/utils/priceFormatter";
 import ScrollArrows from "@/components/ScrollArrows";
 import { useRef } from "react";
+import Image from "next/image";
+
+// const TierCard = ({ tier, ctaHref }) => {
+//   return (
+//     <div className="sm:min-w-[340px] min-w-[300px] w-full rounded-[40px] pb-4  overflow-visible group bg-[#F5F4EF44] shadow">
+//       <div className="relative w-full h-[300px] bg-[linear-gradient(180deg,#F0EEEA_0%,#F0EEEA_60%,rgba(255,255,255,0)_60%,rgba(255,255,255,0)_100%)] rounded-t-[40px] overflow-visible">
+//         <div className="absolute inset-0 -top-10 -left-4 -right-4 flex items-center justify-center">
+//           <CustomImage
+//             src={tier.image}
+//             alt={tier.name}
+//             width={400}
+//             height={500}
+//             className="object-contain drop-shadow-lg scale-110 group-hover:translate-y-[-16px] transition-all duration-300"
+//           />
+//         </div>
+//         {/* {tier.inStock && (
+//                     <span className="absolute top-4 left-4 bg-[#4CAF50] text-white text-[12px] font-[600] px-3 py-1 rounded-md z-10">
+//                         In Stock
+//                     </span>
+//                 )} */}
+//       </div>
+
+//       <div className="p-6 text-center">
+//         <p className="poppins-font text-[#AE7E56] text-sm font-[400] mb-2">
+//           Starting at{" "}
+//           <span className=" font-[500]  headers-font">
+//             ${formatPrice(tier.price)}
+//           </span>
+//         </p>
+//         <h3 className="headers-font text-black text-[24px]  leading-[115%] mb-3">
+//           {tier.name}
+//         </h3>
+//         <p className="poppins-font text-[rgba(0,0,0,0.60)] text-sm font-[400] mb-5">
+//           {tier.subtitle}
+//         </p>
+
+//         <Link
+//           href={ctaHref}
+//           className="bg-black text-white rounded-full w-full text-[14px] font-[600] tracking-[0.5px] uppercase flex items-center justify-center py-3 hover:translate-y-[-3px] transition-all duration-300"
+//         >
+//           Get Started
+//         </Link>
+//       </div>
+//     </div>
+//   );
+// };
 
 const TierCard = ({ tier, ctaHref }) => {
   return (
-    <div className="sm:min-w-[340px] min-w-[300px] w-full rounded-[40px] pb-4  overflow-visible group bg-[#F5F4EF44] shadow">
-      <div className="relative w-full h-[300px] bg-[linear-gradient(180deg,#F0EEEA_0%,#F0EEEA_60%,rgba(255,255,255,0)_60%,rgba(255,255,255,0)_100%)] rounded-t-[40px] overflow-visible">
-        <div className="absolute inset-0 -top-10 -left-4 -right-4 flex items-center justify-center">
-          <CustomImage
-            src={tier.image}
-            alt={tier.name}
-            width={400}
-            height={500}
-            className="object-contain drop-shadow-lg scale-110 group-hover:translate-y-[-16px] transition-all duration-300"
-          />
-        </div>
-        {/* {tier.inStock && (
-                    <span className="absolute top-4 left-4 bg-[#4CAF50] text-white text-[12px] font-[600] px-3 py-1 rounded-md z-10">
-                        In Stock
-                    </span>
-                )} */}
+    // Add 'isolation-auto' to ensure a clean stacking context
+    <div className="sm:min-w-[340px] min-w-[300px] w-full rounded-[40px] pb-4 overflow-visible group bg-[#F5F4EF44] shadow isolation-auto">
+      <div className="relative w-full h-[300px] bg-[linear-gradient(180deg,#F0EEEA_0%,#F0EEEA_60%,rgba(255,255,255,0)_60%,rgba(255,255,255,0)_100%)] rounded-t-[40px]">
+        {/* 
+           FIX 1: Add 'z-10' and 'transform-gpu' to the wrapper.
+           FIX 2: Remove 'overflow-visible' from this specific div if the image doesn't NEED to bleed out sides.
+        */}
+        <Image
+          src={tier.image}
+          alt={tier.name}
+          width={400}
+          height={500}
+          // FIX 3: Added 'will-change-transform' to hint to Safari to keep this layer in memory
+          // FIX 4: Replaced 'drop-shadow-lg' with a standard shadow if it still disappears
+          className="object-contain drop-shadow-lg scale-110 group-hover:-translate-y-4 transition-all duration-300 transform-gpu isolate select-none"
+        />
       </div>
 
       <div className="p-6 text-center">
