@@ -18,6 +18,7 @@ import MedViTrustBadgesRow from "@/components/MedViLanding/MedViTrustBadgesRow";
 import RockyInTheNews from "@/components/MedViLanding/RockyInTheNews";
 import Footer from "@/components/Footer/Footer";
 import Section from "@/components/utils/Section";
+import MedViFlashGuard from "@/components/MedViLanding/MedViFlashGuard";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +33,7 @@ export default function WlMedViPage() {
 
   return (
     <>
+      <MedViFlashGuard />
       <MedViPromoBanner />
       <MedViNav ctaHref={ctaHref} />
       <main className="min-h-screen ">
