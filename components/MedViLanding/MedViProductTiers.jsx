@@ -81,9 +81,7 @@ const MedViProductTiers = ({ ctaHref = "#" }) => {
           className="flex gap-2 md:gap-4 items-start overflow-x-auto snap-x snap-mandatory no-scrollbar pt-12 pb-4"
         >
           {productTiers.map((tier, index) => (
-            <ScrollReveal key={index} delay={index * 0.15}>
-              <TierCard tier={tier} ctaHref={ctaHref} />
-            </ScrollReveal>
+            <TierCard tier={tier} ctaHref={ctaHref} />
           ))}
         </div>
       </div>
