@@ -1,6 +1,7 @@
 "use client";
 import CustomImage from "@/components/utils/CustomImage";
 import CustomContainImage from "@/components/utils/CustomContainImage";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 const AccordionItem = ({ item, isOpen, onClick, isFirst }) => {
   return (
@@ -41,7 +42,7 @@ const AccordionItem = ({ item, isOpen, onClick, isFirst }) => {
       >
         <div className="text-[14px] md:text-[16px] pb-4">
           {/* {item.content} */}
-          <div dangerouslySetInnerHTML={{ __html: item.content }}></div>
+          <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.content) }}></div>
           {item.image && (
             <div className="relative overflow-hidden rounded-[16px] w-full h-[250px] md:hidden ">
               <CustomContainImage src={item.image} alt={item.title} fill />

@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { OptionButton } from "@/components/Product/UI";
 import CartPopup from "../../Cart/CartPopup";
 import { formatPriceUI } from "@/utils/priceFormatter";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 const DhmBlendProductDetails = ({ product, variations, isLoading }) => {
   const router = useRouter();
@@ -299,9 +300,10 @@ const DhmBlendProductDetails = ({ product, variations, isLoading }) => {
             <div
               className="text-gray-800 mb-5"
               dangerouslySetInnerHTML={{
-                __html:
+                __html: sanitizeHtml(
                   product?.description ||
                   "Science-backed formula with DHM, L-Cysteine, Milk Thistle, Prickly Pear, and Vitamin B Complex. DHM Blend is authorized for sale by FDA-Approved.",
+                ),
               }}
             />
           </div>

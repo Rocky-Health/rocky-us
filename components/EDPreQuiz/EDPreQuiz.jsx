@@ -6,6 +6,7 @@ import ListWithIcons from "@/components/ListWithIcons";
 import { FaArrowRightLong } from "react-icons/fa6";
 import ProudPartner from "@/components/ProudPartner";
 import { CiClock1 } from "react-icons/ci";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 const EDPreQuiz = ({
   headerText = "Take our 1-minute quiz.",
@@ -32,7 +33,7 @@ const EDPreQuiz = ({
           {/* Title */}
           {subtitle && (
             <div
-              dangerouslySetInnerHTML={{ __html: subtitle }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(subtitle) }}
               className="text-[32px] lg:text-[48px] headers-font leading-[36.8px] md:leading-[53.52px] font-[550] tracking-[-0.01em] md:tracking-[-0.02em] mb-4 md:mb-8 capitalize"
             />
           )}
@@ -41,7 +42,7 @@ const EDPreQuiz = ({
           {upperNote && (
             <div
               className="text-[14px] md:text-[16px] md:tracking-[-0.02em] mb-[24px] md:mb-[40px] w-[300px] md:w-[390px] h-[58px]"
-              dangerouslySetInnerHTML={{ __html: upperNote }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(upperNote) }}
             />
           )}
 
@@ -79,7 +80,7 @@ const EDPreQuiz = ({
           {note && (
             <div
               className="text-[12px] text-center mt-5 w-full md:w-[310px]"
-              dangerouslySetInnerHTML={{ __html: note }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(note) }}
             />
           )}
 

@@ -176,7 +176,7 @@ export const DATALAYER_EVENT_NAMES = {
 
 /**
  * Generic platform-agnostic milestone names for non-Meta consumers
- * (heatmap.com, GTM, future tools).
+ * (GTM, future tools).
  *
  * Milestone keys are uppercase internally, but all outbound uses
  * (generic `event`, `milestone` field) use these lowercase forms

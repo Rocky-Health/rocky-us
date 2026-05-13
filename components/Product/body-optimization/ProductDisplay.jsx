@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ProductImage } from "@/components/Product";
 import PropTypes from "prop-types";
 import { formatPriceUI } from "@/utils/priceFormatter";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 // import CustomImage from "@/components/utils/CustomImage";
 
 const ProductDisplay = ({ product, productSlug }) => {
@@ -59,7 +60,7 @@ const ProductDisplay = ({ product, productSlug }) => {
 
               <div
                 className="text-base mb-6 text-[#212121]"
-                dangerouslySetInnerHTML={{ __html: productDescription }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(productDescription) }}
               ></div>
               {!isRybelsus && (
                 <ul className="flex flex-col gap-2">

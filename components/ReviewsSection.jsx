@@ -161,6 +161,7 @@ const ReviewsSection = () => {
           data-stars="4,5"
           data-review-languages="en"
           aria-label="Customer reviews from TrustPilot"
+          style={{ minHeight: "240px" }}
         >
           <a
             href="https://www.trustpilot.com/review/myrocky.ca"

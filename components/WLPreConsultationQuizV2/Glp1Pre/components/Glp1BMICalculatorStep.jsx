@@ -25,7 +25,6 @@ const Glp1BMICalculatorStep = ({
     const feetNum = parseFloat(heightFeet) || 0;
     const inchesNum = parseFloat(heightInches) || 0;
     const weightNum = parseFloat(weightPounds) || 0;
-    const goalWeightNum = parseFloat(goalWeightRef.current?.value) || 0;
     let bmiValue = "";
 
     if (feetNum > 0 && inchesNum >= 0 && inchesNum < 12 && weightNum > 0) {
@@ -41,9 +40,9 @@ const Glp1BMICalculatorStep = ({
       bmi: bmiValue,
       height: { feet: heightFeet, inches: heightInches },
       weight: weightPounds,
-      goalWeight: goalWeightNum,
+      // goalWeight is managed by its own onChange — don't overwrite it here
     }));
-  }, [weightPounds, heightFeet, heightInches, goalWeightRef, setUserData]);
+  }, [weightPounds, heightFeet, heightInches, setUserData]);
 
   const handleAction = () => {
     logger.log(config.showPopupAfterStep);
@@ -178,12 +177,7 @@ const Glp1BMICalculatorStep = ({
             enterKeyHint="done"
             className="h-[52px] w-full px-4 border border-[#E2E2E1] rounded-md bg-[#F9F9F9]"
             placeholder="250"
-            value={
-              goalWeightRef.current !== undefined &&
-              goalWeightRef.current !== null
-                ? goalWeightRef.current.value
-                : ""
-            }
+            value={userData?.goalWeight ?? ""}
             onChange={(e) => {
               const value = e.target.value;
               setUserData((prev) => ({

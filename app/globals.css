@@ -438,6 +438,64 @@ input[type="range"]::-moz-range-thumb {
     cursor: pointer;
 }
 
+/* DM offers goal section — weight slider (sky track + grip thumb) */
+input.dm-weight-shed-slider[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 10px;
+    border-radius: 2px;
+    background: #5eb9f0;
+}
+input.dm-weight-shed-slider[type="range"]::-webkit-slider-runnable-track {
+    height: 10px;
+    border-radius: 2px;
+    background: #5eb9f0;
+}
+input.dm-weight-shed-slider[type="range"]::-moz-range-track {
+    height: 10px;
+    border-radius: 2px;
+    background: #5eb9f0;
+}
+input.dm-weight-shed-slider[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 60px;
+    height: 32px;
+    margin-top: -11px;
+    border-radius: 6px;
+    background-color: #fff;
+    background-image:
+        linear-gradient(#9ca3af, #9ca3af), linear-gradient(#9ca3af, #9ca3af),
+        linear-gradient(#9ca3af, #9ca3af);
+    background-size: 1px 20px;
+    background-position:
+        calc(50% - 7px) 50%,
+        50% 50%,
+        calc(50% + 7px) 50%;
+    background-repeat: no-repeat;
+    cursor: grab;
+}
+input.dm-weight-shed-slider[type="range"]:active::-webkit-slider-thumb {
+    cursor: grabbing;
+}
+input.dm-weight-shed-slider[type="range"]::-moz-range-thumb {
+    width: 60px;
+    height: 32px;
+    border-radius: 6px;
+    background-color: #fff;
+    background-image:
+        linear-gradient(#9ca3af, #9ca3af), linear-gradient(#9ca3af, #9ca3af),
+        linear-gradient(#9ca3af, #9ca3af);
+    background-size: 1px 20px;
+    background-position:
+        calc(50% - 7px) 50%,
+        50% 50%,
+        calc(50% + 7px) 50%;
+    background-repeat: no-repeat;
+    cursor: grab;
+}
+
 /* MedVi WL calculator — thin track, white knob + tan ring (scoped; overrides globals above) */
 input.medvi-wl-range-input {
     -webkit-appearance: none;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 export default function BlogContent({
   title,
@@ -59,7 +60,7 @@ export default function BlogContent({
     return (
       <div
         className="wordpress-content max-w-none"
-        dangerouslySetInnerHTML={{ __html: content }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(content) }}
       />
     );
   };

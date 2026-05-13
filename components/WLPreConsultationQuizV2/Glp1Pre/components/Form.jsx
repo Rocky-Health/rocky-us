@@ -734,7 +734,7 @@ const Form = ({
       return !!v;
     }
     if (typeof cond === "object" && cond.fieldId) {
-      // require the controlling field to be completed
+      // controlling field to be completed.
       if (!completedFields[cond.fieldId]) return false;
       const target = fieldsState[cond.fieldId];
       if (cond.hasOwnProperty("value")) {
@@ -775,6 +775,7 @@ const Form = ({
   }, [visibleFields, onStepHasConditionalActions]);
 
   const allFilled = visibleFields.every((field) => {
+    if (field.required === false) return true;
     const value = fieldsState[field.id];
     if (field.type === "date") {
       return value && isValidAge(value);
@@ -954,6 +955,31 @@ const Form = ({
                       );
                     })}
                   </div>
+                ) : field.type === "file" ? (
+                  <div>
+                    <input
+                      key={field.id}
+                      type="file"
+                      id={field.id}
+                      name={field.id}
+                      accept="image/*"
+                      className="w-full border border-[#E5E5E5] rounded-lg px-4 py-3 text-[16px] focus:outline-none focus:border-black"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        handleChange(field.id, file ? file.name : "");
+                      }}
+                    />
+                    {fieldsState[field.id] && (
+                      <p className="text-sm text-[#888] mt-1">
+                        Selected: {fieldsState[field.id]}
+                      </p>
+                    )}
+                    {field.description && (
+                      <p className="text-sm text-[#888] mt-1">
+                        {field.description}
+                      </p>
+                    )}
+                  </div>
                 ) : field.type === "textarea" ? (
                   <textarea
                     name={field.id}
@@ -1027,6 +1053,22 @@ const Form = ({
             );
           })}
         </div>
+
+        {onContinue && (
+          <div className="w-full pt-4">
+            <button
+              type="submit"
+              disabled={!allFilled}
+              className={`w-full py-3 rounded-full h-[52px] font-medium border-none focus:outline-none focus:ring-0 transition-colors ${
+                allFilled
+                  ? "bg-black text-white"
+                  : "bg-gray-400 text-white cursor-not-allowed"
+              }`}
+            >
+              Continue
+            </button>
+          </div>
+        )}
       </form>
     </>
   );

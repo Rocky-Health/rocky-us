@@ -3,6 +3,7 @@ import Link from "next/link";
 import { FaArrowRightLong, FaPlay, FaPause } from "react-icons/fa6";
 import { useRef, useState } from "react";
 import ProudPartner from "../ProudPartner";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 const VideoCover = ({ data }) => {
 
@@ -32,7 +33,7 @@ const VideoCover = ({ data }) => {
         {data.note && (
           <div
             className="text-[14px] md:text-[16px] md:tracking-[-0.02em] mb-[24px] md:mb-[40px] w-[300px] md:w-[390px] h-[58px]"
-            dangerouslySetInnerHTML={{ __html: data.note }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.note) }}
           ></div>
         )}
         <div className="flex flex-col lg:flex-row gap-2">

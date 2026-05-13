@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import MessageForQuiz from "../../components/MessageForQuiz";
 import InfoIcon from "../../components/InfoIcon";
 import Page from "./Page";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 const Glp1GenericQuestionStep = ({
   stepConfig,
@@ -60,10 +61,28 @@ const Glp1GenericQuestionStep = ({
   }, [pageQuestionIds]);
 
   const handleOptionSelect = (value, option) => {
-    setUserData((prev) => ({
-      ...prev,
-      [activeStepConfig.field]: value,
-    }));
+    setUserData((prev) => {
+      const updates = { [activeStepConfig.field]: value };
+      // When switching to an option without a text input, clear any stored text fields
+      if (!option?.showTextInput) {
+        if (activeStepConfig.textField)
+          updates[activeStepConfig.textField] = "";
+        (activeStepConfig.options || []).forEach((opt) => {
+          if (opt.showTextInput) {
+            const tf =
+              opt.textField ||
+              activeStepConfig.textField ||
+              `${activeStepConfig.field}Details`;
+            if (tf) updates[tf] = "";
+          }
+        });
+      }
+      return { ...prev, ...updates };
+    });
+
+    if (!option?.showTextInput) {
+      setTextInput("");
+    }
 
     if (option?.action) {
       onAction(option.action, option.popupType || option);
@@ -291,7 +310,7 @@ const Glp1GenericQuestionStep = ({
               } ${activeStepConfig.titleCenter ? "text-center mb-6" : ""} font-medium leading-[120%] `}
             >
               {typeof stepTitle === "string" && /<[^>]+>/.test(stepTitle) ? (
-                <span dangerouslySetInnerHTML={{ __html: stepTitle }} />
+                <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(stepTitle) }} />
               ) : (
                 stepTitle
               )}
@@ -306,7 +325,7 @@ const Glp1GenericQuestionStep = ({
             /<[^>]+>/.test(activeStepConfig.subtitle) ? (
               <p
                 className="text-[14px] text-[#AE7E56] mb-[24px] md:w-full font-medium"
-                dangerouslySetInnerHTML={{ __html: activeStepConfig.subtitle }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(activeStepConfig.subtitle) }}
               />
             ) : (
               <p className="text-[14px] text-[#AE7E56] mb-[24px] md:w-full font-medium">
