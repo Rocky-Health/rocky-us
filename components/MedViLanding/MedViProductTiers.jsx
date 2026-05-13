@@ -7,6 +7,7 @@ import ScrollReveal from "@/components/animations/ScrollReveal";
 import { formatPrice } from "@/utils/priceFormatter";
 import ScrollArrows from "@/components/ScrollArrows";
 import { useRef } from "react";
+import Image from "next/image";
 
 // const TierCard = ({ tier, ctaHref }) => {
 //   return (
@@ -62,7 +63,7 @@ const TierCard = ({ tier, ctaHref }) => {
            FIX 1: Add 'z-10' and 'transform-gpu' to the wrapper.
            FIX 2: Remove 'overflow-visible' from this specific div if the image doesn't NEED to bleed out sides.
         */}
-        <CustomImage
+        <Image
           src={tier.image}
           alt={tier.name}
           width={400}
