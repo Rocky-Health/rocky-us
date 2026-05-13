@@ -175,5 +175,4 @@ npm run dev
 ```
 
 ## License
-
 Proprietary. All rights reserved.
