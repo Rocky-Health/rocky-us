@@ -2,8 +2,8 @@
 
 A modern, headless storefront for Rocky built with Next.js App Router. It renders a fast, SEO-friendly frontend while integrating with a WordPress + WooCommerce backend via serverless API routes. This repo focuses on UX, performance, tracking, and a robust checkout that mirrors WooCommerce Store API behavior.
 
-## Tech Stack
 
+## Tech Stack
 - Next.js 15 (App Router).  
 - React 19
 - Tailwind CSS
