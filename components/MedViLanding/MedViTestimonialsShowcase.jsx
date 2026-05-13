@@ -61,7 +61,7 @@ const MedViTestimonialsShowcase = () => {
         }}
       >
         <div className="animate-float">
-          <CustomImage
+          <Image
             src="https://myrocky.b-cdn.net/WP%20Images/wl-med/_When%20nothing%20else%20worked,%20Rocky%20did_.png"
             alt="GLP-1 Medication"
             width={400}
