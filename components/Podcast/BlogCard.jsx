@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 export const BlogCard = ({ post }) => {
   const title = post.title?.rendered || "";
@@ -37,7 +38,7 @@ export const BlogCard = ({ post }) => {
           </h3>
           <div
             className="text-base md:text-lg font-medium text-[#6B6967] mb-4 line-clamp-2"
-            dangerouslySetInnerHTML={{ __html: excerpt }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(excerpt) }}
           />
           <div className="mt-auto">
             <span className="text-xs md:text-sm px-3 py-2 bg-[#0000000A] text-black rounded-full border border-[#00000014]">

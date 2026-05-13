@@ -403,11 +403,6 @@ const Footer = ({ className }) => {
                 </div>
             </div>
 
-            {/* BugHerd Script */}
-            <Script
-                src="https://www.bugherd.com/sidebarv2.js?apikey=muxxd3bcs3sxge7xsyrezg"
-                strategy="afterInteractive"
-            />
         </>
     );
 };

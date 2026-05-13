@@ -3,6 +3,7 @@
 import { ProductImage } from "@/components/Product";
 import Link from "next/link";
 import { formatPriceUI } from "@/utils/priceFormatter";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 export default function BasicProductInfo({ product }) {
   if (!product) return null;
@@ -23,7 +24,7 @@ export default function BasicProductInfo({ product }) {
       {product.shortDescription && (
         <div
           className="text-gray-600 mb-6"
-          dangerouslySetInnerHTML={{ __html: product.shortDescription }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(product.shortDescription) }}
         />
       )}
 

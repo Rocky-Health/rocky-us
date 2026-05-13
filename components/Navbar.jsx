@@ -8,15 +8,15 @@ import { cookies } from "next/headers";
 import HeaderProudPartner from "./Navbar/HeaderProudPartner";
 
 const Navbar = async ({
-    className,
-    hideTrustpilot = false,
-    hidePartnerBanner = false,
+  className,
+  hideTrustpilot = false,
+  hidePartnerBanner = false,
 }) => {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("authToken")?.value;
-    const userName = cookieStore.get("userName")?.value;
-    const userEmail = cookieStore.get("userEmail")?.value;
-    const displayName = cookieStore.get("displayName")?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("authToken")?.value;
+  const userName = cookieStore.get("userName")?.value;
+  const userEmail = cookieStore.get("userEmail")?.value;
+  const displayName = cookieStore.get("displayName")?.value;
 
     // Use display name with fallbacks in this order: displayName -> firstName -> userEmail
     let nameToShow;
@@ -33,12 +33,12 @@ const Navbar = async ({
         nameToShow = "Guest";
     }
 
-    return (
-        <header className={`${className || ""}`}>
-            {!hideTrustpilot && <Trustpilot />}
-            {!hidePartnerBanner && <HeaderProudPartner />}
-            <NavContainer>
-                {/* <MobileMenu
+  return (
+    <header className={`${className || ""}`}>
+      {!hideTrustpilot && <Trustpilot />}
+      {!hidePartnerBanner && <HeaderProudPartner />}
+      <NavContainer>
+        {/* <MobileMenu
           menuItems={menuItems}
           token={token}
           displayName={nameToShow}

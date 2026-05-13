@@ -8,7 +8,9 @@
 - [ ] Confirm WooCommerce REST API is enabled
 - [ ] Confirm WooCommerce version is 9.0+ (HPOS compatible)
 
+
 ---
+
 
 ## 📁 Files to Copy/Create
 
@@ -332,4 +334,3 @@ curl -X POST https://[DOMAIN]/api/northbeam/backfill-auto \
 **Date Started:** ___________  
 **Date Completed:** ___________  
 **Implemented By:** ___________
-

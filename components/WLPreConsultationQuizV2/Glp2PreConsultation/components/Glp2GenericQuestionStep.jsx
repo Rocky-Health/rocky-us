@@ -23,6 +23,7 @@ import Glp2DobStep from "./Glp2DobStep";
 import Glp2ContactAuthStep from "./Glp2ContactAuthStep";
 import Form from "../../components/Form";
 import MessageForQuiz from "../../components/MessageForQuiz";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 const Glp2GenericQuestionStep = ({
   stepConfig,
@@ -386,7 +387,7 @@ const Glp2GenericQuestionStep = ({
               } ${stepConfig.titleCenter ? "text-center mb-6" : ""} font-medium leading-[120%] `}
             >
               {typeof stepTitle === "string" && /<[^>]+>/.test(stepTitle) ? (
-                <span dangerouslySetInnerHTML={{ __html: stepTitle }} />
+                <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(stepTitle) }} />
               ) : (
                 stepTitle
               )}
@@ -401,7 +402,7 @@ const Glp2GenericQuestionStep = ({
             /<[^>]+>/.test(stepConfig.subtitle) ? (
               <p
                 className="text-[14px] text-[#AE7E56] mb-[24px] md:w-full font-medium"
-                dangerouslySetInnerHTML={{ __html: stepConfig.subtitle }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(stepConfig.subtitle) }}
               />
             ) : (
               <p className="text-[14px] text-[#AE7E56] mb-[24px] md:w-full font-medium">

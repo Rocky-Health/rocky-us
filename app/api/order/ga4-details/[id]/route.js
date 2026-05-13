@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { api } from "@/lib/woocommerce"; // Assuming woocommerce.js exports 'api'
 import { logger } from "@/utils/devLogger";
 
@@ -77,6 +78,14 @@ export async function GET(request, { params }) {
     );
   }
 
+  const cookieStore = await cookies();
+  const authToken = cookieStore.get("authToken")?.value;
+  const userId = parseInt(cookieStore.get("userId")?.value);
+
+  if (!authToken || !userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     // 1. Fetch the order
     const orderResponse = await api.get(`orders/${orderId}`);
@@ -84,6 +93,10 @@ export async function GET(request, { params }) {
 
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
+
+    if (order.customer_id !== userId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // 2. Process line items to gather GA4 item data

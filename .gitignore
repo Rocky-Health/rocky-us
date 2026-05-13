@@ -58,3 +58,5 @@ post-copilot.bat
 .env.sentry-build-plugin
 
 *.php
+
+docs/

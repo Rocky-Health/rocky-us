@@ -420,22 +420,6 @@ const OrderReceivedContent = ({ userId }) => {
               const s2s = await sendAwinTracking(data);
               fireAwinClientPixel(data, s2s);
             })();
-
-            // Heatmap.com conversion tracking
-            try {
-              function heatmapLoadConversionSnippet(url) {
-                var script = document.createElement('script');
-                script.type = 'text/javascript';
-                script.src = url;
-                script.async = false;
-                script.defer = true;
-                document.head.appendChild(script);
-              }
-              heatmapLoadConversionSnippet('https://dashboard.heatmap.com/conversions.js?siteId=5229');
-              logger.log("[Heatmap] Conversion snippet loaded");
-            } catch (err) {
-              logger.error("[Heatmap] Conversion tracking failed:", err);
-            }
           }, 1000);
         } else {
           logger.error(

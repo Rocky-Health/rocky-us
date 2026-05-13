@@ -151,8 +151,7 @@ export async function POST(req) {
             `${BASE_URL}/wp-json/wc/v3/customers/${userId.value}`,
             {
               headers: {
-                Authorization:
-                  process.env.ADMIN_TOKEN || encodedCredentials.value,
+                Authorization: encodedCredentials.value,
               },
             }
           );
@@ -207,8 +206,7 @@ export async function POST(req) {
                 },
                 {
                   headers: {
-                    Authorization:
-                      process.env.ADMIN_TOKEN || encodedCredentials.value,
+                    Authorization: encodedCredentials.value,
                     "Content-Type": "application/json",
                   },
                 }

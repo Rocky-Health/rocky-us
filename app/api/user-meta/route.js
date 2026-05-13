@@ -38,7 +38,7 @@ export async function GET(request) {
       `${BASE_URL}/wp-json/wc/v3/customers/${userId.value}`,
       {
         headers: {
-          Authorization: process.env.ADMIN_TOKEN || authToken.value,
+          Authorization: authToken.value,
         },
       }
     );

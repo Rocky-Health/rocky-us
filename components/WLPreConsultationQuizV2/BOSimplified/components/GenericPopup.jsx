@@ -7,6 +7,7 @@ import { ProgressBar } from "@/components/EdQuestionnaire/ProgressBar";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import QuestionnaireNavbar from "../../components/QuestionnaireNavbar";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 // Separate GenericPopup component for BO2/BO3 simplified flow
 // This is completely independent from the default WL flow GenericPopup
@@ -207,7 +208,7 @@ const GenericPopup = ({
                     {popupConfig.titleIsHtml ? (
                       <span
                         dangerouslySetInnerHTML={{
-                          __html: popupConfig.title,
+                          __html: sanitizeHtml(popupConfig.title),
                         }}
                       />
                     ) : (
@@ -253,7 +254,7 @@ const GenericPopup = ({
                         key={index}
                         className={index > 0 ? "mt-4" : ""}
                         dangerouslySetInnerHTML={{
-                          __html: line,
+                          __html: sanitizeHtml(line),
                         }}
                       />
                     ))}
@@ -265,7 +266,7 @@ const GenericPopup = ({
                   {typeof popupConfig.content === "string" ? (
                     <div
                       dangerouslySetInnerHTML={{
-                        __html: popupConfig.content,
+                        __html: sanitizeHtml(popupConfig.content),
                       }}
                     />
                   ) : (

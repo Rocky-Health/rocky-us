@@ -6,7 +6,7 @@ const QuestionnaireNavbar = ({ onBackClick, currentPage }) => {
 
   return (
     <header
-      className={`questionnaire-header w-full py-2 relative  ${
+      className={`questionnaire-header glp2-v2-header w-full py-2 relative  ${
         isThankYouPage ? "bg-transparent z-10" : ""
       }`}
       suppressHydrationWarning={true}

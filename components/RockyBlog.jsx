@@ -1,12 +1,12 @@
+import Image from "next/image";
 import Link from "next/link";
 import { FaLongArrowAltRight } from "react-icons/fa";
 import BrimaryButton from "./ui/buttons/BrimaryButton";
-import CustomImage from "./utils/CustomImage";
 
 const homeBlog = [
     {
-        videoSrc:
-            "https://rockywp.s3.ca-central-1.amazonaws.com/wp-content/uploads/video/Rockyhealth-Ad-V1.mp4",
+        imageSrc:
+            "https://myrocky.b-cdn.net/Other%20Images/Measure-your-age-Then-reverse-it-Bottom.jpg.jpeg",
         title: "All things health blog",
         subtitle: "A lifestyle blog connecting you with issues that matter",
         buttonText: "Read our Blog",
@@ -24,17 +24,26 @@ const RockyBlog = ({ blog }) => {
                     key={index}
                     className="relative w-full px-1  h-[365px] md:h-screen bg-black overflow-hidden"
                 >
-                    {/* <CustomImage src="/home/blogSec.png" alt="Blog Background" fill /> */}
-                    <video
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        className="absolute inset-0 w-full h-[365px] md:h-100 md:h-full object-cover"
-                    >
-                        <source src={blog.videoSrc} type="video/mp4" />
-                        Your browser does not support the video tag.
-                    </video>
+                    {blog.imageSrc ? (
+                        <Image
+                            src={blog.imageSrc}
+                            alt={blog.title || "Blog Background"}
+                            fill
+                            sizes="100vw"
+                            className="absolute inset-0 object-cover"
+                        />
+                    ) : (
+                        <video
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            className="absolute inset-0 w-full h-[365px] md:h-100 md:h-full object-cover"
+                        >
+                            <source src={blog.videoSrc} type="video/mp4" />
+                            Your browser does not support the video tag.
+                        </video>
+                    )}
 
                     <div className="relative z-10 flex flex-col justify-center items-center text-center text-[#FFFFFF] h-full px-4 py-12">
                         <h1 className=" text-[36px] md:text-[45px] leading-[114.9%] tracking-[1px]  font-[600] subheaders-font">

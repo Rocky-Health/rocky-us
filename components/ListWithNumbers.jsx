@@ -1,3 +1,5 @@
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
+
 const ListWithNumbers = ({ items, bgNumberGradient }) => {
   return (
     <ul className="space-y-2 md:space-y-3 mb-6 md:mb-10">
@@ -10,7 +12,7 @@ const ListWithNumbers = ({ items, bgNumberGradient }) => {
           </span>
           <div
             className="text-[16px] leading-[22.4px] font-[400]"
-            dangerouslySetInnerHTML={{ __html: item }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(item) }}
           ></div>
         </li>
       ))}

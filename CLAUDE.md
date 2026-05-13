@@ -13,7 +13,7 @@ Telemedicine e-commerce platform for men's health (ED, hair loss, weight loss). 
 - **Backend**: WordPress + WooCommerce REST API (headless)
 - **Auth**: Cookie-based Basic Auth derived from WordPress JWT
 - **Deployment**: Vercel serverless
-- **Analytics**: GA4, Meta CAPI, TikTok CAPI, Northbeam, Awin, Clarity, Heatmap.com
+- **Analytics**: GA4, Meta CAPI, TikTok CAPI, Northbeam, Awin, Clarity
 
 ## Project Structure
 

@@ -87,7 +87,7 @@ export async function POST(req) {
       updatePayload,
       {
         headers: {
-          Authorization: process.env.ADMIN_TOKEN || authToken.value,
+          Authorization: authToken.value,
           "Content-Type": "application/json",
         },
       }

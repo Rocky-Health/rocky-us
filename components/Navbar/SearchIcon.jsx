@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { CiSearch } from "react-icons/ci";
 import { ImSpinner2 } from "react-icons/im"; // You may install this or replace with any spinner
 import { formatPrice } from "@/utils/priceFormatter";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 const SearchIcon = ({ onClose }) => {
   const [searchValue, setSearchValue] = useState("");
@@ -204,7 +205,7 @@ const SearchIcon = ({ onClose }) => {
                   <div
                     className="font-medium text-gray-900 text-sm truncate"
                     dangerouslySetInnerHTML={{
-                      __html: item.title?.rendered || item.name || item.slug,
+                      __html: sanitizeHtml(item.title?.rendered || item.name || item.slug),
                     }}
                   />
                   {item.price && (
