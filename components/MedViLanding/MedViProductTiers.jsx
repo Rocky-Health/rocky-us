@@ -18,7 +18,7 @@ const TierCard = ({ tier, ctaHref }) => {
             alt={tier.name}
             width={400}
             height={500}
-            className="object-contain drop-shadow-lg scale-110 group-hover:translate-y-[-16px] transition-all duration-300"
+            className="object-contain drop-shadow-lg "
           />
         </div>
         {/* {tier.inStock && (
