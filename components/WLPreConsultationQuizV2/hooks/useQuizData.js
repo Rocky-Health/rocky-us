@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { logger } from "@/utils/devLogger";
 
-const STORAGE_KEY = "wl_flow2_quiz_data";
+const STORAGE_KEY = "new-bo-preqiz-data";
 const HISTORY_STORAGE_KEY = "history";
-const ESSENTIAL_CONSUL_STORAGE_KEY = "essential-consul"; //Created by omkar for pre-quiz data transfer. DO NOT DELETE
+const ESSENTIAL_CONSUL_STORAGE_KEY = "new-bo-essential-consul"; //Created by omkar for pre-quiz data transfer. DO NOT DELETE
 
 export const useQuizData = () => {
   // Initialize from localStorage if available

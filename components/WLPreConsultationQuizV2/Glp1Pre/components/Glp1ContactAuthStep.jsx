@@ -52,7 +52,7 @@ const Glp1ContactAuthStep = ({
   const [showPassword, setShowPassword] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
 
-  const [emailTouched, setEmailTouched] = useState(false);
+  const [emailTouched, setEmailTouched] = useState(!!userData?.email);
   const [isCheckingEmail, setIsCheckingEmail] = useState(false);
   const [showPasswordSection, setShowPasswordSection] = useState(false);
   const [emailExists, setEmailExists] = useState(false);
@@ -89,6 +89,15 @@ const Glp1ContactAuthStep = ({
       checkEmailExists(trimmed);
     }
   };
+
+  // Auto-check email on mount if pre-filled from a previous visit
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  React.useEffect(() => {
+    const prefilled = (userData?.email || "").trim();
+    if (isValidEmail(prefilled)) {
+      checkEmailExists(prefilled);
+    }
+  }, []);
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -214,7 +223,7 @@ const Glp1ContactAuthStep = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (loading) return;
+    if (loading || isDisabled) return;
     setLoading(true);
     try {
       // Save email + phone into userData (password never goes to localStorage)
