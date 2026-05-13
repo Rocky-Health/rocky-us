@@ -62,17 +62,15 @@ const TierCard = ({ tier, ctaHref }) => {
            FIX 1: Add 'z-10' and 'transform-gpu' to the wrapper.
            FIX 2: Remove 'overflow-visible' from this specific div if the image doesn't NEED to bleed out sides.
         */}
-        <div className="absolute inset-0 -top-10 -left-4 -right-4 flex items-center justify-center z-10 transform-gpu">
-          <CustomImage
-            src={tier.image}
-            alt={tier.name}
-            width={400}
-            height={500}
-            // FIX 3: Added 'will-change-transform' to hint to Safari to keep this layer in memory
-            // FIX 4: Replaced 'drop-shadow-lg' with a standard shadow if it still disappears
-            className="object-contain drop-shadow-xl scale-110 group-hover:-translate-y-4 transition-all duration-300 will-change-transform"
-          />
-        </div>
+        <CustomImage
+          src={tier.image}
+          alt={tier.name}
+          width={400}
+          height={500}
+          // FIX 3: Added 'will-change-transform' to hint to Safari to keep this layer in memory
+          // FIX 4: Replaced 'drop-shadow-lg' with a standard shadow if it still disappears
+          className="object-contain drop-shadow-lg scale-110 group-hover:-translate-y-4 transition-all duration-300 transform-gpu isolate select-none"
+        />
       </div>
 
       <div className="p-6 text-center">
