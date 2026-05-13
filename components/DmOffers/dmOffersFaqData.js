@@ -24,7 +24,7 @@ export const DM_OFFERS_FAQ_ITEMS = [
         avatarSrc: "https://i.pravatar.cc/128?img=3",
     },
     {
-        question: "Is the medication real semaglutide &amp; tirzepatide?",
+        question: "Is the medication real semaglutide & tirzepatide?",
         answer: "<p>Yes, both of our GLP-1 weight loss medications are real prescription medications that are prescribed by a doctor and compounded by a real US based pharmacy. We offer only the best Semaglutide and Tirzepatide medications for weightloss management for customers that meet the qualifications required for GLP-1 medications. These are the same medications that people are talking about and getting real results with all over social media.</p>",
         initials: "ER",
         avatarSrc: "https://i.pravatar.cc/128?img=7",
