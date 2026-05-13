@@ -775,6 +775,7 @@ const Form = ({
   }, [visibleFields, onStepHasConditionalActions]);
 
   const allFilled = visibleFields.every((field) => {
+    if (field.required === false) return true;
     const value = fieldsState[field.id];
     if (field.type === "date") {
       return value && isValidAge(value);
@@ -953,6 +954,31 @@ const Form = ({
                         />
                       );
                     })}
+                  </div>
+                ) : field.type === "file" ? (
+                  <div>
+                    <input
+                      key={field.id}
+                      type="file"
+                      id={field.id}
+                      name={field.id}
+                      accept="image/*"
+                      className="w-full border border-[#E5E5E5] rounded-lg px-4 py-3 text-[16px] focus:outline-none focus:border-black"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        handleChange(field.id, file ? file.name : "");
+                      }}
+                    />
+                    {fieldsState[field.id] && (
+                      <p className="text-sm text-[#888] mt-1">
+                        Selected: {fieldsState[field.id]}
+                      </p>
+                    )}
+                    {field.description && (
+                      <p className="text-sm text-[#888] mt-1">
+                        {field.description}
+                      </p>
+                    )}
                   </div>
                 ) : field.type === "textarea" ? (
                   <textarea

@@ -60,10 +60,28 @@ const Glp1GenericQuestionStep = ({
   }, [pageQuestionIds]);
 
   const handleOptionSelect = (value, option) => {
-    setUserData((prev) => ({
-      ...prev,
-      [activeStepConfig.field]: value,
-    }));
+    setUserData((prev) => {
+      const updates = { [activeStepConfig.field]: value };
+      // When switching to an option without a text input, clear any stored text fields
+      if (!option?.showTextInput) {
+        if (activeStepConfig.textField)
+          updates[activeStepConfig.textField] = "";
+        (activeStepConfig.options || []).forEach((opt) => {
+          if (opt.showTextInput) {
+            const tf =
+              opt.textField ||
+              activeStepConfig.textField ||
+              `${activeStepConfig.field}Details`;
+            if (tf) updates[tf] = "";
+          }
+        });
+      }
+      return { ...prev, ...updates };
+    });
+
+    if (!option?.showTextInput) {
+      setTextInput("");
+    }
 
     if (option?.action) {
       onAction(option.action, option.popupType || option);

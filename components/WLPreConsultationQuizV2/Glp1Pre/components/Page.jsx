@@ -12,6 +12,7 @@ import Glp1MedicalReviewStep from "./Glp1MedicalReviewStep";
 import Glp1ContactIntroStep from "./Glp1ContactIntroStep";
 import Form from "./Form";
 import Glp1ContactAuthStep from "./Glp1ContactAuthStep";
+import { logger } from "@/utils/devLogger";
 
 const MIN_DOB_YEAR = 1920;
 const MAX_DOB_YEAR = 2008;
@@ -195,10 +196,40 @@ const Page = ({
   }, [isCombinedPage, questions, userData, textInputs]);
 
   const handleCombinedSelect = (configToRender, value, option) => {
-    setUserData((prev) => ({
-      ...prev,
-      [configToRender.field]: value,
-    }));
+    setUserData((prev) => {
+      const updates = { [configToRender.field]: value };
+      // When switching to an option without a text input, clear any stored text fields
+      if (!option?.showTextInput) {
+        if (configToRender.textField) updates[configToRender.textField] = "";
+        (configToRender.options || []).forEach((opt) => {
+          if (opt.showTextInput) {
+            const tf =
+              opt.textField ||
+              configToRender.textField ||
+              `${configToRender.field}Details`;
+            if (tf) updates[tf] = "";
+          }
+        });
+      }
+      return { ...prev, ...updates };
+    });
+
+    if (!option?.showTextInput) {
+      setTextInputs((prev) => {
+        const next = { ...prev };
+        if (configToRender.textField) next[configToRender.textField] = "";
+        (configToRender.options || []).forEach((opt) => {
+          if (opt.showTextInput) {
+            const tf =
+              opt.textField ||
+              configToRender.textField ||
+              `${configToRender.field}Details`;
+            if (tf) next[tf] = "";
+          }
+        });
+        return next;
+      });
+    }
 
     if (option?.showTextInput) {
       return;
@@ -297,7 +328,9 @@ const Page = ({
         : questionProps.setTextInput,
       // In combined mode, hide the inline Continue button — page-level button handles it
       onTextSubmit: isCombined ? null : questionProps.onTextSubmit,
-      onContinue: isCombined ? undefined : questionProps.onContinue,
+      onContinue: isCombined
+        ? handleCombinedContinue
+        : questionProps.onContinue,
       isValid: isCombined
         ? validateQuestion(configToRender)
         : questionProps.isValid,
@@ -306,7 +339,7 @@ const Page = ({
     const scopedSharedProps = {
       ...sharedStepProps,
       config: configToRender,
-      onContinue: isCombined ? undefined : sharedStepProps.onContinue,
+      onContinue: handleCombinedContinue,
     };
 
     switch (configToRender.type) {
@@ -342,7 +375,13 @@ const Page = ({
           </div>
         );
       case "form":
-        return <Form {...scopedQuestionProps} {...scopedSharedProps} />;
+        return (
+          <Form
+            onContinue={handleCombinedContinue}
+            {...scopedQuestionProps}
+            {...scopedSharedProps}
+          />
+        );
       case "radio":
       case "radio-text":
         return <RadioTextQuestion {...scopedQuestionProps} />;
@@ -404,31 +443,45 @@ const Page = ({
 
       {isCombinedPage && (
         <>
-          <div className="w-full pb-4 flex items-center justify-center z-50 ">
-            <div className="w-full  md:max-w-[665px]">
-              {attemptedContinue && !allCombinedQuestionsValid && (
-                <p className="text-red-500 text-sm mb-2 text-center">
-                  Please answer all required questions before continuing.
-                </p>
-              )}
-              <button
-                type="button"
-                onClick={() => {
-                  setAttemptedContinue(true);
-                  if (allCombinedQuestionsValid) {
-                    handleCombinedContinue();
-                  }
-                }}
-                className={`w-full py-3 rounded-full h-[52px] font-medium border-none focus:outline-none focus:ring-0 transition-colors ${
-                  allCombinedQuestionsValid
-                    ? "bg-black text-white"
-                    : "bg-gray-400 text-white cursor-not-allowed"
-                }`}
-              >
-                Continue
-              </button>
-            </div>
-          </div>
+          {logger.log(
+            questions.some(
+              (q) => q.type === "glp1ContactAuth" || q.type === "form",
+            ),
+          )}
+          {questions.some(
+            (q) =>
+              q.type === "glp1ContactAuth" ||
+              q.type === "form" ||
+              q.type === "data",
+          ) ? null : (
+            <>
+              <div className="w-full pb-4 flex items-center justify-center z-50 ">
+                <div className="w-full  md:max-w-[665px]">
+                  {attemptedContinue && !allCombinedQuestionsValid && (
+                    <p className="text-red-500 text-sm mb-2 text-center">
+                      Please answer all required questions before continuing.
+                    </p>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAttemptedContinue(true);
+                      if (allCombinedQuestionsValid) {
+                        handleCombinedContinue();
+                      }
+                    }}
+                    className={`w-full py-3 rounded-full h-[52px] font-medium border-none focus:outline-none focus:ring-0 transition-colors ${
+                      allCombinedQuestionsValid
+                        ? "bg-black text-white"
+                        : "bg-gray-400 text-white cursor-not-allowed"
+                    }`}
+                  >
+                    Continue
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </>
       )}
 
