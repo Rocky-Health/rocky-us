@@ -55,7 +55,7 @@ export const layoutExemptRoutes = [
     "/glp2-offer-hero",
     "/glp1-offer-hero",
     "/glp2-pre-consultation-2",
-    "/dm-offers",
+    "/wl-big-v2",
 ];
 
 /**
