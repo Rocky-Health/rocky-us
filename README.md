@@ -173,5 +173,6 @@ npm run dev
   "lint": "next lint"
 }
 ```
+
 ## License
 Proprietary. All rights reserved.
