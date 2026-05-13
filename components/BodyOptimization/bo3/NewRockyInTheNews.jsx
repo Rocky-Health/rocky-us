@@ -5,6 +5,9 @@ const rockyInTheNewsCards = [
         image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/bloomberg-logo.png",
     },
     {
+        image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/yahoo-logo-grey.png",
+    },
+    {
         image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/The_Globe_and_Mail_Stretched_grey.png",
     },
     {
@@ -23,15 +26,13 @@ const rockyInTheNewsCards = [
     {
         image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/voyage-grey.png",
     },
-    {
-        image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/yahoo-logo-grey.png",
-    },
+
     {
         image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/canhealth-logo-2x.png",
     },
-    {
-        image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/the-canadian-business-journal-logo.png",
-    },
+    // {
+    //     image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/the-canadian-business-journal-logo.png",
+    // },
 ];
 
 const RockyInTheNews = ({ cards }) => {

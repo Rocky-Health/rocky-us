@@ -30,6 +30,9 @@ const news = [
         image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/bloomberg-logo.png",
     },
     {
+        image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/yahoo-logo-grey.png",
+    },
+    {
         image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/The_Globe_and_Mail_Stretched_grey.png",
     },
     {
@@ -41,18 +44,16 @@ const news = [
     {
         image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/market-watch-grey-new.png",
     },
-    {
-        image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/the-canadian-business-journal-logo.png",
-    },
+    // {
+    //     image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/the-canadian-business-journal-logo.png",
+    // },
     {
         image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/trendhunters.png",
     },
     {
         image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/voyage-grey.png",
     },
-    {
-        image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/yahoo-logo-grey.png",
-    },
+
     {
         image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/canhealth-logo-2x.png",
     },
