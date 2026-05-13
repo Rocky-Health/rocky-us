@@ -6,6 +6,7 @@ import {
   featuredTestimonial,
   scatteredTestimonials,
 } from "@/components/MedViLanding/data";
+import Image from "next/image";
 
 const ScatteredQuote = ({ quote, className }) => (
   <div className={`text-center md:text-left ${className}`}>
@@ -115,7 +116,7 @@ const MedViTestimonialsShowcase = () => {
 
       <div className="hidden space-y-6 mt-4">
         <div className="relative w-[200px] h-[300px] mx-auto mb-6 animate-float">
-          <CustomImage
+          <Image
             src="https://myrocky.b-cdn.net/WP%20Images/wl-med/_When%20nothing%20else%20worked,%20Rocky%20did_.png"
             alt="GLP-1 Medication"
             width={200}
@@ -137,7 +138,7 @@ const MedViTestimonialsShowcase = () => {
       </div>
 
       <div className="flex justify-center pb-10 md:pt-20 pt-10">
-        <CustomImage
+        <Image
           src="/medvi/hsafsa1.png"
           alt="HSA FSA logo"
           width={250}
