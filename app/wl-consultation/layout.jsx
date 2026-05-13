@@ -48,6 +48,8 @@ export default function BOWeightQuestionnaireLayout({ children }) {
           margin-bottom: 0 !important;
         }
         /* Zendesk Widget - Hide all elements completely */
+        #zendesk-launcher-placeholder,
+        .zendesk-launcher-placeholder,
         #launcher,
         #messenger,
         .zE-launcher,

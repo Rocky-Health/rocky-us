@@ -6,6 +6,7 @@ import { ProgressBar } from "@/components/EdQuestionnaire/ProgressBar";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import QuestionnaireNavbar from "../components/QuestionnaireNavbar";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 // Dedicated GenericPopup component for wl-offer-pre-consultation flow
 // This is isolated from other flows to allow experimental features like loading indicators
@@ -218,7 +219,7 @@ const WLOfferGenericPopup = ({
                                         {popupConfig.titleIsHtml ? (
                                             <span
                                                 dangerouslySetInnerHTML={{
-                                                    __html: popupConfig.title,
+                                                    __html: sanitizeHtml(popupConfig.title),
                                                 }}
                                             />
                                         ) : (
@@ -266,7 +267,7 @@ const WLOfferGenericPopup = ({
                                                         index > 0 ? "mt-4" : ""
                                                     }
                                                     dangerouslySetInnerHTML={{
-                                                        __html: line,
+                                                        __html: sanitizeHtml(line),
                                                     }}
                                                 />
                                             ))}
@@ -278,7 +279,7 @@ const WLOfferGenericPopup = ({
                                     {typeof popupConfig.content === "string" ? (
                                         <div
                                             dangerouslySetInnerHTML={{
-                                                __html: popupConfig.content,
+                                                __html: sanitizeHtml(popupConfig.content),
                                             }}
                                         />
                                     ) : (

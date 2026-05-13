@@ -1,6 +1,7 @@
 "use client";
 import { FaCheckCircle, FaRegTimesCircle, FaTimesCircle } from "react-icons/fa";
 import CustomImage from "../utils/CustomImage";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 const ComparingTable = ({
   title,
@@ -28,7 +29,7 @@ const ComparingTable = ({
         <div className="flex flex-col justify-start items-start gap-2">
           <div className="w-full text-center md:text-left">
             <span className="text-black  text-[32px] font-[550] tracking-[-1%] leading-[115%]  text-center max-w-[265px] mx-auto">
-             <div dangerouslySetInnerHTML={{ __html: title }}></div>
+             <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(title) }}></div>
             </span>
           </div>
           {desc && (
@@ -52,7 +53,7 @@ const ComparingTable = ({
             <div className="lg:flex hidden flex-col justify-start items-start gap-2">
               <div className="w-full text-center md:text-left md:py-[0px] py-[29px]">
                 <span className="text-black font-[550] headers-font text-[46px] leading-[115%] tracking-[-2%]">
-                  <div dangerouslySetInnerHTML={{ __html: title }}></div>
+                  <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(title) }}></div>
                 </span>
               </div>
               {desc && (
@@ -100,10 +101,10 @@ const ComparingTable = ({
               <div className="flex flex-col w-full lg:w-auto lg:flex-row items-center justify-center md:justify-left  gap-1 lg:pl-[42px]">
                 {item ? (
                   <>
-                    <FaCheckCircle className="text-[#AE7E56] text-lg md:text-xl" /> <span className="text-[14px] md:text-[16px] font-[500] text-center md:text-left"><div dangerouslySetInnerHTML={{ __html: item }}></div></span>
+                    <FaCheckCircle className="text-[#AE7E56] text-lg md:text-xl" /> <span className="text-[14px] md:text-[16px] font-[500] text-center md:text-left"><div dangerouslySetInnerHTML={{ __html: sanitizeHtml(item) }}></div></span>
                   </>
                 ) : (
-                  <><FaRegTimesCircle className="text-black text-lg md:text-xl" /> <span className="text-[14px] md:text-[16px] font-[500] text-center md:text-left"><div dangerouslySetInnerHTML={{ __html: item }}></div></span></>
+                  <><FaRegTimesCircle className="text-black text-lg md:text-xl" /> <span className="text-[14px] md:text-[16px] font-[500] text-center md:text-left"><div dangerouslySetInnerHTML={{ __html: sanitizeHtml(item) }}></div></span></>
                 )}
               </div>
             </div>
@@ -125,7 +126,7 @@ const ComparingTable = ({
                 sec_title.length >= 20 ? `p-12` : `p-20`
               }`}
             >
-              <div dangerouslySetInnerHTML={{ __html: sec_title }}></div>
+              <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(sec_title) }}></div>
             </div>
           </div>
           {third_col.map((item, index) => (

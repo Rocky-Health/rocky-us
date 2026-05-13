@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { logger } from "@/utils/devLogger";
 import Loader from "@/components/Loader";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 import MoreQuestions from "@/components/MoreQuestions";
 import Section from "@/components/utils/Section";
 import TermsNav from "./TermsNav";
@@ -104,7 +105,7 @@ export default function SimpleTermsContent() {
         <div className="mb-10 md:mb-14">
           <div
             className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9] wordpress-content max-w-none"
-            dangerouslySetInnerHTML={{ __html: professionalDisclosure.content }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(professionalDisclosure.content) }}
           />
         </div>
       )}
@@ -122,7 +123,7 @@ export default function SimpleTermsContent() {
               >
                 <div
                   className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9] wordpress-content max-w-none"
-                  dangerouslySetInnerHTML={{ __html: section.content }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(section.content) }}
                 />
               </div>
             ))}
@@ -139,7 +140,7 @@ export default function SimpleTermsContent() {
           <div className="terms-fallback">
             <div
               className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9] wordpress-content max-w-none"
-              dangerouslySetInnerHTML={{ __html: termsData.rawContent }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(termsData.rawContent) }}
             />
           </div>
         )}

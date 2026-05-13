@@ -33,7 +33,8 @@
     "react-tailwindcss-datepicker": "^2.0.0",
     "react-toastify": "^11.0.3",
     "stripe": "^19.1.0",
-    "swiper": "^12.1.2"
+    "swiper": "^12.1.2",
+    "xss": "^1.0.15"
   },
   "overrides": {
     "request": {

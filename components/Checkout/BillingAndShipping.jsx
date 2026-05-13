@@ -273,6 +273,7 @@ const BillingAndShipping = ({
         </>
       )}
       <div
+        data-hm-ignore
         className={
           isGlp2
             ? "p-4 md:p-6 w-full rounded-[16px] border border-solid border-[#E2E2E1] mb-4 bg-white"

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { IoClose } from "react-icons/io5";
 import { useState, useEffect } from "react";
 import { formatPriceUI } from "@/utils/priceFormatter";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 export default function MobileCartPopup({
   open,
@@ -104,7 +105,7 @@ export default function MobileCartPopup({
                 <div className="flex-1">
                   <div className="text-[#212121] text-sm">
                     <span
-                      dangerouslySetInnerHTML={{ __html: item.name }}
+                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.name) }}
                     ></span>
                   </div>
                   {item.name === "Body Optimization Program" ? (

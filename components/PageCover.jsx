@@ -3,6 +3,7 @@ import Link from "next/link";
 import ListWithIcons from "@/components/ListWithIcons";
 import { FaArrowRightLong } from "react-icons/fa6";
 import ProudPartner from "./ProudPartner";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 const PageCover = ({ data, items }) => {
   return (
@@ -16,14 +17,14 @@ const PageCover = ({ data, items }) => {
 
         {data.subtitle && (
           <div
-            dangerouslySetInnerHTML={{ __html: data.subtitle }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.subtitle) }}
             className="text-[32px] lg:text-[48px] headers-font leading-[36.8px] md:leading-[53.52px] font-[550] tracking-[-0.01em] md:tracking-[-0.02em] mb-4 md:mb-8 capitalize"
           ></div>
         )}
         {data.upperNote && (
           <div
             className="text-[14px] md:text-[16px] md:tracking-[-0.02em] mb-[24px] md:mb-[40px] w-[300px] md:w-[390px] h-[58px]"
-            dangerouslySetInnerHTML={{ __html: data.upperNote }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.upperNote) }}
           ></div>
         )}
         {items && <ListWithIcons items={items} />}
@@ -53,7 +54,7 @@ const PageCover = ({ data, items }) => {
         {data.note && (
           <div
             className="text-[12px] text-center mt-5 w-full md:w-[310px]"
-            dangerouslySetInnerHTML={{ __html: data.note }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.note) }}
           ></div>
         )}
         <div className="hidden md:block">

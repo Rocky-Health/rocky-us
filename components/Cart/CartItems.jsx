@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import { canRemoveItem } from "@/lib/cart/cartService";
 import { analyticsService } from "@/utils/analytics/analyticsService";
 import { formatPriceUI } from "@/utils/priceFormatter";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 const COMPOUNDED_ORIGINAL_PRICES = {
   tirzepatide: "$389",
@@ -375,7 +376,7 @@ const CartItem = ({ item, setCartItems, allItems, hasCoupon = false }) => {
             </div>
             <div>
               <p className="text-[14px] font-[500] leading-[19.6px] mb-[2px]">
-                <span dangerouslySetInnerHTML={{ __html: item.name }}></span>{" "}
+                <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.name) }}></span>{" "}
                 {!isSubscriptionWithFallback &&
                   item.variation[0] &&
                   `(${item.variation[0]?.value})`}

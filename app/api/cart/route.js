@@ -105,7 +105,7 @@ export async function GET() {
         ? axios
             .get(`${BASE_URL}/wp-json/wc/v3/customers/${userId.value}`, {
               headers: {
-                Authorization: process.env.ADMIN_TOKEN || encodedCredentials.value,
+                Authorization: encodedCredentials.value,
               },
             })
             .catch((addressError) => {

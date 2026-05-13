@@ -2,6 +2,7 @@
 
 import React from "react";
 import { FaArrowRight } from "react-icons/fa";
+import { sanitizeSvg } from "@/utils/sanitizeHtml";
 
 const LOW_RATE = 0.015;
 const HIGH_RATE = 0.01666;
@@ -116,7 +117,7 @@ const Glp2PaceQuestionStep = ({ userData, setUserData, onContinue }) => {
                     className={`w-[94px] h-[94px] flex items-center justify-center text-[#3D342F] [&_svg]:w-full [&_svg]:h-full ${
                       checked ? "text-[#AE7E56]" : "text-[#3D342F]"
                     }`}
-                    dangerouslySetInnerHTML={{ __html: option.svg }}
+                    dangerouslySetInnerHTML={{ __html: sanitizeSvg(option.svg) }}
                   />
                 </div>
 

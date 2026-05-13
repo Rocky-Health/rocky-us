@@ -7,6 +7,7 @@ import { ProductImage } from "@/components/Product";
 import { useAddItemToCart } from "@/lib/cart/cartHooks";
 import { useRouter } from "next/navigation";
 import { formatPriceUI } from "@/utils/priceFormatter";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 import CartPopup from "../Cart/CartPopup";
 import { addRequiredConsultation } from "@/utils/requiredConsultation";
 import {
@@ -300,9 +301,10 @@ const ZonnicProductDetails = ({ product, variations, isLoading }) => {
             <div
               className="text-gray-800 mb-5"
               dangerouslySetInnerHTML={{
-                __html:
+                __html: sanitizeHtml(
                   product?.description ||
                   "ZONNIC nicotine pouches offer convenient Nicotine Replacement therapy to help control cravings and ease withdrawal symptoms. Designed to support smoking cessation, they provide a nicotine alternative, reducing cravings and cigarette use.",
+                ),
               }}
             />
             <p className="text-sm text-[#212121] mt-5 font-[400]">

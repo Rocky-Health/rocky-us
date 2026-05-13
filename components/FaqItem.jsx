@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 const FaqItem = ({
   question,
@@ -18,7 +19,7 @@ const FaqItem = ({
         className="w-full flex justify-between items-center py-4 text-left text-[16px] lg:text-lg font-[500] hover:text-gray-700 transition"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span dangerouslySetInnerHTML={{ __html: question }} />
+        <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(question) }} />
         <span
           className={`text-2xl transform transition-transform duration-300 ${
             isOpen ? "rotate-45" : ""
@@ -34,7 +35,7 @@ const FaqItem = ({
       >
         <div
           className="text-gray-700 text-start"
-          dangerouslySetInnerHTML={{ __html: answer }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(answer) }}
         />
       </div>
     </div>

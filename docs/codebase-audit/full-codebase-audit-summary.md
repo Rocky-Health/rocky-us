@@ -169,6 +169,29 @@ This document consolidates findings from a comprehensive static-analysis audit o
 
 These tickets are tracked under the same TK-422 epic but were **not** part of the 96 static-analysis findings above. They surfaced separately and are recorded here so this doc remains the single navigation index for the epic.
 
+### TK-447–453 — May 2026 HAR audit gap tickets
+
+- **Source spec:** [`har-audit-gap-tickets.md`](./har-audit-gap-tickets.md)
+- **Severity:** mix of P1 (TK-447, TK-448, TK-449, TK-450, TK-452) and P2 (TK-451, TK-453)
+- **Domain:** Performance, Security/Compliance, Tracking
+- **Effort:** ~7 days total (5× S + 1× M + 1 QA day)
+- **Source:** Full-funnel HAR capture May 2026 (1,015 requests, 28 MB third-party)
+- **Why not in the April audit:** April audit was static analysis only. HAR capture surfaced
+  runtime behavior (triple video download, event firing frequency, checkout vendor load) that
+  static analysis cannot detect.
+
+| Ticket | Title | Severity |
+|--------|-------|----------|
+| TK-447 | Mask PII fields from Heatmap.com on checkout (`data-hm-ignore`) | P1 compliance | **DONE** ✓ |
+| TK-448 | Remove BugHerd entirely (all files + both API keys rotated) | P1 security | **DONE** ✓ |
+| TK-449 | Migrate Canadian S3 video to BunnyCDN; fix triple-load | P1 perf |
+| TK-450 | Checkout vendor gating: remove Convert + AWIN; defer Stripe | P1 perf |
+| TK-451 | Make `update-order-status` non-blocking on Place Order | P2 UX |
+| TK-452 | QA and confirm RKY_FLW_SC fires end-to-end in WL funnel | P1 tracking |
+| TK-453 | Fix `source_data_captured` firing 12× per session | P2 analytics |
+
+---
+
 ### TK-446 — Northbeam `order_tags` overhaul
 
 - **Source spec:** [`northbeam-tagging-overhaul.md`](./northbeam-tagging-overhaul.md)

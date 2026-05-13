@@ -11,6 +11,7 @@ import { canRemoveItem } from "@/lib/cart/cartService";
 import MobileCartPopup from "./MobileCartPopup";
 import { IoIosCart } from "react-icons/io";
 import { formatPriceUI } from "@/utils/priceFormatter";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 const CartIcon = ({ handleToggle }) => {
   const [cartItems, setCartItems] = useState([]);
@@ -364,7 +365,7 @@ const CartItem = ({ item, refreshCart, isLocalCart, allItems }) => {
       </div>
       <div className="text-sm font-semibold flex-grow">
         <h5 className="text-wrap max-w-[150px]">
-          <span dangerouslySetInnerHTML={{ __html: item.name }}></span>{" "}
+          <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.name) }}></span>{" "}
           {!isSubscription &&
             !isLocalCart &&
             item.variation &&

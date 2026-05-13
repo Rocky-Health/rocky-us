@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
-import { initializeAttribution, captureAttribution, getAttributionData } from "@/utils/sourceAttribution";
+import { useEffect } from "react";
+import { initializeAttribution, getAttributionData } from "@/utils/sourceAttribution";
 import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
 import { logger } from "@/utils/devLogger";
 
@@ -33,7 +32,6 @@ const deriveDataLayerSourceName = (fields) => {
 /**
  * Push attribution data to dataLayer for GTM visibility.
  * Fires a structured "source_data_captured" event and flattened persistent variables.
- * Safe to call on every route change — GTM picks up the latest values.
  */
 const pushAttributionToDataLayer = () => {
   if (typeof window === "undefined") return;
@@ -112,44 +110,31 @@ const pushAttributionToDataLayer = () => {
   }
 };
 
+// Window-scoped guard so the push fires exactly once per browser session,
+// surviving React 18 Strict Mode double-mount and any future component remounts.
+const SESSION_FLAG = "__rk_attribution_pushed";
+
 /**
  * AttributionTracker Component
- * Initializes and captures traffic source attribution data
- * Tracks UTM parameters, click IDs, AWIN affiliate tracking, and referrers
- * Surfaces attribution data to GTM via dataLayer on every route change
+ * Captures traffic source attribution data once per session and surfaces it to
+ * GTM via dataLayer. First-touch attribution is captured on session entry
+ * (full-page load) — mid-session SPA navigations intentionally do not re-push,
+ * to avoid inflating GA4 event counts and overwriting first-touch data.
  */
 export default function AttributionTracker() {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const initialized = useRef(false);
-
-  // Initialize attribution tracking on mount
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window[SESSION_FLAG]) return;
+    window[SESSION_FLAG] = true;
+
     try {
       initializeAttribution();
       logger.log("[Attribution] Tracker initialized");
-      // Push attribution to dataLayer on first mount
       pushAttributionToDataLayer();
-      initialized.current = true;
     } catch (error) {
       logger.error("[Attribution] Failed to initialize:", error);
     }
   }, []);
 
-  // Capture attribution on route changes (for SPA navigation)
-  useEffect(() => {
-    try {
-      captureAttribution();
-      // Re-push attribution on every route change so GTM always has fresh data
-      if (initialized.current) {
-        pushAttributionToDataLayer();
-      }
-    } catch (error) {
-      logger.error("[Attribution] Failed to capture on navigation:", error);
-    }
-  }, [pathname, searchParams]);
-
-  // This component doesn't render anything
   return null;
 }
-

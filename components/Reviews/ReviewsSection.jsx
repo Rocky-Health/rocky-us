@@ -125,6 +125,7 @@ const ReviewsSection = () => {
               data-theme="light"
               data-stars="4,5"
               data-review-languages="en"
+              style={{ minHeight: "700px" }}
             >
               <a
                 href="https://www.trustpilot.com/review/myrocky.ca"

@@ -11,6 +11,7 @@ import { ProgressBar } from "@/components/EdQuestionnaire/ProgressBar";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import QuestionnaireNavbar from "./QuestionnaireNavbar";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 const GenericPopup = ({
   isOpen,
@@ -213,7 +214,7 @@ const GenericPopup = ({
                 >
                   {popupConfig.titleIsHtml ? (
                     <span
-                      dangerouslySetInnerHTML={{ __html: popupConfig.title }}
+                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(popupConfig.title) }}
                     />
                   ) : (
                     popupConfig.title
@@ -259,7 +260,7 @@ const GenericPopup = ({
                         <p
                           key={index}
                           className={index > 0 ? "mt-4" : ""}
-                          dangerouslySetInnerHTML={{ __html: line }}
+                          dangerouslySetInnerHTML={{ __html: sanitizeHtml(line) }}
                         />
                       ))}
                 </div>
@@ -269,7 +270,7 @@ const GenericPopup = ({
                 <div>
                   {typeof popupConfig.content === "string" ? (
                     <div
-                      dangerouslySetInnerHTML={{ __html: popupConfig.content }}
+                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(popupConfig.content) }}
                     />
                   ) : (
                     popupConfig.content
