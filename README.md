@@ -174,6 +174,6 @@ npm run dev
 }
 ```
 
-## License
 
+## License
 Proprietary. All rights reserved.
