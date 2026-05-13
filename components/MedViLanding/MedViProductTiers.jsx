@@ -10,44 +10,49 @@ import { useRef } from "react";
 
 const TierCard = ({ tier, ctaHref }) => {
   return (
-    <div className="sm:min-w-[340px] min-w-[300px] w-full rounded-[40px] pb-4  overflow-visible group bg-[#F5F4EF44] shadow">
-      <div className="relative w-full h-[300px] bg-[linear-gradient(180deg,#F0EEEA_0%,#F0EEEA_60%,rgba(255,255,255,0)_60%,rgba(255,255,255,0)_100%)] rounded-t-[40px] overflow-visible">
-        <div className="absolute inset-0 -top-10 -left-4 -right-4 flex items-center justify-center">
-          <CustomImage
-            src={tier.image}
-            alt={tier.name}
-            width={400}
-            height={500}
-            className="object-contain drop-shadow-lg "
-          />
-        </div>
-        {/* {tier.inStock && (
-                    <span className="absolute top-4 left-4 bg-[#4CAF50] text-white text-[12px] font-[600] px-3 py-1 rounded-md z-10">
-                        In Stock
-                    </span>
-                )} */}
+    <div className="sm:min-w-[340px] min-w-[300px] w-full group relative pt-10">
+      {/* Image sits outside the border-radius container so it isn't clipped by iOS Safari's
+          overflow:visible + border-radius bug */}
+      <div className="absolute top-0 left-0 right-0 flex items-center justify-center z-10 pointer-events-none">
+        <CustomImage
+          src={tier.image}
+          alt={tier.name}
+          width={400}
+          height={300}
+          className="object-contain drop-shadow-lg"
+        />
       </div>
 
-      <div className="p-6 text-center">
-        <p className="poppins-font text-[#AE7E56] text-sm font-[400] mb-2">
-          Starting at{" "}
-          <span className=" font-[500]  headers-font">
-            ${formatPrice(tier.price)}
-          </span>
-        </p>
-        <h3 className="headers-font text-black text-[24px]  leading-[115%] mb-3">
-          {tier.name}
-        </h3>
-        <p className="poppins-font text-[rgba(0,0,0,0.60)] text-sm font-[400] mb-5">
-          {tier.subtitle}
-        </p>
+      <div className="rounded-[40px] pb-4 bg-[#F5F4EF44] shadow overflow-hidden">
+        <div className="w-full h-[300px] bg-[linear-gradient(180deg,#F0EEEA_0%,#F0EEEA_60%,rgba(255,255,255,0)_60%,rgba(255,255,255,0)_100%)] rounded-t-[40px]">
+          {/* {tier.inStock && (
+                      <span className="absolute top-4 left-4 bg-[#4CAF50] text-white text-[12px] font-[600] px-3 py-1 rounded-md z-10">
+                          In Stock
+                      </span>
+                  )} */}
+        </div>
 
-        <Link
-          href={ctaHref}
-          className="bg-black text-white rounded-full w-full text-[14px] font-[600] tracking-[0.5px] uppercase flex items-center justify-center py-3 hover:translate-y-[-3px] transition-all duration-300"
-        >
-          Get Started
-        </Link>
+        <div className="p-6 text-center">
+          <p className="poppins-font text-[#AE7E56] text-sm font-[400] mb-2">
+            Starting at{" "}
+            <span className=" font-[500]  headers-font">
+              ${formatPrice(tier.price)}
+            </span>
+          </p>
+          <h3 className="headers-font text-black text-[24px]  leading-[115%] mb-3">
+            {tier.name}
+          </h3>
+          <p className="poppins-font text-[rgba(0,0,0,0.60)] text-sm font-[400] mb-5">
+            {tier.subtitle}
+          </p>
+
+          <Link
+            href={ctaHref}
+            className="bg-black text-white rounded-full w-full text-[14px] font-[600] tracking-[0.5px] uppercase flex items-center justify-center py-3 hover:translate-y-[-3px] transition-all duration-300"
+          >
+            Get Started
+          </Link>
+        </div>
       </div>
     </div>
   );
@@ -81,7 +86,7 @@ const MedViProductTiers = ({ ctaHref = "#" }) => {
           className="flex gap-2 md:gap-4 items-start overflow-x-auto snap-x snap-mandatory no-scrollbar pt-12 pb-4"
         >
           {productTiers.map((tier, index) => (
-            <TierCard tier={tier} ctaHref={ctaHref} />
+            <TierCard key={index} tier={tier} ctaHref={ctaHref} />
           ))}
         </div>
       </div>
