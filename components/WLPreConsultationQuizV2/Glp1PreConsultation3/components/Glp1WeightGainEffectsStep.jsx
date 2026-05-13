@@ -191,7 +191,7 @@ const Glp1WeightGainEffectsStep = ({ userData, setUserData, onContinue }) => {
                     type="button"
                     disabled={!selected.length}
                     onClick={handleNext}
-                    className="mt-10 flex h-[52px] w-full max-w-3xl items-center justify-center gap-2 rounded-full font-sans text-base font-medium text-white transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45"
+                    className="mt-10 flex h-[52px] w-full max-w-4xl items-center justify-center gap-2 rounded-full font-sans text-base font-medium text-white transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45"
                     style={{ backgroundColor: ACCENT }}
                 >
                     <span>Next</span>

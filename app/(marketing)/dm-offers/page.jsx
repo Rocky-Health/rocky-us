@@ -12,6 +12,7 @@ import DmOffersNav from "@/components/DmOffers/DmOffersNav";
 import ReviewsSection from "@/components/ReviewsSection";
 import DmOffersRockyInTheNews from "@/components/DmOffers/DmOffersRockyInTheNews";
 import Section from "@/components/utils/Section";
+import DmOffersPageLoader from "@/components/DmOffers/DmOffersPageLoader";
 
 export const metadata = {
     title: "Spring Offers | Rocky",
@@ -21,6 +22,7 @@ export const metadata = {
 
 export default function DmOffersPage() {
     return (
+        <DmOffersPageLoader>
         <main>
             <DmSpringPromoHeader />
             <DmOffersNav />
@@ -30,7 +32,7 @@ export default function DmOffersPage() {
             <DmOffersHungerSignalsSection />
             <DmOffersTestimonialsCarouselBlock />
             <DmOffersMedicationTimelineSection />
-            <Section bg="bg-[#FAF3EF] !mb-2">
+            <Section bg="bg-[#FAF3EF] !mb-0">
                 <ReviewsSection />
             </Section>
             <Section bg="bg-gray-100 sm:!px-5 !px-0 ">
@@ -43,5 +45,6 @@ export default function DmOffersPage() {
 
             <Footer />
         </main>
+        </DmOffersPageLoader>
     );
 }

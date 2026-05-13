@@ -214,7 +214,7 @@ export default function DmOffersVimeoCarousel({
                             key={`${entry.src}-${index}`}
                             className="sm:w-[min(52vw,300px)] w-full sm:px-0 px-8 shrink-0 snap-center md:w-[268px] lg:w-[300px]"
                         >
-                            <div className="relative aspect-[9/16] w-full overflow-hidden rounded-3xl bg-neutral-950 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.35)] ring-1 ring-neutral-950/10">
+                            <div className="relative aspect-[9/16] w-full overflow-hidden rounded-3xl bg-neutral-950  ring-1 ring-neutral-950/10">
                                 <CustomImage
                                     src={entry.src}
                                     alt={

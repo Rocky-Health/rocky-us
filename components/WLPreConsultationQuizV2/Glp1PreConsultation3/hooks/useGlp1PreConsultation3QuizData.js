@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { logger } from "@/utils/devLogger";
 
 const getStorageKeys = () => ({
-  STORAGE_KEY: "glp1-pc3-preqiz-data",
-  ESSENTIAL_CONSUL_KEY: "glp1-pc3-essential-consul",
+  STORAGE_KEY: "new-bo-preqiz-data",
+  ESSENTIAL_CONSUL_KEY: "new-bo-essential-consul",
 });
 
 export const useGlp1PreConsultation3QuizData = () => {
