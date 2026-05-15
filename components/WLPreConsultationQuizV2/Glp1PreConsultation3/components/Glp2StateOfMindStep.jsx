@@ -35,10 +35,10 @@ const Glp2StateOfMindStep = ({ userData, setUserData, config, onContinue }) => {
         config?.stateOfMindMotivationTemplate != null
             ? String(config.stateOfMindMotivationTemplate).replace(
                   /\{goal\}/g,
-                  goalPart ? `${goalPart}lbs` : "your goal weight",
+                  goalPart ? `${goalPart} lbs` : "your goal weight",
               )
             : goalPart
-              ? `How motivated are you to reach ${goalPart}lbs?`
+              ? `How motivated are you to reach ${goalPart} lbs?`
               : "How motivated are you to reach your goal weight?";
 
     const handleSelect = (value) => {

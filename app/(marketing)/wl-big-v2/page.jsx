@@ -23,28 +23,28 @@ export const metadata = {
 export default function DmOffersPage() {
     return (
         <DmOffersPageLoader>
-        <main>
-            <DmSpringPromoHeader />
-            <DmOffersNav />
-            <DmOffersHero />
-            <DmOffersRockyInTheNews />
-            <DmOffersGoalSection />
-            <DmOffersHungerSignalsSection />
-            <DmOffersTestimonialsCarouselBlock />
-            <DmOffersMedicationTimelineSection />
-            <Section bg="bg-[#FAF3EF] !mb-0">
-                <ReviewsSection />
-            </Section>
-            <Section bg="bg-gray-100 sm:!px-5 !px-0 ">
-                <DmOffersInStockMedicationsSection />
-            </Section>
-            <Section bg="bg-white">
-                <DmOffersFaqsSection />
-            </Section>
-            <DmOffersGetStartedCtaSection />
+            <main>
+                {/* <DmSpringPromoHeader />
+            <DmOffersNav /> */}
+                <DmOffersHero />
+                <DmOffersRockyInTheNews />
+                <DmOffersGoalSection />
+                <DmOffersHungerSignalsSection />
+                <DmOffersTestimonialsCarouselBlock />
+                <DmOffersMedicationTimelineSection />
+                <Section bg="bg-[#FAF3EF] !mb-0">
+                    <ReviewsSection subheading="Over 350,000 customers. Here's what they're saying about their weight loss with MyRocky." />
+                </Section>
+                <Section bg="bg-gray-100 sm:!px-5 !px-0 ">
+                    <DmOffersInStockMedicationsSection />
+                </Section>
+                <Section bg="bg-white">
+                    <DmOffersFaqsSection />
+                </Section>
+                <DmOffersGetStartedCtaSection />
 
-            <Footer />
-        </main>
+                {/* <Footer /> */}
+            </main>
         </DmOffersPageLoader>
     );
 }

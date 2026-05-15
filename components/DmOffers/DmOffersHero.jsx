@@ -114,7 +114,7 @@ const FEATURE_ITEMS = [
     },
     {
         Icon: FeatureIconTruckCheck,
-        text: "Free shipping. Arrives in 1–2 days.",
+        text: "Free shipping. Arrives in 1-2 days.",
     },
 ];
 
@@ -170,14 +170,14 @@ export default function DmOffersHero({
                         <div className="mb-4 flex  items-center gap-1 text-[13px] text-[#3d4556] md:text-[14px]">
                             <StarRow />
                             <span className="font-poppins font-normal sm:text-sm text-xs">
-                                (4.8) Excellent! Over 350,000+ happy customers
+                                (4.4) Excellent! Over 350,000+ happy customers
                             </span>
                         </div>
 
                         <div className="flex justify-between items-center">
                             <div className="lg:w-full w-[60%]">
                                 <h1 className="headers-font text-3xl font-extrabold leading-[100%] md:leading-[1.12] tracking-wide text-gray-900 sm:text-5xl lg:text-6xl lg:leading-[1.1] ">
-                                    Lose 1-2lbs per week!
+                                    Lose 1-2 lbs per week!
                                     <p className="font-poppins text-base font-normal text-gray-900 lg:hidden inline ps-2 leading-[1] md:leading-[1.12]">
                                         The proven way to lose 15% of your body
                                         weight fast!

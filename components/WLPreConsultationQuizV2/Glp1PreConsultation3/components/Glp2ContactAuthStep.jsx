@@ -9,6 +9,7 @@ import { usePassword } from "@/components/WLPreConsultationQuizV2/contexts/Passw
 import PhoneInput, { isValidPhone } from "@/components/PhoneInput";
 import { encryptPasswordWithServerKey } from "@/utils/encryptPasswordWithServerKey";
 import CustomImage from "@/components/utils/CustomImage";
+import TrustpilotWidget from "@/components/utils/TrustpilotWidget";
 
 const isValidEmail = (e) => {
     if (!e || typeof e !== "string") return false;
@@ -443,13 +444,14 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
                 </form>
 
                 <div className="mx-auto mt-16 flex w-full max-w-[300px]  aspect-[16/2] justify-center px-2">
-                    <CustomImage
+                    {/* <CustomImage
                         src="/glp-3-quiz/trustpilot.png"
                         alt="Excellent 4.6 on Trustpilot, 180,000+ happy customers, and Made in the USA premium quality"
                         width={520}
                         height={400}
                         className="h-auto w-full !object-contain object-center"
-                    />
+                    /> */}
+                    <TrustpilotWidget />
                 </div>
 
                 <div className="mx-auto mt-8 flex w-full max-w-[120px] justify-center px-2">

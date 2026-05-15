@@ -54,10 +54,28 @@ export const layoutExemptRoutes = [
     "/bo5",
     "/glp2-offer-hero",
     "/glp1-offer-hero",
-    "/wl-big-v2",
     "/wl-big-v1",
     "/glp2-pre-consultation-2",
+    "/glp1-pre-consultation-3",
 ];
+
+// Routes where the Zendesk chat widget should be hidden
+export const zendeskHiddenRoutes = ["/wl-big-v2", "/glp1-pre-consultation-3"];
+
+/**
+ * Checks if the Zendesk widget should be hidden on the current path
+ * @param {string} path - The current path
+ * @returns {boolean}
+ */
+export function shouldHideZendesk(path) {
+    if (!path) return false;
+    const normalizedPath = path.split("?")[0].replace(/\/$/, "");
+
+    return zendeskHiddenRoutes.some(
+        (route) =>
+            normalizedPath === route || normalizedPath.startsWith(`${route}/`),
+    );
+}
 
 /**
  * Checks if the current path should use a minimal layout without header/footer

@@ -85,7 +85,7 @@ const Glp1HowGlp1WorksStep = ({ onContinue, onQuizChromeVisibilityChange }) => {
                 </button>
             </div>
 
-            <DmOffersRockyInTheNews />
+            {/* <DmOffersRockyInTheNews /> */}
         </div>
     );
 };

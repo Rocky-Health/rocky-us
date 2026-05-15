@@ -22,7 +22,7 @@ const Glp2GoalWeightStep = ({ userData, setUserData, onContinue }) => {
                 {bmi && (
                     <p className="headers-font mb-6 text-3xl leading-[140%]">
                         <span className="font-semibold text-[#4A916C]">
-                            Perfect!
+                            Great — you qualify
                         </span>{" "}
                         <span className="text-[#251F20]">
                             With a BMI of {bmi}, we can continue.

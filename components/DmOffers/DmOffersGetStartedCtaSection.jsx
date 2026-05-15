@@ -15,14 +15,14 @@ export default function DmOffersGetStartedCtaSection({
                     {eyebrow}
                 </p>
                 <h2 className="headers-font mt-5 text-balance  font-bold leading-[1.12] text-neutral-950 md:mt-6 text-5xl md:leading-[1.08] lg:text-[3.35rem]">
-                    Ready to Stop Food Cravings?
+                    Ready to stop food cravings?{" "}
                     <br className="md:block hidden" />
-                    Get $150 OFF your
-                    <br className="md:block hidden" /> prescription instantly!
+                    get $150 off your <br className="md:block hidden" />{" "}
+                    prescription instantly!
                 </h2>
                 <p className="font-poppins text-gray-600 max-w-[460px] mx-auto sm:mt-8 mt-6 sm:text-base text-sm">
                     It&apos;s not cheating, it&apos;s science! Lose up to 15% of
-                    your body weight (1–2 lbs per week) with medically
+                    your body weight (1-2 lbs per week) with medically
                     supervised safe &amp; effective treatment from the comfort
                     of your home.*
                 </p>

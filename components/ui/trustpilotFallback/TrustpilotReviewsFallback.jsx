@@ -4,7 +4,9 @@ import React, { useState } from "react";
 import Image from "next/image";
 import HomeHeading from "@/components/home/HomeHeading";
 
-const TrustpilotReviewsFallback = () => {
+const TrustpilotReviewsFallback = ({
+    subheading = "Hear from real people who trusted MyRocky with their health.",
+}) => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     const reviews = [
@@ -83,7 +85,8 @@ const TrustpilotReviewsFallback = () => {
                 />
 
                 <p className="mt-4 text-lg text-center mb-8">
-                    Hear from real people who trusted MyRocky with their health.
+                    {subheading ||
+                        "Hear from real people who trusted MyRocky with their health."}
                 </p>
 
                 {/* Trustpilot Header */}

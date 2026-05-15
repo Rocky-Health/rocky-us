@@ -1,8 +1,10 @@
-import Image from "next/image";
+"use client";
+
 import Link from "next/link";
 import { FaRegCircleCheck } from "react-icons/fa6";
 import { MdDoNotDisturbAlt } from "react-icons/md";
 import FeaturesNotAnimated from "./FeaturesNotAnimated";
+import TrustpilotWidget from "../utils/TrustpilotWidget";
 
 const DEFAULT_FEATURE_CARDS = [
     {
@@ -44,7 +46,7 @@ export default function DmOffersFeaturesCtaBlock({
     getStartedHref = "/glp1-pre-consultation-3",
     pricingHref = "/glp1-pre-consultation-3",
     trustItems = DEFAULT_TRUST_ITEMS,
-    trustpilotSrc = "/dm-offers/trustpilot.png",
+    trustpilotSrc = "/dm-offers/trustpilot2.png",
     trustpilotAlt = "Trustpilot rating",
     hideFeatures = false,
     getStartedText = "Get started",
@@ -89,15 +91,11 @@ export default function DmOffersFeaturesCtaBlock({
                     ))}
                 </div>
 
-                <div className="w-full px-4">
-                    <Image
-                        src={trustpilotSrc}
-                        alt={trustpilotAlt}
-                        width={270}
-                        height={60}
-                        className="mx-auto block h-auto w-full max-w-[300px] pt-4"
-                    />
-                </div>
+                {/* TrustPilot Logos */}
+                <TrustpilotWidget
+                    fallbackSrc={trustpilotSrc}
+                    fallbackAlt={trustpilotAlt}
+                />
             </div>
         </>
     );

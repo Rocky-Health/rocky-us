@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { logger } from "@/utils/devLogger";
 import CustomImage from "@/components/utils/CustomImage";
 import { FaArrowRight } from "react-icons/fa";
+import TrustpilotWidget from "@/components/utils/TrustpilotWidget";
 
 const Glp2BMICalculatorStep = ({
     userData,
@@ -316,16 +317,17 @@ const Glp2BMICalculatorStep = ({
                     </button>
                 </div>
 
-                <div className="mx-auto mt-10 flex w-full max-w-xl flex-col items-center gap-6 rounded-2xl bg-[#F9F7F2] px-4 py-8 sm:px-8">
-                    <div className="flex flex-col items-center gap-6 sm:flex-row sm:justify-center sm:gap-8">
-                        <div className="relative h-auto w-[min(300px,85vw)] shrink-0 aspect-[30/2]">
+                <div className="mx-auto mt-10 flex w-full max-w-xl flex-col items-center gap-2  px-4 py-8 sm:px-8">
+                    <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center ">
+                        {/* <div className="relative h-auto w-[min(300px,85vw)] shrink-0 aspect-[30/2]">
                             <CustomImage
                                 src="/glp-3-quiz/trustpilot.png"
                                 alt="Excellent rating on Trustpilot"
                                 fill
                                 className="object-cover object-center w-full h-full"
                             />
-                        </div>
+                        </div> */}
+                        <TrustpilotWidget />
                     </div>
                     <div className="relative h-[79px] w-[73px] shrink-0">
                         <CustomImage

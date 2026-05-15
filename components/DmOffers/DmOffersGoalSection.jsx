@@ -120,7 +120,7 @@ function WeightShedCalculator() {
     return (
         <div className="grow w-full rounded-3xl border border-neutral-100 bg-white px-6 py-10 shadow-[0_24px_60px_-32px_rgba(0,0,0,0.18)] lg:w-auto lg:px-10 lg:py-20">
             <h3 className="sm:text-3xl text-2xl lg:text-4xl font-bold text-gray-900 mb-4 tracking-tight sm:text-left text-center">
-                Let&apos;s See How much weight can you shed by next spring?
+                Let&apos;s see how much weight can you shed by next spring?
             </h3>
             <hr className="mt-5 border-neutral-200" />
 
