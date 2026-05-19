@@ -5,6 +5,7 @@ import { quizConfig } from "../config/quizConfig";
 import { logger } from "@/utils/devLogger";
 import { wlFlowAddToCart } from "@/utils/flowCartHandler";
 import { addRequiredConsultation } from "@/utils/requiredConsultation";
+import { fireEverFlowConversion } from "@/components/EverFlow/EverFlowScript";
 
 export const useGLP1Flow = () => {
   const {
@@ -79,6 +80,12 @@ export const useGLP1Flow = () => {
       alert("Please select a product to continue");
       return;
     }
+
+    fireEverFlowConversion({
+      network: "rcr73qtl",
+      offerId: 5094,
+      eventId: 6227,
+    });
 
     const productVariationMap =
       quizConfig.planVariationIds?.[String(selectedProduct.id)] || {};

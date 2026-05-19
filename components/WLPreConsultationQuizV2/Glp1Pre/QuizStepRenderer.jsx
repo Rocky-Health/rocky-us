@@ -5,7 +5,6 @@ import Glp2ContactAuthStep from "../Glp2PreConsultation/components/Glp2ContactAu
 import Glp2TreatmentAndPlanStep from "../Glp2PreConsultation/components/Glp2TreatmentAndPlanStep";
 import Glp1GenericQuestionStep from "./components/Glp1GenericQuestionStep";
 import { getProductRecommendation } from "../utils/recommendationEngine";
-import EverFlowScript from "@/components/EverFlow/EverFlowScript";
 
 const QuizStepRenderer = ({
   currentStep,
@@ -56,24 +55,18 @@ const QuizStepRenderer = ({
       quizConfig.recommendationRules,
     );
 
+    // EverFlow Quiz Completed (event 6227) fires from handlePlanStepCheckout
+    // in useGLP1Flow.js, not here — the planSelection step is never mounted
+    // because Glp2TreatmentAndPlanStep handles both product + plan inline and
+    // its Continue handler redirects straight to checkout.
     return (
-      <>
-        {stepConfig?.type === "planSelection" && (
-          <EverFlowScript
-            mode="event"
-            offerId={5094}
-            eventId={6227}
-            network="rcr73qtl"
-          />
-        )}
-        <Glp2TreatmentAndPlanStep
-          {...recommendation}
-          selectedProduct={selectedProduct}
-          setSelectedProduct={setSelectedProduct}
-          planOptionsByProduct={quizConfig.planOptions}
-          onContinue={handlePlanStepCheckout}
-        />
-      </>
+      <Glp2TreatmentAndPlanStep
+        {...recommendation}
+        selectedProduct={selectedProduct}
+        setSelectedProduct={setSelectedProduct}
+        planOptionsByProduct={quizConfig.planOptions}
+        onContinue={handlePlanStepCheckout}
+      />
     );
   }
 
