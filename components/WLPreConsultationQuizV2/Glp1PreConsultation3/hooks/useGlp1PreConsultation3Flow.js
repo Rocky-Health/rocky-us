@@ -4,6 +4,7 @@ import { glp1PreConsultation3Config } from "../config/glp1PreConsultation3Config
 import { logger } from "@/utils/devLogger";
 import { wlFlowAddToCart } from "@/utils/flowCartHandler";
 import { addRequiredConsultation } from "@/utils/requiredConsultation";
+import { fireEverFlowConversion } from "@/components/EverFlow/EverFlowScript";
 
 export const useGlp1PreConsultation3Flow = () => {
   const {
@@ -86,6 +87,12 @@ export const useGlp1PreConsultation3Flow = () => {
       alert("Please select a product to continue");
       return;
     }
+
+    fireEverFlowConversion({
+      network: "vyrov30g",
+      offerId: 5096,
+      eventId: 6231,
+    });
 
     const productVariationMap =
       glp1PreConsultation3Config.planVariationIds?.[
