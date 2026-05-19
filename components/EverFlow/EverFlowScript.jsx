@@ -10,6 +10,36 @@ const NETWORK_DOMAINS = {
 
 const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 
+// Imperative fire for conversions whose containing step never renders
+// (e.g. quiz-complete events that fire from a checkout handler that redirects
+// before a declarative EverFlowScript could mount). Assumes window.EF is
+// already on the page — true on every funnel page that previously mounted
+// an EverFlowScript Click or Start event.
+export function fireEverFlowConversion({ network, offerId, eventId }) {
+  if (process.env.NEXT_PUBLIC_EF_ENABLED !== "true") return;
+  if (typeof window === "undefined" || !window.EF) return;
+  if (!NETWORK_DOMAINS[network]) return;
+  if (!offerId) return;
+
+  const stateKey = `ef-fired:${network}:event:${offerId}:${eventId || ""}`;
+  try {
+    if (sessionStorage.getItem(stateKey)) return;
+    sessionStorage.setItem(stateKey, "1");
+  } catch (_) {
+    // sessionStorage may be unavailable — proceed without guard
+  }
+
+  try {
+    if (eventId) {
+      window.EF.conversion({ offer_id: offerId, event_id: eventId });
+    } else {
+      window.EF.conversion({ offer_id: offerId });
+    }
+  } catch (err) {
+    console.warn("[EverFlow] imperative fire failed:", err);
+  }
+}
+
 export default function EverFlowScript({ mode, offerId, eventId, network }) {
   const firedRef = useRef(false);
 
