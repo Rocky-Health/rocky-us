@@ -13,6 +13,7 @@ import ReviewsSection from "@/components/ReviewsSection";
 import DmOffersRockyInTheNews from "@/components/DmOffers/DmOffersRockyInTheNews";
 import Section from "@/components/utils/Section";
 import DmOffersPageLoader from "@/components/DmOffers/DmOffersPageLoader";
+import EverFlowScript from "@/components/EverFlow/EverFlowScript";
 
 export const metadata = {
     title: "Spring Offers | Rocky",
@@ -24,6 +25,7 @@ export default function DmOffersPage() {
     return (
         <DmOffersPageLoader>
         <main>
+            <EverFlowScript mode="click" offerId={5096} network="vyrov30g" />
             <DmSpringPromoHeader />
             <DmOffersNav />
             <DmOffersHero />

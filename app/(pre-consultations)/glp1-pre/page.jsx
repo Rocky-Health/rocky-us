@@ -2,6 +2,7 @@
 
 import React from "react";
 import GLP1Pre from "@/components/WLPreConsultationQuizV2/Glp1Pre/GLP1Pre";
+import EverFlowScript from "@/components/EverFlow/EverFlowScript";
 
 export default function Glp1Pre() {
   return (
@@ -91,6 +92,12 @@ export default function Glp1Pre() {
         }
       `}</style>
 
+      <EverFlowScript
+        mode="event"
+        offerId={5094}
+        eventId={6226}
+        network="rcr73qtl"
+      />
       <GLP1Pre />
     </main>
   );

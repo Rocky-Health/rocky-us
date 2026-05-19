@@ -19,6 +19,7 @@ import RockyInTheNews from "@/components/MedViLanding/RockyInTheNews";
 import Footer from "@/components/Footer/Footer";
 import Section from "@/components/utils/Section";
 import MedViFlashGuard from "@/components/MedViLanding/MedViFlashGuard";
+import EverFlowScript from "@/components/EverFlow/EverFlowScript";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +34,7 @@ export default function WlMedViPage() {
 
   return (
     <>
+      <EverFlowScript mode="click" offerId={5094} network="rcr73qtl" />
       <MedViFlashGuard />
       <MedViPromoBanner />
       <MedViNav ctaHref={ctaHref} />
