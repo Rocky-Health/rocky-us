@@ -2,6 +2,7 @@
 
 import React from "react";
 import Glp1PreConsultation3Flow from "@/components/WLPreConsultationQuizV2/Glp1PreConsultation3/Glp1PreConsultation3Flow";
+import EverFlowScript from "@/components/EverFlow/EverFlowScript";
 
 // Fork of glp2-pre-consultation-2; theme/behavior live under Glp1PreConsultation3 only.
 export default function Glp1PreConsultation3Page() {
@@ -91,6 +92,12 @@ export default function Glp1PreConsultation3Page() {
           display: none !important;
         }
       `}</style>
+      <EverFlowScript
+        mode="event"
+        offerId={5096}
+        eventId={6230}
+        network="vyrov30g"
+      />
       <Glp1PreConsultation3Flow />
     </main>
   );
