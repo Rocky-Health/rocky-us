@@ -5,6 +5,7 @@ import Glp2TreatmentAndPlanStep from "./components/Glp2TreatmentAndPlanStep";
 import Glp2DobStep from "./components/Glp2DobStep";
 import Glp2ContactAuthStep from "./components/Glp2ContactAuthStep";
 import { getProductRecommendation } from "../utils/recommendationEngine";
+import EverFlowScript from "@/components/EverFlow/EverFlowScript";
 
 const QuizStepRenderer = ({
   currentStep,
@@ -50,13 +51,23 @@ const QuizStepRenderer = ({
     );
 
     return (
-      <Glp2TreatmentAndPlanStep
-        {...recommendation}
-        selectedProduct={selectedProduct}
-        setSelectedProduct={setSelectedProduct}
-        planOptionsByProduct={glp1PreConsultation3Config.planOptions}
-        onContinue={handlePlanStepCheckout}
-      />
+      <>
+        {stepConfig?.type === "planSelection" && (
+          <EverFlowScript
+            mode="event"
+            offerId={5096}
+            eventId={6231}
+            network="vyrov30g"
+          />
+        )}
+        <Glp2TreatmentAndPlanStep
+          {...recommendation}
+          selectedProduct={selectedProduct}
+          setSelectedProduct={setSelectedProduct}
+          planOptionsByProduct={glp1PreConsultation3Config.planOptions}
+          onContinue={handlePlanStepCheckout}
+        />
+      </>
     );
   }
 
