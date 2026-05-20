@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 // categories are blocked at middleware level and must not be present here.
 const PIXEL_IDS = {
   ED: process.env.NEXT_PUBLIC_FB_PIXEL_ID_ED || "522677764108011",
-  WL: process.env.NEXT_PUBLIC_FB_PIXEL_ID_WL || "1451450365779499",
+  WL: process.env.NEXT_PUBLIC_FB_PIXEL_ID_WL || "1873491106559002",
   HL: process.env.NEXT_PUBLIC_FB_PIXEL_ID_HL || "754893718769214",
 };
 
