@@ -44,17 +44,17 @@ function computePace(weight, goalWeight) {
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
 
-/** Progress header with Rocky logo + step tabs */
+/** Progress header with MyRocky logo + step tabs */
 const ProgressHeader = () => {
   const steps = ["Questions", "Info", "Payment", "Confirmation"];
   return (
     <header className="glp2-v2-header w-full bg-white border-b border-[#EBEBEB] sticky top-0 z-50 flex items-center">
       <div className="max-w-[680px] w-full mx-auto px-5 py-3 flex items-center justify-between">
-        {/* Rocky Logo */}
+        {/* MyRocky Logo */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp"
-          alt="Rocky"
+          alt="MyRocky"
           className="h-7 w-auto object-contain"
         />
 

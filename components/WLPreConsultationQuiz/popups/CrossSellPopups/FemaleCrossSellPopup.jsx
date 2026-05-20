@@ -122,7 +122,7 @@ const femaleAddOnProducts = [
     // },
     // {
     //   id: "323576", // Dad Hat
-    //   name: "Rocky Dad Hat",
+    //   name: "MyRocky Dad Hat",
     //   price: "29.99",
     //   imageUrl:
     //     "https://mycdn.myrocky.com/wp-content/uploads/20241211132726/Copy-of-RockyHealth-15-scaled.webp",

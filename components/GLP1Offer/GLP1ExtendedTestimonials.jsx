@@ -106,7 +106,7 @@ const GLP1ExtendedTestimonials = () => {
             <span className="text-[#AE7E56]">raving about us.</span>
           </h2>
           <p className="poppins-font text-[rgba(0,0,0,0.70)] text-[16px] md:text-[18px] font-[400] leading-[140%] max-w-[600px] mx-auto">
-            Join the thousands of people who have trusted Rocky to help change
+            Join the thousands of people who have trusted MyRocky to help change
             their lives, achieving significant, lasting weight loss.
           </p>
         </div>
@@ -123,7 +123,7 @@ const GLP1ExtendedTestimonials = () => {
           <span className="text-[#AE7E56]">raving about us.</span>
         </h2>
         <p className="poppins-font text-[rgba(0,0,0,0.70)] text-[16px] md:text-[18px] font-[400] leading-[140%] max-w-[600px] mx-auto">
-          Join the thousands of people who have trusted Rocky to help change
+          Join the thousands of people who have trusted MyRocky to help change
           their lives, achieving significant, lasting weight loss.
         </p>
       </div>

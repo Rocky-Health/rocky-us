@@ -11,7 +11,7 @@ export default function GoverningLawDisputeResolution() {
       <p className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9] mb-6">
         PLEASE READ THIS SECTION CAREFULLY BECAUSE IT REQUIRES YOU AND RO TO
         RESOLVE ALL DISPUTES BETWEEN US THROUGH BINDING INDIVIDUAL ARBITRATION
-        AND LIMITS THE MANNER IN WHICH YOU CAN SEEK RELIEF FROM ROCKY
+        AND LIMITS THE MANNER IN WHICH YOU CAN SEEK RELIEF FROM MYROCKY
       </p>
       <p className="text-[16px] md:text-[18px] leading-[160%] font-[400] text-[#000000D9] mb-6">
         These Terms of Use and your use of the Sites shall be governed by the

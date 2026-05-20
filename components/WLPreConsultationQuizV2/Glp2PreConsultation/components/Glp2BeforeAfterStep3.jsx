@@ -10,7 +10,7 @@ const Glp2BeforeAfterStep3 = ({ onContinue }) => {
       <div className="w-full md:w-[580px] mx-auto flex-grow pb-32 md:pb-36">
         <div className="mb-10">
           <p className="text-center text-[24px] leading-[125%] font-medium headers-font text-[#251F20]">
-            &quot;I felt stuck before I joined Rocky. Their guidance helped me{" "}
+            &quot;I felt stuck before I joined MyRocky. Their guidance helped me{" "}
             <span className="text-[#AE7E56]">lose over 50 pounds</span> and
             completely change how I approach health&quot;
           </p>

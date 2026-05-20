@@ -12,7 +12,7 @@ function MerchHero() {
     },
     {
       src: "https://myrocky.b-cdn.net/WP%20Images/merch/herp22.webp",
-      alt: "Group of men in black hoodies with illuminated ROCKY sign",
+      alt: "Group of men in black hoodies with illuminated MYROCKY sign",
     },
   ];
 

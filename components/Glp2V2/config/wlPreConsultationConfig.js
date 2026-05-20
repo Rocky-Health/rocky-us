@@ -377,7 +377,7 @@ export const wlPreConsultationConfig = {
         },
         {
           type: "paragraph",
-          text: "Your answers have been saved. A Rocky physician will review your profile and recommend the right GLP-1 treatment for you.",
+          text: "Your answers have been saved. A MyRocky physician will review your profile and recommend the right GLP-1 treatment for you.",
         },
         {
           type: "paragraph",

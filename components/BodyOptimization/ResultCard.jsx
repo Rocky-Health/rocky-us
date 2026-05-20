@@ -47,7 +47,7 @@ const ResultCard = ({
           {name}
         </p>
         <p className="text-[14px] font-[400] leading-[140%] text-[#0000008F]">
-          Rocky customer
+          MyRocky customer
         </p>
       </div>
     </div>

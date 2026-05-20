@@ -15,7 +15,7 @@ const ScatteredQuote = ({ quote, className }) => (
     </p>
     <p className="flex items-center gap-1 justify-center md:justify-start text-[rgba(0,0,0,0.12)] sm:text-[16px] text-[14px] font-medium">
       <FaCheckCircle className="text-[rgba(0,0,0,0.12)] w-4 h-4" />
-      Verified Rocky Customer
+      Verified MyRocky Customer
     </p>
   </div>
 );
@@ -131,7 +131,7 @@ const MedViTestimonialsShowcase = () => {
             </p>
             <p className="flex items-center gap-1 justify-center text-[rgba(0,0,0,0.30)] text-[12px]">
               <FaCheckCircle className="text-[rgba(0,0,0,0.20)] w-3 h-3" />
-              Verified Rocky Customer
+              Verified MyRocky Customer
             </p>
           </div>
         ))}

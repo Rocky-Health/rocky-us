@@ -46,7 +46,7 @@ const RockyInTheNews = ({ cards }) => {
                     <div className="md:hidden bg-[linear-gradient(270deg,rgba(255,255,255,0)_0%,#ffffff_100%)] absolute -left-[5px] md:left-0 top-[85px] w-[80px] h-[39px] z-10"></div>
                     <div className="flex gap-6">
                         <div className="text-sm leading-[140%] font-medium whitespace-nowrap bg-white pr-6 h-[39px] relative z-10 flex items-center">
-                            ROCKY IN THE NEWS
+                            MYROCKY IN THE NEWS
                         </div>
                         <div className="absolute left-[126px] top-[31px] h-[41px] w-[50px] bg-[linear-gradient(90deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.8)_50%,#ffffff_100%)] pointer-events-none z-20 blur-[5px]"></div>
                         <div className="flex items-center gap-[40px] md:gap-[82px] whitespace-nowrap w-fit h-[39px] relative animate-scroll">
@@ -69,7 +69,7 @@ const RockyInTheNews = ({ cards }) => {
                 </div>
                 <div className="flex justify-center flex-col gap-[24px] items-center md:hidden">
                     <div className="text-sm leading-[140%] text-center font-medium whitespace-nowrap  h-[39px] relative z-10 flex items-center ">
-                        ROCKY IN THE NEWS
+                        MYROCKY IN THE NEWS
                     </div>
 
                     <div className="grid grid-cols-2 md:hidden items-center gap-y-[24px] w-full">

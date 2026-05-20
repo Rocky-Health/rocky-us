@@ -18,7 +18,7 @@ const items = [
 ];
 const HairCoverData = {
   title: "Hair growth",
-  subtitle: "Rocky Makes </br> regrowing hair easy",
+  subtitle: "MyRocky Makes </br> regrowing hair easy",
   image:
     "https://myrocky.b-cdn.net/WP%20Images/Hair%20Loss/hair-page-cover.jpeg",
 

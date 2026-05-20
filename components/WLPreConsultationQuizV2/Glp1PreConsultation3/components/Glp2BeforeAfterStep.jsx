@@ -11,7 +11,7 @@ function buildMaleVariant() {
         key: "male",
         quote: (
             <>
-                &quot;I felt stuck before I joined Rocky. Their guidance helped
+                &quot;I felt stuck before I joined MyRocky. Their guidance helped
                 me <span style={{ color: ACCENT }}>lose over 50 pounds</span>{" "}
                 and completely change how I approach health&quot;
             </>

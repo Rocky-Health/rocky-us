@@ -48,7 +48,7 @@ export const testimonials = [
   {
     name: "Jade",
     description:
-      "“i LOVE rocky skincare and what it’s done for me. my skin is visibly smoother and silkier. THANK YOU”",
+      "“i LOVE myRocky skincare and what it’s done for me. my skin is visibly smoother and silkier. THANK YOU”",
     condition: "Anti-Aging",
     Treatment: "Anti- Aging Cream",
     image:
