@@ -7,7 +7,7 @@ const ACCENT_BLUE = "#A7885A";
 const BTN_BLUE = "#A7885A";
 
 const Glp2GoalWeightStep = ({ userData, setUserData, onContinue }) => {
-    const bmi = userData?.bmi ? parseFloat(userData.bmi).toFixed(2) : null;
+    const bmi = userData?.bmi ? parseFloat(userData.bmi).toFixed(0) : null;
     const [goalWeight, setGoalWeight] = useState(userData?.goalWeight || "");
 
     const handleNext = () => {

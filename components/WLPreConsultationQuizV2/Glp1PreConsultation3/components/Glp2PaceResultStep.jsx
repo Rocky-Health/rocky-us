@@ -39,7 +39,7 @@ function TitleBlock({ variant }) {
     }
     return (
         <h1 className="subheaders-font mb-4 text-5xl font-normal leading-[115%] tracking-[-0.02em] text-[#251F20]">
-            Perfect!
+            Great — you qualify
         </h1>
     );
 }
