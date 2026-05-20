@@ -61,12 +61,20 @@ export const viewport = {
   maximumScale: 1,
 };
 
+const FAVICON_URL =
+  "https://mycdn.myrocky.ca/wp-content/uploads/20260520114301/favicon-mr-desktop.jpg";
+
 export const metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ||
       process.env.BASE_URL?.replace(/\/$/, "") ||
       "https://www.myrocky.com"
   ),
+  icons: {
+    icon: [{ url: FAVICON_URL, type: "image/jpeg" }],
+    shortcut: FAVICON_URL,
+    apple: FAVICON_URL,
+  },
   title: "MyRocky - Your Health Partner",
   description: "Get professional healthcare advice and treatment online",
   openGraph: {
