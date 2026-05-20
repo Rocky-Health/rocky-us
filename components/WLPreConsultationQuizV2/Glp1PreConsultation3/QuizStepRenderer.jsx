@@ -49,6 +49,10 @@ const QuizStepRenderer = ({
       glp1PreConsultation3Config.recommendationRules,
     );
 
+    // EverFlow Quiz Completed (event 6231) fires from handlePlanStepCheckout
+    // in useGlp1PreConsultation3Flow.js, not here — the planSelection step is
+    // never mounted because Glp2TreatmentAndPlanStep handles both product +
+    // plan inline and its Continue handler redirects straight to checkout.
     return (
       <Glp2TreatmentAndPlanStep
         {...recommendation}

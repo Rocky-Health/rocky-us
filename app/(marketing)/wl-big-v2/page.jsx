@@ -13,6 +13,7 @@ import ReviewsSection from "@/components/ReviewsSection";
 import DmOffersRockyInTheNews from "@/components/DmOffers/DmOffersRockyInTheNews";
 import Section from "@/components/utils/Section";
 import DmOffersPageLoader from "@/components/DmOffers/DmOffersPageLoader";
+import EverFlowScript from "@/components/EverFlow/EverFlowScript";
 
 export const metadata = {
     title: "Spring Offers | Rocky",
@@ -24,6 +25,11 @@ export default function DmOffersPage() {
     return (
         <DmOffersPageLoader>
             <main>
+                <EverFlowScript
+                    mode="click"
+                    offerId={5096}
+                    network="vyrov30g"
+                />
                 {/* <DmSpringPromoHeader />
             <DmOffersNav /> */}
                 <DmOffersHero />
@@ -33,7 +39,7 @@ export default function DmOffersPage() {
                 <DmOffersTestimonialsCarouselBlock />
                 <DmOffersMedicationTimelineSection />
                 <Section bg="bg-[#FAF3EF] !mb-0">
-                    <ReviewsSection subheading="Over 350,000 customers. Here's what they're saying about their weight loss with MyRocky." />
+                    <ReviewsSection />
                 </Section>
                 <Section bg="bg-gray-100 sm:!px-5 !px-0 ">
                     <DmOffersInStockMedicationsSection />
