@@ -10,7 +10,11 @@ import { WLProducts } from "../../data/PreConsultationProductsData";
 import Glp2TreatmentCard from "./Glp2TreatmentCard";
 import Glp2PlanOptionsSection from "./Glp2PlanOptionsSection";
 import useDailyPatientCounter from "../hooks/useDailyPatientCounter";
-import { trackMetaPlanSelection, logMetaTrackingError } from "@/utils/metaQuestionnaireTracking";
+import {
+  trackMetaPlanSelection,
+  trackMetaProductSelection,
+  logMetaTrackingError,
+} from "@/utils/metaQuestionnaireTracking";
 
 const ALLOWED_PRODUCT_IDS = ["489798", "489523"];
 const COUNTER_BASE_BY_PRODUCT = {
@@ -164,6 +168,21 @@ const Glp2TreatmentAndPlanStep = ({
     try {
       setIsCheckoutLoading(true);
       setSelectedPlan(plan);
+
+      // Product selection fires before plan selection — this is the combined
+      // UI's substitute for a standalone product step. Idempotency on the
+      // utility side prevents double-counting if the user re-enters the flow.
+      try {
+        trackMetaProductSelection({
+          flow_id: "weight-loss",
+          questionnaire_id: "glp2-pre-consultation",
+          content_id: String(selectedProduct.id || ""),
+          selection_type: "product",
+          selection_value: String(selectedProduct.id || ""),
+        });
+      } catch (err) {
+        logMetaTrackingError(err, { flow_id: "weight-loss", questionnaire_id: "glp2-pre-consultation", milestone: "PRODUCT_SELECTION" });
+      }
 
       try {
         trackMetaPlanSelection({
