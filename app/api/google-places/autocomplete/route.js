@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { logger } from "@/utils/devLogger";
 
-const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API;
+const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API?.trim();
 const GOOGLE_PLACES_AUTOCOMPLETE_URL =
-  "https://maps.googleapis.com/maps/api/place/autocomplete/json";
+  "https://places.googleapis.com/v1/places:autocomplete";
 
 export async function POST(request) {
   try {
@@ -24,16 +24,20 @@ export async function POST(request) {
       );
     }
 
-    const url = new URL(GOOGLE_PLACES_AUTOCOMPLETE_URL);
-    url.searchParams.append("input", query);
-    url.searchParams.append("components", "country:us");
-    url.searchParams.append("types", "address");
-    url.searchParams.append("key", GOOGLE_PLACES_API_KEY);
-    if (sessionToken) {
-      url.searchParams.append("sessiontoken", sessionToken);
-    }
+    const body = {
+      input: query,
+      includedRegionCodes: ["us"],
+    };
+    if (sessionToken) body.sessionToken = sessionToken;
 
-    const response = await fetch(url.toString(), { method: "GET" });
+    const response = await fetch(GOOGLE_PLACES_AUTOCOMPLETE_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": GOOGLE_PLACES_API_KEY,
+      },
+      body: JSON.stringify(body),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -49,21 +53,13 @@ export async function POST(request) {
 
     const data = await response.json();
 
-    if (data.status !== "OK" && data.status !== "ZERO_RESULTS") {
-      logger.error("Google Places autocomplete non-OK status:", data);
-      return NextResponse.json(
-        {
-          error: "Google Places API Error",
-          details: data.error_message || data.status,
-        },
-        { status: 502 },
-      );
-    }
-
-    const addresses = (data.predictions || []).map((p) => ({
-      id: p.place_id,
-      formattedAddress: p.description,
-    }));
+    const addresses = (data.suggestions || [])
+      .map((s) => s.placePrediction)
+      .filter(Boolean)
+      .map((p) => ({
+        id: p.placeId,
+        formattedAddress: p.text?.text || "",
+      }));
 
     return NextResponse.json({ addresses });
   } catch (err) {

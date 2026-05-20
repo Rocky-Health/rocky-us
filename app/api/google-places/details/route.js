@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 import { logger } from "@/utils/devLogger";
 import { PHASE_1_STATES } from "@/lib/constants/usStates";
 
-const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API;
-const GOOGLE_PLACES_DETAILS_URL =
-  "https://maps.googleapis.com/maps/api/place/details/json";
+const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API?.trim();
+const GOOGLE_PLACES_DETAILS_BASE_URL =
+  "https://places.googleapis.com/v1/places/";
 
 const findComponent = (components, type) =>
-  components.find((c) => c.types.includes(type));
+  components.find((c) => Array.isArray(c.types) && c.types.includes(type));
 
 function parseGoogleAddress(addressComponents) {
   const streetNumber = findComponent(addressComponents, "street_number");
@@ -20,16 +20,16 @@ function parseGoogleAddress(addressComponents) {
   const state = findComponent(addressComponents, "administrative_area_level_1");
   const postalCode = findComponent(addressComponents, "postal_code");
 
-  const street = [streetNumber?.long_name, route?.long_name]
+  const street = [streetNumber?.longText, route?.longText]
     .filter(Boolean)
     .join(" ");
 
   return {
     street,
     unit: "",
-    city: city?.long_name || "",
-    province: state?.short_name || "",
-    postalCode: postalCode?.long_name || "",
+    city: city?.longText || "",
+    province: state?.shortText || "",
+    postalCode: postalCode?.longText || "",
   };
 }
 
@@ -52,15 +52,18 @@ export async function POST(request) {
       );
     }
 
-    const url = new URL(GOOGLE_PLACES_DETAILS_URL);
-    url.searchParams.append("place_id", addressId);
-    url.searchParams.append("fields", "address_components,formatted_address");
-    url.searchParams.append("key", GOOGLE_PLACES_API_KEY);
-    if (sessionToken) {
-      url.searchParams.append("sessiontoken", sessionToken);
-    }
+    const url = new URL(
+      GOOGLE_PLACES_DETAILS_BASE_URL + encodeURIComponent(addressId),
+    );
+    if (sessionToken) url.searchParams.append("sessionToken", sessionToken);
 
-    const response = await fetch(url.toString(), { method: "GET" });
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "X-Goog-Api-Key": GOOGLE_PLACES_API_KEY,
+        "X-Goog-FieldMask": "addressComponents,formattedAddress",
+      },
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -75,19 +78,7 @@ export async function POST(request) {
     }
 
     const data = await response.json();
-
-    if (data.status !== "OK") {
-      logger.error("Google Places details non-OK status:", data);
-      return NextResponse.json(
-        {
-          error: "Google Places API Error",
-          details: data.error_message || data.status,
-        },
-        { status: 502 },
-      );
-    }
-
-    const components = data.result?.address_components || [];
+    const components = data.addressComponents || [];
     const address = parseGoogleAddress(components);
 
     if (!PHASE_1_STATES.includes(address.province)) {
