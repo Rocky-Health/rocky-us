@@ -6,7 +6,7 @@ const Glp2OfferHeader = ({ ctaHref = "/glp2-pre-consultation" }) => {
     <header className="w-full bg-[#F4F3EF] border-b border-[#e8e6df]">
       <div className="max-w-[1200px] mx-auto px-5 md:px-8 h-[60px] flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" aria-label="Rocky home">
+        <Link href="/" aria-label="MyRocky home">
           <Image
             src="https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp"
             alt="MyRocky"

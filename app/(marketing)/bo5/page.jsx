@@ -140,7 +140,7 @@ export default function BO5() {
            div:has(> span:contains("Toronto Maple Leafs")),
            div:has(> span:contains("Proud partner")),
            div[class*="bg-[#003876]"],
-           /* Rocky navigation header */
+           /* MyRocky navigation header */
            .rocky-header,
            .rocky-navbar,
            .rocky-navigation,
@@ -201,8 +201,8 @@ export default function BO5() {
             <Section bg={`bg-[#F8F7F3]`}>
                 <ComparingTable
                     section_bg={`bg-[#F8F7F3]`}
-                    title={`The <span class='text-[#AE7E56]'>Rocky</span> Difference`}
-                    desc={`Comprehensive care. Consistent results. See how Rocky compares.`}
+                    title={`The <span class='text-[#AE7E56]'>MyRocky</span> Difference`}
+                    desc={`Comprehensive care. Consistent results. See how MyRocky compares.`}
                     sec_title={`Others`}
                     img={`https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp`}
                     unique_col_bg={`white`}

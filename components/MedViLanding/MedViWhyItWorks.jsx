@@ -13,11 +13,11 @@ const MedViWhyItWorks = () => {
         <div className="text-center">
             <ScrollReveal>
                 <h2 className="headers-font text-black sm:text-[28px] text-[24px] leading-[115%] tracking-[-0.64px] md:tracking-[-0.96px] mb-4">
-                    Why are so many patients signing up for Rocky?{" "}
+                    Why are so many patients signing up for MyRocky?{" "}
                     <span className="text-[#AE7E56] font-[600]">It works.</span>
                 </h2>
                 <p className="poppins-font text-[rgba(0,0,0,0.70)] text-sm font-[400] leading-[140%] mb-10">
-                    On average, patients in the Rocky program lose 15-20% of
+                    On average, patients in the MyRocky program lose 15-20% of
                     their body weight.
                 </p>
             </ScrollReveal>

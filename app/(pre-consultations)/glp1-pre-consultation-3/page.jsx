@@ -40,7 +40,7 @@ export default function Glp1PreConsultation3Page() {
         div:has(> span:contains("Toronto Maple Leafs")),
         div:has(> span:contains("Proud partner")),
         div[class*="bg-[#003876]"],
-        /* Rocky navigation header */
+        /* MyRocky navigation header */
         .rocky-header,
         .rocky-navbar,
         .rocky-navigation,

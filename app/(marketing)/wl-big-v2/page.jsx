@@ -16,7 +16,7 @@ import DmOffersPageLoader from "@/components/DmOffers/DmOffersPageLoader";
 import EverFlowScript from "@/components/EverFlow/EverFlowScript";
 
 export const metadata = {
-    title: "Spring Offers | Rocky",
+    title: "Spring Offers | MyRocky",
     description:
         "Spring savings on GLP-1 weight loss plans. Personalized care, GLP-1 medications, and support from licensed clinicians.",
 };

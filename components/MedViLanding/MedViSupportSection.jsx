@@ -15,7 +15,7 @@ const MedViSupportSection = () => {
                     </h2>
                     <p className="poppins-font text-[rgba(0,0,0,0.70)] text-sm font-[400] leading-[150%] mb-6">
                         rather than against it &ndash; to reach your goal weight
-                        and keep it that way. Rocky provides 24/7 access to a
+                        and keep it that way. MyRocky provides 24/7 access to a
                         dedicated team of specialists, ensuring you have the
                         support you need{" "}
                         <span className="text-[#AE7E56] font-[600]">

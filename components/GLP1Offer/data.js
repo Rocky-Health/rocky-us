@@ -19,8 +19,8 @@ export const productTiers = [
 // ── Testimonials Showcase ──
 export const featuredTestimonial = {
   quote: "When nothing else worked,",
-  highlight: "Rocky did",
-  attribution: "Verified Rocky Customer",
+  highlight: "MyRocky did",
+  attribution: "Verified MyRocky Customer",
 };
 
 export const scatteredTestimonials = [
@@ -121,7 +121,7 @@ export const goalOptions = [
 
 // ── Trust Badges ──
 export const trustBadges = [
-  "Rocky money back guarantee",
+  "MyRocky money back guarantee",
   "Free, expedited delivery",
   "Doctor-led plans & coaching",
 ];

@@ -16,7 +16,7 @@ const GLP1ChangeStats = () => {
           The change we&apos;ve all been waiting for.
         </h2>
         <p className="poppins-font text-[rgba(0,0,0,0.70)] text-[16px] md:text-[18px] font-[400] leading-[140%] mb-10 md:mb-14 max-w-[600px] mx-auto">
-          Join the over 350,000+ Rocky patients and we&apos;ll help you finally
+          Join the over 350,000+ MyRocky patients and we&apos;ll help you finally
           get real, lasting results.
         </p>
       </ScrollReveal>

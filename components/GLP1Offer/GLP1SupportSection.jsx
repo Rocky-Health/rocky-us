@@ -5,7 +5,7 @@ const GLP1SupportSection = () => {
         Unlimited 24/7 support included.
       </h2>
       <p className="poppins-font text-[rgba(0,0,0,0.70)] text-[16px] md:text-[18px] font-[400] leading-[150%]">
-        Rocky provides 24/7 access to a dedicated team of specialists, ensuring
+        MyRocky provides 24/7 access to a dedicated team of specialists, ensuring
         you have the support you need around the clock. With unlimited
         appointments, messaging and support, you can confidently reach out for
         guidance, ask questions, or address concerns at any time.

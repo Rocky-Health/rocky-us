@@ -108,7 +108,7 @@ const Product = ({ product }) => {
         const cartData = {
           productId: selectedOption.productId,
           quantity: 1,
-          name: "My Rocky Hair Kit",
+          name: "MyRocky Hair Kit",
           price: priceValue,
           image: product.img,
           isSubscription: true,
@@ -381,7 +381,7 @@ const Product = ({ product }) => {
           </div>
           <div className="w-1/2 pl-8 pt-10">
             <h2 className="text-4xl font-semibold text-gray-900 mb-5">
-              My Rocky Hair Kit
+              MyRocky Hair Kit
             </h2>
             <p className="w-3/4 mb-5">
               A power house combination of prescription and natural hair
@@ -439,7 +439,7 @@ const Product = ({ product }) => {
         <div className="lg:hidden">
           <div className="w-full">
             <h2 className="text-4xl font-semibold text-gray-900 mb-2">
-              My Rocky Hair Kit
+              MyRocky Hair Kit
             </h2>
             <p className="w-full mb-5">
               A power house combination of prescription and natural hair

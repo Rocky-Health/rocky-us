@@ -90,7 +90,7 @@ function RockyInTheNews() {
                 {/* Title */}
                 <div className="text-center mb-6">
                     <h2 className="text-sm font-medium text-black ">
-                        ROCKY IN THE NEWS
+                        MYROCKY IN THE NEWS
                     </h2>
                 </div>
 

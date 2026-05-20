@@ -21,7 +21,7 @@ const TakeRockyChewalis = () => {
       {/* Heading */}
       <h1 className="text-3xl lg:text-[48px] md:leading-[48px] font-[550] mb-6 md:mb-8 headers-font">
         How to take <br />
-        Rocky Chewalis
+        MyRocky Chewalis
       </h1>
 
       {/* Numbered List */}

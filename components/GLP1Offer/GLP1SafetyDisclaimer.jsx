@@ -6,11 +6,11 @@ const GLP1SafetyDisclaimer = () => {
           IMPORTANT SAFETY INFORMATION &amp; DISCLAIMER:
         </p>
         <p className="poppins-font text-[rgba(0,0,0,0.60)] text-[12px] font-[400] leading-[160%] mb-3">
-          Medication Options: Rocky connects you with licensed medical
+          Medication Options: MyRocky connects you with licensed medical
           providers who can prescribe medication based on their professional
           judgment. Your provider may prescribe FDA-approved branded
           medications (e.g., Ozempic&reg;, Wegovy&reg;, Mounjaro&reg;,
-          Rybelsus&reg;). Rocky does not sell, dispense, or ship any medications
+          Rybelsus&reg;). MyRocky does not sell, dispense, or ship any medications
           directly. All prescriptions are filled and dispensed by a licensed
           pharmacy.
         </p>
@@ -25,7 +25,7 @@ const GLP1SafetyDisclaimer = () => {
         <p className="poppins-font text-[rgba(0,0,0,0.60)] text-[12px] font-[400] leading-[160%]">
           Ozempic&reg;, Wegovy&reg;, Mounjaro&reg;, and Rybelsus&reg; are
           trademarks of their respective owners and are not affiliated with
-          Rocky Health.
+          MyRocky Health.
         </p>
       </div>
     </section>

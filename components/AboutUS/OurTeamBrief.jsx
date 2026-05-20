@@ -10,10 +10,10 @@ const OurTeamBrief = () => {
             A dedicated team with you every step of the way.
           </div>
           <div className="text-[16px] font-[400] leading-[140%] w-[307px] md:hidden">
-            Behind Rocky is a team of healthcare professionals who have you covered at every step. With expertise across medicine, pharmacy, and mental health, our team works together to provide comprehensive solutions tailored to your needs.
+            Behind MyRocky is a team of healthcare professionals who have you covered at every step. With expertise across medicine, pharmacy, and mental health, our team works together to provide comprehensive solutions tailored to your needs.
           </div>
           <div className="text-[18px] font-[400] leading-[140%] max-w-[632px] hidden md:block ">
-            Behind Rocky is a team of healthcare professionals who have you covered at every step. With expertise across medicine, pharmacy, and mental health, our team works together to provide comprehensive solutions tailored to your needs.
+            Behind MyRocky is a team of healthcare professionals who have you covered at every step. With expertise across medicine, pharmacy, and mental health, our team works together to provide comprehensive solutions tailored to your needs.
           </div>
         </div>
       </div>

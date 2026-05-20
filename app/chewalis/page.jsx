@@ -79,7 +79,7 @@ export default function Home() {
 
       <Section>
         <HowRockyWorks
-          title="How to get Rocky Chewalis Mints Online"
+          title="How to get MyRocky Chewalis Mints Online"
           subtitle="Quick, simple, convenient. We're here to support your health journey every step of the way through."
         />
       </Section>
