@@ -323,8 +323,12 @@ export async function POST(req) {
     // Process Meta parameters (fbp, fbc)
     const metaParams = await processMetaParameters(req, meta_params || {});
 
-    // Build event_source_url
-    const eventSourceUrl = `https://myrocky.com/checkout/order-received/${order_id}`;
+    // Build event_source_url — prefer the real client-side page URL so Meta
+    // treats this as a user-facing event. Fall back to a constructed www URL
+    // for server-only callers (webhooks, jobs) that have no browser context.
+    const eventSourceUrl =
+      payload.event_source_url ||
+      `https://www.myrocky.com/checkout/order-received/${order_id}`;
 
     // Generate stable event_id for deduplication
     const eventId = `purchase_${order_id}_${gateway}`;
