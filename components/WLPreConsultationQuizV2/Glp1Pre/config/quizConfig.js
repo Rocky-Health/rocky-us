@@ -490,7 +490,7 @@ export const quizConfig = {
     19: {
       id: "title",
       type: "title",
-      title: "Rocky medical providers review every form within 24 hours",
+      title: "MyRocky medical providers review every form within 24 hours",
       styleClasses :"text-[#AE7E56] subheaders-font md:text-[32px] text-[28px] leading-[115%] mb-10",
     },
 

@@ -16,7 +16,7 @@ const GLP1StatsSection = ({ ctaHref = "#" }) => {
         <p className="poppins-font text-[rgba(0,0,0,0.70)] text-[16px] md:text-[18px] font-[400] leading-[160%] mb-6">
           Sometimes you have to see it to believe it. GLP-1 medication can be{" "}
           <span className="text-[#AE7E56] font-[600]">life-changing</span> and
-          improves mood, sleep, energy and longevity. Results are from Rocky
+          improves mood, sleep, energy and longevity. Results are from MyRocky
           patients.
         </p>
         <Link

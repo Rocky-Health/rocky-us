@@ -42,7 +42,7 @@ const RockyInTheNews = ({ cards }) => {
                 <div className="md:hidden bg-[linear-gradient(270deg,rgba(255,255,255,0)_0%,#ffffff_100%)] absolute -right-[5px] md:right-0 top-[85px] w-[80px] h-[39px] z-10 rotate-[180deg]"></div>
                 <div className="md:hidden bg-[linear-gradient(270deg,rgba(255,255,255,0)_0%,#ffffff_100%)] absolute -left-[5px] md:left-0 top-[85px] w-[80px] h-[39px] z-10"></div>
                 <div className="text-sm leading-[140%] font-medium mb-6 text-center">
-                    ROCKY IN THE NEWS
+                    MYROCKY IN THE NEWS
                 </div>
                 <div className="flex items-center gap-[40px] md:gap-[82px] whitespace-nowrap w-fit h-[39px] relative animate-scroll">
                     {dataToUse.concat(dataToUse).map((card, index) => (

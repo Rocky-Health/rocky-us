@@ -91,7 +91,7 @@ const Footer = ({ className }) => {
                     <div className="mx-auto relative rounded-2xl overflow-hidden w-[150px] h-[50px] flex justify-center mt-8 mb-4">
                         <CustomImage
                             src="https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-white.webp"
-                            alt="Rocky Logo"
+                            alt="MyRocky Logo"
                             fill
                         />
                     </div>
@@ -348,7 +348,7 @@ const Footer = ({ className }) => {
                         }`}
                     >
                         <div>
-                            <p>Rocky Pharmacy (308582)</p>
+                            <p>MyRocky Pharmacy (308582)</p>
                             <p>15 - 5270 Solar Dr</p>
                             <p>Mississauga, ON</p>
                             <p>L4W 5M8</p>
@@ -373,9 +373,9 @@ const Footer = ({ className }) => {
                         />
                     </div>
                     <p className="text-[0.7rem] text-center">
-                        ©{new Date().getFullYear()} Rocky Health Inc. All rights
-                        reserved. Rocky Health Pharmacy Inc. & Rocky Health
-                        Clinic Inc. are subsidiaries of Rocky Health Inc.
+                        ©{new Date().getFullYear()} MyRocky Health Inc. All rights
+                        reserved. MyRocky Health Pharmacy Inc. & MyRocky Health
+                        Clinic Inc. are subsidiaries of MyRocky Health Inc.
                     </p>
                 </div>
                 <div className="flex gap-3">

@@ -43,7 +43,7 @@ const RockyInTheNews = ({ cards }) => {
                 {/* Mobile Layout - Grid */}
                 <div className="md:hidden">
                     {/* <div className="text-sm leading-[140%] font-medium mb-6 text-center">
-            ROCKY IN THE NEWS
+            MYROCKY IN THE NEWS
           </div> */}
                     <h5
                         className={`font-[500] text-black mb-[32px] md:text-[16px] headers-font leading-[100%] tracking-[1px] text-center `}
@@ -91,7 +91,7 @@ const RockyInTheNews = ({ cards }) => {
                 {/* Desktop Layout - Horizontal Scrolling */}
                 <div className="hidden md:flex items-center gap-8 md:gap-12 overflow-hidden relative">
                     {/* <div className="text-sm leading-[140%] font-medium whitespace-nowrap flex-shrink-0 z-20 relative bg-white pr-2">
-                        ROCKY IN THE NEWS
+                        MYROCKY IN THE NEWS
                     </div> */}
                     <h5
                         className={`font-[500] text-black mb-1 text-[18px] subheaders-font leading-[100%] tracking-[1px]  `}

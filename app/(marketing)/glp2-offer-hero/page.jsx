@@ -19,7 +19,7 @@ import GLP1SafetyDisclaimer from "@/components/GLP1Offer/GLP1SafetyDisclaimer";
 import RockyInTheNews from "@/components/RockyInTheNews";
 
 export const metadata = {
-  title: "GLP-1 Weight Loss Program | Rocky",
+  title: "GLP-1 Weight Loss Program | MyRocky",
   description:
     "Lose 1-2lbs per week with GLP-1 medication. 100% online medical review, free delivery, and money-back guarantee. Starting at $149/mo.",
   robots: {
@@ -42,7 +42,7 @@ export default async function GLP2OfferHeroPage() {
         <GLP1HeroSection ctaHref={ctaHref} hideProudPartner />
       </section>
 
-      {/* Rocky In The News */}
+      {/* MyRocky In The News */}
       <Section bg="bg-white !pb-0">
         <RockyInTheNews />
       </Section>

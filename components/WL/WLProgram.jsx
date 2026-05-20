@@ -32,7 +32,7 @@ const WLProgram = ({ ProgramWorksData = [] }) => {
                       width="100"
                       src="/ed-prelander-5/rocky-logo.png"
                       className="lg:mt-64 mt-24 mb-4 px-auto mx-auto"
-                      alt="My rocky logo"
+                      alt="MyRocky logo"
                       quality="100"
                     />
                   </Link>

@@ -1,7 +1,7 @@
 export default function RockyHealthRefundPolicy() {
   return (
     <div
-      id="rocky-health-inc.-&-rocky-health-pharmacy-inc.-refund-policy"
+      id="rocky-health-inc.-&-myRocky-health-pharmacy-inc.-refund-policy"
       className="mb-10 md:mb-14"
     >
       <div className="text-[22px] md:text-[30px] leading-[115%] tracking-[-0.01em] md:tracking-[-0.02em] mb-4 md:mb-6 headers-font">
