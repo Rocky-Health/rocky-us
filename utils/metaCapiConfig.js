@@ -8,10 +8,11 @@
 /**
  * Custom Event Names for Meta CAPI (Cryptic to bypass health restrictions)
  * DO NOT use health/medical/product-related terms
- * 
+ *
  * MAPPING (Internal use only - DO NOT expose to Meta):
  * - RKY_TNT: ED Purchase Event (Target)
  * - RKY_FLW: WL Purchase Event (Flow)
+ * - RKY_FLW_US: WL Purchase mirror — US-only (fires only on rocky-us; lands on the US-only WL dataset 1873491106559002 alongside RKY_FLW which stays on the legacy shared pixel for in-flight ad campaigns)
  * - RKY_VBE: HL Purchase Event (Vibe)
  * - RKY_ZXT: SMOKING Purchase Event (Zeta)
  * - RKY_LXS: SKINCARE Purchase Event (Luxus)
@@ -26,6 +27,18 @@ export const CUSTOM_EVENT_NAMES = {
   OTHERS: 'RKY_MXR'
 };
 
+/**
+ * Per-gateway `secondaryPixels` is an optional array of additional
+ * { pixelId, customEventName } destinations that the server CAPI route
+ * fans out to *in addition* to the primary `pixelId`. The same gateway
+ * `accessToken` is used for every entry — the underlying System User on
+ * rocky-us has access to both the legacy shared pixel and the new
+ * US-only dataset, so a single token authenticates against both. Per-fire
+ * payload (user_data, custom_data, event_source_url, event_time) is
+ * byte-identical between primary and secondary so EMQ / data freshness
+ * scores match the primary one-for-one. event_id is suffixed per-pixel
+ * to keep dedup namespaces independent.
+ */
 export const META_CAPI_GATEWAYS = {
   ED: {
     accessToken: process.env.FB_ACCESS_TOKEN_ED,
@@ -36,8 +49,19 @@ export const META_CAPI_GATEWAYS = {
   },
   WL: {
     accessToken: process.env.FB_ACCESS_TOKEN_WL,
-    pixelId: '1873491106559002',
+    pixelId: '1451450365779499',
     customEventName: CUSTOM_EVENT_NAMES.WL,
+    secondaryPixels: [
+      {
+        // US-only mirror dataset ("Rocky USA WL"). Fires alongside the
+        // primary RKY_FLW so existing ad campaigns optimizing on the
+        // legacy pixel keep getting US Purchase signal, while the new
+        // dataset accumulates a clean US-only event stream we can build
+        // fresh Custom Conversions and audiences from.
+        pixelId: '1873491106559002',
+        customEventName: 'RKY_FLW_US',
+      },
+    ],
     categories: ['weight-loss', 'wl', 'body-optimization'],
     name: 'WL'
   },

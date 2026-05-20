@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getGatewayConfig, getGatewayUrl, META_CAPI_GATEWAYS } from '@/utils/metaCapiConfig';
+import { getGatewayConfig, META_CAPI_GATEWAYS } from '@/utils/metaCapiConfig';
 import { hashEmail, hashPhone, hashSHA256 } from '@/utils/analytics/hashServerSide';
 import { processMetaParameters } from '@/lib/meta/paramBuilderHelper';
 import { toMoney } from '@/utils/priceFormatter';
@@ -330,7 +330,9 @@ export async function POST(req) {
       payload.event_source_url ||
       `https://www.myrocky.com/checkout/order-received/${order_id}`;
 
-    // Generate stable event_id for deduplication
+    // Stable event_id for deduplication on the PRIMARY pixel. Secondary
+    // pixels get a suffixed event_id so each pixel maintains an
+    // independent dedup namespace.
     const eventId = `purchase_${order_id}_${gateway}`;
 
     const resolvedCurrency = currency || order_data?.currency || 'USD';
@@ -376,17 +378,6 @@ export async function POST(req) {
     if (tax !== undefined) customData.tax = toMoney(tax);
     if (discount !== undefined) customData.discount = toMoney(discount);
 
-    // Build Meta CAPI event payload
-    const eventPayload = {
-      event_name: gatewayConfig.customEventName, // Cryptic event name (e.g., RKY_TNT)
-      event_time: eventTime,
-      event_id: eventId,
-      event_source_url: eventSourceUrl,
-      action_source: 'website',
-      user_data: userData,
-      custom_data: customData
-    };
-
     const matchKeys = {
       has_email: !!userData.em?.length,
       has_phone: !!userData.ph?.length,
@@ -400,88 +391,167 @@ export async function POST(req) {
       has_dob: !!userData.db?.length
     };
 
-    console.log(`[Meta CAPI] Sending event for order ${order_id} to ${gateway}:`, {
-      pixel_id: gatewayConfig.pixelId,
-      event_name: eventPayload.event_name,
-      event_id: eventPayload.event_id,
-      action_source: eventPayload.action_source,
-      event_time: eventPayload.event_time,
-      value: eventPayload.custom_data.value,
-      currency: eventPayload.custom_data.currency,
-      match_keys: matchKeys
+    /**
+     * Build a per-pixel CAPI fire target. user_data / custom_data /
+     * event_source_url / event_time are kept byte-identical to the primary
+     * so EMQ and data freshness are guaranteed equal across primary and
+     * every secondary destination.
+     */
+    const buildEventPayload = (eventName, perPixelEventId) => ({
+      event_name: eventName,
+      event_time: eventTime,
+      event_id: perPixelEventId,
+      event_source_url: eventSourceUrl,
+      action_source: 'website',
+      user_data: userData,
+      custom_data: customData,
     });
 
-    // Send to Meta Graph API
-    const metaUrl = getGatewayUrl(gateway);
-    
-    const sendEvent = async (attempt = 1) => {
+    /**
+     * Targets:
+     *   [0] primary       (gatewayConfig.pixelId + gatewayConfig.customEventName)
+     *   [1..] secondary   (each gatewayConfig.secondaryPixels[i])
+     *
+     * All share gatewayConfig.accessToken (same System User authenticates
+     * against every pixel listed for the gateway).
+     */
+    const targets = [
+      {
+        pixelId: gatewayConfig.pixelId,
+        eventName: gatewayConfig.customEventName,
+        eventId,
+        label: gateway,
+        isPrimary: true,
+      },
+      ...((gatewayConfig.secondaryPixels || []).map((sec, idx) => ({
+        pixelId: sec.pixelId,
+        eventName: sec.customEventName,
+        // Suffix the per-pixel event_id with the secondary's event name so
+        // each pixel's dedup namespace is independent and the log makes the
+        // primary/secondary split obvious.
+        eventId: `${eventId}_${sec.customEventName}`,
+        label: `${gateway}/${sec.customEventName}`,
+        isPrimary: false,
+      }))),
+    ];
+
+    const sendOneTarget = async (target, attempt = 1) => {
+      const url = `https://graph.facebook.com/v18.0/${target.pixelId}/events`;
+      const eventPayload = buildEventPayload(target.eventName, target.eventId);
+
+      if (attempt === 1) {
+        console.log(`[Meta CAPI] Sending event for order ${order_id} to ${target.label}:`, {
+          pixel_id: target.pixelId,
+          event_name: eventPayload.event_name,
+          event_id: eventPayload.event_id,
+          action_source: eventPayload.action_source,
+          event_time: eventPayload.event_time,
+          value: eventPayload.custom_data.value,
+          currency: eventPayload.custom_data.currency,
+          match_keys: matchKeys,
+        });
+      }
+
       try {
-        const response = await fetch(metaUrl, {
+        const response = await fetch(url, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             access_token: gatewayConfig.accessToken,
-            data: [eventPayload]
-          })
+            data: [eventPayload],
+          }),
         });
 
         if (!response.ok) {
           const text = await response.text();
           const retryable = isRetryableStatus(response.status);
-          console.error(`[Meta CAPI] HTTP Error ${gateway} (attempt ${attempt}):`, {
-            event_id: eventId,
+          console.error(`[Meta CAPI] HTTP Error ${target.label} (attempt ${attempt}):`, {
+            event_id: target.eventId,
             status: response.status,
             statusText: response.statusText,
             body: text,
-            retryable
+            retryable,
           });
-          
-          // Retry once on transient failures only
+
           if (attempt === 1 && retryable) {
-            console.log(`[Meta CAPI] Retrying ${gateway}...`);
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            return sendEvent(2);
+            console.log(`[Meta CAPI] Retrying ${target.label}...`);
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            return sendOneTarget(target, 2);
           }
-          
+
           throw new Error(`Meta API returned ${response.status}: ${text.substring(0, 200)}`);
         }
 
         const data = await response.json();
 
         if (data.error) {
-          console.error(`[Meta CAPI] Error ${gateway}:`, data.error);
-          return NextResponse.json({ 
-            success: false, 
-            error: data.error.message || 'Meta API error' 
-          }, { status: 400 });
+          console.error(`[Meta CAPI] Error ${target.label}:`, data.error);
+          throw new Error(data.error.message || 'Meta API error');
         }
 
-        console.log(`[Meta CAPI] ✅ Success ${gateway}:`, {
-          event_id: eventId,
+        console.log(`[Meta CAPI] ✅ Success ${target.label}:`, {
+          event_id: target.eventId,
           events_received: data.events_received || 0,
-          fbtrace_id: data.fbtrace_id
+          fbtrace_id: data.fbtrace_id,
         });
 
-        return NextResponse.json({
+        return {
           success: true,
-          gateway,
-          event_id: eventId,
+          pixel_id: target.pixelId,
+          event_name: target.eventName,
+          event_id: target.eventId,
           events_received: data.events_received || 0,
-          fbtrace_id: data.fbtrace_id
-        });
+          fbtrace_id: data.fbtrace_id,
+        };
       } catch (error) {
         if (attempt === 1 && isRetryableError(error)) {
-          console.log(`[Meta CAPI] Retrying ${gateway} after error...`);
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          return sendEvent(2);
+          console.log(`[Meta CAPI] Retrying ${target.label} after error...`);
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          return sendOneTarget(target, 2);
         }
-        throw error;
+        return {
+          success: false,
+          pixel_id: target.pixelId,
+          event_name: target.eventName,
+          event_id: target.eventId,
+          error: error?.message || 'unknown error',
+        };
       }
     };
 
-    return await sendEvent();
+    // Fire all targets in parallel — secondaries must not block / depend on
+    // primary, and a secondary failure must not poison the primary result.
+    const results = await Promise.all(targets.map((t) => sendOneTarget(t)));
+    const primaryResult = results[0];
+    const secondaryResults = results.slice(1);
+
+    // Primary failure is the only thing that makes the overall request
+    // fail. Any secondary failure is logged above and surfaced in the
+    // response body but does not flip HTTP status.
+    if (!primaryResult.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          gateway,
+          primary: primaryResult,
+          secondaries: secondaryResults,
+          error: primaryResult.error || 'Primary CAPI fire failed',
+        },
+        { status: 400 },
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      gateway,
+      event_id: primaryResult.event_id,
+      events_received: primaryResult.events_received,
+      fbtrace_id: primaryResult.fbtrace_id,
+      // Surface the per-target breakdown so caller logs / debugging can
+      // see secondary fire outcomes alongside the primary result.
+      primary: primaryResult,
+      secondaries: secondaryResults,
+    });
 
   } catch (error) {
     console.error('[Meta CAPI] System Error:', error);
