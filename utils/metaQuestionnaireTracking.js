@@ -13,7 +13,9 @@ import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
 import {
   resolveMetaEventName,
   resolveCategory,
+  buildSecondaryEventName,
   CATEGORY_PIXEL_MAP,
+  SECONDARY_CATEGORY_PIXEL_MAP,
   DATALAYER_EVENT_NAMES,
   GENERIC_EVENT_NAMES,
 } from "@/utils/metaBrowserEventConfig";
@@ -69,6 +71,39 @@ function emitMetaFunnelEvent(milestone, flowId, questionnaireId, params = {}) {
       const fbqPayload = { ...basePayload };
       delete fbqPayload.content_name;
       window.fbq("trackSingleCustom", pixelId, obfuscatedName, fbqPayload);
+
+      // 1b. Secondary mirrors — for categories registered in
+      // SECONDARY_CATEGORY_PIXEL_MAP, fire the same milestone to each
+      // mirror pixel under a parallel event name (e.g. RKY_FLW_QS on the
+      // primary becomes RKY_FLW_US_QS on the US-only WL mirror). Payload
+      // is identical so EMQ stays in lockstep with the primary fire.
+      // Wrapped in try/catch so a mirror failure cannot poison the primary.
+      const mirrors = SECONDARY_CATEGORY_PIXEL_MAP[category] || [];
+      for (const mirror of mirrors) {
+        try {
+          const mirrorName = buildSecondaryEventName(
+            mirror.eventNameBase,
+            milestone,
+          );
+          // Per-mirror event_id so each pixel's dedup namespace is
+          // independent of the primary's.
+          const mirrorPayload = { ...fbqPayload, event_id: `${eventId}_${mirror.eventNameBase}` };
+          window.fbq(
+            "trackSingleCustom",
+            mirror.pixelId,
+            mirrorName,
+            mirrorPayload,
+          );
+        } catch (mirrorErr) {
+          logMetaTrackingError(mirrorErr, {
+            flow_id: flowId,
+            questionnaire_id: questionnaireId,
+            milestone,
+            scope: "secondary_mirror",
+            mirror_pixel: mirror.pixelId,
+          });
+        }
+      }
     }
 
     // 2. dataLayer — Meta-readable internal mirror

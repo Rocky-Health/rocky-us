@@ -7,8 +7,17 @@ import { useEffect, useMemo, useState } from "react";
 // categories are blocked at middleware level and must not be present here.
 const PIXEL_IDS = {
   ED: process.env.NEXT_PUBLIC_FB_PIXEL_ID_ED || "522677764108011",
-  WL: process.env.NEXT_PUBLIC_FB_PIXEL_ID_WL || "1873491106559002",
+  WL: process.env.NEXT_PUBLIC_FB_PIXEL_ID_WL || "1451450365779499",
   HL: process.env.NEXT_PUBLIC_FB_PIXEL_ID_HL || "754893718769214",
+};
+
+// Secondary pixels fired in addition to the primary above (browser-side
+// dual-fire). Currently used to mirror US WL PageViews onto the new
+// US-only dataset 1873491106559002 alongside the legacy shared pixel,
+// so the new dataset accumulates a clean per-pixel session record while
+// in-flight ad campaigns optimizing on the legacy pixel keep working.
+const SECONDARY_PIXEL_IDS = {
+  WL: [process.env.NEXT_PUBLIC_FB_PIXEL_ID_WL_US || "1873491106559002"],
 };
 
 // Default pixel for non-categorized pages (homepage, blog, FAQ, etc.).
@@ -129,17 +138,19 @@ export default function FBPixelLoader() {
     return null;
   }, [searchParams]);
 
-  // Synchronous pixel resolution — updates in the same render as pathname.
+  // Synchronous category resolution — updates in the same render as pathname.
   // Query-param flow takes priority (for checkout/thank-you pages).
-  const syncPixelId = useMemo(() => {
-    if (flowFromQuery) return PIXEL_IDS[flowFromQuery];
-    if (!pathname) return PIXEL_IDS[FALLBACK_PIXEL_KEY];
-    const pixelKey = getPixelKeyForPath(pathname) || FALLBACK_PIXEL_KEY;
-    return PIXEL_IDS[pixelKey];
+  const syncPixelKey = useMemo(() => {
+    if (flowFromQuery) return flowFromQuery;
+    if (!pathname) return FALLBACK_PIXEL_KEY;
+    return getPixelKeyForPath(pathname) || FALLBACK_PIXEL_KEY;
   }, [pathname, flowFromQuery]);
+
+  const syncPixelId = useMemo(() => PIXEL_IDS[syncPixelKey], [syncPixelKey]);
 
   // Async refinement for /product/* pages using server-side category data.
   // Falls back to slug-based matching (syncPixelId) if the lookup fails.
+  const [asyncPixelKey, setAsyncPixelKey] = useState(null);
   const [asyncPixelId, setAsyncPixelId] = useState(null);
 
   useEffect(() => {
@@ -147,6 +158,7 @@ export default function FBPixelLoader() {
     const cleanedPath = pathname.toLowerCase();
 
     if (!cleanedPath.startsWith("/product/")) {
+      setAsyncPixelKey(null);
       setAsyncPixelId(null);
       return;
     }
@@ -166,10 +178,14 @@ export default function FBPixelLoader() {
           .map((c) => c.slug)
           .filter(Boolean);
         const pixelKey = getPixelKeyForPath(pathname, categorySlugs) || FALLBACK_PIXEL_KEY;
+        setAsyncPixelKey(pixelKey);
         setAsyncPixelId(PIXEL_IDS[pixelKey]);
       })
       .catch(() => {
-        if (isActive) setAsyncPixelId(null);
+        if (isActive) {
+          setAsyncPixelKey(null);
+          setAsyncPixelId(null);
+        }
       });
 
     return () => {
@@ -177,6 +193,7 @@ export default function FBPixelLoader() {
     };
   }, [pathname]);
 
+  const resolvedPixelKey = asyncPixelKey || syncPixelKey;
   const resolvedPixelId = asyncPixelId || syncPixelId;
 
   // Load fbevents.js exactly once per session.
@@ -218,18 +235,27 @@ export default function FBPixelLoader() {
   // Lazy-init the resolved pixel (once per session) and fire a targeted
   // PageView. Init must happen here — not at module load — so fbevents.js's
   // auto-PageView only fires for the pixel that actually matches the route.
+  //
+  // For categories registered in SECONDARY_PIXEL_IDS we ALSO init the
+  // mirror pixel(s) and fire PageView to each, so the secondary dataset
+  // accumulates the same per-pixel session record as the primary.
   useEffect(() => {
     if (process.env.NODE_ENV !== "production") return;
     if (!resolvedPixelId || typeof window === "undefined") return;
     if (typeof window.fbq !== "function") return;
 
-    if (!initializedPixels.has(resolvedPixelId)) {
-      window.fbq("init", resolvedPixelId);
-      initializedPixels.add(resolvedPixelId);
-    }
+    const secondaryIds = SECONDARY_PIXEL_IDS[resolvedPixelKey] || [];
+    const pixelsToFire = [resolvedPixelId, ...secondaryIds];
 
-    window.fbq("trackSingle", resolvedPixelId, "PageView");
-  }, [resolvedPixelId, pathname]);
+    for (const pid of pixelsToFire) {
+      if (!pid) continue;
+      if (!initializedPixels.has(pid)) {
+        window.fbq("init", pid);
+        initializedPixels.add(pid);
+      }
+      window.fbq("trackSingle", pid, "PageView");
+    }
+  }, [resolvedPixelKey, resolvedPixelId, pathname]);
 
   if (!resolvedPixelId) return null;
 
