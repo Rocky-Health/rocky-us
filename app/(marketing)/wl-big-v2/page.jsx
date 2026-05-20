@@ -39,7 +39,7 @@ export default function DmOffersPage() {
                 <DmOffersTestimonialsCarouselBlock />
                 <DmOffersMedicationTimelineSection />
                 <Section bg="bg-[#FAF3EF] !mb-0">
-                    <ReviewsSection />
+                    <ReviewsSection subheading="Over 350,000 customers. Here's what they're saying about their weight loss with MyRocky." />
                 </Section>
                 <Section bg="bg-gray-100 sm:!px-5 !px-0 ">
                     <DmOffersInStockMedicationsSection />
