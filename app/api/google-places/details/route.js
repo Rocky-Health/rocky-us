@@ -9,9 +9,10 @@ const GOOGLE_PLACES_DETAILS_BASE_URL =
 const findComponent = (components, type) =>
   components.find((c) => Array.isArray(c.types) && c.types.includes(type));
 
-function parseGoogleAddress(addressComponents) {
+function parseGoogleAddress(addressComponents, formattedAddress) {
   const streetNumber = findComponent(addressComponents, "street_number");
   const route = findComponent(addressComponents, "route");
+  const subpremise = findComponent(addressComponents, "subpremise");
   const city =
     findComponent(addressComponents, "locality") ||
     findComponent(addressComponents, "sublocality_level_1") ||
@@ -20,13 +21,20 @@ function parseGoogleAddress(addressComponents) {
   const state = findComponent(addressComponents, "administrative_area_level_1");
   const postalCode = findComponent(addressComponents, "postal_code");
 
-  const street = [streetNumber?.longText, route?.longText]
+  let street = [streetNumber?.longText, route?.longText]
     .filter(Boolean)
     .join(" ");
 
+  // Final safety: if components didn't yield a street, derive it from
+  // the first comma-segment of the formattedAddress so address_1 is never
+  // empty for an otherwise valid place selection.
+  if (!street && formattedAddress) {
+    street = formattedAddress.split(",")[0]?.trim() || "";
+  }
+
   return {
     street,
-    unit: "",
+    unit: subpremise?.longText || "",
     city: city?.longText || "",
     province: state?.shortText || "",
     postalCode: postalCode?.longText || "",
@@ -79,7 +87,7 @@ export async function POST(request) {
 
     const data = await response.json();
     const components = data.addressComponents || [];
-    const address = parseGoogleAddress(components);
+    const address = parseGoogleAddress(components, data.formattedAddress);
 
     if (!PHASE_1_STATES.includes(address.province)) {
       return NextResponse.json(

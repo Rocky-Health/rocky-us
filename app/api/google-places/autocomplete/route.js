@@ -53,9 +53,20 @@ export async function POST(request) {
 
     const data = await response.json();
 
+    // Keep only actual street addresses / buildings / units. Google tags
+    // address-style predictions inconsistently (sometimes "street_address",
+    // sometimes "premise"), so we accept any of these. This drops cities,
+    // neighborhoods, route-only matches, and any business/POI suggestions
+    // (which would otherwise mis-fill the street field).
+    const ADDRESS_TYPES = ["street_address", "premise", "subpremise"];
     const addresses = (data.suggestions || [])
       .map((s) => s.placePrediction)
       .filter(Boolean)
+      .filter(
+        (p) =>
+          Array.isArray(p.types) &&
+          p.types.some((t) => ADDRESS_TYPES.includes(t)),
+      )
       .map((p) => ({
         id: p.placeId,
         formattedAddress: p.text?.text || "",
