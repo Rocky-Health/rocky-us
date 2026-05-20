@@ -1,7 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { logger } from "@/utils/devLogger";
 import { toast } from "react-toastify";
-import { PHASE_1_STATES } from "@/lib/constants/usStates";
+
+const newSessionToken = () =>
+    typeof crypto !== "undefined" && crypto.randomUUID
+        ? crypto.randomUUID()
+        : Math.random().toString(36).slice(2) + Date.now().toString(36);
 
 const PostCanadaAddressAutocomplete = ({
     title,
@@ -11,7 +15,7 @@ const PostCanadaAddressAutocomplete = ({
     required,
     onChange,
     onAddressSelected,
-    country = "US", // Default to USA
+    country = "US", // retained for backward compatibility; provider is US-only
     ...props
 }) => {
     const [suggestions, setSuggestions] = useState([]);
@@ -21,6 +25,7 @@ const PostCanadaAddressAutocomplete = ({
     const [error, setError] = useState(null);
     const wrapperRef = useRef(null);
     const debounceTimeoutRef = useRef(null);
+    const sessionTokenRef = useRef(newSessionToken());
 
     // Update local state when prop value changes
     useEffect(() => {
@@ -44,7 +49,7 @@ const PostCanadaAddressAutocomplete = ({
         };
     }, []);
 
-    // Fetch address suggestions from AddressComplete API (Canada/USA)
+    // Fetch address suggestions from Google Places (US only)
     const fetchSuggestions = async (searchTerm) => {
         if (!searchTerm || searchTerm.length < 1) {
             setSuggestions([]);
@@ -55,22 +60,17 @@ const PostCanadaAddressAutocomplete = ({
         setError(null);
 
         try {
-            logger.log(
-                "Fetching suggestions for:",
-                searchTerm,
-                "Country:",
-                country
-            );
-            const response = await fetch(
-                "/api/postcanada/address-autocomplete",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ query: searchTerm, country }),
-                }
-            );
+            logger.log("Fetching suggestions for:", searchTerm);
+            const response = await fetch("/api/google-places/autocomplete", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    query: searchTerm,
+                    sessionToken: sessionTokenRef.current,
+                }),
+            });
 
             logger.log("Response status:", response.status);
             const responseText = await response.text();
@@ -103,21 +103,21 @@ const PostCanadaAddressAutocomplete = ({
         }
     };
 
-    // Get full address details from AddressComplete API (Canada/USA)
+    // Get full address details from Google Places (US only)
     const getAddressDetails = async (addressId) => {
         setIsLoading(true);
         setError(null);
 
         try {
             logger.log("Fetching address details for ID:", addressId);
-            const response = await fetch("/api/postcanada/address-details", {
+            const response = await fetch("/api/google-places/details", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
                     addressId,
-                    searchTerm: inputValue,
+                    sessionToken: sessionTokenRef.current,
                 }),
             });
 
@@ -132,10 +132,7 @@ const PostCanadaAddressAutocomplete = ({
             const data = JSON.parse(responseText);
             logger.log("Parsed response data:", data);
 
-            if (
-                data.error ||
-                !PHASE_1_STATES.includes(data?.address?.province)
-            ) {
+            if (data.error) {
                 // Handle API errors (unsupported states, URL restrictions, etc.)
                 logger.error("API Error:", data);
                 logger.log("Service Coverage URL:", data.serviceCoverageUrl);
@@ -266,6 +263,7 @@ const PostCanadaAddressAutocomplete = ({
         } finally {
             setIsLoading(false);
             setShowSuggestions(false);
+            sessionTokenRef.current = newSessionToken();
         }
     };
 
