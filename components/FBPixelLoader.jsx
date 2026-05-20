@@ -188,6 +188,7 @@ export default function FBPixelLoader() {
   // GTM-K9PC394B for a Meta pixel tag — remove it and rely solely on this
   // component for all pixel SDK loading.
   useEffect(() => {
+    if (process.env.NODE_ENV !== "production") return;
     if (typeof window === "undefined") return;
     if (window.__fbSdkInjected) return;
 
@@ -218,6 +219,7 @@ export default function FBPixelLoader() {
   // PageView. Init must happen here — not at module load — so fbevents.js's
   // auto-PageView only fires for the pixel that actually matches the route.
   useEffect(() => {
+    if (process.env.NODE_ENV !== "production") return;
     if (!resolvedPixelId || typeof window === "undefined") return;
     if (typeof window.fbq !== "function") return;
 
