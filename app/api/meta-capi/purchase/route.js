@@ -188,6 +188,14 @@ const normalizeGender = (gender) => {
  */
 export async function POST(req) {
   try {
+    if (process.env.NODE_ENV !== 'production') {
+      return NextResponse.json({
+        success: true,
+        skipped: true,
+        reason: 'Non-production environment',
+      });
+    }
+
     const payload = await req.json();
     let { 
       order_id, 
