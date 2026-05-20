@@ -36,7 +36,7 @@ export const META_CAPI_GATEWAYS = {
   },
   WL: {
     accessToken: process.env.FB_ACCESS_TOKEN_WL,
-    pixelId: '1451450365779499',
+    pixelId: '1873491106559002',
     customEventName: CUSTOM_EVENT_NAMES.WL,
     categories: ['weight-loss', 'wl', 'body-optimization'],
     name: 'WL'
