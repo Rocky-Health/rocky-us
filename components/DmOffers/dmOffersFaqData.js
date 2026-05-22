@@ -31,7 +31,7 @@ export const DM_OFFERS_FAQ_ITEMS = [
     },
     {
         question: "How much weight will I lose?",
-        answer: "<p>In clinical anecdotes and published GLP-1 trials, responders often approximate ~1–2% weekly body-weight reduction early on—but biology, adherence, and adjunct lifestyle coaching heavily influence totals. Twelve-week deltas can approach high single-digit percentage points.</p>",
+        answer: "<p>In clinical anecdotes and published GLP-1 trials, responders often approximate ~1-2% weekly body-weight reduction early on—but biology, adherence, and adjunct lifestyle coaching heavily influence totals. Twelve-week deltas can approach high single-digit percentage points.</p>",
         initials: "CR",
         avatarSrc: "https://i.pravatar.cc/128?img=13",
     },

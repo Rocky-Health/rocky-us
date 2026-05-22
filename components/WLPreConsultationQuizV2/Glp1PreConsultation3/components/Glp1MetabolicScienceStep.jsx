@@ -72,7 +72,7 @@ const Glp1MetabolicScienceStep = ({
                 </button>
             </div>
 
-            <DmOffersRockyInTheNews />
+            {/* <DmOffersRockyInTheNews /> */}
         </div>
     );
 };

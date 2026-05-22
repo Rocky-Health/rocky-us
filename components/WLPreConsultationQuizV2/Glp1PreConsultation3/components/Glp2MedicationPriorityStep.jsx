@@ -75,10 +75,10 @@ const Glp2MedicationPriorityStep = ({
         : "";
 
     const headingLead =
-        config?.medicationPriorityHeadingLead ?? "Looking good!";
+        config?.medicationPriorityHeadingLead ?? "Almost there ";
     const headingRest =
         config?.medicationPriorityHeadingRest ??
-        "Let's match you with the best medication.";
+        "- a few clinical questions to make sure GLP-1 is safe for you.";
     const promptText =
         config?.medicationPriorityPrompt ??
         "Which of these is most important to you?";

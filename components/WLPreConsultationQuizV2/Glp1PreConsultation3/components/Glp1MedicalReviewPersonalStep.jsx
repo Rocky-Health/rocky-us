@@ -45,7 +45,7 @@ const Glp1MedicalReviewPersonalStep = ({
     const bmiDisplay =
         bmiRaw !== undefined && bmiRaw !== null && String(bmiRaw).trim() !== ""
             ? Number.isFinite(Number(bmiRaw))
-                ? Number(bmiRaw).toFixed(1)
+                ? Number(bmiRaw).toFixed(0)
                 : String(bmiRaw)
             : "—";
 
