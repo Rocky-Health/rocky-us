@@ -10,9 +10,9 @@ const DoctorTrustedSolutionsCards = [
     },
     {
         DesktopImage:
-            "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/DoctorTrustedSolutionsCards-D-2.svg",
+            "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/DoctorTrustedSolutionsCards-D-2-V2.png",
         MobileImage:
-            "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/DoctorTrustedSolutionsCards-MS-2.png",
+            "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/DoctorTrustedSolutionsCards-M-2-V2.png",
     },
     {
         DesktopImage:

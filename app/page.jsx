@@ -47,7 +47,7 @@ async function HomeContent() {
     const menuItems = [
         {
             category: "Sexual Health",
-            image: "https://myrocky.b-cdn.net/WP%20Images/Sexual%20Health/sex-header.webp",
+            image: "https://myrocky.b-cdn.net/WP%20Images/ED-bag-2.webp",
             assessmentText: "Start Your ED Assessment",
             description: "Get Confidence Back in Bed",
             treatments: [

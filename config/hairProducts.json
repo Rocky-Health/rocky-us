@@ -12,10 +12,13 @@
       "pills": "Finasteride & Minoxidil Foam",
       "isSubscription": true,
       "subscriptionPeriod": "3_month",
-      "image": "https://myrocky.b-cdn.net/WP%20Images/Hair%20Loss/2-in-1-Growth-Plan.png",
+      "image": "https://myrocky.b-cdn.net/WP%20Images/Foam.webp",
       "badge": "https://myrocky.b-cdn.net/WP%20Images/Hair%20Loss/mask-group.png",
       "label": "Most Popular",
-      "bestFor": ["Stopping Hair Loss", "Regrowing Hair"],
+      "bestFor": [
+        "Stopping Hair Loss",
+        "Regrowing Hair"
+      ],
       "benefits": [
         "Clinically proven to prevent hair loss and stimulate hair growth.",
         "See results in 3 months.",
@@ -23,7 +26,10 @@
       ],
       "tooltip": "A 2 in 1 topical foam combining FDA Approved ingredients to help prevent hair loss and regrow hair.",
       "quantity": 1,
-      "consultationOptions": ["Regrowing my hair", "Both"]
+      "consultationOptions": [
+        "Regrowing my hair",
+        "Both"
+      ]
     },
     "6288": {
       "id": "6288",
@@ -37,7 +43,10 @@
       "subscriptionPeriod": "3_month",
       "image": "https://myrocky.b-cdn.net/WP%20Images/Hair%20Loss/The%20Growth%20Plan.png",
       "badge": "https://myrocky.b-cdn.net/WP%20Images/Hair%20Loss/mask-group.png",
-      "bestFor": ["Stopping Hair Loss", "Regrowing Hair"],
+      "bestFor": [
+        "Stopping Hair Loss",
+        "Regrowing Hair"
+      ],
       "benefits": [
         "Clinically proven to prevent hair loss and stimulate hair growth.",
         "See results in 3 months.",
@@ -60,7 +69,9 @@
       "subscriptionPeriod": "3_month",
       "image": "https://myrocky.b-cdn.net/WP%20Images/Hair%20Loss/Back-On-Track.png",
       "badge": "https://myrocky.b-cdn.net/WP%20Images/Hair%20Loss/mask-group.png",
-      "bestFor": ["Regrowing Hair"],
+      "bestFor": [
+        "Regrowing Hair"
+      ],
       "benefits": [
         "No prescription required.",
         "Helps thicken and grow hair.",
@@ -83,7 +94,9 @@
       "subscriptionPeriod": "3_month_24",
       "image": "https://myrocky.b-cdn.net/WP%20Images/Hair%20Loss/Not-on-my-watch.png",
       "badge": "https://myrocky.b-cdn.net/WP%20Images/Hair%20Loss/mask-group.png",
-      "bestFor": ["Stopping Hair Loss"],
+      "bestFor": [
+        "Stopping Hair Loss"
+      ],
       "benefits": [
         "Stops hair loss from worsening.",
         "Just one pill a day.",
@@ -91,7 +104,9 @@
       ],
       "tooltip": "Daily prescription pill clinically proven to prevent hair loss.",
       "quantity": 1,
-      "consultationOptions": ["Preventing future hair loss"]
+      "consultationOptions": [
+        "Preventing future hair loss"
+      ]
     }
   },
   "consultationMapping": {
@@ -99,5 +114,7 @@
     "Preventing future hair loss": "126208",
     "Both": "126208"
   },
-  "flowProducts": ["126208"]
+  "flowProducts": [
+    "126208"
+  ]
 }
