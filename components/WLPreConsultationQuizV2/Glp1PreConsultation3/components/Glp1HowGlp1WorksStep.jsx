@@ -43,12 +43,13 @@ const Glp1HowGlp1WorksStep = ({ onContinue, onQuizChromeVisibilityChange }) => {
 
                 <div className="mt-6 overflow-hidden rounded-2xl max-w-lg mx-auto lg:mt-8 lg:p-5">
                     <CustomImage
-                        src="/wl-pre-consultation/wlps.png"
+                        src="/glp-3-quiz/wlps.webp"
                         alt="How GLP-1 improves metabolic rate and ease of weight loss over 12 weeks"
                         width={880}
                         height={520}
                         className="mx-auto h-auto w-full object-contain"
                         sizes="(max-width: 768px) 100vw, 42rem"
+                        style={{ borderRadius: "50px" }}
                         priority
                     />
                 </div>

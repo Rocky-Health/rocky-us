@@ -125,8 +125,8 @@ export default function DmOffersHungerSignalsSection() {
                     </p>
 
                     <p className="font-poppins text-[26px] font-light text-gray-800/80">
-                        Watch what our customers have to say about losing weight
-                        with MyRocky:
+                        Real people. Real results — 350k+ losing weight with
+                        doctor-prescribed GLP-1.
                     </p>
                 </div>
 
