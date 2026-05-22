@@ -6,9 +6,9 @@ import { FaArrowRight } from "react-icons/fa";
 const ACCENT = "#A7885A";
 
 const LAST_DOSE_OPTIONS = [
-    { id: "0-5-days", label: "0–5 days" },
-    { id: "6-10-days", label: "6–10 days" },
-    { id: "11-14-days", label: "11–14 days" },
+    { id: "0-5-days", label: "0-5 days" },
+    { id: "6-10-days", label: "6-10 days" },
+    { id: "11-14-days", label: "11-14 days" },
     {
         id: "2-4-weeks",
         label: "More than 2 weeks ago but within the last 4 weeks",

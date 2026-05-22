@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { logger } from "@/utils/devLogger";
 import { useEffect, useState } from "react";
-import { shouldUseMinimalLayout } from "@/utils/layoutConfig";
+import { shouldUseMinimalLayout, shouldHideZendesk } from "@/utils/layoutConfig";
 import { getAwinFromUrlOrStorage } from "@/utils/awin";
 import { analyticsService } from "@/utils/analytics/analyticsService";
 
@@ -27,6 +27,8 @@ const LayoutDetector = () => {
     // Determine if current path should use minimal layout
     const shouldBeMinimal = shouldUseMinimalLayout(normalizedPath);
     setIsMinimalLayout(shouldBeMinimal);
+
+    const hideZendesk = shouldHideZendesk(normalizedPath);
 
     // Get header and footer elements with more reliable selectors
     const navbarElement = document.querySelector("header.navbar-main");
@@ -68,6 +70,17 @@ const LayoutDetector = () => {
         } else {
           footerUnderElement.classList.remove("layout-hidden");
           footerUnderElement.style.display = "";
+        }
+      }
+
+      const zendeskElement = document.getElementById("zendesk-launcher-placeholder");
+      if (zendeskElement) {
+        if (hideZendesk) {
+          zendeskElement.classList.add("layout-hidden");
+          zendeskElement.style.display = "none";
+        } else {
+          zendeskElement.classList.remove("layout-hidden");
+          zendeskElement.style.display = "";
         }
       }
 

@@ -18,8 +18,8 @@ const Glp2BeforeAfterStep2 = ({ onContinue, onQuizChromeVisibilityChange }) => {
                 <div className="mb-10">
                     <p className="headers-font text-center text-3xl font-medium leading-[125%] text-[#251F20]">
                         &quot;I was ready to give up. After seeing reviews of
-                        GLP-1, I had to try. 6 months later -- wow. Thank you
-                        for the metabolic reset - game changer.&quot;
+                        GLP-1, I had to try. 6 months later - wow. Thank you for
+                        the metabolic reset - game changer.&quot;
                     </p>
                 </div>
 

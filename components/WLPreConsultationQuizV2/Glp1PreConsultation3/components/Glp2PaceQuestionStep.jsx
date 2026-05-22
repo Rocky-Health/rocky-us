@@ -6,6 +6,7 @@ import { FaPersonWalking } from "react-icons/fa6";
 
 const LOW_RATE = 0.015;
 const HIGH_RATE = 0.01666;
+const WEEKS_RATE = 0.0175;
 const ACCENT = "#A7885A";
 
 function computeProjection(weight, goalWeight) {
@@ -14,8 +15,11 @@ function computeProjection(weight, goalWeight) {
     const lbs = Math.max(w - g, 0);
     const lossPerWeekLow = +(w * LOW_RATE).toFixed(1);
     const lossPerWeekHigh = +(w * HIGH_RATE).toFixed(1);
+    const lossPerWeek = w * WEEKS_RATE;
     const weeksToGoal =
-        lossPerWeekLow > 0 ? +(lbs / lossPerWeekLow).toFixed(2) : null;
+        lossPerWeek > 0 && lbs > 0
+            ? Math.max(1, Math.ceil(lbs / lossPerWeek))
+            : null;
     return {
         lbs,
         lossPerWeekLow,
@@ -63,7 +67,7 @@ const Glp2PaceQuestionStep = ({ userData, setUserData, onContinue }) => {
                 <h1 className="headers-font text-5xl font-normal leading-[125%] tracking-[-0.02em] text-[#251F20]">
                     {hasProjection ? (
                         <>
-                            With medication, you&apos;ll lose {lossPerWeekLow}–
+                            With medication, you&apos;ll lose {lossPerWeekLow}-
                             {lossPerWeekHigh} pounds{" "}
                         </>
                     ) : (

@@ -16,7 +16,7 @@ const Glp1PreConsultation3Navbar = () => {
                         <CustomImage
                             fill
                             className="w-full h-full object-contain object-right"
-                            src="/glp-3-quiz/tp-score.png"
+                            src="/glp-3-quiz/tp-score2.png"
                             alt="Excellent 4.6 — customer reviews"
                         />
                     </div>

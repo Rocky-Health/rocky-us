@@ -14,7 +14,9 @@ function computeProjection(weight, goalWeight) {
     const lbs = Math.max(w - g, 0);
     const lossPerWeekHigh = +(w * HIGH_RATE).toFixed(2);
     const weeksToGoalFast =
-        lossPerWeekHigh > 0 ? +(lbs / lossPerWeekHigh).toFixed(2) : null;
+        lossPerWeekHigh > 0
+            ? Math.max(1, Math.ceil(lbs / lossPerWeekHigh))
+            : null;
     return { lbs, weeksToGoalFast };
 }
 
@@ -37,7 +39,7 @@ function TitleBlock({ variant }) {
     }
     return (
         <h1 className="subheaders-font mb-4 text-5xl font-normal leading-[115%] tracking-[-0.02em] text-[#251F20]">
-            Perfect!
+            Great — you qualify
         </h1>
     );
 }
@@ -54,7 +56,7 @@ const Glp2PaceResultStep = ({ userData, onContinue }) => {
         userData?.goalWeight,
     );
     const lbsRounded = Math.round(lbs);
-    const lbsLabel = lbsRounded > 0 ? `${lbsRounded}lbs` : "your goal weight";
+    const lbsLabel = lbsRounded > 0 ? `${lbsRounded} lbs` : "your goal weight";
 
     let bodyLead = "";
     if (selected === "works-for-me") {

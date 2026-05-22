@@ -27,7 +27,7 @@ export const DM_OFFERS_MEDICATION_TIMELINE_STEPS = [
         color: "text-[#c9a9c9]",
     },
     {
-        label: "Free & discreet 1–2 day delivery",
+        label: "Free & discreet 1-2 day delivery",
         tone: "highlight",
         action: "Get your medication",
         color: "text-[#e7a1d9]",
@@ -48,7 +48,7 @@ export const DM_OFFERS_TIMELINE_PHONE_SRC =
     "https://myrocky.b-cdn.net/WP%20Images/glp-offer/EnhancesCover.png";
 
 export default function DmOffersMedicationTimelineSection({
-    headline = "Get your weight loss meds in 1–2 days",
+    headline = "Get your weight loss meds in 1-2 days",
     subtitle = "Direct healthcare, without the long wait times or doctor denials.",
     steps = DM_OFFERS_MEDICATION_TIMELINE_STEPS,
     logoSrc = DM_OFFERS_MYROCKY_LOGO,

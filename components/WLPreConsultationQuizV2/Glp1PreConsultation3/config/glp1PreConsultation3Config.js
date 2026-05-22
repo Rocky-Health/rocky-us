@@ -197,8 +197,8 @@ export const glp1PreConsultation3Config = {
             required: true,
             options: [
                 { id: "less-than-5", label: "Less than 5 hours" },
-                { id: "6-7", label: "6–7 hours" },
-                { id: "8-9", label: "8–9 hours" },
+                { id: "6-7", label: "6-7 hours" },
+                { id: "8-9", label: "8-9 hours" },
                 { id: "more-than-9", label: "More than 9 hours" },
             ],
         },
@@ -238,7 +238,7 @@ export const glp1PreConsultation3Config = {
                 { id: "thyroid-cyst", label: "Thyroid cyst" },
             ],
         },
-        // Step 17: Additional health questions (GLP-1–related risks)
+        // Step 17: Additional health questions (GLP-1-related risks)
         17: {
             id: "glp1MoreHealthQuestions",
             type: "glp1MoreHealthQuestions",
@@ -388,11 +388,11 @@ export const glp1PreConsultation3Config = {
                 { id: "slow", label: "<60 beats per minute (Slow)" },
                 {
                     id: "normal",
-                    label: "60–100 beats per minute (Normal)",
+                    label: "60-100 beats per minute (Normal)",
                 },
                 {
                     id: "slightly-fast",
-                    label: "101–110 beats per minute (Slightly Fast)",
+                    label: "101-110 beats per minute (Slightly Fast)",
                 },
                 { id: "fast", label: ">110 beats per minute (Fast)" },
                 { id: "not-sure", label: "I'm not sure" },
@@ -939,7 +939,7 @@ export const glp1PreConsultation3Config = {
                 {
                     label: "Continue",
                     action: "navigate",
-                    payload: 2, // Go to step 2 (then through steps 3–13, or skip to recommendations if authenticated)
+                    payload: 2, // Go to step 2 (then through steps 3-13, or skip to recommendations if authenticated)
                     primary: true,
                 },
             ],
