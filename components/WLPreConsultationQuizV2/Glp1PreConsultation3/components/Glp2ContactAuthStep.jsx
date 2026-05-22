@@ -425,7 +425,7 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
                             >
                                 terms and privacy policies
                             </Link>{" "}
-                            and to be contacted as necessary by Rocky and its
+                            and to be contacted as necessary by MyRocky and its
                             medical partners and can opt-out at anytime.
                         </label>
                     </div>

@@ -7,7 +7,7 @@ const PreLanderQSection = ({ img, h2, p, UpText = true, question }) => {
       <Link href="/" aria-label="MyRocky Homepage">
         <Image
           src="/ed-prelander-5/rocky-logo.png"
-          alt="Rocky Logo"
+          alt="MyRocky Logo"
           width={81}
           height={30}
           className="mb-3"
@@ -18,7 +18,7 @@ const PreLanderQSection = ({ img, h2, p, UpText = true, question }) => {
         <div className="hidden md:block relative w-[584px] h-[696px]">
           <Image
             src={img}
-            alt="Rocky product"
+            alt="MyRocky product"
             fill
             className="object-cover rounded-2xl"
           />
@@ -52,7 +52,7 @@ const PreLanderQSection = ({ img, h2, p, UpText = true, question }) => {
           <div className="relative w-full h-[335px]">
             <Image
               src={img}
-              alt="Rocky product"
+              alt="MyRocky product"
               fill
               className="object-cover rounded-2xl"
             />

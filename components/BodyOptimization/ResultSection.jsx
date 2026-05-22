@@ -15,7 +15,7 @@ const reviews = [
       "https://myrocky.b-cdn.net/WP%20Images/Weight%20Loss/wl-1-after.webp",
     duration: "52 lbs in 17 months",
     reviewText:
-      "I felt stuck before I joined Rocky. Their guidance helped me lose over 50 pounds and completely change how I approach health",
+      "I felt stuck before I joined MyRocky. Their guidance helped me lose over 50 pounds and completely change how I approach health",
   },
   {
     name: "Ashley",
@@ -25,7 +25,7 @@ const reviews = [
       "https://myrocky.b-cdn.net/WP%20Images/Weight%20Loss/wl-2-after.webp",
     duration: "33 lbs in 15 months",
     reviewText:
-      "Rocky met me where I was, helping me build confidence in my body and take control of my health without feeling overwhelmed",
+      "MyRocky met me where I was, helping me build confidence in my body and take control of my health without feeling overwhelmed",
   },
   {
     name: "Pedro",
@@ -35,7 +35,7 @@ const reviews = [
       "https://myrocky.b-cdn.net/WP%20Images/Weight%20Loss/wl-3-after.webp",
     duration: "17 lbs in 11 months",
     reviewText:
-      "With Rocky I didn’t just lose weight, I finally understood how to train and eat for my body and this is the best I’ve felt in years",
+      "With MyRocky I didn’t just lose weight, I finally understood how to train and eat for my body and this is the best I’ve felt in years",
   },
   ,
   {
@@ -46,7 +46,7 @@ const reviews = [
       "https://myrocky.b-cdn.net/WP%20Images/Weight%20Loss/wl-4-after.webp",
     duration: "19 lbs in 8 months",
     reviewText:
-      "Rocky helped me build habits that actually stuck and the progress speaks for itself - I never thought I could get this lean again. ",
+      "MyRocky helped me build habits that actually stuck and the progress speaks for itself - I never thought I could get this lean again. ",
   },
 ];
 

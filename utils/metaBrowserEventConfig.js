@@ -24,6 +24,34 @@ export const CATEGORY_PIXEL_MAP = {
 };
 
 /* ------------------------------------------------------------------ */
+/*  Secondary pixel mirrors                                            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Browser-side dual-fire mirrors. Each entry says: for the given category,
+ * also fire the same milestone to `pixelId` under a parallel event name
+ * built from `eventNameBase` + the milestone suffix (e.g. `RKY_FLW_US_QS`).
+ *
+ * Mirrors are PURELY ADDITIVE: the primary CATEGORY_PIXEL_MAP fire still
+ * happens unchanged, and secondaries are fired afterwards in a separate
+ * try/catch so a secondary failure cannot interfere with the primary.
+ *
+ * Currently used to populate the new US-only WL dataset (1873491106559002)
+ * with mirrored funnel events under the `RKY_FLW_US` namespace while the
+ * legacy shared pixel (1451450365779499) keeps receiving the original
+ * `RKY_FLW_*` events for in-flight ad campaigns.
+ */
+export const SECONDARY_CATEGORY_PIXEL_MAP = {
+  WL: [
+    {
+      pixelId:
+        process.env.NEXT_PUBLIC_FB_PIXEL_ID_WL_US || "1873491106559002",
+      eventNameBase: "RKY_FLW_US",
+    },
+  ],
+};
+
+/* ------------------------------------------------------------------ */
 /*  Category base codes (aligned with CAPI CUSTOM_EVENT_NAMES)         */
 /* ------------------------------------------------------------------ */
 
@@ -157,6 +185,18 @@ export function resolveMetaEventName(flowId, questionnaireId, milestone) {
   const suffix = MILESTONES[milestone];
   if (!suffix) return base;
   return `${base}_${suffix}`;
+}
+
+/**
+ * Build the secondary event name for a given (category, milestone) pair
+ * using a supplied event-name base. Mirrors the same suffix convention as
+ * resolveMetaEventName so the secondary stays in lockstep with the primary.
+ * e.g. buildSecondaryEventName("RKY_FLW_US", "QUIZ_START") => "RKY_FLW_US_QS"
+ */
+export function buildSecondaryEventName(eventNameBase, milestone) {
+  const suffix = MILESTONES[milestone];
+  if (!suffix) return eventNameBase;
+  return `${eventNameBase}_${suffix}`;
 }
 
 /* ------------------------------------------------------------------ */

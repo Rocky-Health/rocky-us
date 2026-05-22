@@ -32,7 +32,7 @@ const ProductPopup = ({ isOpen, onClose, product }) => {
     sizeAndFit: true,
     care: true,
   });
-  const isShirt = currentProduct?.slug?.includes("rocky-essential-tee") || false;
+  const isShirt = currentProduct?.slug?.includes("myRocky-essential-tee") || false;
   // Sort sizes from small to XL for better UX
   const sortSizes = (sizes) => {
     const order = ["XS", "S", "M", "L", "XL", "XXL", "XXXL", "One Size", "One Size Fits All"];

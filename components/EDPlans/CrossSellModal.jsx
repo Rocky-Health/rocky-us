@@ -247,7 +247,7 @@ const CrossSellModal = ({
     // },
     // {
     //   id: "353755",
-    //   title: "Rocky Dad Hat",
+    //   title: "MyRocky Dad Hat",
     //   price: 30,
     //   quantity: "",
     //   frequency: "One time purchase",

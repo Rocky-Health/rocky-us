@@ -282,6 +282,7 @@ export const trackMetaCapiPurchase = async (order, additionalData = {}, debug = 
     const sendPromises = Object.entries(reconciledSplits).map(async ([gatewayKey, split]) => {
       try {
         const metaParams = typeof window !== 'undefined' ? captureMetaParameters() : {};
+        const eventSourceUrl = typeof window !== 'undefined' ? window.location.href : undefined;
 
         const payload = {
           order_id: enrichedOrder.id,
@@ -297,6 +298,7 @@ export const trackMetaCapiPurchase = async (order, additionalData = {}, debug = 
           num_items: split.num_items,
           order_data: enrichedOrder,
           meta_params: metaParams,
+          event_source_url: eventSourceUrl,
           ...additionalData
         };
 

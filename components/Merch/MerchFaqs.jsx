@@ -11,7 +11,7 @@ const DynamicHomeFaqsSection = dynamic(
 );
 
 const getProductFAQs = () => {
-    // Rocky Merchandise FAQs
+    // MyRocky Merchandise FAQs
     return [
         {
             question: "What size should I order?",

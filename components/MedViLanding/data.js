@@ -47,8 +47,8 @@ export const productTiers = [
 // ── Testimonials Showcase ──
 export const featuredTestimonial = {
     quote: "When nothing else worked,",
-    highlight: "Rocky did",
-    attribution: "Verified Rocky Customer",
+    highlight: "MyRocky did",
+    attribution: "Verified MyRocky Customer",
 };
 
 // small quotes
@@ -148,7 +148,7 @@ export const goalOptions = [
 // ── Trust Badges (align with GLP1Offer/data.js) ──
 /** @type {{ id: string, label: string }[]} */
 export const trustBadges = [
-    { id: "guarantee", label: "Rocky money back guarantee" },
+    { id: "guarantee", label: "MyRocky money back guarantee" },
     { id: "delivery", label: "Free, expedited delivery" },
     { id: "doctor", label: "Doctor-led plans & coaching" },
     { id: "fees", label: "No hidden fees" },

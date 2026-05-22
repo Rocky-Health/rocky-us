@@ -411,7 +411,7 @@ const Glp1ContactAuthStep = ({
               >
                 terms and privacy policies
               </Link>{" "}
-              and to be contacted as necessary by Rocky and its medical partners
+              and to be contacted as necessary by MyRocky and its medical partners
               and can opt-out at anytime.
             </label>
           </div>

@@ -7,7 +7,7 @@ const RockyHeroSection = () => {
             <div className="px-5 sectionWidth:px-0 pt-[52px] mb-14 md:pt-8 md:mb-[96px] max-w-[1184px] mx-auto h-[550px] md:h-[664px] flex flex-col md:justify-center">
                 <div className="mb-10 md:mb-12 md:max-w-[635px]">
                     <h1 className="capitalize text-[40px] md:text-[120px] leading-[115%] tracking-[-0.02em] mb-2 md:mb-4 headers-font">
-                        how Rocky Works
+                        how MyRocky Works
                     </h1>
                     <p className="text-[16px] font-[500] md:text-[20px] leading-[140%]">
                         Healthcare on your terms. Get started in 3 easy steps.

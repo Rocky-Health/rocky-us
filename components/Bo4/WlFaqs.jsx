@@ -11,7 +11,7 @@ const faqs = [
     },
     {
         question: "What can I expect after I sign up?",
-        answer: "Upon completing the initial online consultation, a Rocky Healthcare provider will assess this and determine if you are eligible. Please check your account for messages from your clinician.",
+        answer: "Upon completing the initial online consultation, a MyRocky Healthcare provider will assess this and determine if you are eligible. Please check your account for messages from your clinician.",
     },
     // {
     //   question: "Why do I need a metabolic lab test?",
@@ -35,12 +35,12 @@ const faqs = [
     //   answer:""
     //  },
     //  {
-    //   question: "How can I get a weight loss medication prescription at Rocky?",
+    //   question: "How can I get a weight loss medication prescription at MyRocky?",
     //   answer: ""
     //  },
 
     // {
-    //   question: "What type of weight loss medications does Rocky offer?",
+    //   question: "What type of weight loss medications does MyRocky offer?",
     //   answer: ""
     //  },
 ];

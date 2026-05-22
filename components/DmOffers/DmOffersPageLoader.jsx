@@ -27,7 +27,7 @@ export default function DmOffersPageLoader({ children }) {
                 <div className="relative h-[80px] w-[240px] z-[100] mb-36">
                     <Image
                         src="https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-white.webp"
-                        alt="Rocky"
+                        alt="MyRocky"
                         fill
                         className="object-contain z-[100]"
                         priority

@@ -10,7 +10,7 @@ const accordionData = [
     number: "01",
     title: "Faster-acting",
     content:
-      "Rocky Chewalis get you hard in 15 minutes on average. Because the mint dissolves under the tongue, it activates way faster than other leading ED medications.",
+      "MyRocky Chewalis get you hard in 15 minutes on average. Because the mint dissolves under the tongue, it activates way faster than other leading ED medications.",
   },
   {
     number: "02",

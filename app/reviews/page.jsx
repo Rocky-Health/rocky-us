@@ -26,7 +26,7 @@ export default function Home() {
       <CoverSection bg={"bg-[#f7f9fb]"}>
         <HeroSection
           title="Don't just take our word for it"
-          description="Join 350,000+ people in Us who trust Rocky for exceptional healthcare."
+          description="Join 350,000+ people in Us who trust MyRocky for exceptional healthcare."
           buttons={reviewsButtons}
           imageSrc="https://myrocky.b-cdn.net/WP%20Images/Review%20Page/Reviews-section.webp"
           imageAlt="hero Image"

@@ -50,7 +50,7 @@ const CHECK_ITEMS = [
     { key: "w5", node: "HSA/FSA Approved!" },
 ];
 
-/** Rocky WL palette (matches GLP1 / body optimization landers) */
+/** MyRocky WL palette (matches GLP1 / body optimization landers) */
 const BTN_PRIMARY = "bg-black hover:bg-[#2d2d2d] text-white shadow-sm";
 const ACCENT_TEXT = "text-[#AE7E56]";
 const CHECK_BG = "bg-[#AE7E56]";

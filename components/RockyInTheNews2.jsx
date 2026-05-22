@@ -147,7 +147,7 @@ const RockyInTheNews2 = () => {
             {/* News Section */}
             <div className="max-w-[1184px] mx-auto relative overflow-hidden w-full md:pt-16 mt-[30px]">
                 <div className="text-sm leading-[140%] font-medium mb-6 text-center">
-                    ROCKY IN THE NEWS
+                    MYROCKY IN THE NEWS
                 </div>
                 <div className="flex items-center gap-[40px] md:gap-[82px] whitespace-nowrap w-fit h-[39px] relative animate-scroll">
                     {news.concat(news).map((card, index) => (
