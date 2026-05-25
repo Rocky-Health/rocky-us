@@ -8,6 +8,7 @@ const RadioTextQuestion = ({
   setTextInput,
   onTextSubmit,
   isValid,
+  hideTitle = false,
 }) => {
   const selectedOption = config.options.find(
     (opt) => opt.id === userData[config.field],
@@ -17,7 +18,7 @@ const RadioTextQuestion = ({
   return (
     <>
       <div className="space-y-4 mb-4 ">
-        <h1>{config.title}</h1>
+        {!hideTitle && <h1>{config.title}</h1>}
         {config.options.length == 2 ? (
           <>
             <div className="flex flex-row items-center gap-3">
