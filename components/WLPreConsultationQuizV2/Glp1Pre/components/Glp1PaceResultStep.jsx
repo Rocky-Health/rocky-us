@@ -9,9 +9,9 @@ function computeProjection(weight, goalWeight) {
   const w = parseFloat(weight) || 0;
   const g = parseFloat(goalWeight) || 0;
   const lbs = Math.max(w - g, 0);
-  const lossPerWeekHigh = +(w * HIGH_RATE).toFixed(2);
+  const lossPerWeekHigh = Math.round(w * HIGH_RATE);
   const weeksToGoalFast =
-    lossPerWeekHigh > 0 ? +(lbs / lossPerWeekHigh).toFixed(2) : null;
+    lossPerWeekHigh > 0 ? Math.round(lbs / lossPerWeekHigh) : null;
   return { lbs, weeksToGoalFast };
 }
 

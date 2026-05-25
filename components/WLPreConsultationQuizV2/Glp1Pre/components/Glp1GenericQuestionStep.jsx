@@ -215,6 +215,7 @@ const Glp1GenericQuestionStep = ({
       onTextSubmit: handleTextSubmit,
       onContinue: handleContinue,
       isValid: isValid(),
+      hideTitle: !isMultiQuestionPage && !isCustomFullLayoutStep,
     };
 
     const sharedStepProps = {

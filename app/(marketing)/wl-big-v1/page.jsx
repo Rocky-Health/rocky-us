@@ -20,6 +20,7 @@ import Footer from "@/components/Footer/Footer";
 import Section from "@/components/utils/Section";
 import MedViFlashGuard from "@/components/MedViLanding/MedViFlashGuard";
 import EverFlowScript from "@/components/EverFlow/EverFlowScript";
+import HeaderProudPartner from "@/components/Navbar/HeaderProudPartner";
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +38,7 @@ export default function WlMedViPage() {
       <EverFlowScript mode="click" offerId={5094} network="rcr73qtl" />
       <MedViFlashGuard />
       <MedViPromoBanner />
+      <HeaderProudPartner />
       <MedViNav ctaHref={ctaHref} />
       <main className="min-h-screen ">
         <MedViHero ctaHref={ctaHref} />
