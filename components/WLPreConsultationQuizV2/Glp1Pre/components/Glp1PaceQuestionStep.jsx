@@ -11,12 +11,12 @@ function computeProjection(weight, goalWeight) {
   const w = parseFloat(weight) || 0;
   const g = parseFloat(goalWeight) || 0;
   const lbs = Math.max(w - g, 0);
-  const lossPerWeekLow = +(w * LOW_RATE).toFixed(2);
-  const lossPerWeekHigh = +(w * HIGH_RATE).toFixed(2);
+  const lossPerWeekLow = Math.round(w * LOW_RATE);
+  const lossPerWeekHigh = Math.round(w * HIGH_RATE);
   const weeksToGoal =
-    lossPerWeekLow > 0 ? +(lbs / lossPerWeekLow).toFixed(2) : null;
+    lossPerWeekLow > 0 ? Math.round(lbs / lossPerWeekLow) : null;
   const weeksToGoalFast =
-    lossPerWeekHigh > 0 ? +(lbs / lossPerWeekHigh).toFixed(2) : null;
+    lossPerWeekHigh > 0 ? Math.round(lbs / lossPerWeekHigh) : null;
   return {
     lbs,
     lossPerWeekLow,
@@ -82,8 +82,11 @@ const Glp2PaceQuestionStep = ({ userData, setUserData, onContinue }) => {
         <h1 className="headers-font text-[32px] leading-[105%] text-[#251F20] mb-10">
           {hasProjection ? (
             <>
-              With Medication, You&apos;ll Lose {lossPerWeekLow} To{" "}
-              {lossPerWeekHigh} Pounds{" "}
+              With Medication, You&apos;ll Lose{" "}
+              {lossPerWeekLow === lossPerWeekHigh
+                ? lossPerWeekLow
+                : `${lossPerWeekLow} To ${lossPerWeekHigh}`}{" "}
+              Pounds{" "}
             </>
           ) : (
             "With Medication, You'll Lose Weight "

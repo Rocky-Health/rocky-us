@@ -9,9 +9,9 @@ function computeWeeks(weight, goalWeight) {
   const w = parseFloat(weight) || 0;
   const g = parseFloat(goalWeight) || 0;
   const lbs = Math.max(w - g, 0);
-  const lossPerWeek = +(w * LOW_RATE).toFixed(2);
+  const lossPerWeek = Math.round(w * LOW_RATE);
   if (!lossPerWeek || !lbs) return null;
-  return +(lbs / lossPerWeek).toFixed(1);
+  return Math.round(lbs / lossPerWeek);
 }
 
 const Glp1MedicalReviewStep = ({ userData, onContinue }) => {
@@ -31,7 +31,7 @@ const Glp1MedicalReviewStep = ({ userData, onContinue }) => {
         <div className="mb-4 space-y-1">
           {bmi !== null && (
             <p className="text-[16px] text-[#251F20]">
-              <span className="font-semibold">BMI</span>: {bmi.toFixed(2)}
+              <span className="font-semibold">BMI</span>: {Math.round(bmi)}
             </p>
           )}
           {weight !== null && (
