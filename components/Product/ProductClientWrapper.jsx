@@ -11,11 +11,14 @@ import BodyOptimizationProductPageContent from "./body-optimization/BodyOptimiza
 import SupplementsProductPageContent from "./Supplements/SupplementsProductPageContent";
 import { useProductTracking } from "@/lib/hooks/useGA4Tracking";
 import { analyticsService } from "@/utils/analytics/analyticsService";
+import { useAutoApplyCoupon } from "@/lib/hooks/useAutoApplyCoupon";
 
 export default function ProductClientWrapper({ slug, initialData = null }) {
   const [productData, setProductData] = useState(initialData);
   const [loading, setLoading] = useState(!initialData);
   const [error, setError] = useState(false);
+
+  useAutoApplyCoupon();
 
   // Check if this is a ZONNIC product
   const isZonnicProduct =
