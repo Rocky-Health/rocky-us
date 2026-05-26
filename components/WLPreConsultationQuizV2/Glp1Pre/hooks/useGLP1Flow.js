@@ -1,13 +1,30 @@
 
+import { useEffect } from "react";
 import { useStepNavigation } from "../../hooks/useStepNavigation";
 import { useQuizData } from "../../hooks/useQuizData";
 import { quizConfig } from "../config/quizConfig";
 import { logger } from "@/utils/devLogger";
 import { wlFlowAddToCart } from "@/utils/flowCartHandler";
 import { addRequiredConsultation } from "@/utils/requiredConsultation";
-import { fireEverFlowConversion } from "@/components/EverFlow/EverFlowScript";
+import {
+  fireEverFlowConversion,
+  fireEverFlowConversionWhenReady,
+} from "@/components/EverFlow/EverFlowScript";
 
 export const useGLP1Flow = () => {
+  // EverFlow Start Quiz (event 6226). The static <EverFlowScript> on the page
+  // misses SPA-navigated entries because next/script.onReady doesn't refire
+  // when the SDK is already loaded. Fire imperatively on hook mount; the
+  // helper shares sessionStorage with the static fire so direct loads
+  // don't double-count.
+  useEffect(() => {
+    return fireEverFlowConversionWhenReady({
+      network: "rcr73qtl",
+      offerId: 5094,
+      eventId: 6226,
+    });
+  }, []);
+
   const {
     currentStep,
     progressPercent,

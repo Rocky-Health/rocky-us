@@ -40,6 +40,41 @@ export function fireEverFlowConversion({ network, offerId, eventId }) {
   }
 }
 
+// Quiz-Start events fire from inside the SPA quiz hook on mount, which can
+// race the EF SDK <Script> load — window.EF may not exist yet. Poll briefly
+// and fire as soon as it's ready. Returns a cleanup fn so callers can cancel
+// from useEffect teardown.
+export function fireEverFlowConversionWhenReady({
+  network,
+  offerId,
+  eventId,
+  timeoutMs = 10000,
+  intervalMs = 250,
+}) {
+  const noop = () => {};
+  if (process.env.NEXT_PUBLIC_EF_ENABLED !== "true") return noop;
+  if (typeof window === "undefined") return noop;
+  if (!NETWORK_DOMAINS[network]) return noop;
+  if (!offerId) return noop;
+
+  if (window.EF) {
+    fireEverFlowConversion({ network, offerId, eventId });
+    return noop;
+  }
+
+  const start = Date.now();
+  const interval = setInterval(() => {
+    if (typeof window !== "undefined" && window.EF) {
+      fireEverFlowConversion({ network, offerId, eventId });
+      clearInterval(interval);
+    } else if (Date.now() - start >= timeoutMs) {
+      clearInterval(interval);
+    }
+  }, intervalMs);
+
+  return () => clearInterval(interval);
+}
+
 export default function EverFlowScript({ mode, offerId, eventId, network }) {
   const firedRef = useRef(false);
 
