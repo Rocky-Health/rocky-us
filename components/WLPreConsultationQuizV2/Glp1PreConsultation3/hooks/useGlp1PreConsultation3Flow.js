@@ -1,12 +1,27 @@
+import { useEffect } from "react";
 import { useGlp1PreConsultation3StepNavigation } from "./useGlp1PreConsultation3StepNavigation";
 import { useGlp1PreConsultation3QuizData } from "./useGlp1PreConsultation3QuizData";
 import { glp1PreConsultation3Config } from "../config/glp1PreConsultation3Config";
 import { logger } from "@/utils/devLogger";
 import { wlFlowAddToCart } from "@/utils/flowCartHandler";
 import { addRequiredConsultation } from "@/utils/requiredConsultation";
-import { fireEverFlowConversion } from "@/components/EverFlow/EverFlowScript";
+import {
+  fireEverFlowConversion,
+  fireEverFlowConversionWhenReady,
+} from "@/components/EverFlow/EverFlowScript";
 
 export const useGlp1PreConsultation3Flow = () => {
+  // EverFlow Start Quiz (event 6230). See useGLP1Flow for rationale —
+  // static EverFlowScript misses SPA entries; this fires once on mount
+  // and shares the sessionStorage idempotency key with the static fire.
+  useEffect(() => {
+    return fireEverFlowConversionWhenReady({
+      network: "vyrov30g",
+      offerId: 5096,
+      eventId: 6230,
+    });
+  }, []);
+
   const {
     currentStep,
     progressPercent,
