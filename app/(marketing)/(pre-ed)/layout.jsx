@@ -14,6 +14,7 @@ export const metadata = buildMetadata({
   description:
     "Confidential ED consultations with licensed clinicians — discreet prescriptions delivered across the US by MyRocky.",
   vertical: "ed",
+  noindex: true,
 });
 
 export default function palendarLayout({ children }) {

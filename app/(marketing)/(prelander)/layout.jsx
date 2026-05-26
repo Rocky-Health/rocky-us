@@ -13,6 +13,7 @@ export const metadata = buildMetadata({
   title: "Online Healthcare for Men",
   description:
     "Discreet, clinician-led care from MyRocky — ED, hair loss, weight management and more, prescribed online and delivered across the US.",
+  noindex: true,
 });
 
 export default function palendarLayout({ children }) {

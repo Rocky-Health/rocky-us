@@ -30,10 +30,13 @@ export async function generateMetadata({ params }) {
       blog?.yoast_head_json?.author ||
       undefined;
 
+    const yoastCanonical = blog?.yoast_head_json?.canonical || undefined;
+
     return buildMetadata({
       title,
       description,
       path: canonicalPath,
+      canonicalUrl: yoastCanonical,
       vertical: "blog",
       type: "article",
       ogImage,

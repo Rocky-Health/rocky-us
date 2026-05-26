@@ -3,6 +3,12 @@ const THIRTY_DAYS = "public, max-age=2592000, stale-while-revalidate=86400";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Disable streaming metadata for all user agents. With async generateMetadata
+  // (e.g. blog [slug] fetching from WordPress), Next.js otherwise injects
+  // <link rel="canonical"> into <body> after the page streams. Google ignores
+  // body-level canonicals, which caused GSC to report "User-declared canonical: None"
+  // on blog URLs despite the tag being present in the HTML.
+  htmlLimitedBots: /.*/,
   images: {
     minimumCacheTTL: 2592000,
     remotePatterns: [
