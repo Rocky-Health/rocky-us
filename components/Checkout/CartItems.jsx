@@ -264,9 +264,9 @@ const CartITem2 = ({ item, hasCoupon = false }) => {
 
   // Check if this is a compounded Tirzepatide / Semaglutide item
   const compoundedPlanInfo = getCompoundedPlanInfo(item);
-  const isSemaglutide =
-    /semaglutide/i.test(item.name || "") &&
-    !/oral|sublingual/i.test(item.name || "");
+  // Monthly Compounded Semaglutide variation (489799): show hardcoded copy.
+  const isSemaMonthlyVariation =
+    item.id === 489799 || item.product_id === 489799;
 
   // Check if this is the special offer product [GLP-1] Buy 2 Get 1 Free
   const isOfferProduct = item.id === 489780 || item.product_id === 489780;
@@ -358,9 +358,9 @@ const CartITem2 = ({ item, hasCoupon = false }) => {
           {compoundedPlanInfo && (
             <div className="mt-1.5 space-y-0.5">
               <div className="flex items-center gap-1.5">
-                {isSemaglutide && compoundedPlanInfo.months === 1 ? (
+                {isSemaMonthlyVariation ? (
                   <span className="text-[11px] font-[600] text-[#000000]">
-                    {currencySymbol}{formatPriceUI(itemPrice / compoundedPlanInfo.months)}/mo after first month
+                    $249/mo after first month
                   </span>
                 ) : (
                   <>
