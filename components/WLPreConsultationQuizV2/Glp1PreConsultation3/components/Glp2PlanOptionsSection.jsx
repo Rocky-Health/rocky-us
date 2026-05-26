@@ -111,7 +111,7 @@ const Glp2PlanOptionsSection = ({
                 </div>
               </div>
 
-              {plan.savings && (
+              {plan.savings && !plan.recurringNote && (
                 <div className="mt-3 rounded-[4px] border border-dashed border-[#9ED3B3] text-[#21A957] text-center py-2 text-sm md:text-base font-semibold">
                   You are saving {savingsText}
                 </div>
@@ -121,7 +121,7 @@ const Glp2PlanOptionsSection = ({
                 <div className="mt-3 rounded-[4px] bg-[#A7885A] text-center py-3 px-3">
                   <p className="text-base leading-snug text-white font-bold">
                     Select Plan ·{" "}
-                    {plan.originalPrice && (
+                    {!plan.recurringNote && plan.originalPrice && (
                       <span className="line-through font-normal opacity-80">
                         ${formatPriceUI(plan.originalPrice)}/month
                       </span>
@@ -132,7 +132,13 @@ const Glp2PlanOptionsSection = ({
                     <span className="font-bold">
                       ${formatPriceUI(plan.price)}
                     </span>{" "}
-                    LIMITED OFFER
+                    {plan.recurringNote ? (
+                      <span className="normal-case font-normal opacity-90 ml-1">
+                        · {plan.recurringNote}
+                      </span>
+                    ) : (
+                      "LIMITED OFFER"
+                    )}
                   </p>
                 </div>
               ) : (

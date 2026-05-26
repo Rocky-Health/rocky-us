@@ -154,6 +154,14 @@ const Glp2TreatmentCheckoutSummary = ({ cartItems, setCartItems }) => {
   const lineTotalDollars = lineTotalCents / 100;
   const couponReducedPrice = lineTotalDollars < lineSubtotalDollars;
 
+  // Detect Compounded Semaglutide monthly plan — display uses first-month framing, no strikethrough
+  const primaryName = stripHtml(primary?.name || "").toLowerCase();
+  const isSemaMonthly =
+    primaryName.includes("semaglutide") &&
+    !primaryName.includes("oral") &&
+    !primaryName.includes("sublingual") &&
+    compounded?.months === 1;
+
   const medicationName = primary ? stripHtml(primary.name) : "Your treatment";
 
   const deliveryPlan =
@@ -176,39 +184,42 @@ const Glp2TreatmentCheckoutSummary = ({ cartItems, setCartItems }) => {
   let monthlyStrike = null;
   let monthlyCurrent = null;
   let compoundedOrigMonthly = null;
-  if (compounded && compounded.months > 0) {
-    const orig = compounded.originalPrice?.replace(/[^0-9.]/g, "") || "";
-    const origNum = parseFloat(orig);
-    if (!Number.isNaN(origNum)) {
-      compoundedOrigMonthly = origNum;
+  if (!isSemaMonthly) {
+    if (compounded && compounded.months > 0) {
+      const orig = compounded.originalPrice?.replace(/[^0-9.]/g, "") || "";
+      const origNum = parseFloat(orig);
+      if (!Number.isNaN(origNum)) {
+        compoundedOrigMonthly = origNum;
+      }
+      // Strike: coupon → plan price per month; no coupon → hardcoded retail price per month
+      const strikePerMonth = couponReducedPrice
+        ? lineSubtotalDollars / compounded.months
+        : compoundedOrigMonthly;
+      if (strikePerMonth != null) {
+        monthlyStrike = `${currencySymbol}${formatPriceUI(strikePerMonth)}/mo`;
+      }
+      // Current uses line_total so it reflects applied coupons
+      monthlyCurrent = `${currencySymbol}${formatPriceUI(
+        lineTotalDollars / compounded.months,
+      )}/mo`;
+    } else if (primary) {
+      // Monthly plan (months = 1 or no compounded info)
+      if (couponReducedPrice) {
+        monthlyStrike = `${currencySymbol}${formatPriceUI(lineSubtotalDollars)}/mo`;
+      } else if (compoundedOrigMonthly != null) {
+        monthlyStrike = `${currencySymbol}${formatPriceUI(compoundedOrigMonthly)}/mo`;
+      }
+      monthlyCurrent = `${currencySymbol}${formatPriceUI(lineTotalDollars)}/mo`;
     }
-    // Strike: coupon → plan price per month; no coupon → hardcoded retail price per month
-    const strikePerMonth = couponReducedPrice
-      ? lineSubtotalDollars / compounded.months
-      : compoundedOrigMonthly;
-    if (strikePerMonth != null) {
-      monthlyStrike = `${currencySymbol}${formatPriceUI(strikePerMonth)}/mo`;
-    }
-    // Current uses line_total so it reflects applied coupons
-    monthlyCurrent = `${currencySymbol}${formatPriceUI(
-      lineTotalDollars / compounded.months,
-    )}/mo`;
-  } else if (primary) {
-    // Monthly plan (months = 1 or no compounded info)
-    if (couponReducedPrice) {
-      monthlyStrike = `${currencySymbol}${formatPriceUI(lineSubtotalDollars)}/mo`;
-    } else if (compoundedOrigMonthly != null) {
-      monthlyStrike = `${currencySymbol}${formatPriceUI(compoundedOrigMonthly)}/mo`;
-    }
-    monthlyCurrent = `${currencySymbol}${formatPriceUI(lineTotalDollars)}/mo`;
   }
 
   // Total row strike: coupon active → plan price; no coupon → retail total
-  const totalStrikeDisplay = couponReducedPrice
+  // Suppressed for sema monthly — no strikethrough framing
+  const totalStrikeDisplay = !isSemaMonthly && (couponReducedPrice
     ? `${currencySymbol}${formatPriceUI(lineSubtotalDollars)}`
     : compounded && compounded.months > 0 && compoundedOrigMonthly != null
       ? `${currencySymbol}${formatPriceUI(compoundedOrigMonthly * compounded.months)}`
-      : null;
+      : null);
 
   const thumb =
     primary?.images?.[0]?.thumbnail || primary?.images?.[0]?.src || "";
@@ -281,7 +292,29 @@ const Glp2TreatmentCheckoutSummary = ({ cartItems, setCartItems }) => {
               valueClassName={shippingFree ? "font-bold" : ""}
               valueStyle={shippingFree ? { color: ACCENT_GREEN } : undefined}
             />
-            {(monthlyStrike || monthlyCurrent) && (
+            {isSemaMonthly ? (
+              <>
+                <div className="flex justify-between gap-3 pt-2 border-t border-[#003b5c]/10">
+                  <span className="shrink-0" style={{ color: LABEL_MUTED }}>
+                    Monthly price
+                  </span>
+                  <span className="text-right font-semibold" style={{ color: ACCENT_GREEN }}>
+                    {currencySymbol}{formatPriceUI(lineTotalDollars)}/mo
+                  </span>
+                </div>
+                <div className="flex justify-between gap-3 mt-1 font-semibold">
+                  <span className="shrink-0" style={{ color: LABEL_MUTED }}>
+                    Total
+                  </span>
+                  <span className="text-right" style={{ color: ACCENT_GREEN }}>
+                    {currencySymbol}{formatPriceUI(lineTotalDollars)}
+                  </span>
+                </div>
+                <p className="text-[12px] mt-1 text-right" style={{ color: LABEL_MUTED }}>
+                  $249/month after first month
+                </p>
+              </>
+            ) : (monthlyStrike || monthlyCurrent) && (
               <>
                 <div className="flex justify-between gap-3 pt-2 border-t border-[#003b5c]/10">
                   <span className="shrink-0" style={{ color: LABEL_MUTED }}>

@@ -8,6 +8,7 @@ import { analyticsService } from "@/utils/analytics/analyticsService";
 import { isUserAuthenticated } from "@/utils/crossSellCheckout";
 import { formatPrice } from "@/utils/priceFormatter";
 import { sanitizeHtml } from "@/utils/sanitizeHtml";
+import { SEMA_PRICING } from "@/lib/constants/subscriptionPricing";
 
 const CartPopup = ({ isOpen, onClose, productType, onContinueShopping }) => {
   const [cartItems, setCartItems] = useState([]);
@@ -298,26 +299,58 @@ const CartPopup = ({ isOpen, onClose, productType, onContinueShopping }) => {
                         )}
                       </div>
                     )}
-                    <div className="text-[#212121] text-sm">
-                      {item.quantity || 1} × $
-                      {item.prices?.sale_price
-                        ? formatPrice(item.prices.sale_price / 100)
-                        : formatPrice(
-                            item.prices?.regular_price / 100 || item.price
-                          )}
-                    </div>
-                    <div className="text-[#212121] text-sm font-semibold">
-                      Total: $
-                      {item.prices?.sale_price
-                        ? formatPrice(
-                            (item.prices.sale_price / 100) *
-                            (item.quantity || 1)
-                          )
-                        : formatPrice(
-                            (item.prices?.regular_price / 100 || item.price) *
-                            (item.quantity || 1)
-                          )}
-                    </div>
+                    {(() => {
+                      const semaName = (item.name || "").toLowerCase();
+                      const nameIsSema =
+                        semaName.includes("semaglutide") &&
+                        !semaName.includes("oral") &&
+                        !semaName.includes("sublingual");
+                      const authBilling =
+                        item.extensions?.subscriptions?.billing_interval == 1 &&
+                        (item.extensions?.subscriptions?.billing_period || "").toLowerCase() === "month";
+                      const isSemaMonthly =
+                        nameIsSema &&
+                        (authBilling || String(item.variation_id) === "489799");
+                      if (isSemaMonthly) {
+                        const qty = item.quantity || 1;
+                        return (
+                          <>
+                            <div className="text-[#212121] text-sm">
+                              {qty} × ${SEMA_PRICING.firstMonthAmount}.00
+                            </div>
+                            <div className="text-[#212121] text-sm font-semibold">
+                              Total: ${formatPrice(SEMA_PRICING.firstMonthAmount * qty)}
+                            </div>
+                            <div className="text-[#212121] text-xs">every 1 month</div>
+                            <div className="text-[#212121] text-xs">{SEMA_PRICING.recurringTagline}</div>
+                          </>
+                        );
+                      }
+                      return (
+                        <>
+                          <div className="text-[#212121] text-sm">
+                            {item.quantity || 1} × $
+                            {item.prices?.sale_price
+                              ? formatPrice(item.prices.sale_price / 100)
+                              : formatPrice(
+                                  item.prices?.regular_price / 100 || item.price
+                                )}
+                          </div>
+                          <div className="text-[#212121] text-sm font-semibold">
+                            Total: $
+                            {item.prices?.sale_price
+                              ? formatPrice(
+                                  (item.prices.sale_price / 100) *
+                                  (item.quantity || 1)
+                                )
+                              : formatPrice(
+                                  (item.prices?.regular_price / 100 || item.price) *
+                                  (item.quantity || 1)
+                                )}
+                          </div>
+                        </>
+                      );
+                    })()}
                   </div>
                   <button
                     onClick={() => handleRemoveItem(item)}

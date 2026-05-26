@@ -264,7 +264,7 @@ export const boSimplifiedConfig = {
             "12month": "490169",
         },
         "489798": { // Compounded Semaglutide
-            monthly:   "489798",
+            monthly:   "489799",
             "3month":  "490164",
             "6month":  "490165",
             "12month": "490166",
@@ -323,8 +323,7 @@ export const boSimplifiedConfig = {
                 label: "Monthly Auto-Refill",
                 subtitle: "Flexible. Pay as you go plan.",
                 price: "$150",
-                originalPrice: "$279",
-                savings: "Save $129",
+                recurringNote: "$249/month after first month",
                 subscriptionPeriod: "1_month",
                 isDefault: true,
             },

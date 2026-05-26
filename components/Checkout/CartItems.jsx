@@ -3,6 +3,7 @@ import { formatPriceUI } from "@/utils/priceFormatter";
 import { useState } from "react";
 import { logger } from "@/utils/devLogger";
 import { sanitizeHtml } from "@/utils/sanitizeHtml";
+import { SEMA_PRICING } from "@/lib/constants/subscriptionPricing";
 
 const CartItems = ({ items, coupons = [] }) => {
   const hasCoupon = coupons.length > 0;
@@ -197,10 +198,11 @@ const CartItem = ({ item }) => {
   );
 };
 
-// Original (base/retail) price per compounded product — shown as strikethrough in checkout
+// Original (base/retail) price per compounded product — shown as strikethrough in checkout.
+// Semaglutide uses first-month pricing framing; only tirzepatide shows a strikethrough.
 const COMPOUNDED_ORIGINAL_PRICES = {
   tirzepatide: "$389",
-  semaglutide: "$279",
+  // semaglutide entry omitted — no strikethrough displayed for sema monthly
 };
 
 // Map subscription billing interval (months) → plan label
@@ -264,6 +266,20 @@ const CartITem2 = ({ item, hasCoupon = false }) => {
 
   // Check if this is a compounded Tirzepatide / Semaglutide item
   const compoundedPlanInfo = getCompoundedPlanInfo(item);
+
+  // Sema monthly detection and cosmetic price
+  const _itemName2 = (item.name || "").toLowerCase();
+  const isSemaMonthly =
+    _itemName2.includes("semaglutide") &&
+    !_itemName2.includes("oral") &&
+    !_itemName2.includes("sublingual") &&
+    !!(compoundedPlanInfo?.months === 1 || String(item.variation_id) === "489799");
+  const couponReducedPrice =
+    isSemaMonthly &&
+    item.totals?.line_total < item.totals?.line_subtotal;
+  const semaDisplayPrice = isSemaMonthly
+    ? (couponReducedPrice ? item.totals.line_total / 100 : SEMA_PRICING.firstMonthAmount)
+    : null;
 
   // Check if this is the special offer product [GLP-1] Buy 2 Get 1 Free
   const isOfferProduct = item.id === 489780 || item.product_id === 489780;
@@ -352,18 +368,24 @@ const CartITem2 = ({ item, hasCoupon = false }) => {
           )}
 
           {/* Compounded Tirzepatide / Semaglutide: show selected plan + sale vs base price */}
-          {compoundedPlanInfo && (
-            <div className="mt-1.5 space-y-0.5">
-              <div className="flex items-center gap-1.5">
-                <span className="text-[11px] text-[#999999] line-through">
-                  {compoundedPlanInfo.originalPrice}/mo
-                </span>
-                <span className="text-[11px] font-[600] text-[#000000]">
-                  {currencySymbol}{formatPriceUI(itemPrice / compoundedPlanInfo.months)}/mo
-                </span>
+          {compoundedPlanInfo && (() => {
+            return (
+              <div className="mt-1.5 space-y-0.5">
+                {isSemaMonthly ? (
+                  <p className="text-[11px] text-[#666666]">{SEMA_PRICING.recurringTagline}</p>
+                ) : (
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[11px] text-[#999999] line-through">
+                      {compoundedPlanInfo.originalPrice}/mo
+                    </span>
+                    <span className="text-[11px] font-[600] text-[#000000]">
+                      {currencySymbol}{formatPriceUI(itemPrice / compoundedPlanInfo.months)}/mo
+                    </span>
+                  </div>
+                )}
               </div>
-            </div>
-          )}
+            );
+          })()}
           {isOfferProduct && (
             <p className="text-[12px]">
               {currencySymbol}
@@ -482,7 +504,7 @@ const CartITem2 = ({ item, hasCoupon = false }) => {
         {item.name === "Body Optimization Program" ? (
           <span className="text-green-500">FREE</span>
         ) : (
-          currencySymbol + formatPriceUI(itemPrice)
+          currencySymbol + formatPriceUI(isSemaMonthly ? semaDisplayPrice : itemPrice)
         )}
       </div>
     </div>

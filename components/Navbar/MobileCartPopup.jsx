@@ -4,6 +4,7 @@ import { IoClose } from "react-icons/io5";
 import { useState, useEffect } from "react";
 import { formatPriceUI } from "@/utils/priceFormatter";
 import { sanitizeHtml } from "@/utils/sanitizeHtml";
+import { SEMA_PRICING } from "@/lib/constants/subscriptionPricing";
 
 export default function MobileCartPopup({
   open,
@@ -113,6 +114,37 @@ export default function MobileCartPopup({
                   ) : (
                     <>
                       {(() => {
+                        const semaName = (item.name || "").toLowerCase();
+                        const nameIsSema =
+                          semaName.includes("semaglutide") &&
+                          !semaName.includes("oral") &&
+                          !semaName.includes("sublingual");
+                        const subscription = !isLocalCart
+                          ? item.extensions?.subscriptions
+                          : null;
+                        const authBilling =
+                          subscription?.billing_interval == 1 &&
+                          (subscription?.billing_period || "").toLowerCase() === "month";
+                        const isSemaMonthly =
+                          nameIsSema &&
+                          (authBilling || String(item.variation_id) === "489799");
+
+                        if (isSemaMonthly) {
+                          const quantity = item.quantity || 1;
+                          return (
+                            <>
+                              <div className="text-[#212121] text-sm">
+                                {quantity} × ${SEMA_PRICING.firstMonthAmount}.00
+                              </div>
+                              <div className="text-[#212121] text-sm font-semibold">
+                                Total: ${formatPriceUI(SEMA_PRICING.firstMonthAmount * quantity)}
+                              </div>
+                              <div className="text-[#212121] text-xs">every 1 month</div>
+                              <div className="text-[#212121] text-xs">{SEMA_PRICING.recurringTagline}</div>
+                            </>
+                          );
+                        }
+
                         // Normalize price: server cart uses cents in prices.*, local cart often stores cents in item.price
                         const rawUnitPrice =
                           (isLocalCart

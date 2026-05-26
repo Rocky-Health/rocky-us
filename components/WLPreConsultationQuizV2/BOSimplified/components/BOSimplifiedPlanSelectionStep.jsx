@@ -227,7 +227,11 @@ const BOSimplifiedPlanSelectionStep = ({
                                                 {monthlyPlan?.subtitle ||
                                                     "Flexible. Pay as you go plan."}
                                             </p>
-                                            {monthlyPlan?.savings && (
+                                            {monthlyPlan?.recurringNote ? (
+                                                <span className="block mt-1 text-xs text-[#666666]">
+                                                    {monthlyPlan.recurringNote}
+                                                </span>
+                                            ) : monthlyPlan?.savings ? (
                                                 <span
                                                     className={`inline-block mt-2 px-2 py-1 rounded-[4px] text-xs font-[500] ${
                                                         selectedPlan?.id ===
@@ -238,13 +242,13 @@ const BOSimplifiedPlanSelectionStep = ({
                                                 >
                                                     {monthlyPlan.savings}
                                                 </span>
-                                            )}
+                                            ) : null}
                                         </div>
                                     </div>
                                     <div className="text-right shrink-0">
                                         <span className="font-[600] text-[#000000] flex md:flex-row flex-col-reverse md:items-center md:gap-2 gap-0.5">
                                             {" "}
-                                            {monthlyPlan?.originalPrice && (
+                                            {!monthlyPlan?.recurringNote && monthlyPlan?.originalPrice && (
                                                 <span className="text-[16px] text-[#999999] line-through">
                                                     $
                                                     {formatPriceUI(
@@ -376,7 +380,7 @@ const BOSimplifiedPlanSelectionStep = ({
                                     </p>
                                 </div>
                                 <div className="text-right shrink-0 ml-4">
-                                    {selectedPlan?.originalPrice && (
+                                    {!selectedPlan?.recurringNote && selectedPlan?.originalPrice && (
                                         <p className="text-[13px] text-[#999999] line-through">
                                             $
                                             {formatPriceUI(
@@ -390,6 +394,11 @@ const BOSimplifiedPlanSelectionStep = ({
                                         {formatPriceUI(getOrderSummaryPrice())}
                                         /mo
                                     </p>
+                                    {selectedPlan?.recurringNote && (
+                                        <p className="text-[11px] text-[#666666] mt-0.5">
+                                            {selectedPlan.recurringNote}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
 
@@ -403,8 +412,8 @@ const BOSimplifiedPlanSelectionStep = ({
                                 </div>
                             )}
 
-                            {/* Savings badge */}
-                            {selectedPlan?.savings && (
+                            {/* Savings badge — hidden for sema monthly (uses recurringNote instead) */}
+                            {selectedPlan?.savings && !selectedPlan?.recurringNote && (
                                 <div className="mb-3">
                                     <span className="inline-block px-2 py-1 rounded-[4px] bg-[#CEEAD6] text-[#0D652D] text-xs font-[500]">
                                         {selectedPlan.savings}

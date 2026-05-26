@@ -9,10 +9,11 @@ import { canRemoveItem } from "@/lib/cart/cartService";
 import { analyticsService } from "@/utils/analytics/analyticsService";
 import { formatPriceUI } from "@/utils/priceFormatter";
 import { sanitizeHtml } from "@/utils/sanitizeHtml";
+import { SEMA_PRICING } from "@/lib/constants/subscriptionPricing";
 
+// Semaglutide entry omitted — no strikethrough displayed for sema monthly
 const COMPOUNDED_ORIGINAL_PRICES = {
   tirzepatide: "$389",
-  semaglutide: "$279",
 };
 
 const PLAN_LABEL_BY_INTERVAL = {
@@ -189,6 +190,20 @@ const CartItem = ({ item, setCartItems, allItems, hasCoupon = false }) => {
   const isSubscriptionWithFallback = isSubscription || isOralSemaglutide;
 
   const compoundedPlanInfo = getCompoundedPlanInfo(item);
+
+  // Sema monthly detection at item scope so both price spots can share it
+  const _itemName = (item.name || "").toLowerCase();
+  const isSemaMonthly =
+    _itemName.includes("semaglutide") &&
+    !_itemName.includes("oral") &&
+    !_itemName.includes("sublingual") &&
+    !!(compoundedPlanInfo?.months === 1 || String(item.variation_id) === "489799");
+  const couponReducedPrice =
+    isSemaMonthly &&
+    item.totals?.line_total < item.totals?.line_subtotal;
+  const semaDisplayPrice = isSemaMonthly
+    ? (couponReducedPrice ? item.totals.line_total / 100 : SEMA_PRICING.firstMonthAmount)
+    : null;
 
   let supply = "";
   if (
@@ -411,21 +426,30 @@ const CartItem = ({ item, setCartItems, allItems, hasCoupon = false }) => {
                   </p>
                 </>
               )}
-              {compoundedPlanInfo && (
-                <div className="mt-1">
-                  <p className="text-[12px] font-[400] text-[#212121]">
-                    {currencySymbol}{formatPriceUI(itemTotalPrice)} / {intervalText}
-                  </p>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="text-[11px] text-[#999999] line-through">
-                      {compoundedPlanInfo.originalPrice}/mo
-                    </span>
-                    <span className="text-[11px] font-[600] text-[#212121]">
-                      {currencySymbol}{formatPriceUI(itemTotalPrice / compoundedPlanInfo.months)}/mo
-                    </span>
+              {compoundedPlanInfo && (() => {
+                const displayPrice = isSemaMonthly ? semaDisplayPrice : itemTotalPrice;
+                return (
+                  <div className="mt-1">
+                    <p className="text-[12px] font-[400] text-[#212121]">
+                      {currencySymbol}{formatPriceUI(displayPrice)} / {intervalText}
+                    </p>
+                    {isSemaMonthly ? (
+                      <p className="text-[11px] text-[#666666] mt-0.5">
+                        {SEMA_PRICING.recurringTagline}
+                      </p>
+                    ) : (
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <span className="text-[11px] text-[#999999] line-through">
+                          {compoundedPlanInfo.originalPrice}/mo
+                        </span>
+                        <span className="text-[11px] font-[600] text-[#212121]">
+                          {currencySymbol}{formatPriceUI(itemTotalPrice / compoundedPlanInfo.months)}/mo
+                        </span>
+                      </div>
+                    )}
                   </div>
-                </div>
-              )}
+                );
+              })()}
               {item.name === "Body Optimization Program" && (
                 <div className="flex flex-col">
                   <p className="text-sm md:text-base font-[500] text-[#212121] underline text-nowrap">
@@ -480,7 +504,7 @@ const CartItem = ({ item, setCartItems, allItems, hasCoupon = false }) => {
                 <><span className="woocommerce-Price-currencySymbol">
                   {currencySymbol}
                 </span>
-                {formatPriceUI(itemTotalPrice)}</>
+                {formatPriceUI(isSemaMonthly ? semaDisplayPrice : itemTotalPrice)}</>
               )}
             </bdi>
           </span>

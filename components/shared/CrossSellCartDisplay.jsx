@@ -138,6 +138,21 @@ const CrossSellCartDisplay = ({
                       x {item.quantity}
                     </span></>}
                   </p>
+                  {(() => {
+                    const semaName = (item.name || "").toLowerCase();
+                    const isSema =
+                      semaName.includes("semaglutide") &&
+                      !semaName.includes("oral") &&
+                      !semaName.includes("sublingual");
+                    if (isSema) {
+                      return (
+                        <>
+                          <p className="text-[12px] text-[#212121] block text-right mt-0.5">every 1 month</p>
+                          <p className="text-[12px] text-[#666666] block text-right mt-0.5">$249/month after first month</p>
+                        </>
+                      );
+                    }
+                  })()}
                   {item.name != "Body Optimization Program" && <p className="text-[12px] text-[#212121] block text-right mt-1">
                     {(() => {
                       if (

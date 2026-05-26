@@ -12,6 +12,7 @@ import MobileCartPopup from "./MobileCartPopup";
 import { IoIosCart } from "react-icons/io";
 import { formatPriceUI } from "@/utils/priceFormatter";
 import { sanitizeHtml } from "@/utils/sanitizeHtml";
+import { SEMA_PRICING } from "@/lib/constants/subscriptionPricing";
 
 const CartIcon = ({ handleToggle }) => {
   const [cartItems, setCartItems] = useState([]);
@@ -382,19 +383,50 @@ const CartItem = ({ item, refreshCart, isLocalCart, allItems }) => {
         </p>
         {item.name === "Body Optimization Program" ? <p className="mt-1 text-xs text-green-500">
           FREE
-        </p> : <>
-          <p className="mt-1 text-xs">
-          {quantity} × {currencySymbol}
-          {typeof itemPrice === "number"
-            ? formatPriceUI(itemPrice)
-            : formatPriceUI(itemPrice)}
-        </p>
-        <p className="mt-1 text-xs font-semibold">
-          Total: {currencySymbol}
-          {typeof itemPrice === "number"
-            ? formatPriceUI(itemPrice * quantity)
-            : formatPriceUI(parseFloat(itemPrice || 0) * quantity)}
-        </p></>}
+        </p> : (() => {
+          const semaName = (item.name || "").toLowerCase();
+          const nameIsSema =
+            semaName.includes("semaglutide") &&
+            !semaName.includes("oral") &&
+            !semaName.includes("sublingual");
+          const authBilling =
+            isSubscription &&
+            subscription?.billing_interval == 1 &&
+            (subscription?.billing_period || "").toLowerCase() === "month";
+          const isSemaMonthly =
+            nameIsSema &&
+            (authBilling || String(item.variation_id) === "489799");
+          if (isSemaMonthly) {
+            return (
+              <>
+                <p className="mt-1 text-xs">
+                  {quantity} × {currencySymbol}{SEMA_PRICING.firstMonthAmount}.00
+                </p>
+                <p className="mt-1 text-xs font-semibold">
+                  Total: {currencySymbol}{formatPriceUI(SEMA_PRICING.firstMonthAmount * quantity)}
+                </p>
+                <p className="mt-0.5 text-xs text-[#666666]">every 1 month</p>
+                <p className="mt-0.5 text-xs text-[#666666]">{SEMA_PRICING.recurringTagline}</p>
+              </>
+            );
+          }
+          return (
+            <>
+              <p className="mt-1 text-xs">
+              {quantity} × {currencySymbol}
+              {typeof itemPrice === "number"
+                ? formatPriceUI(itemPrice)
+                : formatPriceUI(itemPrice)}
+            </p>
+            <p className="mt-1 text-xs font-semibold">
+              Total: {currencySymbol}
+              {typeof itemPrice === "number"
+                ? formatPriceUI(itemPrice * quantity)
+                : formatPriceUI(parseFloat(itemPrice || 0) * quantity)}
+            </p>
+            </>
+          );
+        })()}
         {item.name === "Body Optimization Program" && (
           <div className="flex flex-col">
             <p className="text-sm font-[500] text-[#212121] underline text-nowrap">
