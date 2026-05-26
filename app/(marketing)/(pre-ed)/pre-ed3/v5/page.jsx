@@ -5,13 +5,14 @@ import ReviewsSection from "@/components/ReviewsSection";
 import Section from "@/components/utils/Section";
 import { SexualHealthFaqs } from "@/components/PreLanders/data/SexualHealthFaqs";
 import { getVariantById } from "@/lib/constants/preEd3Variants";
+import { buildMetadata } from "@/lib/seo/metadata";
 
-export const metadata = {
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
+export const metadata = buildMetadata({
+  title: "Online ED Care for Men",
+  description: "Digital healthcare for men — without the wait time or stigma.",
+  vertical: "ed",
+  noindex: true,
+});
 
 export default function PreEd3V5() {
   const variant = getVariantById(5);

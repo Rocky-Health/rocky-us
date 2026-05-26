@@ -1,36 +1,26 @@
 import MoreQuestions from "@/components/MoreQuestions";
 import React from "react";
+import { buildMetadata } from "@/lib/seo/metadata";
 
-export const metadata = {
-    title: "ED Medication Services Across US | MyRocky",
-    description:
-        "Access ED medications online with discreet delivery across US. Professional consultation and prescription services for Viagra and Cialis.",
-    openGraph: {
-        title: "ED Medication Services Across US | MyRocky",
-        description:
-            "Access ED medications online with discreet delivery across US. Professional consultation and prescription services for Viagra and Cialis.",
-        images: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp",
-    },
-    twitter: {
-        card: "ED Medication Services Across US | MyRocky",
-        title: "ED Medication Services Across US | MyRocky",
-        description:
-            "Access ED medications online with discreet delivery across US. Professional consultation and prescription services for Viagra and Cialis.",
-        images: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp",
-    },
-};
+export const metadata = buildMetadata({
+  title: "ED Medication Services Across US",
+  description:
+    "Access ED medications online with discreet delivery across the US. Professional consultation and prescription services for Viagra and Cialis.",
+  path: "/service-across-canada",
+  vertical: "ed",
+});
 
 export default function ServiceLayout({ children }) {
-    return (
-        <>
-            {children}
-            <div className="max-w-[1184px] mx-auto px-5 pb-8 md:pb-12 md:px-0">
-                <MoreQuestions
-                    title="Your path to better health begins here."
-                    buttonText="Get Started For Free"
-                    link="/faqs"
-                />
-            </div>
-        </>
-    );
+  return (
+    <>
+      {children}
+      <div className="max-w-[1184px] mx-auto px-5 pb-8 md:pb-12 md:px-0">
+        <MoreQuestions
+          title="Your path to better health begins here."
+          buttonText="Get Started For Free"
+          link="/faqs"
+        />
+      </div>
+    </>
+  );
 }

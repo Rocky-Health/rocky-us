@@ -2,6 +2,15 @@ import { Suspense } from "react";
 import { cookies } from "next/headers";
 import CouponCapture from "@/components/utils/CouponCapture";
 import HomePageClient from "@/components/home/HomePageClient";
+import { buildMetadata } from "@/lib/seo/metadata";
+
+export const metadata = buildMetadata({
+  title: { absolute: "MyRocky - Your Health Partner" },
+  description:
+    "Discreet online healthcare for men — ED, hair loss, weight management, mental health, skincare and more, prescribed by licensed clinicians and delivered across the US.",
+  path: "/",
+  vertical: "home",
+});
 
 async function HomeContent() {
     const faqs = [

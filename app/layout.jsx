@@ -20,6 +20,7 @@ import MetaCookieInitializer from "@/components/Layout/MetaCookieInitializer";
 import FBPixelLoader from "@/components/FBPixelLoader";
 import InactivityTimeoutHandler from "@/components/InactivityTimeoutHandler";
 import { Suspense } from "react";
+import { SITE, ogImageUrl } from "@/lib/seo/metadata";
 
 // Layout will use client-side path detection to avoid forcing dynamic rendering
 
@@ -64,44 +65,50 @@ export const viewport = {
 const FAVICON_URL =
   "https://mycdn.myrocky.ca/wp-content/uploads/20260520114301/favicon-mr-desktop.jpg";
 
+const DEFAULT_HOME_TITLE = "MyRocky - Your Health Partner";
+const DEFAULT_OG_IMAGE = ogImageUrl({ title: SITE.name, vertical: "home" });
+
 export const metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ||
-      process.env.BASE_URL?.replace(/\/$/, "") ||
-      "https://www.myrocky.com"
-  ),
+  metadataBase: new URL(SITE.baseUrl),
   icons: {
     icon: [{ url: FAVICON_URL, type: "image/jpeg" }],
     shortcut: FAVICON_URL,
     apple: FAVICON_URL,
   },
-  title: "MyRocky - Your Health Partner",
-  description: "Get professional healthcare advice and treatment online",
+  title: {
+    template: `%s ${SITE.titleSuffix}`,
+    default: DEFAULT_HOME_TITLE,
+  },
+  description: SITE.defaultDescription,
   openGraph: {
-    title: "MyRocky - Your Health Partner",
-    description: "Get professional healthcare advice and treatment online",
-    siteName: "MyRocky Health",
+    type: "website",
+    siteName: SITE.siteName,
+    locale: "en_US",
+    title: DEFAULT_HOME_TITLE,
+    description: SITE.defaultDescription,
     images: [
       {
-        url: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp",
+        url: DEFAULT_OG_IMAGE,
         width: 1200,
         height: 630,
-        alt: "MyRocky - Your Health Partner",
+        alt: SITE.defaultOgAlt,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "MyRocky - Your Health Partner",
-    description: "Get professional healthcare advice and treatment online",
-    images: [
-      "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/Rocky.webp",
-    ],
+    title: DEFAULT_HOME_TITLE,
+    description: SITE.defaultDescription,
+    images: [DEFAULT_OG_IMAGE],
+  },
+  other: {
+    "geo.region": "US",
+    "geo.placename": "United States",
   },
 };
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en-US">
       <head>
         {/* Preconnect to critical third-party origins to overlap DNS+TLS with HTML parse.
             Limited to origins fetched on every cold load to avoid wasting handshakes.

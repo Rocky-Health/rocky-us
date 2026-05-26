@@ -14,12 +14,14 @@ import DmOffersRockyInTheNews from "@/components/DmOffers/DmOffersRockyInTheNews
 import Section from "@/components/utils/Section";
 import DmOffersPageLoader from "@/components/DmOffers/DmOffersPageLoader";
 import EverFlowScript from "@/components/EverFlow/EverFlowScript";
+import { buildMetadata } from "@/lib/seo/metadata";
 
-export const metadata = {
-    title: "Spring Offers | MyRocky",
-    description:
-        "Spring savings on GLP-1 weight loss plans. Personalized care, GLP-1 medications, and support from licensed clinicians.",
-};
+export const metadata = buildMetadata({
+  title: "Spring Offers",
+  description:
+    "Spring savings on GLP-1 weight loss plans. Personalized care, GLP-1 medications, and support from licensed clinicians.",
+  vertical: "wl",
+});
 
 export default function DmOffersPage() {
     return (
