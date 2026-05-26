@@ -10,7 +10,7 @@
 //     supplyAvailable: true,
 //   },
 //   COMPOUNDED_SEMAGLUTIDE: {
-//     id: "489798",
+//     id: "489799",
 //     name: "Compounded Semaglutide",
 //     description: "(semaglutide) Vial",
 //     price: "$149",
@@ -93,7 +93,7 @@ const WLProducts = {
     // ],
   },
   COMPOUNDED_SEMAGLUTIDE: {
-    id: "489798",
+    id: "489799",
     name: "Compounded Semaglutide",
     description: "Dual-action mechanism with the highest rated clinical weight loss.",
     price: "$150",
