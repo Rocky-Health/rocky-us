@@ -38,9 +38,7 @@ export const NAD_PLUS_MEDICATION_TIMELINE_STEPS = [
 export const NAD_PLUS_MYROCKY_LOGO =
     "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp";
 
-/** Swap for a WL quiz screenshot when available (`/public/dm-offers/…`). */
-export const NAD_PLUS_TIMELINE_PHONE_SRC =
-    "https://myrocky.b-cdn.net/WP%20Images/glp-offer/EnhancesCover.png";
+export const NAD_PLUS_TIMELINE_PHONE_SRC = "/nad+/Get your NAD+ 1.png";
 
 export default function NadPlusMedicationTimelineSection({
     headline = "Get your NAD+ meds in just 1–2 days.",

@@ -10,7 +10,7 @@ export const NAD_PLUS_INSTOCK_CARDS = [
             </>
         ),
         badge: "In Stock - Up to $100 OFF",
-        imageSrc: "https://myrocky.b-cdn.net/WP%20Images/glp-offer/GLP-1.png",
+        imageSrc: "/nad+/Compounded NAD+.png",
         imageAlt: "MyRocky GLP-1 NAD+ injection vials",
     },
 ];

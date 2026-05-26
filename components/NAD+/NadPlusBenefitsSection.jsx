@@ -69,74 +69,74 @@ export default function NadPlusBenefitsSection({
                         {header.title}
                     </h2>
                 </header>
+            </div>
 
-                {/* Desktop / tablet: left column | image | right column */}
-                <div className="mx-auto hidden w-full max-w-[1280px] md:flex md:items-center md:justify-center md:gap-4 lg:gap-8 xl:gap-10">
-                    <div className="flex min-w-0 flex-1 flex-col items-center gap-10 lg:gap-12">
-                        {leftBenefits.map((item) => (
-                            <BenefitCard
-                                key={item.id}
-                                iconKey={item.id}
-                                title={item.title}
-                                description={item.description}
-                            />
-                        ))}
-                    </div>
-
-                    <div className="flex shrink-0 items-center justify-center self-center px-3 md:w-[300px] lg:w-[380px] xl:w-[440px]">
-                        <Image
-                            src={centerImageSrc}
-                            alt={centerImageAlt}
-                            width={440}
-                            height={660}
-                            className="mx-auto h-auto w-full object-contain drop-shadow-xl"
-                            priority
+            {/* Desktop / tablet: wider than 7xl so center art can scale up */}
+            <div className="mx-auto hidden w-full max-w-[min(100%,1720px)] px-3 md:grid md:grid-cols-[minmax(0,1fr)_minmax(420px,54%)_minmax(0,1fr)] md:items-center md:gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(560px,56%)_minmax(0,1fr)] lg:gap-5 xl:gap-6 md:px-6 lg:px-8">
+                <div className="flex flex-col items-center justify-center gap-8 lg:gap-10">
+                    {leftBenefits.map((item) => (
+                        <BenefitCard
+                            key={item.id}
+                            iconKey={item.id}
+                            title={item.title}
+                            description={item.description}
                         />
-                    </div>
-
-                    <div className="flex min-w-0 flex-1 flex-col items-center gap-10 lg:gap-12">
-                        {rightBenefits.map((item) => (
-                            <BenefitCard
-                                key={item.id}
-                                iconKey={item.id}
-                                title={item.title}
-                                description={item.description}
-                            />
-                        ))}
-                    </div>
+                    ))}
                 </div>
 
-                {/* Mobile */}
-                <div className="md:hidden">
-                    <div className="flex justify-center px-4">
-                        <Image
-                            src={centerImageSrc}
-                            alt={centerImageAlt}
-                            width={320}
-                            height={480}
-                            className="mx-auto h-auto w-full max-w-[320px] object-contain drop-shadow-lg"
-                        />
-                    </div>
-                    <div className="mt-10 flex flex-col items-center gap-10">
-                        {[...leftBenefits, ...rightBenefits].map((item) => (
-                            <BenefitCard
-                                key={item.id}
-                                iconKey={item.id}
-                                title={item.title}
-                                description={item.description}
-                            />
-                        ))}
-                    </div>
-                </div>
-
-                <div className="mt-12 md:mt-14">
-                    <NadPlusFeaturesCtaBlock
-                        getStartedHref={getStartedHref}
-                        pricingHref={pricingHref}
-                        cards={trustCards}
-                        featuresBg="!max-w-7xl mb-2 bg-white/80 md:mb-4"
+                <div className="flex w-full items-center justify-center">
+                    <Image
+                        src={centerImageSrc}
+                        alt={centerImageAlt}
+                        width={960}
+                        height={1440}
+                        className="mx-auto h-auto w-full max-w-[min(100%,960px)] object-contain drop-shadow-xl"
+                        priority
                     />
                 </div>
+
+                <div className="flex flex-col items-center justify-center gap-8 lg:gap-10">
+                    {rightBenefits.map((item) => (
+                        <BenefitCard
+                            key={item.id}
+                            iconKey={item.id}
+                            title={item.title}
+                            description={item.description}
+                        />
+                    ))}
+                </div>
+            </div>
+
+            {/* Mobile */}
+            <div className="mx-auto max-w-7xl px-4 md:hidden">
+                <div className="flex justify-center">
+                    <Image
+                        src={centerImageSrc}
+                        alt={centerImageAlt}
+                        width={480}
+                        height={720}
+                        className="mx-auto h-auto w-full max-w-[min(100%,480px)] object-contain drop-shadow-lg"
+                    />
+                </div>
+                <div className="mt-10 flex flex-col items-center gap-10">
+                    {[...leftBenefits, ...rightBenefits].map((item) => (
+                        <BenefitCard
+                            key={item.id}
+                            iconKey={item.id}
+                            title={item.title}
+                            description={item.description}
+                        />
+                    ))}
+                </div>
+            </div>
+
+            <div className="mx-auto mt-12 max-w-7xl px-4 md:mt-14 md:px-6">
+                <NadPlusFeaturesCtaBlock
+                    getStartedHref={getStartedHref}
+                    pricingHref={pricingHref}
+                    cards={trustCards}
+                    featuresBg="!max-w-7xl mb-2 bg-white/80 md:mb-4"
+                />
             </div>
         </section>
     );

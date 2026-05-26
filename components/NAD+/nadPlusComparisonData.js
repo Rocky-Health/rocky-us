@@ -1,4 +1,4 @@
-import { NAD_PLUS_BENEFITS_CENTER_IMAGE } from "./nadPlusBenefitsData";
+export const NAD_PLUS_PRODUCT_BOTTLE_IMAGE = "/nad+/NAD+ product bottle.png";
 
 export const NAD_PLUS_COMPARISON_HEADER = {
     title: "Not all NAD+ is the same",
@@ -27,8 +27,8 @@ export const NAD_PLUS_COMPARISON_COLUMNS = [
         id: "myrocky",
         title: "MyRocky NAD+ Injections",
         subtitle: "(500-1000mg)",
-        image: NAD_PLUS_BENEFITS_CENTER_IMAGE,
-        imageAlt: "MyRocky NAD+ injection vials",
+        image: NAD_PLUS_PRODUCT_BOTTLE_IMAGE,
+        imageAlt: "MyRocky NAD+ product bottle",
         highlight: true,
         cells: [
             { status: "check", text: "Yes — Rx from licensed provider" },

@@ -137,10 +137,10 @@ const TRUST_ITEMS = [
     },
 ];
 
-function HeroFigure() {
-    const heroImage =
-        "https://myrocky.b-cdn.net/WP%20Images/glp-offer/hero2.png";
+const HERO_IMAGE_MOBILE = "/nad+/Hero Section 1.png";
+const HERO_IMAGE_DESKTOP = "/nad+/hero.png";
 
+function HeroFigure({ heroImage }) {
     return (
         <div className="relative mx-auto w-full max-w-[440px] lg:max-w-none">
             <div className="relative flex justify-center pt-4">
@@ -191,7 +191,7 @@ export default function NadPlusHero({
                                 </p>
                             </div>
                             <div className="lg:hidden block lg:w-auto w-[40%]">
-                                <HeroFigure />
+                                <HeroFigure heroImage={HERO_IMAGE_MOBILE} />
                             </div>
                         </div>
 
@@ -246,7 +246,7 @@ export default function NadPlusHero({
                     </div>
 
                     <div className="hidden lg:block order-2 md:w-[50%]">
-                        <HeroFigure />
+                        <HeroFigure heroImage={HERO_IMAGE_DESKTOP} />
                     </div>
                 </div>
             </div>

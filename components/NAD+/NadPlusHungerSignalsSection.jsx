@@ -2,10 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import CustomImage from "@/components/utils/CustomImage";
+import { NAD_PLUS_PRODUCT_BOTTLE_IMAGE } from "./nadPlusComparisonData";
 import { NAD_PLUS_HUNGER_SIGNALS_CONTENT } from "./nadPlusHungerSignalsData";
-
-const PRODUCT_IMG =
-    "https://myrocky.b-cdn.net/WP%20Images/wl-med/_When%20nothing%20else%20worked,%20Rocky%20did_.png";
 
 const FLOAT_MOTION = {
     left: {
@@ -38,8 +36,8 @@ function FloatingProduct({ className, motion = "left", staggerMs = 0, show }) {
                 }`}
             >
                 <CustomImage
-                    src={PRODUCT_IMG}
-                    alt=""
+                    src={NAD_PLUS_PRODUCT_BOTTLE_IMAGE}
+                    alt="MyRocky NAD+ product bottle"
                     fill
                     className="object-contain drop-shadow-[0_12px_28px_rgba(174,126,86,0.15)]"
                     sizes="(max-width: 768px) 90px, 220px"

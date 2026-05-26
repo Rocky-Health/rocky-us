@@ -69,6 +69,5 @@ export const NAD_PLUS_TRUST_FEATURE_CARDS = [
     },
 ];
 
-/** Center product visual — replace when NAD+ asset is ready */
 export const NAD_PLUS_BENEFITS_CENTER_IMAGE =
-    "https://myrocky.b-cdn.net/WP%20Images/wl-med/_When%20nothing%20else%20worked,%20Rocky%20did_.png";
+    "/nad+/Feel like yourself again.png";

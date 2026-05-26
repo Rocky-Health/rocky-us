@@ -1,7 +1,9 @@
-import Image from "next/image";
+"use client";
+
 import Link from "next/link";
 import { FaRegCircleCheck } from "react-icons/fa6";
 import { MdDoNotDisturbAlt } from "react-icons/md";
+import TrustpilotWidget from "@/components/utils/TrustpilotWidget";
 import FeaturesNotAnimated from "./FeaturesNotAnimated";
 
 const DEFAULT_FEATURE_CARDS = [
@@ -44,7 +46,7 @@ export default function NadPlusFeaturesCtaBlock({
     getStartedHref = "/glp1-pre-consultation-3",
     pricingHref = "/glp1-pre-consultation-3",
     trustItems = DEFAULT_TRUST_ITEMS,
-    trustpilotSrc = "/dm-offers/trustpilot.png",
+    trustpilotSrc = "/dm-offers/trustpilot2.png",
     trustpilotAlt = "Trustpilot rating",
     hideFeatures = false,
     getStartedText = "Get started",
@@ -91,15 +93,10 @@ export default function NadPlusFeaturesCtaBlock({
                     ))}
                 </div>
 
-                <div className="w-full px-4 pt-2 md:pt-4">
-                    <Image
-                        src={trustpilotSrc}
-                        alt={trustpilotAlt}
-                        width={270}
-                        height={60}
-                        className="mx-auto block h-auto w-full max-w-[300px]"
-                    />
-                </div>
+                <TrustpilotWidget
+                    fallbackSrc={trustpilotSrc}
+                    fallbackAlt={trustpilotAlt}
+                />
             </div>
         </>
     );
