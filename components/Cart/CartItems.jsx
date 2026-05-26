@@ -416,9 +416,11 @@ const CartItem = ({ item, setCartItems, allItems, hasCoupon = false }) => {
               )}
               {compoundedPlanInfo && (
                 <div className="mt-1">
-                  <p className="text-[12px] font-[400] text-[#212121]">
-                    {currencySymbol}{formatPriceUI(itemTotalPrice)} / {intervalText}
-                  </p>
+                  {!isSemaMonthlyVariation && (
+                    <p className="text-[12px] font-[400] text-[#212121]">
+                      {currencySymbol}{formatPriceUI(itemTotalPrice)} / {intervalText}
+                    </p>
+                  )}
                   <div className="flex items-center gap-1.5 mt-0.5">
                     {isSemaMonthlyVariation ? (
                       <span className="text-[11px] font-[600] text-[#212121]">
