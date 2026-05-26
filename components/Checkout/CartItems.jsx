@@ -264,6 +264,9 @@ const CartITem2 = ({ item, hasCoupon = false }) => {
 
   // Check if this is a compounded Tirzepatide / Semaglutide item
   const compoundedPlanInfo = getCompoundedPlanInfo(item);
+  const isSemaglutide =
+    /semaglutide/i.test(item.name || "") &&
+    !/oral|sublingual/i.test(item.name || "");
 
   // Check if this is the special offer product [GLP-1] Buy 2 Get 1 Free
   const isOfferProduct = item.id === 489780 || item.product_id === 489780;
@@ -355,12 +358,20 @@ const CartITem2 = ({ item, hasCoupon = false }) => {
           {compoundedPlanInfo && (
             <div className="mt-1.5 space-y-0.5">
               <div className="flex items-center gap-1.5">
-                <span className="text-[11px] text-[#999999] line-through">
-                  {compoundedPlanInfo.originalPrice}/mo
-                </span>
-                <span className="text-[11px] font-[600] text-[#000000]">
-                  {currencySymbol}{formatPriceUI(itemPrice / compoundedPlanInfo.months)}/mo
-                </span>
+                {isSemaglutide && compoundedPlanInfo.months === 1 ? (
+                  <span className="text-[11px] font-[600] text-[#000000]">
+                    {currencySymbol}{formatPriceUI(itemPrice / compoundedPlanInfo.months)}/mo after first month
+                  </span>
+                ) : (
+                  <>
+                    <span className="text-[11px] text-[#999999] line-through">
+                      {compoundedPlanInfo.originalPrice}/mo
+                    </span>
+                    <span className="text-[11px] font-[600] text-[#000000]">
+                      {currencySymbol}{formatPriceUI(itemPrice / compoundedPlanInfo.months)}/mo
+                    </span>
+                  </>
+                )}
               </div>
             </div>
           )}
