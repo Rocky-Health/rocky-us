@@ -83,6 +83,7 @@ export const metadata = {
   openGraph: {
     type: "website",
     siteName: SITE.siteName,
+    locale: "en_US",
     title: DEFAULT_HOME_TITLE,
     description: SITE.defaultDescription,
     images: [
@@ -100,10 +101,14 @@ export const metadata = {
     description: SITE.defaultDescription,
     images: [DEFAULT_OG_IMAGE],
   },
+  other: {
+    "geo.region": "US",
+    "geo.placename": "United States",
+  },
 };
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en-US">
       <head>
         {/* Preconnect to critical third-party origins to overlap DNS+TLS with HTML parse.
             Limited to origins fetched on every cold load to avoid wasting handshakes.
