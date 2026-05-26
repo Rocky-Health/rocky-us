@@ -1,25 +1,12 @@
 import React from "react";
+import { buildMetadata } from "@/lib/seo/metadata";
 
-export const metadata = {
-  title: "MyRocky | Expert Insights on Health & Wellness",
+export const metadata = buildMetadata({
+  title: "MyRocky Podcast — Expert Insights on Men's Health",
   description:
-    "Explore our collection of informative podcasts covering health, wellness, and lifestyle topics. Listen to expert discussions and stay updated with the latest trends.",
-  openGraph: {
-    title: "MyRocky | Expert Insights on Health & Wellness",
-    description:
-      "Explore our collection of informative podcasts covering health, wellness, and lifestyle topics. Listen to expert discussions and stay updated with the latest trends.",
-    images:
-      "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp",
-  },
-  twitter: {
-    card: "MyRocky | Expert Insights on Health & Wellness",
-    title: "MyRocky | Expert Insights on Health & Wellness",
-    description:
-      "Explore our collection of informative podcasts covering health, wellness, and lifestyle topics. Listen to expert discussions and stay updated with the latest trends.",
-    images:
-      "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp",
-  },
-};
+    "Conversations with clinicians and specialists on men's health, longevity, mental wellness, and the science behind MyRocky's treatments.",
+  path: "/podcast",
+});
 
 export default function PodcastLayout({ children }) {
   return <>{children}</>;

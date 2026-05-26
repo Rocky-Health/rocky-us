@@ -1,23 +1,11 @@
-// Minimal layout for flows
-// Simplified to avoid duplication with template components
+import { buildMetadata } from "@/lib/seo/metadata";
 
-export const metadata = {
-  title: "MyRocky - Your Health Partner",
-  description: "Get professional healthcare advice and treatment online",
-  openGraph: {
-    title: "MyRocky - Your Health Partner",
-    description: "Get professional healthcare advice and treatment online",
-    images:
-      "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp",
-  },
-  twitter: {
-    card: "Get professional healthcare advice and treatment online",
-    title: "MyRocky - Your Health Partner",
-    description: "Get professional healthcare advice and treatment online",
-    images:
-      "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp",
-  },
-};
+export const metadata = buildMetadata({
+  title: "Checkout",
+  description:
+    "Complete your MyRocky consultation and treatment order securely. Discreet delivery across the US.",
+  noindex: true,
+});
 
 export default function FlowsLayout({ children }) {
   return <>{children}</>;

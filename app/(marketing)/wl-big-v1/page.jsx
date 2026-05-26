@@ -21,14 +21,16 @@ import Section from "@/components/utils/Section";
 import MedViFlashGuard from "@/components/MedViLanding/MedViFlashGuard";
 import EverFlowScript from "@/components/EverFlow/EverFlowScript";
 import HeaderProudPartner from "@/components/Navbar/HeaderProudPartner";
+import { buildMetadata } from "@/lib/seo/metadata";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Weight Loss Program | MyRocky",
+export const metadata = buildMetadata({
+  title: "Weight Loss Program",
   description:
     "Personalized GLP-1 weight loss care. Start for $149, free shipping, HSA/FSA eligible.",
-};
+  vertical: "wl",
+});
 
 export default function WlMedViPage() {
   const ctaHref = "/glp1-pre";

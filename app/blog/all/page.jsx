@@ -1,14 +1,17 @@
 import { blogService } from "@/components/NewBlogs/services/blogService";
 import { AllBlogsPage } from "@/components/NewBlogs/AllBlogsPage";
 import { logger } from "@/utils/devLogger";
+import { buildMetadata } from "@/lib/seo/metadata";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  alternates: {
-    canonical: "/blog/all",
-  },
-};
+export const metadata = buildMetadata({
+  title: "All Articles",
+  description:
+    "Browse every article from MyRocky's library — men's health, treatment guides, and clinician perspectives.",
+  path: "/blog/all",
+  vertical: "blog",
+});
 
 export default async function AllBlogsPageRoute({ searchParams }) {
   try {

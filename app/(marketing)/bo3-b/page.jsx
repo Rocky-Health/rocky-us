@@ -8,13 +8,14 @@ import NewWlProducts from "@/components/BodyOptimization/bo3/NewWlProducts";
 import NewWlCover from "@/components/BodyOptimization/bo3/NewWlCover";
 import NewReviewsSection from "@/components/BodyOptimization/bo3/NewReviewsSection";
 import NewRockyInTheNews from "@/components/BodyOptimization/bo3/NewRockyInTheNews";
+import { buildMetadata } from "@/lib/seo/metadata";
 
-export const metadata = {
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
+export const metadata = buildMetadata({
+  title: "Weight Loss Program",
+  description: "Personalized GLP-1 weight loss care from MyRocky.",
+  vertical: "wl",
+  noindex: true,
+});
 
 export default async function BO3Page() {
   const consultationHref = "/wl-pre-consultation-2/";

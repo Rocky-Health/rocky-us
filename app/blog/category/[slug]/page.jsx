@@ -1,16 +1,36 @@
 import { blogService } from "@/components/NewBlogs/services/blogService";
 import { CategoryPage } from "@/components/NewBlogs/CategoryPage";
 import { logger } from "@/utils/devLogger";
+import { buildMetadata, stripHtml } from "@/lib/seo/metadata";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  return {
-    alternates: {
-      canonical: `/blog/category/${slug}`,
-    },
-  };
+  const path = `/blog/category/${slug}`;
+
+  try {
+    const categories = await blogService.getBlogCategories();
+    const current = categories?.find((cat) => cat.slug === slug);
+    const categoryName = current?.name || slug.replace(/-/g, " ");
+    const description =
+      stripHtml(current?.description) ||
+      `Articles on ${categoryName} from MyRocky — men's health articles for the US.`;
+
+    return buildMetadata({
+      title: `${categoryName} Articles`,
+      description,
+      path,
+      vertical: "blog",
+    });
+  } catch (error) {
+    logger.error("Error generating blog category metadata:", error);
+    return buildMetadata({
+      title: "Blog Category",
+      path,
+      vertical: "blog",
+    });
+  }
 }
 
 export default async function CategoryBlogsPage({ params }) {

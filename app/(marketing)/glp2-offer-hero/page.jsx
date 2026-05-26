@@ -17,16 +17,15 @@ import GLP1MoneyBackCTA from "@/components/GLP1Offer/GLP1MoneyBackCTA";
 import GLP1GoalSelector from "@/components/GLP1Offer/GLP1GoalSelector";
 import GLP1SafetyDisclaimer from "@/components/GLP1Offer/GLP1SafetyDisclaimer";
 import RockyInTheNews from "@/components/RockyInTheNews";
+import { buildMetadata } from "@/lib/seo/metadata";
 
-export const metadata = {
-  title: "GLP-1 Weight Loss Program | MyRocky",
+export const metadata = buildMetadata({
+  title: "GLP-1 Weight Loss Program",
   description:
     "Lose 1-2lbs per week with GLP-1 medication. 100% online medical review, free delivery, and money-back guarantee. Starting at $149/mo.",
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
+  vertical: "wl",
+  noindex: true,
+});
 
 export default async function GLP2OfferHeroPage() {
   const ctaHref = "/glp2-pre-consultation";

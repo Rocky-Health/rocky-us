@@ -9,6 +9,11 @@ import {
   VariationManager,
   adaptForProductPage,
 } from "@/lib/models";
+import {
+  buildMetadata,
+  deriveVertical,
+  stripHtml,
+} from "@/lib/seo/metadata";
 
 // Add revalidation time (1 hour)
 export const revalidate = 3600;
@@ -43,7 +48,6 @@ export async function generateMetadata({ params }) {
   try {
     const { slug } = await params;
 
-    // Prevent processing of source map files
     if (slug.endsWith(".map")) {
       return {
         title: "Not Found",
@@ -60,11 +64,21 @@ export async function generateMetadata({ params }) {
       };
     }
 
-    return {
+    const vertical = deriveVertical(productData.categories);
+    const description = stripHtml(
+      productData.short_description || productData.description,
+    );
+    const productImage = productData.images?.[0]?.src;
+
+    return buildMetadata({
       title: productData.name,
-      description:
-        productData.short_description || productData.description || "",
-    };
+      description,
+      path: `/product/${slug}`,
+      vertical,
+      type: "product",
+      ogImage: productImage,
+      ogTitle: productData.name,
+    });
   } catch (error) {
     logger.error("Error generating metadata", error);
     return {

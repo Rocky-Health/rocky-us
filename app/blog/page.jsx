@@ -3,14 +3,17 @@ import { logger } from "@/utils/devLogger";
 import { blogService } from "@/components/NewBlogs/services/blogService";
 import { MainBlogsPage } from "@/components/NewBlogs";
 import BlogPageSkeleton from "@/components/NewBlogs/components/BlogPageSkeleton";
+import { buildMetadata } from "@/lib/seo/metadata";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  alternates: {
-    canonical: "/blog",
-  },
-};
+export const metadata = buildMetadata({
+  title: "MyRocky Blog — Men's Health Articles",
+  description:
+    "Evidence-based articles from MyRocky on ED, hair loss, weight management, mental health, skincare, and longevity — written for men.",
+  path: "/blog",
+  vertical: "blog",
+});
 
 async function BlogsContent() {
   try {
