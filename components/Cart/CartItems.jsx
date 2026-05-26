@@ -189,6 +189,9 @@ const CartItem = ({ item, setCartItems, allItems, hasCoupon = false }) => {
   const isSubscriptionWithFallback = isSubscription || isOralSemaglutide;
 
   const compoundedPlanInfo = getCompoundedPlanInfo(item);
+  // Monthly Compounded Semaglutide variation (489799): show hardcoded copy.
+  const isSemaMonthlyVariation =
+    item.id === 489799 || item.product_id === 489799;
 
   let supply = "";
   if (
@@ -417,12 +420,20 @@ const CartItem = ({ item, setCartItems, allItems, hasCoupon = false }) => {
                     {currencySymbol}{formatPriceUI(itemTotalPrice)} / {intervalText}
                   </p>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="text-[11px] text-[#999999] line-through">
-                      {compoundedPlanInfo.originalPrice}/mo
-                    </span>
-                    <span className="text-[11px] font-[600] text-[#212121]">
-                      {currencySymbol}{formatPriceUI(itemTotalPrice / compoundedPlanInfo.months)}/mo
-                    </span>
+                    {isSemaMonthlyVariation ? (
+                      <span className="text-[11px] font-[600] text-[#212121]">
+                        $249/mo after first month
+                      </span>
+                    ) : (
+                      <>
+                        <span className="text-[11px] text-[#999999] line-through">
+                          {compoundedPlanInfo.originalPrice}/mo
+                        </span>
+                        <span className="text-[11px] font-[600] text-[#212121]">
+                          {currencySymbol}{formatPriceUI(itemTotalPrice / compoundedPlanInfo.months)}/mo
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
               )}
