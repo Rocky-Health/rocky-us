@@ -16,16 +16,16 @@ import {
   logMetaTrackingError,
 } from "@/utils/metaQuestionnaireTracking";
 
-const ALLOWED_PRODUCT_IDS = ["489798", "489523"];
+const ALLOWED_PRODUCT_IDS = ["489799", "489523"];
 const COUNTER_BASE_BY_PRODUCT = {
-  489798: 872,
+  489799: 872,
   489523: 621,
 };
 const COUNTER_ANCHOR_DATE = "2026-04-03";
 
 const WEIGHT_LOSS_PRODUCT_IDS = [
   "489523",
-  "489798",
+  "489799",
   "142975",
   "160468",
   "250827",
@@ -81,7 +81,7 @@ const Glp2TreatmentAndPlanStep = ({
 
   const cardMetaById = useMemo(
     () => ({
-      489798: {
+      489799: {
         title: "Semaglutide",
         subtitle: "Proven, effective, more affordable.",
         badge: "🪙 More Affordable",
@@ -113,7 +113,7 @@ const Glp2TreatmentAndPlanStep = ({
   useEffect(() => {
     if (!productsToRender.length) return;
     const semaProduct =
-      productsToRender.find((p) => String(p?.id || "") === "489798") ||
+      productsToRender.find((p) => String(p?.id || "") === "489799") ||
       productsToRender[0];
     if (!selectedProduct) {
       setSelectedProduct(semaProduct);

@@ -1263,7 +1263,7 @@ export const createCartUrl = async (
     // Define all weight loss product IDs that should include Body Optimization Program
     const weightLossProductIds = [
       "489523", // Compounded Tirzepatide
-      "489798", // Compounded Semaglutide
+      "489799", // Compounded Semaglutide
       "142975",
       "160468",
       "250827",

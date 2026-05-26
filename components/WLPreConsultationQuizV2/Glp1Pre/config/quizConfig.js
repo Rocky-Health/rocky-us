@@ -788,9 +788,9 @@ export const quizConfig = {
       "6month": "490168",
       "12month": "490169",
     },
-    489798: {
+    489799: {
       // Compounded Semaglutide
-      monthly: "489798",
+      monthly: "489799",
       "3month": "490164",
       "6month": "490165",
       "12month": "490166",
@@ -842,15 +842,15 @@ export const quizConfig = {
         type: "One-time purchase",
       },
     },
-    // Compounded Semaglutide (489798)
-    489798: {
+    // Compounded Semaglutide (489799)
+    489799: {
       monthly: {
         id: "monthly",
         label: "Monthly Auto-Refill",
         subtitle: "Flexible. Pay as you go plan.",
         price: "$150",
-        originalPrice: "$279",
-        savings: "Save $129",
+        originalPrice: "$249",
+        savings: "Save $99",
         subscriptionPeriod: "1_month",
         isDefault: true,
       },
@@ -859,8 +859,8 @@ export const quizConfig = {
         badge: "STARTER BUNDLE",
         label: "3 Month Supply",
         price: "$199",
-        originalPrice: "$279",
-        savings: "Save $240",
+        originalPrice: "$249",
+        savings: "Save $150",
         subscriptionPeriod: "3_month",
         type: "One-time purchase",
       },
@@ -869,8 +869,8 @@ export const quizConfig = {
         badge: "MOST POPULAR",
         label: "6 Month Supply",
         price: "$175",
-        originalPrice: "$279",
-        savings: "Save $624",
+        originalPrice: "$249",
+        savings: "Save $444",
         subscriptionPeriod: "6_month",
         type: "One-time purchase",
       },
@@ -879,8 +879,8 @@ export const quizConfig = {
         badge: "BEST VALUE",
         label: "12 Month Supply",
         price: "$150",
-        originalPrice: "$279",
-        savings: "Save $1,548",
+        originalPrice: "$249",
+        savings: "Save $1,188",
         subscriptionPeriod: "12_month",
         type: "One-time purchase",
       },

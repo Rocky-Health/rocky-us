@@ -13,7 +13,7 @@ import { formatPriceUI } from "@/utils/priceFormatter";
 // Weight loss product IDs that require consultation
 const WEIGHT_LOSS_PRODUCT_IDS = [
   "489523", // Compounded Tirzepatide
-  "489798", // Compounded Semaglutide
+  "489799", // Compounded Semaglutide
   "489778", // Compounded Semaglutide (Segmented)
   "142975", // OZEMPIC
   "160468", // MOUNJARO
@@ -164,13 +164,13 @@ const WLOfferRecommendationStep = ({
 
       logger.log("Selected Product ->", selectedProduct);
       
-      // Check if this is the special offer product (489798)
+      // Check if this is the special offer product (489799)
       // If so, only add the offer product (489780) instead of the selected product
       let mainProductForCheckout;
       const addons = [];
       let useWlFlow = true;
       
-      if (String(selectedProduct.id) === "489798") {
+      if (String(selectedProduct.id) === "489799") {
         // Replace with offer product instead of adding the selected product
         mainProductForCheckout = {
           id: "489780",
