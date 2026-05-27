@@ -13,7 +13,7 @@ const rockyFeaturesCards = [
         image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/Pre%20Sell/personalized.png",
     },
     {
-        title: "Trusted by 350K+ Users",
+        title: "Trusted by 350,000+ customers",
         image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/Pre%20Sell/trusted.png",
     },
     {

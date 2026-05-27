@@ -16,7 +16,7 @@ const DEFAULT_FEATURE_CARDS = [
         image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/Pre%20Sell/personalized.png",
     },
     {
-        title: "Trusted by 350K+ Users",
+        title: "Trusted by 350,000+ customers",
         image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/Pre%20Sell/trusted.png",
     },
     {
@@ -43,8 +43,8 @@ const DEFAULT_TRUST_ITEMS = [
 export default function NadPlusFeaturesCtaBlock({
     cards = DEFAULT_FEATURE_CARDS,
     featuresBg = "!max-w-7xl mb-16",
-    getStartedHref = "/glp1-pre-consultation-3",
-    pricingHref = "/glp1-pre-consultation-3",
+    getStartedHref = "/nad-plus-quiz",
+    pricingHref = "/nad-plus-quiz",
     trustItems = DEFAULT_TRUST_ITEMS,
     trustpilotSrc = "/dm-offers/trustpilot2.png",
     trustpilotAlt = "Trustpilot rating",

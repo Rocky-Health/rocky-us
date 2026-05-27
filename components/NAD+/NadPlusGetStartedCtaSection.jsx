@@ -5,7 +5,7 @@ import Section from "@/components/utils/Section";
  * Bottom funnel CTA — gradient band, headline + promo, primary link.
  */
 export default function NadPlusGetStartedCtaSection({
-    getStartedHref = "/glp1-pre-consultation-3",
+    getStartedHref = "/nad-plus-quiz",
     eyebrow = "GET STARTED",
 }) {
     return (

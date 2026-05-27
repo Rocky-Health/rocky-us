@@ -49,8 +49,8 @@ function BenefitCard({ title, description, iconKey }) {
 }
 
 export default function NadPlusBenefitsSection({
-    getStartedHref = "/glp1-pre-consultation-3",
-    pricingHref = "/glp1-pre-consultation-3",
+    getStartedHref = "/nad-plus-quiz",
+    pricingHref = "/nad-plus-quiz",
     centerImageSrc = NAD_PLUS_BENEFITS_CENTER_IMAGE,
     centerImageAlt = "MyRocky NAD+ prescription vial",
     header = NAD_PLUS_BENEFITS_HEADER,

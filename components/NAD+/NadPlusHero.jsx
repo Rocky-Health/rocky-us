@@ -137,20 +137,40 @@ const TRUST_ITEMS = [
     },
 ];
 
-const HERO_IMAGE_MOBILE = "/nad+/Hero Section 1.png";
-const HERO_IMAGE_DESKTOP = "/nad+/hero.png";
+/** Same PNG on all breakpoints — cut-out on transparent/no-scene BG (Hero Section PNGs bake in gradients). */
+const HERO_IMAGE = "/nad+/hero.png";
 
-function HeroFigure({ heroImage }) {
+function HeroFigure({ heroImage, variant = "mobile" }) {
+    const isDesktop = variant === "desktop";
+
     return (
-        <div className="relative mx-auto w-full max-w-[440px] lg:max-w-none">
-            <div className="relative flex justify-center pt-4">
-                <div className="relative aspect-square w-[min(100%,580px)] ">
+        <div
+            className={
+                isDesktop
+                    ? "relative h-full w-full"
+                    : "relative mx-auto w-full max-w-[440px]"
+            }
+        >
+            <div
+                className={`relative flex justify-center ${isDesktop ? "h-full items-end" : "items-end pt-4"}`}
+            >
+                <div
+                    className={
+                        isDesktop
+                            ? "relative h-full w-full max-w-[620px]"
+                            : "relative aspect-square w-[min(100%,580px)]"
+                    }
+                >
                     <CustomImage
                         src={heroImage}
                         alt="Patient receiving NAD+ anti-aging treatment from MyRocky"
                         fill
-                        className="object-top !object-contain"
-                        sizes="(max-width: 1024px) 90vw, 580px"
+                        className="object-bottom !object-contain"
+                        sizes={
+                            isDesktop
+                                ? "(max-width: 1280px) 50vw, 620px"
+                                : "(max-width: 1024px) 90vw, 580px"
+                        }
                         priority
                     />
                 </div>
@@ -163,14 +183,14 @@ function HeroFigure({ heroImage }) {
  * NAD+ landing hero — Rocky brand palette (cream / taupe / accent brown).
  */
 export default function NadPlusHero({
-    getStartedHref = "/glp1-pre-consultation-3",
-    pricingHref = "/glp1-pre-consultation-3",
+    getStartedHref = "/nad-plus-quiz",
+    pricingHref = "/nad-plus-quiz",
 }) {
     return (
         <section className="w-full bg-[#F5F4EF] px-4 pt-2 md:px-6">
-            <div className="rounded-[58px] overflow-hidden w-full bg-desktop-aging-gradient md:bg-[linear-gradient(120deg,#F5F4EF_0%,#EFE5DC_40%,#BCA889_75%,#AE7E56_100%)] md:px-7 px-4 py-10 md:py-16 border border-[#D9D9D5]/60">
-                <div className="flex sm:flex-row flex-col items-center gap-10 lg:gap-14 max-w-7xl mx-auto">
-                    <div className="flex flex-col order-1 lg:w-[50%]">
+            <div className="relative rounded-[58px] overflow-hidden w-full bg-desktop-aging-gradient md:bg-[linear-gradient(120deg,#F5F4EF_0%,#EFE5DC_40%,#BCA889_75%,#AE7E56_100%)] md:px-7 px-4 pt-10 pb-10 md:pt-16 md:pb-16 lg:pb-0 border border-[#D9D9D5]/60">
+                <div className="relative z-10 flex sm:flex-row flex-col items-center gap-10 lg:gap-14 max-w-7xl mx-auto">
+                    <div className="flex flex-col order-1 lg:w-[50%] lg:pb-16">
                         <div className="mb-4 flex items-center gap-1 text-[13px] text-gray-700 md:text-[14px]">
                             <StarRow />
                             <span className="font-poppins font-normal sm:text-sm text-xs">
@@ -191,7 +211,7 @@ export default function NadPlusHero({
                                 </p>
                             </div>
                             <div className="lg:hidden block lg:w-auto w-[40%]">
-                                <HeroFigure heroImage={HERO_IMAGE_MOBILE} />
+                                <HeroFigure heroImage={HERO_IMAGE} />
                             </div>
                         </div>
 
@@ -245,9 +265,13 @@ export default function NadPlusHero({
                         </div>
                     </div>
 
-                    <div className="hidden lg:block order-2 md:w-[50%]">
-                        <HeroFigure heroImage={HERO_IMAGE_DESKTOP} />
-                    </div>
+                </div>
+
+                <div
+                    className="pointer-events-none absolute bottom-0 right-0 hidden lg:block w-[50%] max-w-[640px] top-16 md:right-7"
+                    aria-hidden
+                >
+                    <HeroFigure heroImage={HERO_IMAGE} variant="desktop" />
                 </div>
             </div>
         </section>
