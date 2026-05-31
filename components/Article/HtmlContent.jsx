@@ -1,7 +1,27 @@
 "use client";
 
 import { useMemo } from "react";
-import { sanitizeHtml } from "@/utils/sanitizeHtml";
+import xss from "xss";
+
+// Per-call xss filter that extends the default whitelist to allow `id` on
+// heading tags. HtmlContent injects slug IDs onto h1–h6 so the side
+// navigation can scroll to them via getElementById(); the default xss
+// whitelist for h1–h6 is an empty array, which strips those IDs and breaks
+// the TOC. Scope is intentionally narrow — only `id` on headings.
+const headingAttrs = ["id"];
+const blogContentFilter = new xss.FilterXSS({
+  whiteList: {
+    ...xss.getDefaultWhiteList(),
+    h1: [...(xss.getDefaultWhiteList().h1 || []), ...headingAttrs],
+    h2: [...(xss.getDefaultWhiteList().h2 || []), ...headingAttrs],
+    h3: [...(xss.getDefaultWhiteList().h3 || []), ...headingAttrs],
+    h4: [...(xss.getDefaultWhiteList().h4 || []), ...headingAttrs],
+    h5: [...(xss.getDefaultWhiteList().h5 || []), ...headingAttrs],
+    h6: [...(xss.getDefaultWhiteList().h6 || []), ...headingAttrs],
+  },
+});
+const sanitizeBlogHtml = (dirty) =>
+  dirty ? blogContentFilter.process(String(dirty)) : "";
 
 // Rendered as a real <style> element below — not concatenated into the HTML
 // that goes through sanitizeHtml(), because the xss default whitelist escapes
@@ -306,7 +326,7 @@ const HtmlContent = ({ html, className, loading = false }) => {
       <style dangerouslySetInnerHTML={{ __html: BLOG_CONTENT_STYLES }} />
       <div
         className={`blog-content ${className || ""}`}
-        dangerouslySetInnerHTML={{ __html: sanitizeHtml(processedHtml) }}
+        dangerouslySetInnerHTML={{ __html: sanitizeBlogHtml(processedHtml) }}
       />
     </>
   );
