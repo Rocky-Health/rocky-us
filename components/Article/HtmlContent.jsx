@@ -3,46 +3,10 @@
 import { useMemo } from "react";
 import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
-const HtmlContent = ({ html, className, loading = false }) => {
-  // Function to normalize HTML entities and clean text
-  const normalizeText = (text) => {
-    return text
-      .replace(/&#8217;/g, "'") // Convert HTML apostrophe to regular apostrophe
-      .replace(/&#8216;/g, "'") // Convert HTML left single quote to regular apostrophe
-      .replace(/&#8220;/g, '"') // Convert HTML left double quote to regular quote
-      .replace(/&#8221;/g, '"') // Convert HTML right double quote to regular quote
-      .replace(/&amp;/g, "&") // Convert HTML ampersand to regular ampersand
-      .replace(/&lt;/g, "<") // Convert HTML less than to regular <
-      .replace(/&gt;/g, ">") // Convert HTML greater than to regular >
-      .replace(/&quot;/g, '"') // Convert HTML quote to regular quote
-      .replace(/&#39;/g, "'") // Convert HTML apostrophe to regular apostrophe
-      .trim();
-  };
-
-  const processedHtml = useMemo(() => {
-    if (!html) return "";
-
-    // Clean up Visual Composer shortcodes and other unwanted elements
-    let cleanedHtml = html
-      // Remove Visual Composer shortcodes
-      .replace(/\[vc_row[^\]]*\]/gi, "")
-      .replace(/\[vc_column[^\]]*\]/gi, "")
-      .replace(/\[vc_column_text[^\]]*\]/gi, "")
-      .replace(/\[\/vc_column_text\]/gi, "")
-      .replace(/\[\/vc_column\]/gi, "")
-      .replace(/\[\/vc_row\]/gi, "")
-      // Remove other common shortcodes that might interfere
-      .replace(/\[vc_[^\]]*\]/gi, "")
-      .replace(/\[\/vc_[^\]]*\]/gi, "")
-      // Remove empty paragraphs that might be left behind
-      .replace(/<p>\s*<\/p>/gi, "")
-      .replace(/<p><br\s*\/?><\/p>/gi, "")
-      // Clean up multiple consecutive line breaks
-      .replace(/\n\s*\n\s*\n/gi, "\n\n");
-
-    // Add custom styles for blog content - scoped to blog content only
-    const customStyles = `
-      <style>
+// Rendered as a real <style> element below — not concatenated into the HTML
+// that goes through sanitizeHtml(), because the xss default whitelist escapes
+// <style> tags and dumps the CSS as visible text in the post body.
+const BLOG_CONTENT_STYLES = `
         /* Links styling - using brand colors */
         .blog-content a {
           color: #814b00 !important;
@@ -51,7 +15,7 @@ const HtmlContent = ({ html, className, loading = false }) => {
         .blog-content a:hover {
           color: #a65c00 !important;
         }
-        
+
         /* Styled button/CTA links - override inline styles for better visibility */
         .blog-content a[style*="background-color"] {
           color: #ffffff !important;
@@ -61,7 +25,7 @@ const HtmlContent = ({ html, className, loading = false }) => {
           color: #ffffff !important;
           opacity: 0.9 !important;
         }
-        
+
         /* Specific styling for black background buttons */
         .blog-content a[style*="background-color: #000000"],
         .blog-content a[style*="background-color:#000000"] {
@@ -73,7 +37,7 @@ const HtmlContent = ({ html, className, loading = false }) => {
           color: #ffffff !important;
           opacity: 0.9 !important;
         }
-        
+
         /* Heading tags styling - applying h2 style to all headings (h1-h6) */
         .blog-content h1,
         .blog-content h2,
@@ -87,7 +51,7 @@ const HtmlContent = ({ html, className, loading = false }) => {
           margin-bottom: 0.75rem !important;
           line-height: 1.3 !important;
         }
-        
+
         /* Hide empty headings that contain only whitespace or &nbsp; */
         .blog-content h1:empty,
         .blog-content h2:empty,
@@ -103,12 +67,12 @@ const HtmlContent = ({ html, className, loading = false }) => {
         .blog-content h6:has(:only-child):has([style*="display: none"]) {
           display: none !important;
         }
-        
+
         /* Hide all br tags */
         .blog-content br {
           display: none !important;
         }
-        
+
         /* Hide empty paragraphs and other elements as fallback */
         .blog-content p:empty,
         .blog-content div:empty,
@@ -132,7 +96,7 @@ const HtmlContent = ({ html, className, loading = false }) => {
           margin: 0 !important;
           display: inline !important;
         }
-        
+
         /* Strong tags styling - smaller than headings, less weight, inline */
         .blog-content strong {
           font-size: 1rem !important;
@@ -142,7 +106,7 @@ const HtmlContent = ({ html, className, loading = false }) => {
           margin-bottom: 0.25rem !important;
           display: inline !important;
         }
-        
+
         /* Lists styling - restore bullets reset by preflight */
         .blog-content ul,
         .blog-content ol {
@@ -159,7 +123,7 @@ const HtmlContent = ({ html, className, loading = false }) => {
         .blog-content li {
           margin: 0.25rem 0 !important;
         }
-        
+
         /* Image sizing and padding */
         .blog-content img.size-large ,.blog-content img.size-full,.blog-content img.aligncenter {
           max-width: 100% !important;
@@ -184,7 +148,7 @@ const HtmlContent = ({ html, className, loading = false }) => {
         margin: 1rem  0 !important;
 
         }
-        
+
         /* Caption text styling */
         .blog-content .wp-caption-text {
           font-size: 0.875rem !important;
@@ -192,7 +156,7 @@ const HtmlContent = ({ html, className, loading = false }) => {
           font-style: italic !important;
           margin-top: 0.5rem !important;
         }
-        
+
         /* Video and iframe styling - non-intrusive and responsive */
         .blog-content iframe {
           display: block;
@@ -231,7 +195,7 @@ const HtmlContent = ({ html, className, loading = false }) => {
           max-width: 100% !important;
           height: auto !important;
         }
-        
+
         /* WordPress caption container */
         .blog-content .wp-caption {
           max-width: 100% !important;
@@ -240,8 +204,44 @@ const HtmlContent = ({ html, className, loading = false }) => {
           max-width: 100% !important;
           height: auto !important;
         }
-      </style>
-    `;
+`;
+
+const HtmlContent = ({ html, className, loading = false }) => {
+  // Function to normalize HTML entities and clean text
+  const normalizeText = (text) => {
+    return text
+      .replace(/&#8217;/g, "'") // Convert HTML apostrophe to regular apostrophe
+      .replace(/&#8216;/g, "'") // Convert HTML left single quote to regular apostrophe
+      .replace(/&#8220;/g, '"') // Convert HTML left double quote to regular quote
+      .replace(/&#8221;/g, '"') // Convert HTML right double quote to regular quote
+      .replace(/&amp;/g, "&") // Convert HTML ampersand to regular ampersand
+      .replace(/&lt;/g, "<") // Convert HTML less than to regular <
+      .replace(/&gt;/g, ">") // Convert HTML greater than to regular >
+      .replace(/&quot;/g, '"') // Convert HTML quote to regular quote
+      .replace(/&#39;/g, "'") // Convert HTML apostrophe to regular apostrophe
+      .trim();
+  };
+
+  const processedHtml = useMemo(() => {
+    if (!html) return "";
+
+    // Clean up Visual Composer shortcodes and other unwanted elements
+    let cleanedHtml = html
+      // Remove Visual Composer shortcodes
+      .replace(/\[vc_row[^\]]*\]/gi, "")
+      .replace(/\[vc_column[^\]]*\]/gi, "")
+      .replace(/\[vc_column_text[^\]]*\]/gi, "")
+      .replace(/\[\/vc_column_text\]/gi, "")
+      .replace(/\[\/vc_column\]/gi, "")
+      .replace(/\[\/vc_row\]/gi, "")
+      // Remove other common shortcodes that might interfere
+      .replace(/\[vc_[^\]]*\]/gi, "")
+      .replace(/\[\/vc_[^\]]*\]/gi, "")
+      // Remove empty paragraphs that might be left behind
+      .replace(/<p>\s*<\/p>/gi, "")
+      .replace(/<p><br\s*\/?><\/p>/gi, "")
+      // Clean up multiple consecutive line breaks
+      .replace(/\n\s*\n\s*\n/gi, "\n\n");
 
     // Remove empty headings that contain only whitespace or &nbsp;
     let processed = cleanedHtml.replace(
@@ -286,8 +286,7 @@ const HtmlContent = ({ html, className, loading = false }) => {
       return match;
     });
 
-    // Add custom styles to the beginning of the processed HTML
-    return customStyles + processed;
+    return processed;
   }, [html]);
 
   if (loading) {
@@ -303,10 +302,13 @@ const HtmlContent = ({ html, className, loading = false }) => {
   }
 
   return (
-    <div
-      className={`blog-content ${className || ""}`}
-      dangerouslySetInnerHTML={{ __html: sanitizeHtml(processedHtml) }}
-    />
+    <>
+      <style dangerouslySetInnerHTML={{ __html: BLOG_CONTENT_STYLES }} />
+      <div
+        className={`blog-content ${className || ""}`}
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(processedHtml) }}
+      />
+    </>
   );
 };
 
