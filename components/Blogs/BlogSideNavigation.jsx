@@ -133,7 +133,7 @@ const BlogSideNavigation = ({ html, loading = false }) => {
   const minLevel = headings.length > 0 ? Math.min(...headings.map((h) => h.level)) : 1;
 
   return (
-    <div className="lg:col-span-3 col-span-12 sm:mb-4">
+    <div className="lg:col-span-3 col-span-12 sm:mb-4 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto">
       <div className="">
 
         <h3 className="text-lg font-semibold text-gray-900 mb-6">
