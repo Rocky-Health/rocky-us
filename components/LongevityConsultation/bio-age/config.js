@@ -149,7 +149,7 @@ export const quizConfig = {
             title: "Test Eligibility",
             titleColor: "#C19A6B",
             message:
-                "We want to make sure your results are accurate.\n\nBased on your answers, the biological age test and/or NAD⁺ injections may not be appropriate at this time. Certain medications, medical conditions, or temporary health factors can affect the blood markers used to calculate biological age.\n\nPlease contact our support team and we'll review your case. If the biological age test isn't appropriate right now, we'll issue a full refund for the test.\n\ncontact@myrocky.ca",
+                "We want to make sure your results are accurate.\n\nBased on your answers, the biological age test and/or NAD⁺ injections may not be appropriate at this time. Certain medications, medical conditions, or temporary health factors can affect the blood markers used to calculate biological age.\n\nPlease contact our support team and we'll review your case. If the biological age test isn't appropriate right now, we'll issue a full refund for the test.\n\ncontact@myrocky.com",
             buttons: [{ label: "Go Back", action: "close", primary: true }],
         },
     },
