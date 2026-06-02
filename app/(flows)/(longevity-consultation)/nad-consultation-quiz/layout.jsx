@@ -8,7 +8,7 @@ export default function NadConsultationQuizLayout({ children }) {
           display: none !important;
         }
 
-        header,
+        header:not(.questionnaire-header),
         nav,
         .header,
         .navbar,
@@ -37,6 +37,10 @@ export default function NadConsultationQuizLayout({ children }) {
         .footer-area,
         .footer-container {
           display: none !important;
+        }
+
+        .questionnaire-header {
+          display: flex !important;
         }
 
         body {
