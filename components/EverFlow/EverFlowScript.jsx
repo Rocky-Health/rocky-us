@@ -1,7 +1,6 @@
 "use client";
 
-import { useRef } from "react";
-import Script from "next/script";
+import { useEffect } from "react";
 
 const NETWORK_DOMAINS = {
   rcr73qtl: "www.rcr73qtl.com",
@@ -10,11 +9,56 @@ const NETWORK_DOMAINS = {
 
 const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 
-// Imperative fire for conversions whose containing step never renders
-// (e.g. quiz-complete events that fire from a checkout handler that redirects
-// before a declarative EverFlowScript could mount). Assumes window.EF is
-// already on the page — true on every funnel page that previously mounted
-// an EverFlowScript Click or Start event.
+// Idempotently inject the EF SDK script tag. We previously relied on
+// next/script's onReady callback, but onReady does not re-fire on SPA-mounted
+// <Script> elements whose src is already loaded. On Stripe-redirect storefronts
+// where order-received is reached via router.push (CA side), this silently
+// dropped the Conversion event. US side keeps the same pattern in sync.
+function ensureSdkLoaded(network) {
+  if (typeof document === "undefined") return;
+  const domain = NETWORK_DOMAINS[network];
+  if (!domain) return;
+  const sdkUrl = `https://${domain}/scripts/main.js`;
+  if (document.querySelector(`script[src="${sdkUrl}"]`)) return;
+  const s = document.createElement("script");
+  s.src = sdkUrl;
+  s.async = true;
+  document.head.appendChild(s);
+}
+
+// Run onReady once `window.EF` is available. If the SDK isn't on the page yet
+// (e.g. direct-nav or refresh on the post-payment quiz), inject it ourselves.
+// Returns a cancellation fn so callers in useEffect cleanups can abort.
+function whenEfReady(
+  { network, timeoutMs = 10000, intervalMs = 250 },
+  onReady,
+) {
+  const noop = () => {};
+  if (typeof window === "undefined") return noop;
+  if (window.EF) {
+    onReady();
+    return noop;
+  }
+  ensureSdkLoaded(network);
+  const start = Date.now();
+  const interval = setInterval(() => {
+    if (typeof window !== "undefined" && window.EF) {
+      try {
+        onReady();
+      } finally {
+        clearInterval(interval);
+      }
+    } else if (Date.now() - start >= timeoutMs) {
+      clearInterval(interval);
+    }
+  }, intervalMs);
+  return () => clearInterval(interval);
+}
+
+// Imperative fire for events whose containing step never renders long enough
+// for a declarative EverFlowScript to mount (e.g. quiz-complete fires from a
+// handler that redirects). Assumes window.EF is already available — true once
+// the user has been past any route that mounted EverFlowScript.
 export function fireEverFlowConversion({ network, offerId, eventId }) {
   if (process.env.NEXT_PUBLIC_EF_ENABLED !== "true") return;
   if (typeof window === "undefined" || !window.EF) return;
@@ -41,9 +85,8 @@ export function fireEverFlowConversion({ network, offerId, eventId }) {
 }
 
 // Quiz-Start events fire from inside the SPA quiz hook on mount, which can
-// race the EF SDK <Script> load — window.EF may not exist yet. Poll briefly
-// and fire as soon as it's ready. Returns a cleanup fn so callers can cancel
-// from useEffect teardown.
+// race the EF SDK load — window.EF may not exist yet. Poll briefly and fire as
+// soon as it's ready; self-loads the SDK if no upstream route mounted it.
 export function fireEverFlowConversionWhenReady({
   network,
   offerId,
@@ -57,89 +100,76 @@ export function fireEverFlowConversionWhenReady({
   if (!NETWORK_DOMAINS[network]) return noop;
   if (!offerId) return noop;
 
-  if (window.EF) {
+  return whenEfReady({ network, timeoutMs, intervalMs }, () => {
     fireEverFlowConversion({ network, offerId, eventId });
-    return noop;
-  }
-
-  const start = Date.now();
-  const interval = setInterval(() => {
-    if (typeof window !== "undefined" && window.EF) {
-      fireEverFlowConversion({ network, offerId, eventId });
-      clearInterval(interval);
-    } else if (Date.now() - start >= timeoutMs) {
-      clearInterval(interval);
-    }
-  }, intervalMs);
-
-  return () => clearInterval(interval);
+  });
 }
 
 export default function EverFlowScript({ mode, offerId, eventId, network }) {
-  const firedRef = useRef(false);
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_EF_ENABLED !== "true") return;
+    if (!NETWORK_DOMAINS[network]) return;
+    if (!offerId) return;
+    if (mode === "event" && !eventId) return;
 
-  if (process.env.NEXT_PUBLIC_EF_ENABLED !== "true") return null;
+    const stateKey = `ef-fired:${network}:${mode}:${offerId}:${eventId || ""}`;
 
-  const domain = NETWORK_DOMAINS[network];
-  if (!domain) return null;
-  if (!offerId) return null;
-  if (mode === "event" && !eventId) return null;
-
-  const stateKey = `ef-fired:${network}:${mode}:${offerId}:${eventId || ""}`;
-
-  const handleReady = () => {
-    if (firedRef.current) return;
-    if (typeof window === "undefined" || !window.EF) return;
-
-    try {
-      if (sessionStorage.getItem(stateKey)) {
-        firedRef.current = true;
-        return;
+    return whenEfReady({ network }, () => {
+      try {
+        if (sessionStorage.getItem(stateKey)) return;
+      } catch (_) {
+        // sessionStorage may be unavailable — proceed without guard
       }
-    } catch (_) {
-      // sessionStorage may be unavailable (e.g. private mode) — proceed without guard
-    }
 
-    firedRef.current = true;
-    try {
-      sessionStorage.setItem(stateKey, "1");
-    } catch (_) {
-      // ignore
-    }
+      try {
+        const EF = window.EF;
+        if (mode === "click") {
+          // Tightened from the prior implementation: gate on `oid` URL param.
+          // Organic visitors (no `oid`) skip both the click fire and the
+          // cookie write so they can't be misattributed downstream. Previously
+          // the cookie fell back to the component's `offerId` prop, which
+          // tagged organic NAD+ / WL traffic as affiliate-driven.
+          const oid = EF.urlParameter("oid");
+          if (!oid) return;
 
-    try {
-      const EF = window.EF;
-      if (mode === "click") {
-        EF.click({
-          offer_id: EF.urlParameter("oid"),
-          affiliate_id: EF.urlParameter("affid"),
-          source_id: EF.urlParameter("source_id"),
-          sub1: EF.urlParameter("sub1"),
-          sub2: EF.urlParameter("sub2"),
-          sub3: EF.urlParameter("sub3"),
-          sub4: EF.urlParameter("sub4"),
-          sub5: EF.urlParameter("sub5"),
-          uid: EF.urlParameter("uid"),
-          transaction_id: EF.urlParameter("_ef_transaction_id"),
-        });
-        const cookieOid = EF.urlParameter("oid") || offerId;
-        document.cookie = `ef_offer_id=${cookieOid}; path=/; max-age=${COOKIE_MAX_AGE_SECONDS}; SameSite=Lax`;
-      } else if (mode === "conversion") {
-        EF.conversion({ offer_id: offerId });
-      } else if (mode === "event") {
-        EF.conversion({ offer_id: offerId, event_id: eventId });
+          try {
+            sessionStorage.setItem(stateKey, "1");
+          } catch (_) {
+            // ignore
+          }
+
+          EF.click({
+            offer_id: oid,
+            affiliate_id: EF.urlParameter("affid"),
+            source_id: EF.urlParameter("source_id"),
+            sub1: EF.urlParameter("sub1"),
+            sub2: EF.urlParameter("sub2"),
+            sub3: EF.urlParameter("sub3"),
+            sub4: EF.urlParameter("sub4"),
+            sub5: EF.urlParameter("sub5"),
+            uid: EF.urlParameter("uid"),
+            transaction_id: EF.urlParameter("_ef_transaction_id"),
+          });
+          document.cookie = `ef_offer_id=${oid}; path=/; max-age=${COOKIE_MAX_AGE_SECONDS}; SameSite=Lax`;
+          return;
+        }
+
+        try {
+          sessionStorage.setItem(stateKey, "1");
+        } catch (_) {
+          // ignore
+        }
+
+        if (mode === "conversion") {
+          EF.conversion({ offer_id: offerId });
+        } else if (mode === "event") {
+          EF.conversion({ offer_id: offerId, event_id: eventId });
+        }
+      } catch (err) {
+        console.warn("[EverFlow] event failed:", err);
       }
-    } catch (err) {
-      console.warn("[EverFlow] event failed:", err);
-    }
-  };
+    });
+  }, [mode, offerId, eventId, network]);
 
-  return (
-    <Script
-      id={`ef-${network}-${mode}-${offerId}${eventId ? `-${eventId}` : ""}`}
-      src={`https://${domain}/scripts/main.js`}
-      strategy="afterInteractive"
-      onReady={handleReady}
-    />
-  );
+  return null;
 }
