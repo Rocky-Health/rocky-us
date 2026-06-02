@@ -190,13 +190,7 @@ const QuizStepRenderer = ({
       <Glp2ContactAuthStep
         userData={userData}
         setUserData={setUserData}
-        onContinue={() => {
-          handlePlanStepCheckout({
-            id: "monthly",
-            subscriptionPeriod: "1_month",
-            price: "$99",
-          });
-        }}
+        onContinue={handleContinue}
       />
     );
   }

@@ -3,10 +3,7 @@ import { useNadPlusQuizData } from "./useNadPlusQuizData";
 import { nadPlusQuizConfig } from "../config/nadPlusQuizConfig";
 import { logger } from "@/utils/devLogger";
 import { addToCartDirectly } from "@/utils/flowCartHandler";
-import {
-  addRequiredConsultation,
-  clearRequiredConsultations,
-} from "@/utils/requiredConsultation";
+import { clearRequiredConsultations } from "@/utils/requiredConsultation";
 import {
   fireEverFlowConversion,
   fireEverFlowConversionWhenReady,
@@ -30,6 +27,31 @@ function buildNadPlusCrmFields(userData) {
   form["product_name"] = "NAD+";
   form["product.name"] = "NAD+";
   return form;
+}
+
+const NAD_PLUS_CHECKOUT_PATH = "/checkout";
+
+/** Remove stale ED/WL flow flags so checkout stays plain `/checkout`. */
+function clearStaleCheckoutFlowMarkers(productIds) {
+  if (typeof window === "undefined") return;
+  clearRequiredConsultations();
+  [...new Set(productIds.map(String).filter(Boolean))].forEach((id) => {
+    try {
+      localStorage.removeItem(`required_consultation_${id}`);
+    } catch (_) {
+      // ignore
+    }
+  });
+  try {
+    const raw = localStorage.getItem("flow_cart_products");
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    if (saved?.flowType && saved.flowType !== "nad-plus") {
+      localStorage.removeItem("flow_cart_products");
+    }
+  } catch (_) {
+    // ignore
+  }
 }
 
 async function submitNadPlusToCrm(userData) {
@@ -176,23 +198,26 @@ export const useNadPlusQuizFlow = () => {
       console.error("NAD+ CRM submission failed (continuing with checkout):", err);
     }
 
-    const resolvedVariationId = "490785";
+    // WooCommerce Store API expects the variation ID as `id` (not parent + variation_id).
+    const variationId = "490785";
 
     logger.log(
-      `🛒 NadPlusQuiz: variationId=${resolvedVariationId}, plan=${selectedPlan?.id}`,
+      `🛒 NadPlusQuiz: variationId=${variationId}, plan=${selectedPlan?.id}`,
     );
 
+    clearStaleCheckoutFlowMarkers([
+      variationId,
+      nadPlusQuizConfig.productId,
+    ]);
+
     const mainProduct = {
-      id: resolvedVariationId,
+      id: variationId,
       name: "NAD+",
       price: selectedPlan?.price || "$99",
       isSubscription: true,
-      variationId: resolvedVariationId,
+      variationId,
     };
 
-    // Prevent stale ED/WL/etc. markers from rewriting checkout URL.
-    clearRequiredConsultations();
-    addRequiredConsultation(resolvedVariationId, "nad-plus-flow");
     logger.log("🛒 NadPlusQuiz Plan checkout:", mainProduct);
 
     const result = await addToCartDirectly(mainProduct, [], "nad-plus", {
@@ -203,15 +228,17 @@ export const useNadPlusQuizFlow = () => {
 
     if (result.success) {
       if (typeof window !== "undefined") {
-        const checkoutPath = "/checkout";
+        // Always plain checkout — never use result.redirectUrl (may include ?ed-flow=1).
         window.location.href = result.authenticationRequired
-          ? `/login-register?onboarding=1&view=account&viewshow=register&redirect_to=${encodeURIComponent(checkoutPath)}&consultation-required=1`
-          : checkoutPath;
+          ? `/login-register?onboarding=1&view=account&viewshow=register&redirect_to=${encodeURIComponent(NAD_PLUS_CHECKOUT_PATH)}&consultation-required=1`
+          : NAD_PLUS_CHECKOUT_PATH;
       }
-    } else {
-      logger.error("❌ NadPlusQuiz Plan checkout failed:", result.error);
-      alert("There was an issue processing your checkout. Please try again.");
+      return;
     }
+
+    logger.error("❌ NadPlusQuiz Plan checkout failed:", result.error);
+    alert("There was an issue processing your checkout. Please try again.");
+    throw new Error(result.error || "Checkout failed");
   };
 
   return {
