@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
 import { logger } from "@/utils/devLogger";
+import {
+  buildNadPlusPreHandoff,
+  ESSENTIAL_CONSUL_KEY,
+} from "@/utils/nadPlusPreConsultationHandoff";
 
 const getStorageKeys = () => ({
   STORAGE_KEY: "nad-plus-preqiz-data",
-  ESSENTIAL_CONSUL_KEY: "nad-plus-essential-consul",
 });
 
 export const useNadPlusQuizData = () => {
-  const { STORAGE_KEY, ESSENTIAL_CONSUL_KEY } = getStorageKeys();
+  const { STORAGE_KEY } = getStorageKeys();
 
   const [userData, setUserData] = useState(() => {
     if (typeof window !== "undefined") {
@@ -61,12 +64,15 @@ export const useNadPlusQuizData = () => {
           }),
         );
 
-        localStorage.setItem(ESSENTIAL_CONSUL_KEY, JSON.stringify(dataToSave));
+        const handoff = buildNadPlusPreHandoff(dataToSave);
+        if (Object.keys(handoff).length > 0) {
+          localStorage.setItem(ESSENTIAL_CONSUL_KEY, JSON.stringify(handoff));
+        }
       } catch (e) {
         logger.error("Failed to save to localStorage:", e);
       }
     }
-  }, [userData, selectedProduct, STORAGE_KEY, ESSENTIAL_CONSUL_KEY]);
+  }, [userData, selectedProduct, STORAGE_KEY]);
 
   const handleAction = (action, payload, onContinue) => {
     switch (action) {

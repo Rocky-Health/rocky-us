@@ -225,6 +225,7 @@ const OrderReceivedContent = ({ userId }) => {
   const wlFlow = searchParams.get("wl-flow");
   const hairFlow = searchParams.get("hair-flow");
   const smokingFlow = searchParams.get("smoking-flow");
+  const longevityFlow = searchParams.get("longevity-flow");
   
   // Check localStorage once on mount to determine if this is a BO flow
   const [isNewBOFlow, setIsNewBOFlow] = useState(false);
@@ -247,7 +248,8 @@ const OrderReceivedContent = ({ userId }) => {
     edFlow === "1" ||
     wlFlow === "1" ||
     hairFlow === "1" ||
-    smokingFlow === "1";
+    smokingFlow === "1" ||
+    longevityFlow === "1";
 
   // Function to generate the seskey
   const generateSeskey = (userId) => {
@@ -269,6 +271,7 @@ const OrderReceivedContent = ({ userId }) => {
     }
     if (hairFlow === "1") basePath = "/hair-main-questionnaire";
     if (smokingFlow === "1") basePath = "/smoking-consultation/?checked-out=1";
+    if (longevityFlow === "1") basePath = "/nad-consultation-quiz";
 
     logger.log("[Debug] Base path:", basePath);
     logger.log("[Debug] Flow parameters:", {
@@ -277,6 +280,7 @@ const OrderReceivedContent = ({ userId }) => {
       wlFlow,
       hairFlow,
       smokingFlow,
+      longevityFlow,
     });
 
     // Build the query parameters
@@ -485,7 +489,7 @@ const OrderReceivedContent = ({ userId }) => {
       logger.warn("Order ID or Key missing from URL params.");
       setLoading(false);
     }
-  }, [orderId, key, shouldRedirect, mhFlow, edFlow, wlFlow, hairFlow]);
+  }, [orderId, key, shouldRedirect, mhFlow, edFlow, wlFlow, hairFlow, longevityFlow]);
 
   if (loading) {
     return <Loader />;

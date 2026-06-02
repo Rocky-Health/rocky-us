@@ -48,6 +48,7 @@ const FLOW_QUERY_MAP = {
   "ed-flow": "ED",
   "wl-flow": "WL",
   "hair-flow": "HL",
+  "longevity-flow": "WL",
 };
 
 const hasPrefixMatch = (segments, prefixes) =>
