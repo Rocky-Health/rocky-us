@@ -3,7 +3,10 @@ import { useNadPlusQuizData } from "./useNadPlusQuizData";
 import { nadPlusQuizConfig } from "../config/nadPlusQuizConfig";
 import { logger } from "@/utils/devLogger";
 import { addToCartDirectly } from "@/utils/flowCartHandler";
-import { addRequiredConsultation } from "@/utils/requiredConsultation";
+import {
+  addRequiredConsultation,
+  clearRequiredConsultations,
+} from "@/utils/requiredConsultation";
 import {
   fireEverFlowConversion,
   fireEverFlowConversionWhenReady,
@@ -187,19 +190,23 @@ export const useNadPlusQuizFlow = () => {
       variationId: resolvedVariationId,
     };
 
+    // Prevent stale ED/WL/etc. markers from rewriting checkout URL.
+    clearRequiredConsultations();
     addRequiredConsultation(resolvedVariationId, "nad-plus-flow");
     logger.log("🛒 NadPlusQuiz Plan checkout:", mainProduct);
 
-    const result = await addToCartDirectly(mainProduct, [], "ed", {
+    const result = await addToCartDirectly(mainProduct, [], "nad-plus", {
       requireConsultation: true,
       preserveExistingCart: false,
       subscriptionPeriod: selectedPlan?.subscriptionPeriod || "1_month",
-      checkoutQueryParams: { "nad-plus-checkout": "1" },
     });
 
     if (result.success) {
-      if (typeof window !== "undefined" && result.redirectUrl) {
-        window.location.href = result.redirectUrl;
+      if (typeof window !== "undefined") {
+        const checkoutPath = "/checkout";
+        window.location.href = result.authenticationRequired
+          ? `/login-register?onboarding=1&view=account&viewshow=register&redirect_to=${encodeURIComponent(checkoutPath)}&consultation-required=1`
+          : checkoutPath;
       }
     } else {
       logger.error("❌ NadPlusQuiz Plan checkout failed:", result.error);

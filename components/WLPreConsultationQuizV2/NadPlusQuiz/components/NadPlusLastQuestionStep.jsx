@@ -25,6 +25,15 @@ const NadPlusLastQuestionStep = ({
 
   const handleSelect = (id) => {
     setSelected(id);
+    if (id === "no") {
+      setDetails("");
+      setUserData((prev) => {
+        const next = { ...prev, [field]: id };
+        delete next[detailsField];
+        return next;
+      });
+      return;
+    }
     setUserData((prev) => ({ ...prev, [field]: id }));
   };
 
@@ -33,6 +42,8 @@ const NadPlusLastQuestionStep = ({
     const updated = { ...userData, [field]: selected };
     if (selected === "yes" && details) {
       updated[detailsField] = details;
+    } else {
+      delete updated[detailsField];
     }
     setUserData(updated);
     onContinue(updated);
