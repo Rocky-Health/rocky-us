@@ -48,7 +48,7 @@ export async function POST(request) {
         { status: 200 }
       );
     } catch (apiError) {
-      logger.error("API password reset error:", apiError.response?.data);
+      logger.error("API password reset error:", apiError?.message);
       return NextResponse.json(
         {
           success: false,

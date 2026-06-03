@@ -56,7 +56,7 @@ export async function GET(req) {
     let apiPassword;
     try {
       apiPassword = Buffer.from(apiPasswordEncoded, "base64").toString();
-      logger.log("API: Successfully decoded the base64 password");
+      logger.log("API: Successfully decoded auth token");
     } catch (decodeError) {
       logger.error("API: Failed to decode base64 password:", decodeError);
       return NextResponse.json(
