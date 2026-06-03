@@ -283,7 +283,6 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
             const encryptResult = await encryptPasswordWithServerKey(
                 formData.password,
             );
-            logger.log("Form data:", encryptResult);
             if (encryptResult.error) {
                 isEncryptedPassword = false;
                 logger.error(
