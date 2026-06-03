@@ -3,9 +3,14 @@
 import { useRef, useState } from "react";
 import { logger } from "@/utils/devLogger";
 
-const ZENDESK_KEY =
-  process.env.NEXT_PUBLIC_ZENDESK_KEY || "51c9f4e2-65bd-4b2d-a1bf-ecbe181728cf";
-const ZENDESK_SNIPPET_URL = `https://static.zdassets.com/ekr/snippet.js?key=${ZENDESK_KEY}`;
+// Zendesk widget key comes ONLY from env (set per-environment in Vercel:
+// US = the US key, CA = the CA key; local dev in .env.local). No hardcoded key
+// or fallback in source — a missing key must never silently load another
+// region's widget (TK-629).
+const ZENDESK_KEY = process.env.NEXT_PUBLIC_ZENDESK_KEY;
+const ZENDESK_SNIPPET_URL = ZENDESK_KEY
+  ? `https://static.zdassets.com/ekr/snippet.js?key=${ZENDESK_KEY}`
+  : null;
 const TOOLTIP_DISMISS_STORAGE_KEY = "zendeskTooltipDismissed";
 
 /**
@@ -64,6 +69,14 @@ export default function ZendeskWidget() {
 
   function injectSnippet() {
     if (typeof document === "undefined") return;
+    if (!ZENDESK_SNIPPET_URL) {
+      logger.error(
+        "Zendesk: NEXT_PUBLIC_ZENDESK_KEY is not set — widget will not load.",
+      );
+      launchStartedRef.current = false;
+      setPhase("idle");
+      return;
+    }
     if (document.getElementById("ze-snippet")) return;
 
     const script = document.createElement("script");
