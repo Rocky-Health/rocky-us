@@ -12,6 +12,7 @@ export const layoutExemptRoutes = [
     "/glp2-pre-consultation",
     "/wl-offer-pre-consultation",
     "/ed-consultation-quiz",
+    "/nad-consultation-quiz",
     "/hair-pre-consultation-quiz", // Added hair pre-consultation quiz
     "/hair-main-questionnaire", // Added hair main questionnaire
     "/mh-pre-quiz", // Added mental health pre-quiz
@@ -60,7 +61,11 @@ export const layoutExemptRoutes = [
 ];
 
 // Routes where the Zendesk chat widget should be hidden
-export const zendeskHiddenRoutes = ["/wl-big-v2", "/glp1-pre-consultation-3"];
+export const zendeskHiddenRoutes = [
+    "/wl-big-v2",
+    "/glp1-pre-consultation-3",
+    "/nad-consultation-quiz",
+];
 
 /**
  * Checks if the Zendesk widget should be hidden on the current path

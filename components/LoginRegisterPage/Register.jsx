@@ -359,7 +359,8 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
           searchParams.get("ed-flow") === "1" ||
           searchParams.get("wl-flow") === "1" ||
           searchParams.get("hair-flow") === "1" ||
-          searchParams.get("mh-flow") === "1";
+          searchParams.get("mh-flow") === "1" ||
+          searchParams.get("longevity-flow") === "1";
 
         // Always check for local cart items and migrate if present
         // This is important because unauthenticated users add items to localStorage

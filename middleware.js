@@ -217,6 +217,7 @@ function shouldProtectRoute(pathname) {
     "/cart",
     "/profile",
     "/ed-consultation-quiz",
+    "/nad-consultation-quiz",
     "/hair-main-questionnaire",
     "/wl-consultation",
     "/mh-quiz",
