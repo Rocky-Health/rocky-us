@@ -105,7 +105,6 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
     const tryLogin = async (emailVal, passwordVal) => {
         let isEncryptedPassword = false;
         const encryptResult = await encryptPasswordWithServerKey(passwordVal);
-        logger.log("Form data:", encryptResult);
         if (encryptResult.error) {
             isEncryptedPassword = false;
             logger.error(
@@ -166,7 +165,6 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
     const registerAndLogin = async () => {
         let isEncryptedPassword = false;
         const encryptResult = await encryptPasswordWithServerKey(password);
-        logger.log("Form data:", encryptResult);
         if (encryptResult.error) {
             isEncryptedPassword = false;
             logger.error(

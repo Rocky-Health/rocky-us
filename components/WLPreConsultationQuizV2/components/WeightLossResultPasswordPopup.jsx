@@ -120,7 +120,6 @@ const WeightLossResultPasswordPopup = ({
 
       let isEncryptedPassword = false;
       const encryptResult = await encryptPasswordWithServerKey(loginPassword);
-      logger.log("Form data:", encryptResult);
       if (encryptResult.error) {
         isEncryptedPassword = false;
         logger.error(
