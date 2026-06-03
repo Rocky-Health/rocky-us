@@ -100,6 +100,7 @@ const CheckoutPageContent = () => {
     "mh-flow": searchParams.get("mh-flow"),
     "smoking-flow": searchParams.get("smoking-flow"),
     "skincare-flow": searchParams.get("skincare-flow"),
+    "longevity-flow": searchParams.get("longevity-flow"),
   };
 
   // Build flow query string to append to redirects

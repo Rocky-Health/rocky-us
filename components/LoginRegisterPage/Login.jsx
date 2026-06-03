@@ -93,7 +93,9 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
                               ? "mh"
                               : searchParams.get("skincare-flow") === "1"
                                 ? "skincare"
-                                : savedProducts.flowType || "ed"; // Use saved flow type or default to "ed"
+                                : searchParams.get("longevity-flow") === "1"
+                                  ? "longevity"
+                                  : savedProducts.flowType || "ed"; // Use saved flow type or default to "ed"
 
                 logger.log(
                     "Using flow type for direct cart addition after login:",
@@ -400,7 +402,8 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
                             searchParams.get("wl-flow") === "1" ||
                             searchParams.get("hair-flow") === "1" ||
                             searchParams.get("mh-flow") === "1" ||
-                            searchParams.get("skincare-flow") === "1";
+                            searchParams.get("skincare-flow") === "1" ||
+                            searchParams.get("longevity-flow") === "1";
 
                         if (isFlow) {
                             // For flow-specific logins without a redirect_to parameter,
@@ -424,7 +427,8 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
                                     key.includes("wl-flow") ||
                                     key.includes("hair-flow") ||
                                     key.includes("mh-flow") ||
-                                    key.includes("skincare-flow"),
+                                    key.includes("skincare-flow") ||
+                                    key.includes("longevity-flow"),
                             );
 
                             // Create a new URLSearchParams for checkout
