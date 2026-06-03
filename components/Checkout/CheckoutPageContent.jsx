@@ -45,6 +45,10 @@ import {
 import { getAwinFromUrlOrStorage } from "@/utils/awin";
 import { analyticsService } from "@/utils/analytics/analyticsService";
 import { getOrCreateSessionId } from "@/utils/dataLayerHelper";
+import {
+  trackMetaStartCheckout,
+  logMetaTrackingError,
+} from "@/utils/metaQuestionnaireTracking";
 import StripeElementsPayment from "./StripeElementsPayment";
 import { Elements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
@@ -190,6 +194,74 @@ const CheckoutPageContent = () => {
       // non-blocking
     }
   }, [cartItems]);
+
+  // TK-633: fire the Meta "Start Checkout" milestone (RKY_<cat>_SC) on the
+  // ACTUAL checkout page load — not on the upstream /wl-pre-consultation page.
+  // The premature fires were removed from utils/flowCartHandler.js; this covers
+  // ALL flows (WL/ED/Hair/etc.) by reading the flow query param. The server-side
+  // CAPI mirror follows automatically because it is driven off the
+  // `meta_start_checkout` dataLayer push that this same call emits.
+  const startCheckoutFiredRef = useRef(false);
+  useEffect(() => {
+    if (
+      startCheckoutFiredRef.current ||
+      !cartItems?.items?.length ||
+      window.location.pathname.includes("order-received")
+    ) {
+      return;
+    }
+
+    // Map the checkout flow query param -> the flow_id the Meta tracker expects
+    // (drives category/pixel resolution: wl -> WL/RKY_FLW, ed -> ED/RKY_TNT...).
+    const FLOW_PARAM_TO_FLOW_ID = {
+      "wl-flow": "wl",
+      "ed-flow": "ed",
+      "hair-flow": "hair",
+      "smoking-flow": "smoking",
+      "skincare-flow": "skincare",
+      "mh-flow": "mh",
+    };
+    const flowEntry = Object.entries(FLOW_PARAM_TO_FLOW_ID).find(
+      ([param]) => searchParams.get(param) === "1",
+    );
+    if (!flowEntry) return; // not a flow-driven checkout — don't fire
+    const flowType = flowEntry[1];
+
+    // Fire once per flow per tab session: survives SPA nav, refresh and
+    // back-nav; a genuinely new session re-fires. Falls back to the per-mount
+    // ref guard if sessionStorage is unavailable (Meta dedups on event_id).
+    const guardKey = `rky_start_checkout_fired_${flowType}`;
+    try {
+      if (sessionStorage.getItem(guardKey)) {
+        startCheckoutFiredRef.current = true;
+        return;
+      }
+      sessionStorage.setItem(guardKey, "1");
+    } catch (_) {
+      // sessionStorage unavailable — rely on the ref guard for this mount
+    }
+    startCheckoutFiredRef.current = true;
+
+    try {
+      const primary = cartItems.items[0];
+      // Mirror the prior payload: primary (main) product id + its unit price.
+      const value =
+        parseFloat(primary?.prices?.price || primary?.totals?.line_total || 0) /
+        100;
+      trackMetaStartCheckout({
+        flow_id: flowType,
+        content_id: String(primary?.id || primary?.product_id || ""),
+        value,
+        currency: "USD",
+      });
+    } catch (err) {
+      logMetaTrackingError(err, {
+        flow_id: flowType,
+        milestone: "START_CHECKOUT",
+        context: "checkout_page_load",
+      });
+    }
+  }, [cartItems, searchParams]);
 
   const [formData, setFormData] = useState({
     additional_fields: [],

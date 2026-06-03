@@ -55,6 +55,7 @@ function emitMetaFunnelEvent(milestone, flowId, questionnaireId, params = {}) {
     const obfuscatedName = resolveMetaEventName(flowId, questionnaireId, milestone);
     const dlEventName = DATALAYER_EVENT_NAMES[milestone];
     const genericEventName = GENERIC_EVENT_NAMES[milestone];
+    const category = resolveCategory(flowId, questionnaireId);
 
     const basePayload = {
       flow_id: flowId || null,
@@ -66,7 +67,6 @@ function emitMetaFunnelEvent(milestone, flowId, questionnaireId, params = {}) {
 
     // 1. Meta Pixel — obfuscated, targeted at the correct pixel
     if (typeof window.fbq === "function") {
-      const category = resolveCategory(flowId, questionnaireId);
       const pixelId = CATEGORY_PIXEL_MAP[category] || CATEGORY_PIXEL_MAP.OTHERS;
       const fbqPayload = { ...basePayload };
       delete fbqPayload.content_name;
@@ -139,6 +139,8 @@ function emitMetaFunnelEvent(milestone, flowId, questionnaireId, params = {}) {
         logMetaTrackingError(err, { flow_id: flowId, questionnaire_id: questionnaireId, milestone, scope: "debug_log" });
       }
     }
+
+    return { eventId, category };
   } catch (err) {
     logMetaTrackingError(err, { flow_id: flowId, questionnaire_id: questionnaireId, milestone });
   }
@@ -218,10 +220,37 @@ export function trackMetaStartCheckout({
   value,
   currency,
 }) {
-  emitMetaFunnelEvent("START_CHECKOUT", flow_id, questionnaire_id, {
+  const result = emitMetaFunnelEvent("START_CHECKOUT", flow_id, questionnaire_id, {
     step_type: step_type || "checkout",
     content_id,
     value,
     currency: currency || "USD",
   });
+
+  // Server-side CAPI mirror (TK-633). Fire-and-forget with the SAME event_id +
+  // resolved category as the browser pixel fire so Meta dedups the pair into a
+  // single Start Checkout event. keepalive lets it survive the page transition.
+  if (result?.eventId && result?.category && typeof window !== "undefined") {
+    try {
+      fetch("/api/meta-capi/start-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        keepalive: true,
+        body: JSON.stringify({
+          gateway: result.category,
+          event_id: result.eventId,
+          value,
+          currency: currency || "USD",
+          content_id,
+          event_source_url: window.location.href,
+        }),
+      }).catch(() => {});
+    } catch (err) {
+      logMetaTrackingError(err, {
+        flow_id,
+        milestone: "START_CHECKOUT",
+        scope: "server_mirror",
+      });
+    }
+  }
 }
