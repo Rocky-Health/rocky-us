@@ -381,10 +381,6 @@ const CheckoutPageContent = () => {
             const response = await fetch("/api/profile");
             if (response.ok) {
               const profileData = await response.json();
-              logger.log(
-                "Profile data for age validation (province change):",
-                profileData,
-              );
               if (profileData.success && profileData.date_of_birth) {
                 dateOfBirthToCheck = profileData.date_of_birth;
               }
@@ -1747,7 +1743,6 @@ const CheckoutPageContent = () => {
               const response = await fetch("/api/profile");
               if (response.ok) {
                 const profileData = await response.json();
-                logger.log("Profile data for age validation:", profileData);
                 if (profileData.success && profileData.date_of_birth) {
                   dateOfBirthToCheck = profileData.date_of_birth;
                 }
