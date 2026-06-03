@@ -19,10 +19,6 @@ import {
 import { refreshCartNonceClient } from "./nonceManager";
 import { analyticsService } from "@/utils/analytics/analyticsService";
 import { getOrCreateSessionId } from "@/utils/dataLayerHelper";
-import {
-  trackMetaStartCheckout,
-  logMetaTrackingError,
-} from "@/utils/metaQuestionnaireTracking";
 
 /**
  * Helper function to clean and parse price strings
@@ -179,21 +175,6 @@ async function handleAuthenticatedFlow(mainProduct, addons, flowType, options) {
 
       // Add flow-specific consultation requirements
       addFlowConsultationRequirements(mainProduct, flowType);
-
-      try {
-        trackMetaStartCheckout({
-          flow_id: flowType,
-          content_id: String(
-            extractProductId(mainProduct) || mainProduct.variationId || "",
-          ),
-          value: parsePrice(mainProduct.price),
-        });
-      } catch (err) {
-        logMetaTrackingError(err, {
-          flow_id: flowType,
-          milestone: "START_CHECKOUT",
-        });
-      }
 
       // Generate clean checkout URL
       const checkoutUrl = generateFlowCheckoutUrl(
@@ -359,21 +340,6 @@ async function handleUnauthenticatedFlow(
     // Add flow-specific consultation requirements to localStorage
     addFlowConsultationRequirements(mainProduct, flowType);
 
-    try {
-      trackMetaStartCheckout({
-        flow_id: flowType,
-        content_id: String(
-          extractProductId(mainProduct) || mainProduct.variationId || "",
-        ),
-        value: parsePrice(mainProduct.price),
-      });
-    } catch (err) {
-      logMetaTrackingError(err, {
-        flow_id: flowType,
-        milestone: "START_CHECKOUT",
-      });
-    }
-
     // Get the updated cart from cartService
     const cartData = getLocalCart();
     logger.log(
@@ -517,21 +483,6 @@ async function handleUnauthenticatedEarlyAddition(
       );
     } catch (_) {
       // non-blocking
-    }
-
-    try {
-      trackMetaStartCheckout({
-        flow_id: flowType,
-        content_id: String(
-          extractProductId(mainProduct) || mainProduct.variationId || "",
-        ),
-        value: parsePrice(mainProduct.price),
-      });
-    } catch (err) {
-      logMetaTrackingError(err, {
-        flow_id: flowType,
-        milestone: "START_CHECKOUT",
-      });
     }
 
     // Return success with cart data for display
@@ -1284,21 +1235,6 @@ async function handleAuthenticatedEarlyAddition(
         );
       } catch (_) {
         // non-blocking
-      }
-
-      try {
-        trackMetaStartCheckout({
-          flow_id: flowType,
-          content_id: String(
-            extractProductId(mainProduct) || mainProduct.variationId || "",
-          ),
-          value: parsePrice(mainProduct.price),
-        });
-      } catch (err) {
-        logMetaTrackingError(err, {
-          flow_id: flowType,
-          milestone: "START_CHECKOUT",
-        });
       }
 
       // Generate checkout URL (but don't redirect yet)
