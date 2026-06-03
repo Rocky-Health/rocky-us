@@ -11,11 +11,11 @@ export async function POST(request) {
     try {
         // Parse the request body
         const { email } = await request.json();
-        logger.log("Received subscription request for email:", email);
+        logger.log("Received subscription request");
 
         // Validate the email
         if (!email || !isValidEmail(email)) {
-            logger.log("Invalid email format:", email);
+            logger.log("Invalid email format");
             return NextResponse.json(
                 { success: false, error: "Invalid or missing email" },
                 { status: 400 },

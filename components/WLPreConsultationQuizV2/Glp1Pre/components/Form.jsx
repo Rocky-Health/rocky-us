@@ -506,7 +506,6 @@ const Form = ({
       const encryptResult = await encryptPasswordWithServerKey(
         registrationData.password,
       );
-      logger.log("Form data:", encryptResult);
       if (encryptResult.error) {
         isEncryptedPassword = false;
         logger.error(

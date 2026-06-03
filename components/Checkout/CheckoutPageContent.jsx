@@ -1059,8 +1059,6 @@ const CheckoutPageContent = () => {
       });
 
       if (data.success) {
-        logger.log("User profile data fetched successfully from API:", data);
-
         const profileData = data;
 
         // Update form data with user profile information

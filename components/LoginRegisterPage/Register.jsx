@@ -224,7 +224,6 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
       const encryptResult = await encryptPasswordWithServerKey(
         formData.password,
       );
-      logger.log("Form data:", encryptResult);
       if (encryptResult.error) {
         isEncryptedPassword = false;
         logger.error(
@@ -315,7 +314,6 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
       const encryptResult = await encryptPasswordWithServerKey(
         formData.password,
       );
-      logger.log("Form data:", encryptResult);
       if (encryptResult.error) {
         isEncryptedPassword = false;
         logger.error(
