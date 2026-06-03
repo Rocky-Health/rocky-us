@@ -65,6 +65,8 @@ export const zendeskHiddenRoutes = [
     "/wl-big-v2",
     "/glp1-pre-consultation-3",
     "/nad-consultation-quiz",
+    "/cart",
+    "/checkout",
 ];
 
 /**
