@@ -51,7 +51,7 @@ import {
 } from "@/utils/metaQuestionnaireTracking";
 import StripeElementsPayment from "./StripeElementsPayment";
 import { Elements, useStripe } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
+import { getStripe } from "@/lib/stripe/stripeClient";
 import { useAddressManager } from "@/lib/hooks/useAddressManager";
 import { debugAddressData } from "@/utils/addressDebugger";
 import {
@@ -60,10 +60,8 @@ import {
   clearPendingCouponCode,
 } from "@/lib/hooks/useAutoApplyCoupon";
 
-// Load Stripe outside component to avoid recreating on every render
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-);
+// Shared singleton so Stripe.js (and shared-ffa.js) loads once app-wide.
+const stripePromise = getStripe();
 
 // Wrapper component to provide Stripe context
 const CheckoutPageWrapper = () => {
