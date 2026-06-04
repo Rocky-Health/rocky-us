@@ -218,6 +218,11 @@ const CheckoutPageContent = () => {
       "smoking-flow": "smoking",
       "skincare-flow": "skincare",
       "mh-flow": "mh",
+      // NAD+ checkout arrives as ?longevity-flow=1 → fires RKY_NVA_SC (browser +
+      // server CAPI mirror). Today the longevity vertical's only US funnel is
+      // NAD+; when a general longevity product launches on US it will need its
+      // own param/flow_id to fire RKY_AEN_SC instead.
+      "longevity-flow": "nad",
     };
     const flowEntry = Object.entries(FLOW_PARAM_TO_FLOW_ID).find(
       ([param]) => searchParams.get(param) === "1",
