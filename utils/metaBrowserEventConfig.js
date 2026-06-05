@@ -20,6 +20,11 @@ export const CATEGORY_PIXEL_MAP = {
   SMOKING: process.env.NEXT_PUBLIC_FB_PIXEL_ID_SMOKING || "1311848663202831",
   HL: process.env.NEXT_PUBLIC_FB_PIXEL_ID_HL || "754893718769214",
   SKINCARE: process.env.NEXT_PUBLIC_FB_PIXEL_ID_SKINCARE || "1843271713209245",
+  // US-only Longevity vertical pixels (TK-652). NAD+ is split onto its own
+  // dedicated pixel; LONGEVITY is the parent-vertical pixel (staged for the
+  // general longevity quiz, which is CA-only until greenlit on US).
+  NAD: process.env.NEXT_PUBLIC_FB_PIXEL_ID_NAD || "959261143605875",
+  LONGEVITY: process.env.NEXT_PUBLIC_FB_PIXEL_ID_LONGEVITY || "1315116483444151",
   OTHERS: process.env.NEXT_PUBLIC_FB_PIXEL_ID_OTHERS || "799609076328562",
 };
 
@@ -61,6 +66,8 @@ const CATEGORY_BASE = {
   HL: "RKY_VBE",
   SMOKING: "RKY_ZXT",
   SKINCARE: "RKY_LXS",
+  NAD: "RKY_NVA",
+  LONGEVITY: "RKY_AEN",
   OTHERS: "RKY_MXR",
 };
 
@@ -88,6 +95,8 @@ const FLOW_ID_MAP = {
   hl: "HL",
   smoking: "SMOKING",
   skincare: "SKINCARE",
+  nad: "NAD",
+  longevity: "LONGEVITY",
   mh: "OTHERS",
 };
 
@@ -108,6 +117,10 @@ const QUESTIONNAIRE_ID_MAP = {
   "bo-simplified": "WL",
   "bo-simplified-2": "WL",
   "bo-weight-consultation": "WL",
+  // NAD+ quiz → dedicated NAD pixel. The quiz uses flow_id "nad" (mapped in
+  // FLOW_ID_MAP), so this questionnaire_id entry is a belt-and-suspenders backup.
+  // flow_id "longevity" is reserved for the future general longevity-program quiz.
+  "nad-plus-quiz": "NAD",
   "acne-quiz": "SKINCARE",
   "anti-aging-quiz": "SKINCARE",
   "hyperpigmentation-quiz": "SKINCARE",

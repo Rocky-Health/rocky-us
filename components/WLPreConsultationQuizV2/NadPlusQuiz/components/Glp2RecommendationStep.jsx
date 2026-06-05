@@ -152,14 +152,14 @@ const Glp2RecommendationStep = ({
 
     try {
       trackMetaProductSelection({
-        flow_id: "weight-loss",
+        flow_id: "nad",
         questionnaire_id: "nad-plus-quiz",
         content_id: String(selectedProduct.id || ""),
         selection_type: "product",
         selection_value: selectedProduct.id || "",
       });
     } catch (err) {
-      logMetaTrackingError(err, { flow_id: "weight-loss", questionnaire_id: "nad-plus-quiz", milestone: "PRODUCT_SELECTION" });
+      logMetaTrackingError(err, { flow_id: "nad", questionnaire_id: "nad-plus-quiz", milestone: "PRODUCT_SELECTION" });
     }
 
     if (

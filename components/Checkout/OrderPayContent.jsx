@@ -15,11 +15,10 @@ import Payment from "./Payment";
 import Loader from "@/components/Loader";
 import CheckoutSkeleton from "@/components/ui/skeletons/CheckoutSkeleton";
 import { Elements, useStripe, useElements } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
+import { getStripe } from "@/lib/stripe/stripeClient";
 
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-);
+// Shared singleton so Stripe.js (and shared-ffa.js) loads once app-wide.
+const stripePromise = getStripe();
 
 function OrderPayForm({
   orderId,
