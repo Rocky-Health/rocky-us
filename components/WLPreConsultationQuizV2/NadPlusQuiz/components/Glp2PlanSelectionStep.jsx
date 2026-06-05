@@ -53,7 +53,7 @@ const Glp2PlanSelectionStep = ({
 
         try {
             trackMetaPlanSelection({
-                flow_id: "weight-loss",
+                flow_id: "nad",
                 questionnaire_id: "nad-plus-quiz",
                 content_id: String(product?.id || ""),
                 selection_type: "plan",
@@ -61,7 +61,7 @@ const Glp2PlanSelectionStep = ({
             });
         } catch (err) {
             logMetaTrackingError(err, {
-                flow_id: "weight-loss",
+                flow_id: "nad",
                 questionnaire_id: "nad-plus-quiz",
                 milestone: "PLAN_SELECTION",
             });

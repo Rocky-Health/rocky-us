@@ -16,6 +16,8 @@
  * - RKY_VBE: HL Purchase Event (Vibe)
  * - RKY_ZXT: SMOKING Purchase Event (Zeta)
  * - RKY_LXS: SKINCARE Purchase Event (Luxus)
+ * - RKY_AEN: LONGEVITY Purchase Event (Aeon) — parent vertical pixel (US-only pixel; CA uses its own)
+ * - RKY_NVA: NAD+ Purchase Event (Nova) — dedicated NAD+ pixel, split out of LONGEVITY (US-only pixel; CA uses its own)
  * - RKY_MXR: OTHERS Purchase Event (Mixer)
  */
 export const CUSTOM_EVENT_NAMES = {
@@ -24,6 +26,8 @@ export const CUSTOM_EVENT_NAMES = {
   HL: 'RKY_VBE',
   SMOKING: 'RKY_ZXT',
   SKINCARE: 'RKY_LXS',
+  LONGEVITY: 'RKY_AEN',
+  NAD: 'RKY_NVA',
   OTHERS: 'RKY_MXR'
 };
 
@@ -100,6 +104,26 @@ export const META_CAPI_GATEWAYS = {
       'hyperpigmentation'
     ],
     name: 'SKINCARE'
+  },
+  // NAD must be evaluated BEFORE LONGEVITY: NAD+ products carry both the
+  // `nad` and parent `longevity` slugs, and categorizeProduct returns the
+  // first match — so listing NAD first routes NAD+ to its own pixel and
+  // keeps it OUT of the LONGEVITY (parent vertical) pixel. (US currently
+  // only has the NAD+ product under longevity; LONGEVITY is here for parity
+  // and auto-includes any future US longevity products.)
+  NAD: {
+    accessToken: process.env.FB_ACCESS_TOKEN_NAD,
+    pixelId: '959261143605875', // Rocky USA NAD+ (US-only pixel)
+    customEventName: CUSTOM_EVENT_NAMES.NAD,
+    categories: ['nad'],
+    name: 'NAD'
+  },
+  LONGEVITY: {
+    accessToken: process.env.FB_ACCESS_TOKEN_LONGEVITY,
+    pixelId: '1315116483444151', // Rocky USA Longevity (US-only pixel)
+    customEventName: CUSTOM_EVENT_NAMES.LONGEVITY,
+    categories: ['longevity'],
+    name: 'LONGEVITY'
   },
   OTHERS: {
     accessToken: process.env.FB_ACCESS_TOKEN_OTHERS,

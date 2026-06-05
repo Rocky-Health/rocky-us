@@ -174,26 +174,26 @@ const Glp2TreatmentAndPlanStep = ({
       // utility side prevents double-counting if the user re-enters the flow.
       try {
         trackMetaProductSelection({
-          flow_id: "weight-loss",
+          flow_id: "nad",
           questionnaire_id: "nad-plus-quiz",
           content_id: String(selectedProduct.id || ""),
           selection_type: "product",
           selection_value: String(selectedProduct.id || ""),
         });
       } catch (err) {
-        logMetaTrackingError(err, { flow_id: "weight-loss", questionnaire_id: "nad-plus-quiz", milestone: "PRODUCT_SELECTION" });
+        logMetaTrackingError(err, { flow_id: "nad", questionnaire_id: "nad-plus-quiz", milestone: "PRODUCT_SELECTION" });
       }
 
       try {
         trackMetaPlanSelection({
-          flow_id: "weight-loss",
+          flow_id: "nad",
           questionnaire_id: "nad-plus-quiz",
           content_id: String(selectedProduct.id || ""),
           selection_type: "plan",
           selection_value: plan?.id || "",
         });
       } catch (err) {
-        logMetaTrackingError(err, { flow_id: "weight-loss", questionnaire_id: "nad-plus-quiz", milestone: "PLAN_SELECTION" });
+        logMetaTrackingError(err, { flow_id: "nad", questionnaire_id: "nad-plus-quiz", milestone: "PLAN_SELECTION" });
       }
 
       if (typeof onContinue === "function") {
