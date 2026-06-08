@@ -55,14 +55,14 @@ export const layoutExemptRoutes = [
     "/bo5",
     "/glp2-offer-hero",
     "/glp1-offer-hero",
-    "/wl-big-v1",
+    "/wl-tt9-v1",
     "/glp2-pre-consultation-2",
     "/glp1-pre-consultation-3",
 ];
 
 // Routes where the Zendesk chat widget should be hidden
 export const zendeskHiddenRoutes = [
-    "/wl-big-v2",
+    "/wl-tt9-v2",
     "/glp1-pre-consultation-3",
     "/nad-consultation-quiz",
     "/cart",
