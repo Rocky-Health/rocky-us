@@ -17,6 +17,11 @@ import { ProgressBar } from "../EdQuestionnaire/ProgressBar";
 import Logo from "../Navbar/Logo";
 import Link from "next/link";
 import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
+import {
+  buildSafeStepId,
+  trackQuestionnaireStepComplete,
+  trackQuestionnaireSubmit,
+} from "@/utils/questionnaireTracking";
 
 // Pages 1-5: Migrated pre-quiz questions (moved to start)
 // Pages 6-27: Standard WL questionnaire questions (22 pages)
@@ -2416,6 +2421,15 @@ export default function NewBOWLConsultationQuiz({
   const handleContinueClick = () => {
     clearError();
     if (isValidated()) {
+      // TK-584: the current page validated and the user is advancing.
+      trackQuestionnaireStepComplete({
+        flow_id: "weight-loss",
+        questionnaire_id: "bo-weight-consultation",
+        step_id: buildSafeStepId(currentPage),
+        step_index: currentPage,
+        step_type: "quiz",
+      });
+
       if (currentPage === 28) {
         const currentPageData = collectCurrentPageData();
         const updates = {
@@ -2432,6 +2446,14 @@ export default function NewBOWLConsultationQuiz({
 
       if (currentPage === 30) {
         if (photoIdFile || formData["196"]) {
+          // TK-584: final step submit -> bottom of the quiz funnel.
+          trackQuestionnaireSubmit({
+            flow_id: "weight-loss",
+            questionnaire_id: "bo-weight-consultation",
+            step_id: buildSafeStepId(currentPage),
+            step_index: currentPage,
+            step_type: "quiz",
+          });
           verifyCustomerAndProceed();
           return;
         } else {

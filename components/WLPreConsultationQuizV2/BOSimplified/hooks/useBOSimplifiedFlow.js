@@ -4,6 +4,18 @@ import { boSimplifiedConfig } from "../config/boSimplifiedConfig";
 import { logger } from "@/utils/devLogger";
 import { wlFlowAddToCart } from "@/utils/flowCartHandler";
 import { addRequiredConsultation } from "@/utils/requiredConsultation";
+import {
+    buildSafeStepId,
+    trackQuestionnaireStepComplete,
+    trackQuestionnaireSubmit,
+} from "@/utils/questionnaireTracking";
+import { trackFunnelEvent } from "@/utils/clarityFunnelEvents";
+
+const QS_TRACK = {
+    questionnaire_id: "bo-simplified",
+    flow_id: "weight-loss",
+    step_type: "pre-consultation",
+};
 
 export const useBOSimplifiedFlow = () => {
     const {
@@ -29,6 +41,12 @@ export const useBOSimplifiedFlow = () => {
 
     // Prevent, repeated popups by tracking which popups have been shown in userData.
     const handleContinue = () => {
+        // TK-584: the step is validated and advancing -> mark it complete.
+        trackQuestionnaireStepComplete({
+            ...QS_TRACK,
+            step_id: buildSafeStepId(currentStep),
+            step_index: currentStep,
+        });
         const stepConfig = boSimplifiedConfig.steps[currentStep];
         // Only show popup if not already shown for this step
         if (stepConfig && stepConfig.showPopupAfterStep && !userData[`popupShown_${currentStep}`]) {
@@ -51,6 +69,12 @@ export const useBOSimplifiedFlow = () => {
     };
 
     const handleRecommendationContinue = () => {
+        // TK-584: user finished the quiz and locked in a product -> Submit milestone.
+        trackQuestionnaireSubmit({
+            ...QS_TRACK,
+            step_id: buildSafeStepId(currentStep),
+            step_index: currentStep,
+        });
         baseHandleRecommendationContinue();
         // After product selection, route to checkout
         // Data is kept in localStorage for checkout process
@@ -62,6 +86,35 @@ export const useBOSimplifiedFlow = () => {
             alert("Please select a product to continue");
             return;
         }
+
+        // TK-585: "Plan selected" (duration) + "Proceed to checkout" on the
+        // in-flow plan step. Treatment selection fires from GenericRecommendationStep.
+        trackFunnelEvent("wl_plan_selected", {
+            clarity: {
+                qs_flow_id: "weight-loss",
+                wl_plan_label: selectedPlan?.subscriptionPeriod ?? selectedPlan?.id ?? "",
+                wl_plan_product: selectedProduct?.name ?? selectedProduct?.id ?? "",
+            },
+            data: {
+                flow_id: "weight-loss",
+                plan_id: selectedPlan?.id ?? "",
+                plan_period: selectedPlan?.subscriptionPeriod ?? "",
+                plan_price: selectedPlan?.price ?? "",
+                product_id: selectedProduct?.id ?? "",
+            },
+        });
+        trackFunnelEvent("wl_proceed_to_checkout", {
+            clarity: {
+                qs_flow_id: "weight-loss",
+                wl_treatment_id: selectedProduct?.id ?? "",
+                wl_treatment_name: selectedProduct?.name ?? "",
+            },
+            data: {
+                flow_id: "weight-loss",
+                treatment_id: selectedProduct?.id ?? "",
+                treatment_name: selectedProduct?.name ?? "",
+            },
+        });
 
         // Resolve the exact WooCommerce variation ID for this product + plan combo.
         // Same pattern as the ED flow: the variation ID IS sent as both id and variationId,

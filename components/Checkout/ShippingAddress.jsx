@@ -3,6 +3,7 @@ import FormInput from "./FormInput";
 import PostCanadaAddressAutocomplete from "./PostCanada/PostCanadaAddressAutocomplete";
 import { logger } from "@/utils/devLogger";
 import { US_STATES_WITH_CODES, PHASE_1_STATES } from "@/lib/constants/usStates";
+import { trackFunnelEvent } from "@/utils/clarityFunnelEvents";
 
 const ShippingAddress = ({
     formData,
@@ -235,6 +236,10 @@ const ShipToAnotherAddressButton = ({
                         logger.log("Checkbox changed:", e.target.checked);
                         setActive(Boolean(e.target.checked));
                         handleAnotherShippingAddressChange(e);
+                        // TK-586: user expanded the separate shipping-address section.
+                        if (e.target.checked) {
+                            trackFunnelEvent("checkout_shipping_viewed");
+                        }
                     }}
                 />
                 Ship to a different address?
