@@ -2,6 +2,7 @@
 import React from "react";
 import Link from "next/link";
 import { FaArrowRight, FaCheck } from "react-icons/fa6";
+import { FaFlagUsa } from "react-icons/fa";
 import CustomImage from "@/components/utils/CustomImage";
 import NewHighlightV2 from "@/components/BodyOptimization/bo3/NewHighlightV2";
 import NewProudPartner from "@/components/BodyOptimization/bo3/NewProudPartner";
@@ -19,6 +20,7 @@ const NewWlCover = ({
         >
           <p className="text-black poppins-font text-[14px] md:text-[16px] font-[400] leading-[100%] flex items-center gap-2 md:mb-2 mb-[13px] md:mt-[83px]">
             Trusted by 250,000+ Users
+            <FaFlagUsa className="text-[#3C3B6E] w-4 h-4" />
           </p>
           <h1 className="tagline-hero text-[36px] md:text-[54px] leading-[115%] tracking-[-0.72px] md:tracking-[-1.08px] text-black mb-4 md:mb-8 capitalize headers-font md:max-w-[552px]">
             Medical Weight Loss, Guaranteed

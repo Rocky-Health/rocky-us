@@ -1,33 +1,13 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useLazyTrustpilot } from "@/utils/hooks/useLazyTrustpilot";
 
 const Trustpilot = () => {
-  const widgetRef = useRef(null);
-
-  useEffect(() => {
-    // Check if Trustpilot script is already loaded
-    const existingScript = document.querySelector(
-      'script[src*="widget.trustpilot.com/bootstrap"]'
-    );
-
-    if (!existingScript) {
-      const script = document.createElement("script");
-      script.src =
-        "https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js";
-      script.async = true;
-      document.body.appendChild(script);
-    } else {
-      // Re-load the widget if the script is already there
-      if (window.Trustpilot) {
-        window.Trustpilot.loadFromElement(widgetRef.current, true);
-      }
-    }
-  }, []);
+  // Defer the Trustpilot bootstrap script until the widget scrolls into view.
+  const { containerRef } = useLazyTrustpilot();
 
   return (
-    <div className="text-black text-center ">
+    <div ref={containerRef} className="text-black text-center ">
       <div
-        ref={widgetRef}
         className="trustpilot-widget text-black relative scale-[.9]"
         data-locale="en-US"
         data-template-id="5419b6ffb0d04a076446a9af"
