@@ -14,13 +14,9 @@ import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
 import { formatPrice, toMoney } from "@/utils/priceFormatter";
 import {
   buildQueue,
-  advanceQueue,
-  clearQueue,
-  buildQuizUrl,
   FLOW_PARAM_TO_VERTICAL,
   VERTICAL_QUIZ_PATH,
 } from "@/lib/questionnaire/questionnaireSequence";
-import QuestionnaireIntermission from "./QuestionnaireIntermission";
 
 // AWIN API configuration
 const AWIN_CONFIG = {
@@ -389,10 +385,6 @@ const OrderReceivedContent = ({ userId }) => {
   const [questionnaireCheckComplete, setQuestionnaireCheckComplete] =
     useState(false);
 
-  // Multi-questionnaire intermission state
-  const [showIntermission, setShowIntermission] = useState(false);
-  const [intermissionData, setIntermissionData] = useState(null);
-
   // When a multi-product sequence is detected from order.line_items, this holds
   // the first vertical slug in the queue (e.g. "wl").  getRedirectPath() uses
   // it to ensure the initial redirect lands on the same quiz that is at index 0
@@ -737,43 +729,6 @@ const OrderReceivedContent = ({ userId }) => {
       setLoading(false);
     }
   }, [orderId, key, shouldRedirect, mhFlow, edFlow, wlFlow, hairFlow, longevityFlow]);
-
-  // ----- Intermission: when shown, render just the intermission screen -----
-  if (showIntermission && intermissionData) {
-    return (
-      <section className="px-5 sectionWidth:px-0 py-4 md:py-8">
-        <div className="flex justify-center">
-          <div className="border rounded-xl w-full max-w-[480px] p-6">
-            <QuestionnaireIntermission
-              completedVertical={intermissionData.completedVertical}
-              nextVertical={intermissionData.nextVertical}
-              sequenceN={intermissionData.sequenceN}
-              sequenceTotal={intermissionData.sequenceTotal}
-              onComplete={() => {
-                // Advance the queue and navigate to the next quiz
-                const updatedQueue = advanceQueue();
-                if (updatedQueue) {
-                  const nextSlug = updatedQueue.verticals[updatedQueue.currentIndex];
-                  const url = buildQuizUrl(
-                    nextSlug,
-                    updatedQueue,
-                    order?.line_items?.[0]?.name
-                  );
-                  if (url) {
-                    router.push(url);
-                  } else {
-                    router.push("/");
-                  }
-                } else {
-                  router.push("/");
-                }
-              }}
-            />
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   if (loading) {
     return <Loader />;
