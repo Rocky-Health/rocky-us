@@ -8,7 +8,7 @@ import LoadingOverlay from "@/components/utils/LoadingBar";
 import CacheClearer from "@/components/utils/CacheClearer";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { shouldUseMinimalLayout } from "@/utils/layoutConfig";
+import { shouldUseMinimalLayout, layoutExemptRoutes } from "@/utils/layoutConfig";
 import Script from "next/script";
 import ClientLayoutProvider from "@/components/Layout/ClientLayoutProvider";
 import { Analytics } from "@vercel/analytics/react";
@@ -108,8 +108,24 @@ export const metadata = {
 };
 export default function RootLayout({ children }) {
   return (
-    <html lang="en-US">
+    <html lang="en-US" suppressHydrationWarning={true}>
       <head>
+        {/* Minimal-layout pre-paint flag (CLS fix): synchronously tag <html>
+            with data-layout BEFORE first paint so the global navbar/footer
+            never render visibly on exempt routes (checkout, quizzes,
+            prelanders) only to be hidden by JS after hydration. globals.css
+            hides .navbar-main/.footer-main on [data-layout="minimal"];
+            LayoutDetector keeps the flag in sync on client-side navigation.
+            Inline + synchronous (not next/script) so it runs during <head>
+            parse, before the body paints. */}
+        <script
+          id="layout-minimal-flag"
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var r=${JSON.stringify(
+              layoutExemptRoutes,
+            )};var p=location.pathname.split("?")[0].replace(/\\/$/,"");var m=r.some(function(x){return p===x||p.indexOf(x+"/")===0;});document.documentElement.setAttribute("data-layout",m?"minimal":"full");}catch(e){}})();`,
+          }}
+        />
         {/* Preconnect to critical third-party origins to overlap DNS+TLS with HTML parse.
             Limited to origins fetched on every cold load to avoid wasting handshakes.
             Zendesk/TikTok/Attentive are intentionally NOT here — they're lazy-loaded. */}
