@@ -28,6 +28,16 @@ const LayoutDetector = () => {
     const shouldBeMinimal = shouldUseMinimalLayout(normalizedPath);
     setIsMinimalLayout(shouldBeMinimal);
 
+    // Keep the <html data-layout> flag (set pre-paint by the inline script in
+    // app/layout.jsx) in sync on client-side navigation. globals.css hides
+    // .navbar-main/.footer-main on [data-layout="minimal"], so updating this
+    // synchronously hides/shows them with no layout shift when SPA-navigating
+    // between full and minimal routes — before the deferred toggle below runs.
+    document.documentElement.setAttribute(
+      "data-layout",
+      shouldBeMinimal ? "minimal" : "full"
+    );
+
     const hideZendesk = shouldHideZendesk(normalizedPath);
 
     // Get header and footer elements with more reliable selectors

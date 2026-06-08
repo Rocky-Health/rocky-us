@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Minimal-layout routes (checkout, quizzes, prelanders): hide the global
+   navbar/footer with zero layout shift. The data-layout flag is set on <html>
+   by a beforeInteractive inline script in app/layout.jsx BEFORE first paint,
+   so these elements never paint-then-collapse (the main /checkout CLS cause).
+   LayoutDetector keeps data-layout in sync on client-side navigation. */
+html[data-layout="minimal"] .navbar-main,
+html[data-layout="minimal"] .footer-main {
+  display: none !important;
+}
+
 /* Scroll reveal animation */
 @keyframes scrollRevealUp {
     from {
