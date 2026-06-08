@@ -12,6 +12,14 @@ import { analyticsService } from "@/utils/analytics/analyticsService";
 import { trackFunnelEventOnce } from "@/utils/clarityFunnelEvents";
 import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
 import { formatPrice, toMoney } from "@/utils/priceFormatter";
+import {
+  buildQueue,
+  advanceQueue,
+  clearQueue,
+  buildQuizUrl,
+  FLOW_PARAM_TO_VERTICAL,
+} from "@/lib/questionnaire/questionnaireSequence";
+import QuestionnaireIntermission from "./QuestionnaireIntermission";
 
 // AWIN API configuration
 const AWIN_CONFIG = {
@@ -206,6 +214,34 @@ const checkQuestionnaireCompletion = async (questionnaireId) => {
   }
 };
 
+// ----- Helpers for multi-questionnaire sequencing -----
+
+/**
+ * Collect all flow params present in the URL and return them as an ordered
+ * array of vertical slugs.  Order follows the canonical flow-param list so
+ * the sequence is deterministic across reloads.
+ */
+const CANONICAL_FLOW_PARAMS = [
+  "wl-flow",
+  "ed-flow",
+  "hair-flow",
+  "longevity-flow",
+  "mh-flow",
+  "smoking-flow",
+  "skincare-flow",
+];
+
+function collectVerticals(searchParams) {
+  const verticals = [];
+  for (const param of CANONICAL_FLOW_PARAMS) {
+    if (searchParams.get(param) === "1") {
+      const slug = FLOW_PARAM_TO_VERTICAL[param];
+      if (slug) verticals.push(slug);
+    }
+  }
+  return verticals;
+}
+
 const OrderReceivedContent = ({ userId }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -216,6 +252,11 @@ const OrderReceivedContent = ({ userId }) => {
     useState(false);
   const [questionnaireCheckComplete, setQuestionnaireCheckComplete] =
     useState(false);
+
+  // Multi-questionnaire intermission state
+  const [showIntermission, setShowIntermission] = useState(false);
+  const [intermissionData, setIntermissionData] = useState(null);
+
   const key = searchParams.get("key");
   const params = useParams();
   const orderId = params.id;
@@ -227,7 +268,7 @@ const OrderReceivedContent = ({ userId }) => {
   const hairFlow = searchParams.get("hair-flow");
   const smokingFlow = searchParams.get("smoking-flow");
   const longevityFlow = searchParams.get("longevity-flow");
-  
+
   // TK-586: "Order success page reached" — the bottom of the funnel. Fires
   // once when the order has loaded with an id, flagged with the WL flow when
   // the checkout redirect carried wl-flow=1.
@@ -280,6 +321,7 @@ const OrderReceivedContent = ({ userId }) => {
     };
     return btoa(JSON.stringify(seskeyData));
   };
+
   // Determine the redirect destination
   const getRedirectPath = () => {
     // Build the base path based on flow type
@@ -452,6 +494,24 @@ const OrderReceivedContent = ({ userId }) => {
           );
         }
 
+        // ----- Multi-questionnaire sequence setup -----
+        // Collect ALL flow params present in the URL
+        const verticals = collectVerticals(searchParams);
+
+        if (shouldRedirect && verticals.length >= 2) {
+          // Multiple questionnaires required — build a queue
+          const seskey = generateSeskey(userId);
+          buildQueue({
+            orderId: data?.id ? String(data.id) : String(orderId),
+            seskey,
+            verticals,
+          });
+          logger.log("[QuizSeq] Built sequence queue:", { verticals, orderId: data?.id });
+          // Redirect to the FIRST quiz immediately (no extra countdown needed
+          // beyond the existing 10s countdown which picks up getRedirectPath())
+        }
+        // -----------------------------------------------
+
         // Check if we need to redirect to a questionnaire
         if (shouldRedirect) {
           // Only perform questionnaire completion check for ED and Hair flows
@@ -510,6 +570,43 @@ const OrderReceivedContent = ({ userId }) => {
       setLoading(false);
     }
   }, [orderId, key, shouldRedirect, mhFlow, edFlow, wlFlow, hairFlow, longevityFlow]);
+
+  // ----- Intermission: when shown, render just the intermission screen -----
+  if (showIntermission && intermissionData) {
+    return (
+      <section className="px-5 sectionWidth:px-0 py-4 md:py-8">
+        <div className="flex justify-center">
+          <div className="border rounded-xl w-full max-w-[480px] p-6">
+            <QuestionnaireIntermission
+              completedVertical={intermissionData.completedVertical}
+              nextVertical={intermissionData.nextVertical}
+              sequenceN={intermissionData.sequenceN}
+              sequenceTotal={intermissionData.sequenceTotal}
+              onComplete={() => {
+                // Advance the queue and navigate to the next quiz
+                const updatedQueue = advanceQueue();
+                if (updatedQueue) {
+                  const nextSlug = updatedQueue.verticals[updatedQueue.currentIndex];
+                  const url = buildQuizUrl(
+                    nextSlug,
+                    updatedQueue,
+                    order?.line_items?.[0]?.name
+                  );
+                  if (url) {
+                    router.push(url);
+                  } else {
+                    router.push("/");
+                  }
+                } else {
+                  router.push("/");
+                }
+              }}
+            />
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (loading) {
     return <Loader />;

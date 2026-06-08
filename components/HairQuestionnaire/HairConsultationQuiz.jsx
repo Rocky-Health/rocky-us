@@ -15,6 +15,8 @@ import Logo from "../Navbar/Logo";
 import DOBInput from "../shared/DOBInput";
 import Link from "next/link";
 import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
+import { useQuizSequence } from "@/lib/questionnaire/useQuizSequence";
+import QuestionnaireIntermission from "@/components/OrderReceived/QuestionnaireIntermission";
 
 const { uploadFileToS3WithProgress } = await import(
   "@/utils/s3/frontend-upload"
@@ -33,6 +35,13 @@ export default function HairConsultationQuiz({
   const router = useRouter();
   const formRef = useRef(null);
 
+  // Multi-questionnaire sequence
+  const {
+    showIntermission: hairShowIntermission,
+    intermissionProps: hairIntermissionProps,
+    handleQuizComplete: hairHandleQuizComplete,
+  } = useQuizSequence(router);
+
   //   date Picker
   const [datePickerValue, setDatePickerValue] = useState("");
   const [intentionalReload, setIntentionalReload] = useState(false);
@@ -49,6 +58,15 @@ export default function HairConsultationQuiz({
     flowId: "hair",
     stepType: "quiz",
   });
+
+  // Fire sequence check when Hair quiz reaches the completion screen (page 22)
+  const hairSequenceCheckedRef = useRef(false);
+  useEffect(() => {
+    if (currentPage === 22 && !hairSequenceCheckedRef.current) {
+      hairSequenceCheckedRef.current = true;
+      hairHandleQuizComplete();
+    }
+  }, [currentPage, hairHandleQuizComplete]);
 
   const [progress, setProgress] = useState(10);
   const [showPopup, setShowPopup] = useState(false);
@@ -4528,7 +4546,15 @@ export default function HairConsultationQuiz({
         </div>
       )}
 
-      {currentPage === 22 && (
+      {currentPage === 22 && hairShowIntermission && hairIntermissionProps && (
+        <div className="px-5 py-8 flex justify-center">
+          <div className="border rounded-xl w-full max-w-[480px] p-6">
+            <QuestionnaireIntermission {...hairIntermissionProps} />
+          </div>
+        </div>
+      )}
+
+      {currentPage === 22 && !hairShowIntermission && (
         <div className="fixed inset-0 bg-[#F5F4EF] overflow-hidden flex flex-col">
           <div className="absolute inset-0 hidden md:block">
             <img
