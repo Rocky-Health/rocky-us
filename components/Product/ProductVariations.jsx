@@ -6,6 +6,7 @@ import {
   isForcedSubscriptionProduct,
   formatSubscriptionOptions,
 } from "@/lib/utils/subscriptionUtils";
+import { trackFunnelEvent } from "@/utils/clarityFunnelEvents";
 import { formatPriceUI } from "@/utils/priceFormatter";
 
 const VariationButton = ({ selected, onClick, children, disabled = false }) => (
@@ -337,6 +338,25 @@ const ProductVariations = ({
 
     // Reset notification flag to allow updated data to be sent
     didNotifyParent.current = false;
+
+    // TK-585: "Plan selected" (Monthly / 3-Month / 6-Month / 12-Month) on the
+    // product/plan page. Gated to forced-subscription products (the GLP-1 / WL
+    // plan pattern) so non-WL products don't add funnel noise.
+    if (isForcedSubscription) {
+      trackFunnelEvent("wl_plan_selected", {
+        clarity: {
+          qs_flow_id: "weight-loss",
+          wl_plan_label: subscription?.label ?? "",
+          wl_plan_product: product?.name ?? product?.id ?? "",
+        },
+        data: {
+          flow_id: "weight-loss",
+          plan_label: subscription?.label ?? "",
+          plan_price: subscription?.price ?? "",
+          product_id: product?.id ?? "",
+        },
+      });
+    }
   };
 
   // Check if a variation has a sale price

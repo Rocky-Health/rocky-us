@@ -21,7 +21,11 @@ const Payment = ({
   }, [elements, onStripeReady]);
 
   return (
+    // TK-586: id anchors the payment section-view smart event; data-hm-ignore
+    // blocks heatmaps/recordings from capturing payment details.
     <div
+      id="checkout-section-payment"
+      data-hm-ignore
       className={`bg-white w-full p-4 md:p-6 rounded-[16px] shadow-[0px_1px_1px_0px_#E2E2E1] border border-[#E2E2E1] mt-8 ${
         fullWidth ? "" : "lg:max-w-[512px]"
       }`}

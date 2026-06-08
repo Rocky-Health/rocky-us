@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import { logger } from "@/utils/devLogger";
 import { CiCircleAlert, CiCircleCheck } from "react-icons/ci";
 import { useSearchParams, useParams, useRouter } from "next/navigation";
@@ -9,6 +9,7 @@ import Link from "next/link";
 import { FaArrowRight } from "react-icons/fa";
 import CustomImage from "../utils/CustomImage";
 import { analyticsService } from "@/utils/analytics/analyticsService";
+import { trackFunnelEventOnce } from "@/utils/clarityFunnelEvents";
 import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
 import { formatPrice, toMoney } from "@/utils/priceFormatter";
 
@@ -227,6 +228,25 @@ const OrderReceivedContent = ({ userId }) => {
   const smokingFlow = searchParams.get("smoking-flow");
   const longevityFlow = searchParams.get("longevity-flow");
   
+  // TK-586: "Order success page reached" — the bottom of the funnel. Fires
+  // once when the order has loaded with an id, flagged with the WL flow when
+  // the checkout redirect carried wl-flow=1.
+  const orderSuccessFiredRef = useRef(false);
+  useEffect(() => {
+    if (!order?.id) return;
+    trackFunnelEventOnce(orderSuccessFiredRef, "checkout_order_success", {
+      clarity: {
+        checkout_order_id: order.id,
+        checkout_flow: wlFlow === "1" ? "weight-loss" : "",
+      },
+      data: {
+        order_id: order.id,
+        order_total: order.total ?? "",
+        flow: wlFlow === "1" ? "weight-loss" : "",
+      },
+    });
+  }, [order, wlFlow]);
+
   // Check localStorage once on mount to determine if this is a BO flow
   const [isNewBOFlow, setIsNewBOFlow] = useState(false);
   useEffect(() => {

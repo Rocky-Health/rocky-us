@@ -273,6 +273,7 @@ const BillingAndShipping = ({
         </>
       )}
       <div
+        id="checkout-section-contact"
         data-hm-ignore
         className={
           isGlp2

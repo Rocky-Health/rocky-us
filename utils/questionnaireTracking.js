@@ -3,6 +3,8 @@
  * Pure functions -- no React, SSR-safe.
  */
 
+import { trackFunnelEvent } from "./clarityFunnelEvents";
+
 const QS_DEBUG =
   typeof process !== "undefined" &&
   process.env.NEXT_PUBLIC_QS_TRACK_DEBUG === "1";
@@ -139,4 +141,64 @@ export function trackQuestionnaireStepView(payload) {
       new CustomEvent("questionnaire_step_view", { detail: payload })
     );
   } catch (_) {}
+}
+
+/* ------------------------------------------------------------------ */
+/*  Clarity custom dimensions shared by every questionnaire event     */
+/* ------------------------------------------------------------------ */
+
+function clarityDimsFromPayload(payload) {
+  return {
+    qs_flow_id: payload.flow_id ?? "",
+    qs_questionnaire_id: payload.questionnaire_id ?? "",
+    qs_step_id: payload.step_id ?? "",
+    qs_step_index: payload.step_index ?? "",
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/*  trackQuestionnaireStepComplete                                     */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Emit `questionnaire_step_complete` when a step is validated and the user
+ * advances. Pairs with `questionnaire_step_view` so a per-step funnel (view ->
+ * complete) is buildable in Clarity. Payload mirrors trackQuestionnaireStepView.
+ *
+ * @param {object} payload  Safe, minimal payload (no PHI).
+ */
+export function trackQuestionnaireStepComplete(payload) {
+  if (typeof window === "undefined") return;
+  if (QS_DEBUG) {
+    try {
+      console.info("[QS_TRACK] complete", payload);
+    } catch (_) {}
+  }
+  trackFunnelEvent("questionnaire_step_complete", {
+    clarity: clarityDimsFromPayload(payload),
+    data: payload,
+  });
+}
+
+/* ------------------------------------------------------------------ */
+/*  trackQuestionnaireSubmit                                           */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Emit `questionnaire_submit` when the user clicks Submit on the final step.
+ * Marks the bottom of the quiz funnel before the plan-selection page.
+ *
+ * @param {object} payload  Safe, minimal payload (no PHI).
+ */
+export function trackQuestionnaireSubmit(payload) {
+  if (typeof window === "undefined") return;
+  if (QS_DEBUG) {
+    try {
+      console.info("[QS_TRACK] submit", payload);
+    } catch (_) {}
+  }
+  trackFunnelEvent("questionnaire_submit", {
+    clarity: clarityDimsFromPayload(payload),
+    data: payload,
+  });
 }

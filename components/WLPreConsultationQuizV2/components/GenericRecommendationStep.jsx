@@ -9,6 +9,17 @@ import { addRequiredConsultation } from "@/utils/requiredConsultation";
 import Loader from "@/components/Loader";
 import { trackMetaProductSelection, logMetaTrackingError } from "@/utils/metaQuestionnaireTracking";
 import { formatPriceUI } from "@/utils/priceFormatter";
+import { trackFunnelEvent } from "@/utils/clarityFunnelEvents";
+
+// TK-585: this step is the WL pre-consultation recommendation page.
+const QS_QUESTIONNAIRE_ID = "wl-pre-consultation";
+const treatmentDims = (product) => ({
+  qs_flow_id: "weight-loss",
+  qs_questionnaire_id: QS_QUESTIONNAIRE_ID,
+  wl_treatment_id: product?.id ?? "",
+  wl_treatment_name: product?.name ?? "",
+  wl_treatment_ingredient: product?.ingredient ?? "",
+});
 
 // Weight loss product IDs that require consultation
 const WEIGHT_LOSS_PRODUCT_IDS = [
@@ -42,6 +53,42 @@ const GenericRecommendationStep = ({
   const router = useRouter();
 
   const [hasSelectedAlternative, setHasSelectedAlternative] = useState(false);
+
+  // TK-585: fire "treatment selected" whenever the user actively picks a card.
+  const handleSelectTreatment = (product) => {
+    setSelectedProduct(product);
+    trackFunnelEvent("wl_treatment_selected", {
+      clarity: treatmentDims(product),
+      data: {
+        flow_id: "weight-loss",
+        questionnaire_id: QS_QUESTIONNAIRE_ID,
+        treatment_id: product?.id ?? "",
+        treatment_name: product?.name ?? "",
+      },
+    });
+  };
+
+  // TK-585: "Plan page abandoned" — left the page without proceeding.
+  const proceededRef = useRef(false);
+  useEffect(() => {
+    const onLeave = () => {
+      if (proceededRef.current) return;
+      trackFunnelEvent("wl_plan_page_abandoned", {
+        clarity: {
+          qs_flow_id: "weight-loss",
+          qs_questionnaire_id: QS_QUESTIONNAIRE_ID,
+          wl_treatment_id: selectedProduct?.id ?? "",
+        },
+        data: {
+          flow_id: "weight-loss",
+          questionnaire_id: QS_QUESTIONNAIRE_ID,
+          treatment_id: selectedProduct?.id ?? "",
+        },
+      });
+    };
+    window.addEventListener("pagehide", onLeave);
+    return () => window.removeEventListener("pagehide", onLeave);
+  }, [selectedProduct]);
 
   // Privacy text component
   const PrivacyText = () => (
@@ -149,6 +196,10 @@ const GenericRecommendationStep = ({
       return;
     }
 
+    // TK-585: user is proceeding from the recommendation page (either to the
+    // plan step or straight to checkout) — suppress the abandonment event.
+    proceededRef.current = true;
+
     try {
       trackMetaProductSelection({
         flow_id: "weight-loss",
@@ -161,13 +212,26 @@ const GenericRecommendationStep = ({
       logMetaTrackingError(err, { flow_id: "weight-loss", questionnaire_id: "wl-pre-consultation", milestone: "PRODUCT_SELECTION" });
     }
 
-    // If onBeforeCheckout returns true, navigate to plan step instead of checkout
+    // If onBeforeCheckout returns true, navigate to plan step instead of checkout.
+    // The plan step fires its own wl_proceed_to_checkout (handlePlanStepCheckout),
+    // so don't double-count here.
     if (typeof onBeforeCheckout === "function" && onBeforeCheckout(selectedProduct)) {
       if (typeof onNavigateToPlanStep === "function") {
         onNavigateToPlanStep();
       }
       return;
     }
+
+    // TK-585: direct "Proceed to checkout" (no intermediate plan step).
+    trackFunnelEvent("wl_proceed_to_checkout", {
+      clarity: treatmentDims(selectedProduct),
+      data: {
+        flow_id: "weight-loss",
+        questionnaire_id: QS_QUESTIONNAIRE_ID,
+        treatment_id: selectedProduct?.id ?? "",
+        treatment_name: selectedProduct?.name ?? "",
+      },
+    });
 
     try {
       setIsCheckoutLoading(true);
@@ -332,7 +396,7 @@ const GenericRecommendationStep = ({
           <ProductCard
             product={recommended}
             variations={variations}
-            onSelect={(product) => setSelectedProduct(product)}
+            onSelect={(product) => handleSelectTreatment(product)}
             isSelected={selectedProduct?.id === recommended?.id}
           />
 
@@ -341,7 +405,7 @@ const GenericRecommendationStep = ({
               <ProductCard
                 key={product.id ?? product.name}
                 product={product}
-                onSelect={(product) => setSelectedProduct(product)}
+                onSelect={(product) => handleSelectTreatment(product)}
                 isSelected={selectedProduct?.id === product.id}
               />
             ))}

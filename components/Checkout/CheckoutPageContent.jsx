@@ -31,6 +31,10 @@ import {
 } from "@/utils/zonnicQuebecValidation";
 import useCheckoutValidation from "@/lib/hooks/useCheckoutValidation";
 import { checkAgeRestriction } from "@/utils/ageValidation";
+import {
+  trackFunnelEvent,
+  trackFunnelEventOnce,
+} from "@/utils/clarityFunnelEvents";
 import QuebecRestrictionPopup from "../Popups/QuebecRestrictionPopup";
 import AgeRestrictionPopup from "../Popups/AgeRestrictionPopup";
 import ProductNotAvailablePopup from "../Popups/ProductNotAvailablePopup";
@@ -1685,6 +1689,15 @@ const CheckoutPageContent = () => {
     try {
       setSubmitting(true);
 
+      // TK-586: "Place Order button clicked" — fires on every attempt (before
+      // validation) so the click-to-success drop-off on /checkout is measurable.
+      trackFunnelEvent("checkout_place_order_clicked", {
+        clarity: {
+          checkout_item_count: cartItems?.items?.length ?? "",
+        },
+        data: { item_count: cartItems?.items?.length ?? 0 },
+      });
+
       // Validate form data before processing
       // For NEW CARD payments with Stripe Elements, skip card validation
       // (Stripe Elements handles card validation internally)
@@ -2776,6 +2789,71 @@ const CheckoutPageContent = () => {
   };
 
   // Show loading indicator if cart is not yet loaded or URL parameters are being processed
+  // ---- TK-586: per-section Clarity smart events ------------------------
+  // /checkout is PHI-blocked from heatmaps (data-hm-ignore), so named smart
+  // events are the only way to segment the load-then-leave rate by section.
+
+  // Section "viewed" — IntersectionObserver on the section anchors. Each fires
+  // once when it scrolls into view. Runs after the real form renders (gated on
+  // cartItems) since the skeleton above returns before these anchors exist.
+  const sectionViewFiredRef = useRef({});
+  useEffect(() => {
+    if (!cartItems || isProcessingUrlParams) return;
+    if (typeof IntersectionObserver === "undefined") return;
+
+    const sections = [
+      { id: "checkout-section-contact", event: "checkout_contact_viewed" },
+      { id: "checkout-section-payment", event: "checkout_payment_viewed" },
+    ];
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const match = sections.find((s) => s.id === entry.target.id);
+          if (!match || sectionViewFiredRef.current[match.event]) return;
+          sectionViewFiredRef.current[match.event] = true;
+          trackFunnelEvent(match.event);
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.25 }
+    );
+
+    sections.forEach((s) => {
+      const el = document.getElementById(s.id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [cartItems, isProcessingUrlParams]);
+
+  // Section "completed" — derived from form state. Contact = identity fields,
+  // shipping = the delivery address fields (billing address is the default
+  // ship-to), payment = Stripe element valid. Each fires once.
+  const contactCompleteRef = useRef(false);
+  const shippingCompleteRef = useRef(false);
+  const paymentCompleteRef = useRef(false);
+
+  useEffect(() => {
+    const b = formData?.billing_address || {};
+    const contactDone =
+      b.first_name && b.last_name && b.phone && b.date_of_birth;
+    if (contactDone) {
+      trackFunnelEventOnce(contactCompleteRef, "checkout_contact_completed");
+    }
+    const addressDone = b.address_1 && b.city && b.state && b.postcode;
+    if (addressDone) {
+      trackFunnelEventOnce(shippingCompleteRef, "checkout_shipping_completed");
+    }
+  }, [formData]);
+
+  useEffect(() => {
+    if (isPaymentValid) {
+      trackFunnelEventOnce(paymentCompleteRef, "checkout_payment_completed");
+    }
+  }, [isPaymentValid]);
+
   if (!cartItems || isProcessingUrlParams) {
     return <CheckoutSkeleton />;
   }
