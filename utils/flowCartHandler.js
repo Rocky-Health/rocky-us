@@ -627,16 +627,46 @@ async function handleUnauthenticatedAddonAddition(
  * @param {string} flowType - The flow whose items should be removed (e.g. "wl")
  * @returns {Promise<void>}
  */
+// WL plan product IDs (mirrors WEIGHT_LOSS_PRODUCT_IDS in app/api/cart/route.js).
+// The authenticated Store API cart (GET /api/cart) does NOT expose the private
+// _flow_type meta, so for WL we fall back to product-ID matching. Removing a WL
+// item via DELETE /api/cart also cascades the Body Optimization Program removal.
+const WL_FLOW_PRODUCT_IDS = [
+  "489523",
+  "489799",
+  "142976",
+  "160469",
+  "276274",
+  "369795",
+];
+
+// Name keywords that identify a WL product. Needed because the authenticated
+// Store API cart exposes neither _flow_type nor a complete product-ID set, but
+// it does expose the item name (e.g. compounded semaglutide/tirzepatide).
+const WL_NAME_PATTERN =
+  /semaglutide|tirzepatide|ozempic|wegovy|mounjaro|rybelsus|weight.?loss|body.?optim/i;
+
+// True if a fetched cart item belongs to the given flow. Matches the _flow_type
+// meta when present (guest/local cart); for WL on the authenticated Store API
+// cart (which omits _flow_type) it falls back to product-ID then name matching.
+function cartItemBelongsToFlow(item, flowType) {
+  const byMeta = (item?.meta_data || []).some(
+    (meta) => meta.key === "_flow_type" && meta.value === flowType,
+  );
+  if (byMeta) return true;
+  if (flowType === "wl") {
+    if (WL_FLOW_PRODUCT_IDS.includes(String(item?.id))) return true;
+    if (WL_NAME_PATTERN.test(item?.name || "")) return true;
+  }
+  return false;
+}
+
 async function removeItemsByFlowType(flowType) {
   const cart = await getCart();
   const items = cart?.items || [];
 
-  // Identify items that belong to this flow via the _flow_type meta key
-  const flowItems = items.filter((item) =>
-    (item.meta_data || []).some(
-      (meta) => meta.key === "_flow_type" && meta.value === flowType,
-    ),
-  );
+  // Identify items that belong to this flow (meta or, for WL, product ID)
+  const flowItems = items.filter((item) => cartItemBelongsToFlow(item, flowType));
 
   if (flowItems.length === 0) {
     logger.log(
@@ -697,9 +727,7 @@ async function handleFlowSpecificPreProcessing(flowType, preserveExistingCart) {
         // Confirm no WL-flow items remain before proceeding
         const cart = await getCart();
         const remainingFlowItems = (cart?.items || []).filter((item) =>
-          (item.meta_data || []).some(
-            (meta) => meta.key === "_flow_type" && meta.value === flowType,
-          ),
+          cartItemBelongsToFlow(item, flowType),
         );
 
         if (remainingFlowItems.length === 0) {
