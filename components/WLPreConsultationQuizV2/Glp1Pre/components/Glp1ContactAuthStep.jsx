@@ -8,6 +8,7 @@ import { logger } from "@/utils/devLogger";
 import { usePassword } from "@/components/WLPreConsultationQuizV2/contexts/PasswordContext";
 import PhoneInput, { isValidPhone } from "@/components/PhoneInput";
 import { encryptPasswordWithServerKey } from "@/utils/encryptPasswordWithServerKey";
+import { migrateLocalCartToServer, getLocalCart } from "@/lib/cart/cartService";
 
 const isValidEmail = (e) => {
   if (!e || typeof e !== "string") return false;
@@ -237,6 +238,17 @@ const Glp1ContactAuthStep = ({
       } else {
         await registerAndLogin();
         toast.success("Account created successfully");
+      }
+
+      // Migrate any pre-existing guest cart items (e.g. ED) to the server
+      // cart before the WL plan is added in the next step. Non-blocking.
+      try {
+        const localCart = getLocalCart();
+        if (localCart.items && localCart.items.length > 0) {
+          await migrateLocalCartToServer();
+        }
+      } catch (migrateErr) {
+        logger.error("Cart migration after auth:", migrateErr);
       }
 
       onContinue?.();

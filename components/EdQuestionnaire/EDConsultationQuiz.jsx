@@ -18,6 +18,8 @@ import {
 } from "react-icons/fa";
 import Loader from "../Loader";
 import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
+import { useQuizSequence } from "@/lib/questionnaire/useQuizSequence";
+import QuestionnaireIntermission from "@/components/OrderReceived/QuestionnaireIntermission";
 const { uploadFileToS3WithProgress } = await import(
   "@/utils/s3/frontend-upload"
 );
@@ -131,6 +133,13 @@ export default function EDConsultationQuiz({
   const isValidating = useRef(false);
   const isIntentionalNavigation = useRef(false);
 
+  // Multi-questionnaire sequence
+  const {
+    showIntermission: edShowIntermission,
+    intermissionProps: edIntermissionProps,
+    handleQuizComplete: edHandleQuizComplete,
+  } = useQuizSequence(router);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showCustomerVerificationPopup, setShowCustomerVerificationPopup] =
     useState(false);
@@ -221,6 +230,15 @@ export default function EDConsultationQuiz({
 
   const [showThankYou, setShowThankYou] = useState(false);
   const [isCheckingCompletion, setIsCheckingCompletion] = useState(true);
+
+  // Fire sequence check when ED quiz reaches the thank-you screen
+  const edSequenceCheckedRef = useRef(false);
+  useEffect(() => {
+    if (currentPage === 22 && showThankYou && !edSequenceCheckedRef.current) {
+      edSequenceCheckedRef.current = true;
+      edHandleQuizComplete();
+    }
+  }, [currentPage, showThankYou, edHandleQuizComplete]);
 
   const slideVariants = {
     hiddenRight: { x: "100%", opacity: 0 },
@@ -5137,7 +5155,14 @@ export default function EDConsultationQuiz({
                         </motion.div>
                       </QuestionWrapper>
                     )}{" "}
-                    {currentPage === 22 && (
+                    {currentPage === 22 && edShowIntermission && edIntermissionProps && (
+                      <QuestionWrapper>
+                        <div className="py-4">
+                          <QuestionnaireIntermission {...edIntermissionProps} />
+                        </div>
+                      </QuestionWrapper>
+                    )}
+                    {currentPage === 22 && !edShowIntermission && (
                       <QuestionWrapper>
                         <div
                           className="quiz-page page-thank-you quiz-page-22"

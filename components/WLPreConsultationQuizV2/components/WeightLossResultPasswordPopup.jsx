@@ -1,5 +1,5 @@
 import Loader from "@/components/Loader";
-import { isAuthenticated } from "@/lib/cart/cartService";
+import { isAuthenticated, migrateLocalCartToServer, getLocalCart } from "@/lib/cart/cartService";
 import { logger } from "@/utils/devLogger";
 import Link from "next/link";
 import React, { useState, useRef } from "react";
@@ -200,6 +200,17 @@ const WeightLossResultPasswordPopup = ({
       if (emailExists) {
         const goNext = await TryLogin({ email, password });
         if (goNext == 0) return;
+
+        // Migrate any pre-existing guest cart items (e.g. ED) to the server
+        // cart before the WL plan is added in the next step. Non-blocking.
+        try {
+          const localCart = getLocalCart();
+          if (localCart.items && localCart.items.length > 0) {
+            await migrateLocalCartToServer();
+          }
+        } catch (migrateErr) {
+          logger.error("Cart migration after auth:", migrateErr);
+        }
       }
       onSubmit("openPopup", "YourWeightPopup");
     }
