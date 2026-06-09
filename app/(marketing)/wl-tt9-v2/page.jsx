@@ -21,6 +21,7 @@ export const metadata = buildMetadata({
   description:
     "Spring savings on GLP-1 weight loss plans. Personalized care, GLP-1 medications, and support from licensed clinicians.",
   vertical: "wl",
+  noindex: true,
 });
 
 export default function DmOffersPage() {
