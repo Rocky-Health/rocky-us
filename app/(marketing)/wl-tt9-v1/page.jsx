@@ -30,6 +30,7 @@ export const metadata = buildMetadata({
   description:
     "Personalized GLP-1 weight loss care. Start for $149, free shipping, HSA/FSA eligible.",
   vertical: "wl",
+  noindex: true,
 });
 
 export default function WlMedViPage() {
