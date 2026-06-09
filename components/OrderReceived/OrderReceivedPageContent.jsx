@@ -12,6 +12,11 @@ import { analyticsService } from "@/utils/analytics/analyticsService";
 import { trackFunnelEventOnce } from "@/utils/clarityFunnelEvents";
 import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
 import { formatPrice, toMoney } from "@/utils/priceFormatter";
+import {
+  buildQueue,
+  FLOW_PARAM_TO_VERTICAL,
+  VERTICAL_QUIZ_PATH,
+} from "@/lib/questionnaire/questionnaireSequence";
 
 // AWIN API configuration
 const AWIN_CONFIG = {
@@ -206,6 +211,169 @@ const checkQuestionnaireCompletion = async (questionnaireId) => {
   }
 };
 
+// ----- Helpers for multi-questionnaire sequencing -----
+
+/**
+ * Canonical vertical order — determines the sequence when an order contains
+ * multiple products from different verticals.
+ */
+const CANONICAL_VERTICAL_ORDER = [
+  "wl",
+  "ed",
+  "hair",
+  "longevity",
+  "mh",
+  "smoking",
+  "skincare",
+];
+
+// ----- Product classification: vertical detection from order.line_items -----
+//
+// WooCommerce order line items include product_id, variation_id, name, and sku
+// but do NOT include the WooCommerce product categories (those are on the parent
+// product object, not the order line item).  We therefore classify each line item
+// using two signals in priority order:
+//
+//   1. Known product/variation IDs from config files (highest confidence).
+//   2. Product name keyword matching (same keywords already used by
+//      metaCapiPurchase.js categorizeProduct — battle-tested, covers the
+//      majority of products whose IDs are not enumerated here).
+//
+// These checks are all synchronous and require no additional API calls.
+
+// WL: product IDs from config/wlProducts.json
+const WL_PRODUCT_IDS = new Set([
+  "489523", // Compounded Tirzepatide
+  "489799", // Compounded Semaglutide
+  "142976", // Ozempic
+  "160469", // Mounjaro
+  "276274", // Wegovy
+  "369795", // Rybelsus
+]);
+
+// Hair: variation IDs (which appear as variation_id) and base product IDs
+// from config/hairProducts.json
+const HAIR_PRODUCT_IDS = new Set([
+  "126208", // 2 in 1 Growth Plan (variation)
+  "96913",  // 2 in 1 Growth Plan (base product)
+  "6288",   // The Growth Plan
+  "268",    // Back On Track (variation)
+  "267",    // Back On Track (base product)
+  "2838",   // Finasteride (Propecia) Tablets
+]);
+
+// Longevity/NAD+: product ID from NadPlusQuiz config
+const LONGEVITY_PRODUCT_IDS = new Set([
+  "490774", // NAD+ product
+]);
+
+// ED: all known variation IDs from config/edProducts.json
+// The parent product IDs are not in the config, so we list variation IDs.
+// variation_id is present on line items for variable products.
+const ED_VARIATION_IDS = new Set([
+  "259", "260", "261",
+  "233", "234", "235", "236", "237",
+  "1421", "1422", "1423", "1424", "1427", "1428", "1429", "1430", "1431", "1432",
+  "1960", "1961", "1962", "1967",
+  "3287", "3437", "3438", "3439", "3440", "3442",
+  "3465", "3466", "3467", "3469", "3470", "3471",
+  "37668", "37669", "37673", "37674",
+]);
+
+/**
+ * Classify a single WooCommerce order line item into a vertical slug.
+ * Returns one of: "wl", "ed", "hair", "longevity", "mh", "smoking", "skincare",
+ * or null if unrecognised.
+ *
+ * Priority:
+ *   1. Product/variation ID lookup (config-driven, most reliable)
+ *   2. Product name keyword matching (fallback, same as metaCapiPurchase.js)
+ */
+function classifyLineItem(item) {
+  if (!item) return null;
+
+  const productId = String(item.product_id || "");
+  const variationId = String(item.variation_id || "");
+  const name = (item.name || "").toLowerCase();
+
+  // --- ID-based classification (highest confidence) ---
+
+  if (WL_PRODUCT_IDS.has(productId)) return "wl";
+  if (LONGEVITY_PRODUCT_IDS.has(productId)) return "longevity";
+  if (HAIR_PRODUCT_IDS.has(productId) || HAIR_PRODUCT_IDS.has(variationId)) return "hair";
+  if (ED_VARIATION_IDS.has(variationId)) return "ed";
+
+  // --- Name-based classification (fallback) ---
+  // Mirrors the nameKeywords map in utils/metaCapiPurchase.js
+
+  if (name.match(/\b(semaglutide|tirzepatide|ozempic|wegovy|mounjaro|rybelsus|weight.?loss|body.?optim)/)) {
+    return "wl";
+  }
+  if (name.match(/\b(nad\+?|nad plus|longevity|rapamycin|metformin)\b/)) {
+    return "longevity";
+  }
+  if (name.match(/\b(finasteride|minoxidil|dutasteride|hair.?loss|hairloss|hair.?growth|propecia)\b/)) {
+    return "hair";
+  }
+  if (name.match(/\b(sildenafil|tadalafil|viagra|cialis|erectile)\b/)) {
+    return "ed";
+  }
+  if (name.match(/\b(zonnic|nicotine|smoking.?cessation|quit.?smoking)\b/)) {
+    return "smoking";
+  }
+  if (name.match(/\b(tretinoin|acne|retinol|hyperpigmentation|anti.?aging|skincare|skin.?care)\b/)) {
+    return "skincare";
+  }
+  if (name.match(/\b(mental.?health|anxiety|depression|ssri|snri)\b/)) {
+    return "mh";
+  }
+
+  return null;
+}
+
+/**
+ * Derive the ordered list of distinct verticals that require a questionnaire
+ * from the actual purchased products in order.line_items.
+ *
+ * Returns an array of vertical slugs in canonical order (same as
+ * CANONICAL_VERTICAL_ORDER) with duplicates removed.  Only verticals that have
+ * a known quiz path (i.e. are in VERTICAL_QUIZ_PATH with a non-null value, or
+ * are mh/smoking/skincare for future use) are included.
+ *
+ * Falls back to URL flow params when no line items can be classified.
+ */
+function collectVerticalsFromOrder(lineItems, searchParamsFallback) {
+  const detectedSet = new Set();
+
+  if (Array.isArray(lineItems)) {
+    for (const item of lineItems) {
+      const vertical = classifyLineItem(item);
+      if (vertical) detectedSet.add(vertical);
+    }
+  }
+
+  // If we could classify at least one item from the order, use that result.
+  if (detectedSet.size > 0) {
+    // Return in canonical order, deduped.
+    return CANONICAL_VERTICAL_ORDER.filter((v) => detectedSet.has(v));
+  }
+
+  // Fallback: read from URL flow params (original collectVerticals behaviour).
+  // This covers edge cases where the product name/ID doesn't match any known
+  // pattern (e.g. new products not yet in the classification tables).
+  const verticals = [];
+  for (const vertical of CANONICAL_VERTICAL_ORDER) {
+    // Map vertical slug back to the corresponding flow param name
+    const paramEntry = Object.entries(FLOW_PARAM_TO_VERTICAL).find(
+      ([, v]) => v === vertical
+    );
+    if (paramEntry && searchParamsFallback.get(paramEntry[0]) === "1") {
+      verticals.push(vertical);
+    }
+  }
+  return verticals;
+}
+
 const OrderReceivedContent = ({ userId }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -216,6 +384,13 @@ const OrderReceivedContent = ({ userId }) => {
     useState(false);
   const [questionnaireCheckComplete, setQuestionnaireCheckComplete] =
     useState(false);
+
+  // When a multi-product sequence is detected from order.line_items, this holds
+  // the first vertical slug in the queue (e.g. "wl").  getRedirectPath() uses
+  // it to ensure the initial redirect lands on the same quiz that is at index 0
+  // of the queue, regardless of which single flow param came in on the URL.
+  const [firstQueueVertical, setFirstQueueVertical] = useState(null);
+
   const key = searchParams.get("key");
   const params = useParams();
   const orderId = params.id;
@@ -227,7 +402,7 @@ const OrderReceivedContent = ({ userId }) => {
   const hairFlow = searchParams.get("hair-flow");
   const smokingFlow = searchParams.get("smoking-flow");
   const longevityFlow = searchParams.get("longevity-flow");
-  
+
   // TK-586: "Order success page reached" — the bottom of the funnel. Fires
   // once when the order has loaded with an id, flagged with the WL flow when
   // the checkout redirect carried wl-flow=1.
@@ -280,18 +455,33 @@ const OrderReceivedContent = ({ userId }) => {
     };
     return btoa(JSON.stringify(seskeyData));
   };
+
   // Determine the redirect destination
   const getRedirectPath = () => {
-    // Build the base path based on flow type
+    // Build the base path based on flow type.
+    //
+    // When a multi-product sequence has been built from order.line_items,
+    // firstQueueVertical holds the slug for the first quiz in the queue.
+    // Use the queue-derived path so the initial redirect is consistent with
+    // what the sequence expects — otherwise the URL flow param (which reflects
+    // only the entry flow) could disagree with verticals[0].
     let basePath = "";
-    if (mhFlow === "1") basePath = "/mh-quiz";
-    if (edFlow === "1") basePath = "/ed-consultation-quiz";
-    if (wlFlow === "1") {
-      basePath = "/wl-consultation";
+    if (firstQueueVertical) {
+      // Resolve base path from the canonical slug → path map
+      basePath = VERTICAL_QUIZ_PATH[firstQueueVertical] || "";
+      // Special-case: smoking path needs the extra query param
+      if (firstQueueVertical === "smoking") basePath = "/smoking-consultation/?checked-out=1";
+    } else {
+      // Single-product order (or unrecognised): fall back to URL flow params.
+      // The if-chain is intentionally last-wins so that the most specific flow
+      // param takes precedence; the order matches the CANONICAL_VERTICAL_ORDER.
+      if (mhFlow === "1") basePath = "/mh-quiz";
+      if (edFlow === "1") basePath = "/ed-consultation-quiz";
+      if (wlFlow === "1") basePath = "/wl-consultation";
+      if (hairFlow === "1") basePath = "/hair-main-questionnaire";
+      if (smokingFlow === "1") basePath = "/smoking-consultation/?checked-out=1";
+      if (longevityFlow === "1") basePath = "/nad-consultation-quiz";
     }
-    if (hairFlow === "1") basePath = "/hair-main-questionnaire";
-    if (smokingFlow === "1") basePath = "/smoking-consultation/?checked-out=1";
-    if (longevityFlow === "1") basePath = "/nad-consultation-quiz";
 
     logger.log("[Debug] Base path:", basePath);
     logger.log("[Debug] Flow parameters:", {
@@ -451,6 +641,35 @@ const OrderReceivedContent = ({ userId }) => {
             { dataKeys: data && typeof data === "object" ? Object.keys(data) : null }
           );
         }
+
+        // ----- Multi-questionnaire sequence setup -----
+        // Derive the set of verticals from the ACTUAL purchased products in
+        // order.line_items, falling back to URL flow params only when the
+        // product names/IDs cannot be classified.  This fixes the bug where
+        // a multi-product order (e.g. WL + ED) would only show one flow param
+        // in the URL (set at checkout entry time) and thus never trigger the
+        // sequential flow.
+        const verticals = collectVerticalsFromOrder(data?.line_items, searchParams);
+
+        if (shouldRedirect && verticals.length >= 2) {
+          // Multiple questionnaires required — build a queue.
+          const seskey = generateSeskey(userId);
+          buildQueue({
+            orderId: data?.id ? String(data.id) : String(orderId),
+            seskey,
+            verticals,
+          });
+          // Record the first vertical so getRedirectPath() can route the
+          // initial redirect to the same quiz that is at index 0 in the queue,
+          // regardless of which single flow param was in the URL.
+          setFirstQueueVertical(verticals[0]);
+          logger.log("[QuizSeq] Built sequence queue from line_items:", {
+            verticals,
+            orderId: data?.id,
+            source: data?.line_items?.length ? "line_items" : "url_fallback",
+          });
+        }
+        // -----------------------------------------------
 
         // Check if we need to redirect to a questionnaire
         if (shouldRedirect) {

@@ -14,6 +14,8 @@ import Logo from "../Navbar/Logo";
 import Link from "next/link";
 import BMICalculatorStep from "../WLPreConsultationQuiz/steps/BMICalculatorStep";
 import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
+import { useQuizSequence } from "@/lib/questionnaire/useQuizSequence";
+import QuestionnaireIntermission from "@/components/OrderReceived/QuestionnaireIntermission";
 
 const SINGLE_CHOICE_PAGES = [1, 2, 3, 7, 10, 11, 12, 14];
 
@@ -182,6 +184,13 @@ export default function WeightLossConsultationQuiz({
   const router = useRouter();
   const formRef = useRef(null);
 
+  // Multi-questionnaire sequence
+  const {
+    showIntermission: wlShowIntermission,
+    intermissionProps: wlIntermissionProps,
+    handleQuizComplete: wlHandleQuizComplete,
+  } = useQuizSequence(router);
+
   const [nameUpdateOption, setNameUpdateOption] = useState("");
   const [showPhotoIdPopup, setShowPhotoIdPopup] = useState(false);
   const [pendingSubmissions, setPendingSubmissions] = useState([]);
@@ -207,6 +216,19 @@ export default function WeightLossConsultationQuiz({
     flowId: "weight-loss",
     stepType: "quiz",
   });
+
+  // Fire sequence check when WL quiz reaches the completion screen
+  const wlSequenceCheckedRef = useRef(false);
+  useEffect(() => {
+    if (
+      currentPage === 23 &&
+      formData.completion_state === "Full" &&
+      !wlSequenceCheckedRef.current
+    ) {
+      wlSequenceCheckedRef.current = true;
+      wlHandleQuizComplete();
+    }
+  }, [currentPage, formData.completion_state, wlHandleQuizComplete]);
 
   const [progress, setProgress] = useState(0);
   const [photoIdAcknowledged, setPhotoIdAcknowledged] = useState(false);
@@ -5807,7 +5829,15 @@ export default function WeightLossConsultationQuiz({
               </div>
             )}
 
-          {currentPage === 23 && formData.completion_state === "Full" && (
+          {currentPage === 23 && formData.completion_state === "Full" && wlShowIntermission && wlIntermissionProps && (
+            <div className="w-full px-5 py-8 flex justify-center">
+              <div className="border rounded-xl w-full max-w-[480px] p-6">
+                <QuestionnaireIntermission {...wlIntermissionProps} />
+              </div>
+            </div>
+          )}
+
+          {currentPage === 23 && formData.completion_state === "Full" && !wlShowIntermission && (
             <div className="relative min-h-screen w-full bg-[#F5F4EF] overflow-hidden flex flex-col">
               <div className="absolute inset-0 hidden md:block">
                 <img

@@ -13,7 +13,6 @@ import {
   addItemToCart,
   getCart,
   getLocalCart,
-  emptyCart,
   isAuthenticated as checkIsAuthenticated,
 } from "@/lib/cart/cartService";
 import { refreshCartNonceClient } from "./nonceManager";
@@ -106,8 +105,7 @@ async function handleAuthenticatedFlow(mainProduct, addons, flowType, options) {
   } = options;
 
   try {
-    // Flow-specific pre-processing
-    // Note: emptyCart sets a fresh cart-nonce cookie; add-items-batch reuses it via getCurrentCartNonce
+    // Flow-specific pre-processing (e.g. removing stale WL items before re-adding)
     await handleFlowSpecificPreProcessing(flowType, preserveExistingCart);
 
     // Prepare items for batch addition
@@ -619,34 +617,133 @@ async function handleUnauthenticatedAddonAddition(
 }
 
 /**
+ * Remove only the cart items that belong to the given flow (matched via the
+ * _flow_type meta key).  Items from other verticals are left untouched.
+ *
+ * This is used by handleFlowSpecificPreProcessing so that re-entering the WL
+ * flow clears stale WL items without destroying ED / Hair / or any other
+ * vertical's items that are already in the cart.
+ *
+ * @param {string} flowType - The flow whose items should be removed (e.g. "wl")
+ * @returns {Promise<void>}
+ */
+// WL plan product IDs (mirrors WEIGHT_LOSS_PRODUCT_IDS in app/api/cart/route.js).
+// The authenticated Store API cart (GET /api/cart) does NOT expose the private
+// _flow_type meta, so for WL we fall back to product-ID matching. Removing a WL
+// item via DELETE /api/cart also cascades the Body Optimization Program removal.
+const WL_FLOW_PRODUCT_IDS = [
+  "489523",
+  "489799",
+  "142976",
+  "160469",
+  "276274",
+  "369795",
+];
+
+// Name keywords that identify a WL product. Needed because the authenticated
+// Store API cart exposes neither _flow_type nor a complete product-ID set, but
+// it does expose the item name (e.g. compounded semaglutide/tirzepatide).
+const WL_NAME_PATTERN =
+  /semaglutide|tirzepatide|ozempic|wegovy|mounjaro|rybelsus|weight.?loss|body.?optim/i;
+
+// True if a fetched cart item belongs to the given flow. Matches the _flow_type
+// meta when present (guest/local cart); for WL on the authenticated Store API
+// cart (which omits _flow_type) it falls back to product-ID then name matching.
+function cartItemBelongsToFlow(item, flowType) {
+  const byMeta = (item?.meta_data || []).some(
+    (meta) => meta.key === "_flow_type" && meta.value === flowType,
+  );
+  if (byMeta) return true;
+  if (flowType === "wl") {
+    if (WL_FLOW_PRODUCT_IDS.includes(String(item?.id))) return true;
+    if (WL_NAME_PATTERN.test(item?.name || "")) return true;
+  }
+  return false;
+}
+
+async function removeItemsByFlowType(flowType) {
+  const cart = await getCart();
+  const items = cart?.items || [];
+
+  // Identify items that belong to this flow (meta or, for WL, product ID)
+  const flowItems = items.filter((item) => cartItemBelongsToFlow(item, flowType));
+
+  if (flowItems.length === 0) {
+    logger.log(
+      `WL flow: No existing ${flowType} items found in cart — nothing to remove`,
+    );
+    return;
+  }
+
+  logger.log(
+    `WL flow: Removing ${flowItems.length} existing ${flowType} item(s) from cart`,
+  );
+
+  for (const item of flowItems) {
+    try {
+      const response = await fetch("/api/cart", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ itemKey: item.key }),
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(
+          errData.error || `Failed to remove cart item ${item.key}`,
+        );
+      }
+
+      logger.log(`WL flow: Removed ${flowType} item ${item.key} from cart`);
+    } catch (removeError) {
+      logger.error(
+        `WL flow: Error removing item ${item.key}:`,
+        removeError,
+      );
+      throw removeError;
+    }
+  }
+}
+
+/**
  * Handle flow-specific pre-processing (cart clearing, etc.)
  */
 async function handleFlowSpecificPreProcessing(flowType, preserveExistingCart) {
   if (flowType === "wl" && !preserveExistingCart) {
-    // Weight Loss flow requires a clean cart so the new plan is the only item.
-    // We retry up to 3 times and verify the cart is actually empty after each
-    // attempt — this prevents a race condition where a slow or failed emptyCart
-    // call lets the old plan linger in the cart when the new one is added.
+    // Weight Loss flow requires the cart to contain only the new WL plan after
+    // this step.  We remove only items that already belong to the WL flow
+    // (matched via the _flow_type === "wl" meta key) so that items from other
+    // verticals (e.g. ED) are preserved.
+    //
+    // We retry up to 3 times and re-check after each attempt to guard against
+    // slow/failed remove calls leaving stale WL items behind.
     const MAX_RETRIES = 3;
     let cleared = false;
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
-        await emptyCart();
-        // Confirm the cart is truly empty before we proceed
+        await removeItemsByFlowType(flowType);
+
+        // Confirm no WL-flow items remain before proceeding
         const cart = await getCart();
-        const remainingItems = (cart?.items || []).length;
-        if (remainingItems === 0) {
-          logger.log(`WL flow: Cart cleared successfully (attempt ${attempt})`);
+        const remainingFlowItems = (cart?.items || []).filter((item) =>
+          cartItemBelongsToFlow(item, flowType),
+        );
+
+        if (remainingFlowItems.length === 0) {
+          logger.log(
+            `WL flow: Existing ${flowType} items cleared successfully (attempt ${attempt})`,
+          );
           cleared = true;
           break;
         }
+
         logger.warn(
-          `WL flow: Cart still has ${remainingItems} item(s) after emptyCart attempt ${attempt} — retrying...`,
+          `WL flow: ${remainingFlowItems.length} ${flowType} item(s) still in cart after attempt ${attempt} — retrying...`,
         );
       } catch (clearError) {
         logger.error(
-          `WL flow: Error clearing cart (attempt ${attempt}):`,
+          `WL flow: Error clearing ${flowType} items (attempt ${attempt}):`,
           clearError,
         );
       }
