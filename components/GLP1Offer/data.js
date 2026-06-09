@@ -73,7 +73,7 @@ export const steps = [
     description:
       "Your medication will be shipped directly to your door for maximum convenience. Starting your treatment is as simple as opening your package and following the easy-to-use instructions.",
     image:
-      "https://myrocky.b-cdn.net/WP%20Images/bo3/new/Getyourmedication.jpg",
+      "https://myrocky.b-cdn.net/WP%20Images/bo3/new/get3.jpg",
   },
 ];
 
