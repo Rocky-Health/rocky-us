@@ -65,7 +65,7 @@ export const viewport = {
 const FAVICON_URL =
   "https://mycdn.myrocky.ca/wp-content/uploads/20260520114301/favicon-mr-desktop.jpg";
 
-const DEFAULT_HOME_TITLE = "MyRocky - Your Health Partner";
+const DEFAULT_HOME_TITLE = "MyRocky - Online Healthcare Made For You";
 const DEFAULT_OG_IMAGE = ogImageUrl({ title: SITE.name, vertical: "home" });
 
 export const metadata = {

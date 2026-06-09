@@ -10,7 +10,7 @@ import { buildMetadata } from "@/lib/seo/metadata";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = buildMetadata({
-  title: "Online Healthcare for Men",
+  title: "Online Healthcare Made For You",
   description:
     "Discreet, clinician-led care from MyRocky — ED, hair loss, weight management and more, prescribed online and delivered across the US.",
   noindex: true,
