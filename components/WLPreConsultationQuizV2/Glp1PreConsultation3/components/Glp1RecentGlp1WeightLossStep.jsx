@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { FaArrowRight } from "react-icons/fa";
+import React from "react";
 
 const ACCENT = "#A7885A";
 
@@ -9,27 +8,26 @@ const Glp1RecentGlp1WeightLossStep = ({
     userData,
     setUserData,
     config,
-    onContinue,
+    onSelect,
 }) => {
     const field = config?.field || "glp1RecentGlp1WeightLoss";
     const options = config?.options || [];
-    const [selected, setSelected] = useState(() => userData?.[field] ?? null);
+    const selected = userData?.[field] ?? null;
 
-    useEffect(() => {
-        setSelected(userData?.[field] ?? null);
-    }, [userData, field]);
-
-    const handleNext = () => {
-        if (selected == null) return;
-        let next = { ...userData, [field]: selected };
-        if (selected === "no") {
-            delete next.priorMedNameDoseFrequency;
-            delete next.priorMedLastDose;
-            delete next.priorMedPrescriber;
-            delete next.priorMedPrescriberOther;
+    const handleOptionClick = (value, option) => {
+        // Clean up prior-med fields when the user selects "no"
+        if (value === "no") {
+            setUserData((prev) => {
+                const next = { ...prev, [field]: value };
+                delete next.priorMedNameDoseFrequency;
+                delete next.priorMedLastDose;
+                delete next.priorMedPrescriber;
+                delete next.priorMedPrescriberOther;
+                return next;
+            });
         }
-        setUserData(next);
-        onContinue?.(next);
+        // Route through the dispatcher so conditionalNavigation is resolved correctly
+        onSelect(value, option);
     };
 
     return (
@@ -50,7 +48,7 @@ const Glp1RecentGlp1WeightLossStep = ({
                             <button
                                 key={option.id}
                                 type="button"
-                                onClick={() => setSelected(option.id)}
+                                onClick={() => handleOptionClick(option.id, option)}
                                 className={`flex min-h-[60px] w-full items-center gap-3 rounded-xl border bg-white px-4 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 ${
                                     isSel
                                         ? "border-2"
@@ -82,25 +80,6 @@ const Glp1RecentGlp1WeightLossStep = ({
                             </button>
                         );
                     })}
-                </div>
-            </div>
-
-            <div className=" bottom-0 left-0 z-50 flex w-full items-center justify-center bg-[linear-gradient(180deg,rgba(245,244,239,0)_0%,rgba(245,244,239,0.8)_37.51%,#F5F4EF_63.04%)]  pb-4 backdrop-blur-sm">
-                <div className="w-full max-w-4xl">
-                    <button
-                        type="button"
-                        onClick={handleNext}
-                        disabled={selected == null}
-                        className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none py-3 text-base font-medium text-white focus:outline-none focus:ring-0 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600"
-                        style={
-                            selected != null
-                                ? { backgroundColor: ACCENT }
-                                : undefined
-                        }
-                    >
-                        <span>Next</span>
-                        <FaArrowRight />
-                    </button>
                 </div>
             </div>
         </div>

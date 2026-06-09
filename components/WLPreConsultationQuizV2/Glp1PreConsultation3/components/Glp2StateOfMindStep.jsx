@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { FaArrowRight } from "react-icons/fa";
 import { FaRegGrinBeam, FaRegSmile } from "react-icons/fa";
 import { FaRegFaceMeh } from "react-icons/fa6";
 
@@ -27,7 +26,7 @@ function formatGoalWeightLbs(userData) {
     return t.length ? t : null;
 }
 
-const Glp2StateOfMindStep = ({ userData, setUserData, config, onContinue }) => {
+const Glp2StateOfMindStep = ({ userData, config, onSelect }) => {
     const selectedValue = userData?.[config.field] || "";
     const options = config?.options || [];
     const goalPart = formatGoalWeightLbs(userData);
@@ -40,13 +39,6 @@ const Glp2StateOfMindStep = ({ userData, setUserData, config, onContinue }) => {
             : goalPart
               ? `How motivated are you to reach ${goalPart} lbs?`
               : "How motivated are you to reach your goal weight?";
-
-    const handleSelect = (value) => {
-        setUserData((prev) => ({
-            ...prev,
-            [config.field]: value,
-        }));
-    };
 
     return (
         <div className="flex h-full w-full flex-col px-4 md:px-0">
@@ -68,7 +60,7 @@ const Glp2StateOfMindStep = ({ userData, setUserData, config, onContinue }) => {
                             <button
                                 key={option.id}
                                 type="button"
-                                onClick={() => handleSelect(option.id)}
+                                onClick={() => onSelect(option.id, option)}
                                 className={`flex flex-col items-center justify-center rounded-2xl border-2 bg-white px-4 py-12 text-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 md:px-5 ${
                                     checked
                                         ? "border-[#A7885A] shadow-[0_0_0_1px_#A7885A]"
@@ -85,24 +77,6 @@ const Glp2StateOfMindStep = ({ userData, setUserData, config, onContinue }) => {
                             </button>
                         );
                     })}
-                </div>
-            </div>
-
-            <div className="bottom-0 left-0 z-50 flex w-full items-center justify-center bg-[linear-gradient(180deg,rgba(245,244,239,0)_0%,rgba(245,244,239,0.8)_37.51%,#F5F4EF_63.04%)] px-0 pb-4 backdrop-blur-sm">
-                <div className="w-full max-w-4xl">
-                    <button
-                        type="button"
-                        onClick={() => onContinue?.()}
-                        disabled={!selectedValue}
-                        className={`flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none py-3 text-base font-medium focus:outline-none focus:ring-0 ${
-                            selectedValue
-                                ? "bg-[#A7885A] text-white"
-                                : "cursor-not-allowed bg-gray-300 text-gray-700"
-                        }`}
-                    >
-                        <span>Next</span>
-                        <FaArrowRight />
-                    </button>
                 </div>
             </div>
         </div>

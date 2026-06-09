@@ -11,6 +11,7 @@ const Glp1CurrentMedicationsStep = ({
     setUserData,
     config,
     onContinue,
+    onSelect,
 }) => {
     const field = config.field;
     const detailsField = config.detailsField;
@@ -26,7 +27,7 @@ const Glp1CurrentMedicationsStep = ({
     const imageAlt =
         config?.imageAlt || "Person organizing blister packs and medication";
 
-    const handleSelect = (value) => {
+    const handleRadioClick = (value, option) => {
         setUserData((prev) => {
             const next = { ...prev, [field]: value };
             if (value === "no" && detailsField) {
@@ -34,6 +35,10 @@ const Glp1CurrentMedicationsStep = ({
             }
             return next;
         });
+        // For "no": advance immediately via dispatcher (no showTextInput).
+        // For "yes": dispatcher sees showTextInput:true and returns without advancing;
+        //            user fills in the textarea then clicks the Next button below.
+        onSelect(value, { ...option, showTextInput: value === "yes" });
     };
 
     const handleDetailsChange = (e) => {
@@ -42,9 +47,8 @@ const Glp1CurrentMedicationsStep = ({
         setUserData((prev) => ({ ...prev, [detailsField]: v }));
     };
 
-    const canContinue =
-        selectedValue === "no" ||
-        (selectedValue === "yes" && String(detailsValue).trim().length > 0);
+    const canSubmitDetails =
+        selectedValue === "yes" && String(detailsValue).trim().length > 0;
 
     return (
         <div className="flex h-full w-full flex-col px-4 md:px-0">
@@ -69,7 +73,7 @@ const Glp1CurrentMedicationsStep = ({
                             <button
                                 key={option.id}
                                 type="button"
-                                onClick={() => handleSelect(option.id)}
+                                onClick={() => handleRadioClick(option.id, option)}
                                 className={`flex min-h-[55px] items-center gap-3 rounded-[8px] border bg-white px-4 py-3 text-left md:min-h-[60px] md:px-5 ${
                                     checked
                                         ? "border-[#A7885A]"
@@ -114,26 +118,20 @@ const Glp1CurrentMedicationsStep = ({
                             className="w-full resize-y rounded-[8px] border border-[#E2E2E1] bg-white px-3 py-3 text-[15px] text-[#251F20] outline-none focus:border-[#A7885A] focus:ring-1 focus:ring-[#A7885A]"
                             autoComplete="off"
                         />
+                        {canSubmitDetails && (
+                            <div className="mt-6">
+                                <button
+                                    type="button"
+                                    onClick={() => onContinue?.()}
+                                    className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none bg-[#A7885A] py-3 text-base font-medium text-white focus:outline-none focus:ring-0"
+                                >
+                                    <span>Next</span>
+                                    <FaArrowRight />
+                                </button>
+                            </div>
+                        )}
                     </div>
                 ) : null}
-            </div>
-
-            <div className="bottom-0 left-0 z-50 flex w-full items-center justify-center bg-[linear-gradient(180deg,rgba(245,244,239,0)_0%,rgba(245,244,239,0.8)_37.51%,#F5F4EF_63.04%)] px-0 pb-4 backdrop-blur-sm">
-                <div className="w-full max-w-4xl">
-                    <button
-                        type="button"
-                        onClick={() => onContinue?.()}
-                        disabled={!canContinue}
-                        className={`flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none py-3 text-base font-medium focus:outline-none focus:ring-0 ${
-                            canContinue
-                                ? "bg-[#A7885A] text-white"
-                                : "cursor-not-allowed bg-gray-300 text-gray-700"
-                        }`}
-                    >
-                        <span>Next</span>
-                        <FaArrowRight />
-                    </button>
-                </div>
             </div>
         </div>
     );

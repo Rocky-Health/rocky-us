@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { FaArrowRight, FaBolt, FaCheck } from "react-icons/fa";
+import { FaBolt, FaCheck } from "react-icons/fa";
 import { FaPersonWalking } from "react-icons/fa6";
 
 const LOW_RATE = 0.015;
@@ -47,19 +47,12 @@ const OPTIONS = [
     },
 ];
 
-const Glp2PaceQuestionStep = ({ userData, setUserData, onContinue }) => {
+const Glp2PaceQuestionStep = ({ userData, onSelect }) => {
     const selectedValue = userData?.pacePreference || "";
     const { lossPerWeekLow, lossPerWeekHigh, weeksToGoal, goalWeight } =
         computeProjection(userData?.weight, userData?.goalWeight);
 
     const hasProjection = lossPerWeekLow > 0 && goalWeight > 0;
-
-    const handleSelect = (value) => {
-        setUserData((prev) => ({
-            ...prev,
-            pacePreference: value,
-        }));
-    };
 
     return (
         <div className="flex w-full flex-col px-4 pb-10 md:px-0">
@@ -112,7 +105,7 @@ const Glp2PaceQuestionStep = ({ userData, setUserData, onContinue }) => {
                             <button
                                 key={option.value}
                                 type="button"
-                                onClick={() => handleSelect(option.value)}
+                                onClick={() => onSelect(option.value, option)}
                                 className={`flex  w-full min-w-0 flex-col rounded-xl border bg-white px-2 py-10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2  ${
                                     checked
                                         ? "border-[3px] shadow-sm"
@@ -137,17 +130,6 @@ const Glp2PaceQuestionStep = ({ userData, setUserData, onContinue }) => {
                         );
                     })}
                 </div>
-
-                <button
-                    type="button"
-                    onClick={() => onContinue?.()}
-                    disabled={!selectedValue}
-                    className="mt-10 flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none font-sans text-base font-medium text-white transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45"
-                    style={{ backgroundColor: ACCENT }}
-                >
-                    <span>Next</span>
-                    <FaArrowRight className="text-sm" />
-                </button>
             </div>
         </div>
     );

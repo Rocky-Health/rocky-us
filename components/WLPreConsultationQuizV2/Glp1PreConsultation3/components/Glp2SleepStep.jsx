@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { FaArrowRight, FaBed, FaMeh } from "react-icons/fa";
+import { FaBed, FaMeh } from "react-icons/fa";
 import { TbBedOff } from "react-icons/tb";
 
 const ACCENT = "#A7885A";
@@ -12,17 +12,10 @@ const ICONS_BY_ID = {
     "dont-sleep-well": TbBedOff,
 };
 
-const Glp2SleepStep = ({ userData, setUserData, config, onContinue }) => {
+const Glp2SleepStep = ({ userData, config, onSelect }) => {
     const field = config?.field || "overallSleep";
     const selectedValue = userData?.[field] || "";
     const options = config?.options || [];
-
-    const handleSelect = (value) => {
-        setUserData((prev) => ({
-            ...prev,
-            [field]: value,
-        }));
-    };
 
     return (
         <div className="flex w-full flex-col px-4 pb-10 md:px-0">
@@ -54,7 +47,7 @@ const Glp2SleepStep = ({ userData, setUserData, config, onContinue }) => {
                             <button
                                 key={option.id}
                                 type="button"
-                                onClick={() => handleSelect(option.id)}
+                                onClick={() => onSelect(option.id, option)}
                                 className={`flex  w-full min-w-0 flex-col rounded-xl border bg-white px-2 py-10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2  ${
                                     checked
                                         ? "border-[3px] shadow-sm"
@@ -79,17 +72,6 @@ const Glp2SleepStep = ({ userData, setUserData, config, onContinue }) => {
                         );
                     })}
                 </div>
-
-                <button
-                    type="button"
-                    onClick={() => onContinue?.()}
-                    disabled={!selectedValue}
-                    className="mt-10 flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none font-sans text-base font-medium text-white transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45"
-                    style={{ backgroundColor: ACCENT }}
-                >
-                    <span>Next</span>
-                    <FaArrowRight className="text-sm" />
-                </button>
             </div>
         </div>
     );
