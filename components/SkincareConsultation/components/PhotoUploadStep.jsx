@@ -124,7 +124,7 @@ const PhotoUploadStep = ({
                 className="w-16 h-16 object-contain mr-4"
                 src={
                   frontPreview ||
-                  "https://wpbe.myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png"
+                  `${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/themes/salient-child/img/photo_upload_icon.png`
                 }
                 alt="Upload icon"
               />
@@ -156,7 +156,7 @@ const PhotoUploadStep = ({
                 className="w-16 h-16 object-contain mr-4"
                 src={
                   sidePreview ||
-                  "https://wpbe.myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png"
+                  `${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/themes/salient-child/img/photo_upload_icon.png`
                 }
                 alt="Upload icon"
               />

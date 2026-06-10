@@ -74,7 +74,7 @@ const HairCrossSellPopup = ({
       quantity: "60 Caps",
       frequency: "One month supply",
       image:
-        "https://wpbe.myrocky.com/wp-content/uploads/RockyHealth-Proofs-HQ-111-Hair-1-500x500.jpg",
+        `${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/uploads/RockyHealth-Proofs-HQ-111-Hair-1-500x500.jpg`,
       description:
         "Meticulously crafted to address male pattern baldness. Packed with nutraceuticals and botanicals, this supplement supports hair growth by targeting root causes of androgenic alopecia.",
       dataType: "simple",

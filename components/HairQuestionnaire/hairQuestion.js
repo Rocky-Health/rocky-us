@@ -8,22 +8,22 @@ export const hairQuestionList = [
       {
         body: "Receding hairline",
         imageSrc:
-          "https://wpbe.myrocky.com/wp-content/themes/salient-child/img/receding.svg",
+          `${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/themes/salient-child/img/receding.svg`,
       },
       {
         body: "Thinning at the crown",
         imageSrc:
-          "https://wpbe.myrocky.com/wp-content/themes/salient-child/img/crown.svg",
+          `${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/themes/salient-child/img/crown.svg`,
       },
       {
         body: "Overall hair loss/thinning",
         imageSrc:
-          "https://wpbe.myrocky.com/wp-content/themes/salient-child/img/overall.svg",
+          `${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/themes/salient-child/img/overall.svg`,
       },
       {
         body: "Full head of hair",
         imageSrc:
-          "https://wpbe.myrocky.com/wp-content/themes/salient-child/img/nowhere.svg",
+          `${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/themes/salient-child/img/nowhere.svg`,
       },
     ],
   },

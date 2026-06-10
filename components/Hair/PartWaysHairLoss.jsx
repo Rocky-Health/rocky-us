@@ -6,28 +6,28 @@ import ScrollArrows from "../ScrollArrows";
 
 const hairLossCards = [
   {
-    image: "https://wpbe.myrocky.com/wp-content/themes/salient-child/img/nowhere.svg",
+    image: `${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/themes/salient-child/img/nowhere.svg`,
     title: "revention",
     letter: "P",
     description:
       "Even if you have a full head of hair, you might want to get ahead of the game, especially if male pattern baldness runs in the family. After all, 2/3 of men will suffer from hair loss.",
   },
   {
-    image: "https://wpbe.myrocky.com/wp-content/themes/salient-child/img/overall.svg",
+    image: `${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/themes/salient-child/img/overall.svg`,
     title: "ll over thinning",
     letter: "A",
     description:
       "If you're seeing more of your scalp, it's still not too late. It's normal for hair follicles to close as men age. The treatment options we offer can help reactivate them.",
   },
   {
-    image: "https://wpbe.myrocky.com/wp-content/themes/salient-child/img/receding.svg",
+    image: `${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/themes/salient-child/img/receding.svg`,
     title: "eceding Hairline",
     letter: "R",
     description:
       "Often a combo of family history and aging, seeing more forehead is common for guys. With our help, we can prevent turning that forehead into a fivehead.",
   },
   {
-    image: "https://wpbe.myrocky.com/wp-content/themes/salient-child/img/crown.svg",
+    image: `${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/themes/salient-child/img/crown.svg`,
     title: "hinning at the crown",
     letter: "T",
     description:

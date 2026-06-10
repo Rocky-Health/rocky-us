@@ -30,6 +30,12 @@ const SECURITY_HEADERS = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Expose the WordPress backend URL to the client bundle so client components
+  // (image src, form actions, etc.) can build asset/endpoint URLs from a single
+  // source of truth. Inlined at build time — set BASE_URL in the build env.
+  env: {
+    BASE_URL: process.env.BASE_URL,
+  },
   // Disable streaming metadata for all user agents. With async generateMetadata
   // (e.g. blog [slug] fetching from WordPress), Next.js otherwise injects
   // <link rel="canonical"> into <body> after the page streams. Google ignores
@@ -52,6 +58,11 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "mycdn.myrocky.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "wpbe.myrocky.com",
         pathname: "/**",
       },
       {

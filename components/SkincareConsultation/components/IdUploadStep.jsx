@@ -59,7 +59,7 @@ const IdUploadStep = ({
 
     if (isHeifFile && !isSafari) {
       setIdPreview(
-        "https://wpbe.myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png"
+        `${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/themes/salient-child/img/photo_upload_icon.png`
       );
     } else {
       const reader = new FileReader();

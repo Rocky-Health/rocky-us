@@ -2,36 +2,36 @@ import CustomContainImage from "@/components/utils/CustomContainImage";
 
 const FeaturedSliderImages = [
   {
-    image: "https://wpbe.myrocky.com/wp-content/uploads/yahoo-logo-grey.png",
+    image: `${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/uploads/yahoo-logo-grey.png`,
     alt: "Yahoo",
   },
   {
-    image: "https://wpbe.myrocky.com/wp-content/uploads/canhealth-logo-2x.png",
+    image: `${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/uploads/canhealth-logo-2x.png`,
     alt: "canhealth",
   },
   {
-    image: "https://wpbe.myrocky.com/wp-content/uploads/huf-magazine-grey.png",
+    image: `${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/uploads/huf-magazine-grey.png`,
     alt: "HUF magazine",
   },
   {
-    image: "https://wpbe.myrocky.com/wp-content/uploads/influencive-grey.png",
+    image: `${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/uploads/influencive-grey.png`,
     alt: "influencive grey",
   },
   {
-    image: "https://wpbe.myrocky.com/wp-content/uploads/market-watch-grey-new.png",
+    image: `${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/uploads/market-watch-grey-new.png`,
     alt: "market watch grey",
   },
   {
     image:
-      "https://wpbe.myrocky.com/wp-content/uploads/The_Globe_and_Mail_Stretched_grey.png",
+      `${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/uploads/The_Globe_and_Mail_Stretched_grey.png`,
     alt: "The Globe and Mail",
   },
   {
-    image: "https://wpbe.myrocky.com/wp-content/uploads/trendhunters.png",
+    image: `${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/uploads/trendhunters.png`,
     alt: "trendhunters",
   },
   {
-    image: "https://wpbe.myrocky.com/wp-content/uploads/voyage-grey.png",
+    image: `${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/uploads/voyage-grey.png`,
     alt: "Voyage",
   },
   {

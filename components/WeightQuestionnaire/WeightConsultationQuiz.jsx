@@ -1192,7 +1192,7 @@ export default function WeightLossConsultationQuiz({
       }
       e.target.value = "";
       document.getElementById("frontPhotoPreview").src =
-        "https://wpbe.myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png";
+        `${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/themes/salient-child/img/photo_upload_icon.png`;
       setFrontPhotoFile(null);
       toggleUploadButton();
       return false;
@@ -1287,7 +1287,7 @@ export default function WeightLossConsultationQuiz({
       }
       e.target.value = "";
       document.getElementById("sidePhotoPreview").src =
-        "https://wpbe.myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png";
+        `${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/themes/salient-child/img/photo_upload_icon.png`;
       setSidePhotoFile(null);
       toggleUploadButton();
       return false;
@@ -4050,7 +4050,7 @@ export default function WeightLossConsultationQuiz({
                   <form
                     id="wl-quiz-form"
                     method="post"
-                    action="https://wpbe.myrocky.com/wp-admin/admin-ajax.php"
+                    action={`${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-admin/admin-ajax.php`}
                   >
                     <input type="hidden" name="form_id" value="6" />
                     <input
@@ -5534,7 +5534,7 @@ export default function WeightLossConsultationQuiz({
                                     <div className="flex w-full items-center">
                                       <img
                                         className="w-16 h-16 object-contain mr-4"
-                                        src="https://wpbe.myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png"
+                                        src={`${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/themes/salient-child/img/photo_upload_icon.png`}
                                         id="frontPhotoPreview"
                                         alt="Upload icon"
                                       />
@@ -5566,7 +5566,7 @@ export default function WeightLossConsultationQuiz({
                                     <div className="flex w-full items-center">
                                       <img
                                         className="w-16 h-16 object-contain mr-4"
-                                        src="https://wpbe.myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png"
+                                        src={`${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/themes/salient-child/img/photo_upload_icon.png`}
                                         id="sidePhotoPreview"
                                         alt="Upload icon"
                                       />
@@ -5820,7 +5820,7 @@ export default function WeightLossConsultationQuiz({
                           )}
                       </div>
                       <img
-                        src="https://wpbe.myrocky.com/wp-content/themes/salient-child/img/please_wait_animation.gif"
+                        src={`${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/themes/salient-child/img/please_wait_animation.gif`}
                         alt=""
                         style={{ margin: "0 auto" }}
                       />
