@@ -180,6 +180,39 @@ export function trackMetaQuizStep({
   });
 }
 
+// Post-purchase consultation tracking — emits CONSULTATION_START / CONSULTATION_STEP
+// (CS / CP suffix) rather than the pre-purchase QS / QP events so consultation
+// traffic stays out of the pre-purchase funnel metrics.
+export function trackMetaConsultationStart({
+  questionnaire_id,
+  flow_id,
+  step_index,
+  step_slug,
+  step_type,
+}) {
+  emitMetaFunnelEvent("CONSULTATION_START", flow_id, questionnaire_id, {
+    step_index,
+    step_slug,
+    step_type,
+  });
+}
+
+export function trackMetaConsultationStep({
+  questionnaire_id,
+  flow_id,
+  step_index,
+  step_slug,
+  step_type,
+  transition,
+}) {
+  emitMetaFunnelEvent("CONSULTATION_STEP", flow_id, questionnaire_id, {
+    step_index,
+    step_slug,
+    step_type,
+    transition,
+  });
+}
+
 export function trackMetaProductSelection({
   questionnaire_id,
   flow_id,

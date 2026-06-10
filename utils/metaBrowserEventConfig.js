@@ -78,6 +78,10 @@ const CATEGORY_BASE = {
 export const MILESTONES = {
   QUIZ_START: "QS",
   QUIZ_STEP: "QP",
+  // Post-purchase consultation milestones — distinct from the pre-purchase
+  // QS/QP funnel events so consultation traffic doesn't pollute funnel metrics.
+  CONSULTATION_START: "CS",
+  CONSULTATION_STEP: "CP",
   PRODUCT_SELECTION: "PS",
   PLAN_SELECTION: "PL",
   START_CHECKOUT: "SC",
@@ -222,6 +226,9 @@ export function buildSecondaryEventName(eventNameBase, milestone) {
 export const DATALAYER_EVENT_NAMES = {
   QUIZ_START: "meta_quiz_start",
   QUIZ_STEP: "meta_quiz_step",
+  // Post-purchase consultation milestones — separate from pre-purchase QS/QP.
+  CONSULTATION_START: "meta_consultation_start",
+  CONSULTATION_STEP: "meta_consultation_step",
   PRODUCT_SELECTION: "meta_product_selection",
   PLAN_SELECTION: "meta_plan_selection",
   START_CHECKOUT: "meta_start_checkout",
@@ -238,6 +245,9 @@ export const DATALAYER_EVENT_NAMES = {
 export const GENERIC_EVENT_NAMES = {
   QUIZ_START: "quiz_start",
   QUIZ_STEP: "quiz_step",
+  // Post-purchase consultation milestones — separate from pre-purchase QS/QP.
+  CONSULTATION_START: "consultation_start",
+  CONSULTATION_STEP: "consultation_step",
   PRODUCT_SELECTION: "product_selection",
   PLAN_SELECTION: "plan_selection",
   START_CHECKOUT: "start_checkout",

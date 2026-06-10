@@ -217,6 +217,13 @@ export const analyticsService = {
         return;
       }
 
+      // Don't feed $0 / fully-comped orders to ad platforms
+      const netTotal = Number.parseFloat(order?.total);
+      if (Number.isFinite(netTotal) && netTotal <= 0) {
+        logger.log(`[Analytics] Skipping $0 order ${order.id} — no purchase events dispatched`);
+        return;
+      }
+
       // Separate idempotency guards per integration to avoid blocking S2S
       const guardKeyGA4 = `analytics:purchase:ga4:${order.id}`;
       const guardKeyNB = `analytics:purchase:nb:${order.id}`;

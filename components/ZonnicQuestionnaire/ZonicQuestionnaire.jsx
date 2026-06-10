@@ -39,6 +39,7 @@ export default function ZonnicConsultationQuiz({
     stepIndex: currentPage,
     flowId: "smoking",
     stepType: "quiz",
+    isPostPurchaseConsultation: true,
   });
 
   const [progress, setProgress] = useState(0);
