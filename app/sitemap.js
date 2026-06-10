@@ -8,6 +8,19 @@ const BASE_SITE_URL =
   process.env.BASE_URL?.replace(/\/$/, "") ||
   "https://www.myrocky.com";
 
+// WP/WC return GMT dates without a timezone marker (e.g. "2026-06-04T20:59:24").
+// Google's sitemap spec requires a timezone on <lastmod>, so normalize to UTC ISO.
+function toSitemapDate(...candidates) {
+  for (const value of candidates) {
+    if (!value) continue;
+    // Treat tz-less WP/WC strings as UTC by appending Z before parsing.
+    const normalized = /[Z+]|[+-]\d{2}:?\d{2}$/.test(value) ? value : `${value}Z`;
+    const date = new Date(normalized);
+    if (!isNaN(date.getTime())) return date.toISOString();
+  }
+  return new Date().toISOString();
+}
+
 // Static routes – main pages, policies, and landing pages
 const staticRoutes = [
   { url: "", priority: 1.0, changeFrequency: "daily" },
@@ -60,7 +73,7 @@ async function getAllProducts() {
         status: "publish",
         per_page: perPage,
         page,
-        _fields: "slug,date_modified",
+        _fields: "slug,date_modified,date_modified_gmt",
       });
 
       if (!response.ok) {
@@ -107,7 +120,7 @@ async function getAllBlogPosts() {
             per_page: perPage,
             page,
             status: "publish",
-            _fields: "slug,modified",
+            _fields: "slug,modified,modified_gmt",
           },
           headers: {
             Authorization: process.env.ADMIN_TOKEN,
@@ -163,8 +176,11 @@ export default async function sitemap() {
       if (product?.slug) {
         sitemapEntries.push({
           url: `${BASE_SITE_URL}/product/${product.slug}`,
-          lastModified:
-            product.date_modified || product.date_created || currentDate,
+          lastModified: toSitemapDate(
+            product.date_modified_gmt,
+            product.date_modified,
+            currentDate
+          ),
           changeFrequency: "weekly",
           priority: 0.8,
         });
@@ -181,7 +197,7 @@ export default async function sitemap() {
       if (blog?.slug) {
         sitemapEntries.push({
           url: `${BASE_SITE_URL}/blog/${blog.slug}`,
-          lastModified: blog.modified || blog.date || currentDate,
+          lastModified: toSitemapDate(blog.modified_gmt, blog.modified, currentDate),
           changeFrequency: "monthly",
           priority: 0.7,
         });
