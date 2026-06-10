@@ -16,7 +16,7 @@ import Image from "next/image";
  * @returns {JSX.Element} Header component
  */
 const CustomHeader = ({
-  logoUrl = "https://wpbe.myrocky.com/wp-content/uploads/2022/03/Rocky-Mens-Wellness-copy-4-1-300x120-1.png",
+  logoUrl = `${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/uploads/2022/03/Rocky-Mens-Wellness-copy-4-1-300x120-1.png`,
   logoAlt = "MyRocky",
   logoWidth = 90,
   logoHeight = 50,

@@ -592,14 +592,14 @@ const HairPreConsultationQuiz = () => {
             <p className="text-center p-5">
               <img
                 className="block w-full h-auto m-auto p-5 max-w-[500px]"
-                src="https://wpbe.myrocky.com/wp-content/uploads/2023/03/review-aanton-before-after-e1678831383630.jpg"
+                src={`${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/uploads/2023/03/review-aanton-before-after-e1678831383630.jpg`}
                 alt="Before and After Results"
               />
               <img
                 width="24"
                 height="24"
                 className="block m-auto"
-                src="https://wpbe.myrocky.com/wp-content/themes/salient-child/img/puff.svg"
+                src={`${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/themes/salient-child/img/puff.svg`}
                 alt="Puff"
               />
             </p>
@@ -726,7 +726,7 @@ const HairPreConsultationQuiz = () => {
             </div>
             <p className="text-center p-5 pb-[150px]">
               <img
-                src="https://wpbe.myrocky.com/wp-content/themes/salient-child/img/preloader-wheel.svg"
+                src={`${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/themes/salient-child/img/preloader-wheel.svg`}
                 className="block w-[100px] h-auto m-auto"
                 alt="Preloader Wheel"
               />
@@ -738,7 +738,7 @@ const HairPreConsultationQuiz = () => {
           <div className="quiz-page">
             <p className="text-center p-5 pb-[100px]">
               <img
-                src="https://wpbe.myrocky.com/wp-content/themes/salient-child/img/preloader-wheel.svg"
+                src={`${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/themes/salient-child/img/preloader-wheel.svg`}
                 className="block w-[100px] h-auto m-auto pt-6"
                 alt="Preloader Wheel"
               />

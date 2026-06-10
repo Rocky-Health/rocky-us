@@ -2207,7 +2207,7 @@ export default function ZonnicConsultationQuiz({
           style={{ position: "relative", top: "25%" }}
         >
           <img
-            src="https://wpbe.myrocky.com/wp-content/themes/salient-child/img/preloader-wheel.svg"
+            src={`${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/themes/salient-child/img/preloader-wheel.svg`}
             className="block w-[100px] h-auto m-auto pt-6"
             style={{ marginBottom: "10px" }}
             alt="Preloader Wheel"
