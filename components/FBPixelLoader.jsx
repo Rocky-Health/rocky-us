@@ -1,7 +1,8 @@
 "use client";
 
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { getIdentityKey, buildAdvancedMatching } from "@/utils/metaAdvancedMatching";
 
 // US bundle: only ED / WL / HL. Smoking, Skincare, and Mental-Health
 // categories are blocked at middleware level and must not be present here.
@@ -107,6 +108,11 @@ const getPixelKeyForPath = (pathname, categories = []) => {
 // a previously-active pixel.
 const initializedPixels = new Set();
 
+// Tracks pixel IDs that have already had advanced matching applied via a
+// re-init call.  Once AM is applied to a pixel we never re-init it again,
+// so we don't accidentally fire extra PageViews.
+const amAppliedPixels = new Set();
+
 if (typeof window !== "undefined") {
   if (!window.fbq) {
     const n = (window.fbq = function () {
@@ -148,6 +154,29 @@ export default function FBPixelLoader() {
   }, [pathname, flowFromQuery]);
 
   const syncPixelId = useMemo(() => PIXEL_IDS[syncPixelKey], [syncPixelKey]);
+
+  // Advanced matching state.  Populated once identity cookies are present
+  // (i.e. after login) and re-evaluated on every navigation so it picks up
+  // cookies set during the same page session.  null = no identity yet (pre-login).
+  const [advancedMatching, setAdvancedMatching] = useState(null);
+  // Tracks the identity key that was last used to compute advancedMatching so
+  // we skip redundant async hashing on navigations that don't change identity.
+  const lastIdentityKeyRef = useRef('');
+  // Mirror of advancedMatching for the PageView/init effect to read without
+  // taking advancedMatching as a dependency (which would re-fire PageView).
+  const amRef = useRef(null);
+
+  useEffect(() => {
+    const key = getIdentityKey();
+    if (!key || key === lastIdentityKeyRef.current) return;
+    lastIdentityKeyRef.current = key;
+    buildAdvancedMatching()
+      .then((am) => {
+        amRef.current = am || null;
+        setAdvancedMatching(am || null);
+      })
+      .catch(() => {/* AM errors must never surface */});
+  }, [pathname]);
 
   // Async refinement for /product/* pages using server-side category data.
   // Falls back to slug-based matching (syncPixelId) if the lookup fails.
@@ -240,6 +269,12 @@ export default function FBPixelLoader() {
   // For categories registered in SECONDARY_PIXEL_IDS we ALSO init the
   // mirror pixel(s) and fire PageView to each, so the secondary dataset
   // accumulates the same per-pixel session record as the primary.
+  //
+  // This effect deliberately does NOT depend on advancedMatching — PageView
+  // must fire only on navigation, never just because identity arrived
+  // mid-session (that would double-count PageView). On a pixel's first init we
+  // attach AM if it's already known (read via amRef to avoid the dependency);
+  // otherwise the enrichment effect below applies it without a PageView.
   useEffect(() => {
     if (process.env.NODE_ENV !== "production") return;
     if (!resolvedPixelId || typeof window === "undefined") return;
@@ -251,12 +286,40 @@ export default function FBPixelLoader() {
     for (const pid of pixelsToFire) {
       if (!pid) continue;
       if (!initializedPixels.has(pid)) {
-        window.fbq("init", pid);
+        // First time seeing this pixel — init with AM if it's already known.
+        if (amRef.current) {
+          window.fbq("init", pid, amRef.current);
+          amAppliedPixels.add(pid);
+        } else {
+          window.fbq("init", pid);
+        }
         initializedPixels.add(pid);
       }
       window.fbq("trackSingle", pid, "PageView");
     }
   }, [resolvedPixelKey, resolvedPixelId, pathname]);
+
+  // Advanced-matching enrichment. Runs when advancedMatching becomes available
+  // (post-login). For each active pixel already initialized WITHOUT AM, issue a
+  // second fbq('init', pid, am) — Meta's supported way to update AM mid-session
+  // — and crucially fire NO PageView. Each pixel is AM-updated at most once,
+  // tracked via the module-level amAppliedPixels Set.
+  useEffect(() => {
+    if (process.env.NODE_ENV !== "production") return;
+    if (!advancedMatching || !resolvedPixelId) return;
+    if (typeof window === "undefined" || typeof window.fbq !== "function") return;
+
+    const secondaryIds = SECONDARY_PIXEL_IDS[resolvedPixelKey] || [];
+    const pixelsToFire = [resolvedPixelId, ...secondaryIds];
+
+    for (const pid of pixelsToFire) {
+      if (!pid) continue;
+      if (initializedPixels.has(pid) && !amAppliedPixels.has(pid)) {
+        window.fbq("init", pid, advancedMatching);
+        amAppliedPixels.add(pid);
+      }
+    }
+  }, [advancedMatching, resolvedPixelKey, resolvedPixelId]);
 
   if (!resolvedPixelId) return null;
 
