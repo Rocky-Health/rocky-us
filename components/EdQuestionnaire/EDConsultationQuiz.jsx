@@ -155,6 +155,7 @@ export default function EDConsultationQuiz({
     stepIndex: currentPage,
     flowId: "ed",
     stepType: "quiz",
+    isPostPurchaseConsultation: true,
   });
 
   const [progress, setProgress] = useState(0);
