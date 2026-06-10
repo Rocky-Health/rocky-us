@@ -17,14 +17,13 @@ export function captureMetaParameters() {
     const existingFbp = getCookie('_fbp');
     const existingFbc = getCookie('_fbc');
 
+    // Let fbevents.js own _fbp — it writes a valid fb.{idx}.{creationTime}.{randomId}.
+    // We used to mint a 3-segment value, which the pixel rejects and regenerates
+    // per event (TK-677). Drop a legacy malformed cookie so fbevents recreates it.
     let fbp = existingFbp;
-    if (!fbp) {
-      const creationTime = Date.now();
-      const subdomainIndex = '1';
-      fbp = `fb.${subdomainIndex}.${creationTime}`;
-      
-      setCookie('_fbp', fbp, domain, 90);
-      console.log('[Meta Helper] Generated new _fbp:', fbp);
+    if (fbp && fbp.split('.').length < 4) {
+      deleteCookie('_fbp', domain);
+      fbp = '';
     }
 
     let fbc = existingFbc;
@@ -79,6 +78,23 @@ function setCookie(name, value, domain, days) {
     }
   } catch (error) {
     console.error('[Meta Helper] Error setting cookie:', error);
+  }
+}
+
+function deleteCookie(name, domain) {
+  if (typeof document === 'undefined') return;
+  try {
+    const isLocalhost = window.location.hostname === 'localhost' ||
+                        window.location.hostname === '127.0.0.1';
+    // Clear both the domain and host-only variants we may have written.
+    if (isLocalhost) {
+      document.cookie = `${name}=;path=/;max-age=0;SameSite=Lax`;
+    } else {
+      document.cookie = `${name}=;path=/;max-age=0;domain=${domain};SameSite=Lax;Secure`;
+      document.cookie = `${name}=;path=/;max-age=0;SameSite=Lax;Secure`;
+    }
+  } catch (error) {
+    console.error('[Meta Helper] Error deleting cookie:', error);
   }
 }
 
