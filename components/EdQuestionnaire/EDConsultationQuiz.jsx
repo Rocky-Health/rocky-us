@@ -98,7 +98,7 @@ export default function EDConsultationQuiz({
       page_step: 1,
       completion_state: "Partial",
       completion_percentage: 10,
-      source_site: "https://myrocky.com",
+      source_site: process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com",
       "130_3": fname || "",
       "130_6": lname || "",
       131: userEmail,
@@ -1241,7 +1241,7 @@ export default function EDConsultationQuiz({
         page_step: currentPage,
         completion_state: formData.completion_state || "Partial",
         completion_percentage: progress,
-        source_site: formData.source_site || "https://myrocky.com",
+        source_site: formData.source_site || process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com",
       };
 
       const userInfo = {
@@ -1767,7 +1767,7 @@ export default function EDConsultationQuiz({
       const preview = document.getElementById("photo-id-preview");
       if (preview) {
         preview.src =
-          "https://myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png";
+          "https://wpbe.myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png";
       }
     } else {
       const reader = new FileReader();
@@ -5237,7 +5237,7 @@ export default function EDConsultationQuiz({
                               >
                                 <a
                                   className="mt-3 py-2 px-10 h-[40px] rounded-md border border-[#814B00] bg-[#814B00] text-[#fefefe] font-medium text-md hover:bg-white hover:text-[#814B00]"
-                                  href="https://myrocky.com/"
+                                  href={`${process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com"}/`}
                                 >
                                   Back Home
                                 </a>
@@ -5492,7 +5492,7 @@ export default function EDConsultationQuiz({
               style={{ position: "relative", top: "25%" }}
             >
               <img
-                src="https://myrocky.com/wp-content/themes/salient-child/img/preloader-wheel.svg"
+                src="https://wpbe.myrocky.com/wp-content/themes/salient-child/img/preloader-wheel.svg"
                 className="block w-[100px] h-auto m-auto pt-6"
                 style={{ marginBottom: "10px" }}
                 alt="Preloader Wheel"

@@ -124,7 +124,7 @@ const PhotoUploadStep = ({
                 className="w-16 h-16 object-contain mr-4"
                 src={
                   frontPreview ||
-                  "https://myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png"
+                  "https://wpbe.myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png"
                 }
                 alt="Upload icon"
               />
@@ -156,7 +156,7 @@ const PhotoUploadStep = ({
                 className="w-16 h-16 object-contain mr-4"
                 src={
                   sidePreview ||
-                  "https://myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png"
+                  "https://wpbe.myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png"
                 }
                 alt="Upload icon"
               />

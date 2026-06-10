@@ -90,7 +90,7 @@ export const wlPreConsultationConfig = {
     extraData: {
       form_id: 6,
       action: "wl_pre_consultation_submit",
-      source_site: "https://myrocky.com",
+      source_site: process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com",
     },
 
     // When to POST: "onComplete" fires submitAnswers() on the last page

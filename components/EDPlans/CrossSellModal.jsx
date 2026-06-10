@@ -310,7 +310,7 @@ const CrossSellModal = ({
     //   title: "Essential Follicle Support",
     //   price: "39.00",
     //   image:
-    //     "https://myrocky.com/wp-content/uploads/RockyHealth-Proofs-HQ-111-Hair-1-500x500.jpg",
+    //     "https://wpbe.myrocky.com/wp-content/uploads/RockyHealth-Proofs-HQ-111-Hair-1-500x500.jpg",
     //   description:
     //     "Essential Follicle Support is designed to support healthy growth, strengthen strands, and nourish follicles from within. Formulated with essential vitamins, minerals, and plant-based extracts, it helps improve hair resilience, scalp health, and overall vitality for stronger, fuller-looking hair.",
     //   dataType: "simple",

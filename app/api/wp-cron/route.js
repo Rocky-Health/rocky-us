@@ -5,7 +5,7 @@ export async function GET() {
   logger.log("[CRON] GET /api/wp-cron triggered at", new Date().toISOString());
 
   try {
-    const res = await fetch("https://myrocky.com/wp-cron.php?doing_wp_cron", {
+    const res = await fetch("https://wpbe.myrocky.com/wp-cron.php?doing_wp_cron", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",

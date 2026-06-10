@@ -92,7 +92,7 @@ const maleAddOnProducts = [
     //   name: "Essential Follicle Support",
     //   price: "39.00",
     //   imageUrl:
-    //     "https://myrocky.com/wp-content/uploads/RockyHealth-Proofs-HQ-111-Hair-1-500x500.jpg",
+    //     "https://wpbe.myrocky.com/wp-content/uploads/RockyHealth-Proofs-HQ-111-Hair-1-500x500.jpg",
     //   bulletPoints: [
     //     "Made in US",
     //     "Non GMO - no fillers or chemicals",

@@ -809,7 +809,7 @@ const EDPreConsultationQuiz = () => {
                         </div>
                         <p className="text-center p-5 pb-[150px]">
                             <img
-                                src="https://myrocky.com/wp-content/themes/salient-child/img/preloader-wheel.svg"
+                                src="https://wpbe.myrocky.com/wp-content/themes/salient-child/img/preloader-wheel.svg"
                                 className="block w-[100px] h-auto m-auto"
                                 alt="Preloader Wheel"
                             />

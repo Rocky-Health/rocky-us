@@ -157,7 +157,7 @@ export default function HairConsultationQuiz({
     page_step: 1,
     completion_state: "Partial",
     completion_percentage: 10,
-    source_site: "https://myrocky.com",
+    source_site: process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com",
     131: userEmail || "omkar@w3mg.in",
     132: pn || "(000) 000-0000",
     158: dob,
@@ -923,7 +923,7 @@ export default function HairConsultationQuiz({
       const preview = document.getElementById("photo-id-preview");
       if (preview) {
         preview.src =
-          "https://myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png";
+          "https://wpbe.myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png";
       }
     } else {
       const reader = new FileReader();
@@ -1323,7 +1323,7 @@ export default function HairConsultationQuiz({
       }
       e.target.value = "";
       document.getElementById("output1").src =
-        "https://myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png";
+        "https://wpbe.myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png";
       setFileData1(null);
       toggleUploadButton();
       return false;
@@ -1357,7 +1357,7 @@ export default function HairConsultationQuiz({
 
     if (isHeifFile && !isSafari) {
       const placeholderSrc =
-        "https://myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png";
+        "https://wpbe.myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png";
       updateUI(placeholderSrc);
       const preview = document.getElementById("output1");
       if (preview) {
@@ -1431,7 +1431,7 @@ export default function HairConsultationQuiz({
       }
       e.target.value = "";
       document.getElementById("output2").src =
-        "https://myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png";
+        "https://wpbe.myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png";
       setFileData2(null);
       toggleUploadButton();
       return false;
@@ -1465,7 +1465,7 @@ export default function HairConsultationQuiz({
 
     if (isHeifFile && !isSafari) {
       const placeholderSrc =
-        "https://myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png";
+        "https://wpbe.myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png";
       updateUI(placeholderSrc);
       const preview = document.getElementById("output2");
       if (preview) {
@@ -2453,7 +2453,7 @@ export default function HairConsultationQuiz({
         page_step: currentPage,
         completion_state: formData.completion_state || "Partial",
         completion_percentage: progress,
-        source_site: formData.source_site || "https://myrocky.com",
+        source_site: formData.source_site || process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com",
       };
 
       const userInfo = {
@@ -3204,7 +3204,7 @@ export default function HairConsultationQuiz({
               <input
                 type="hidden"
                 name="source_site"
-                value="https://myrocky.com"
+                value={process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com"}
               />
 
               <input
@@ -4685,7 +4685,7 @@ export default function HairConsultationQuiz({
           style={{ position: "relative", top: "25%" }}
         >
           <img
-            src="https://myrocky.com/wp-content/themes/salient-child/img/preloader-wheel.svg"
+            src="https://wpbe.myrocky.com/wp-content/themes/salient-child/img/preloader-wheel.svg"
             className="block w-[100px] h-auto m-auto pt-6"
             style={{ marginBottom: "10px" }}
             alt="Preloader Wheel"
