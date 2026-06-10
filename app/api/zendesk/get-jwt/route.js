@@ -59,7 +59,7 @@ export async function GET(request) {
     const expirationTime = issuedAt + JWT_EXPIRATION_SECONDS;
 
     const payload = {
-      iss: process.env.NEXT_PUBLIC_SITE_URL || "https://myrocky.com",
+      iss: process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com",
       iat: issuedAt,
       exp: expirationTime,
       scope: "user",

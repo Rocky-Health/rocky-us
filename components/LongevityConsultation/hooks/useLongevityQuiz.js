@@ -289,7 +289,7 @@ export function useLongevityQuiz(quizConfig) {
                 "completion.state": isGoingToComplete ? "Full" : "Partial",
                 completion_percentage: completionPercentage,
                 "completion.percentage": completionPercentage,
-                source_site: "https://myrocky.com",
+                source_site: process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com",
                 ...clientContext,
                 ...preHandoff,
                 ...formPayload,

@@ -2,34 +2,34 @@
   "redirects": [
     {
       "source": "/wp-admin",
-      "destination": "https://myrocky.com/wp-admin",
+      "destination": "https://wpbe.myrocky.com/wp-admin",
       "permanent": true
     },
     {
       "source": "/wp-admin/:path*",
-      "destination": "https://myrocky.com/wp-admin/:path*",
+      "destination": "https://wpbe.myrocky.com/wp-admin/:path*",
       "permanent": true
     },
     {
       "source": "/wp-login.php",
-      "destination": "https://myrocky.com/wp-login.php",
+      "destination": "https://wpbe.myrocky.com/wp-login.php",
       "permanent": true
     },
     {
       "source": "/wp-cron.php",
-      "destination": "https://myrocky.com/wp-cron.php",
+      "destination": "https://wpbe.myrocky.com/wp-cron.php",
       "permanent": true
     },
     {
       "source": "/wp-cron.php/:path*",
-      "destination": "https://myrocky.com/wp-cron.php/:path*",
+      "destination": "https://wpbe.myrocky.com/wp-cron.php/:path*",
       "permanent": true
     }
   ],
   "rewrites": [
     {
       "source": "/wp-json/:path*",
-      "destination": "https://myrocky.com/wp-json/:path*"
+      "destination": "https://wpbe.myrocky.com/wp-json/:path*"
     }
   ],
   "crons": [

@@ -949,7 +949,7 @@ export default function NewBOWLConsultationQuiz({
         page_step: dataToSubmit.page_step || currentPage,
         completion_percentage: completionPct,
         completion_state: completionPct >= 100 ? "Full" : "Partial",
-        source_site: "https://myrocky.com",
+        source_site: process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com",
       };
 
       logTextareaFields(completeData);

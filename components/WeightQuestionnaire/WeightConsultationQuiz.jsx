@@ -54,7 +54,7 @@ export default function WeightLossConsultationQuiz({
       page_step: 1,
       completion_state: "Partial",
       completion_percentage: 0,
-      source_site: "https://myrocky.com",
+      source_site: process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com",
       "130_3": fname || "",
       "130_6": lname || "",
       131: userEmail || "@w3mg.in",
@@ -1192,7 +1192,7 @@ export default function WeightLossConsultationQuiz({
       }
       e.target.value = "";
       document.getElementById("frontPhotoPreview").src =
-        "https://myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png";
+        "https://wpbe.myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png";
       setFrontPhotoFile(null);
       toggleUploadButton();
       return false;
@@ -1287,7 +1287,7 @@ export default function WeightLossConsultationQuiz({
       }
       e.target.value = "";
       document.getElementById("sidePhotoPreview").src =
-        "https://myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png";
+        "https://wpbe.myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png";
       setSidePhotoFile(null);
       toggleUploadButton();
       return false;
@@ -1851,7 +1851,7 @@ export default function WeightLossConsultationQuiz({
         page_step: currentPage,
         completion_percentage: completionPct,
         completion_state: completionPct >= 100 ? "Full" : "Partial",
-        source_site: "https://myrocky.com",
+        source_site: process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com",
       };
 
       logTextareaFields(completeData);
@@ -4050,7 +4050,7 @@ export default function WeightLossConsultationQuiz({
                   <form
                     id="wl-quiz-form"
                     method="post"
-                    action="https://myrocky.com/wp-admin/admin-ajax.php"
+                    action="https://wpbe.myrocky.com/wp-admin/admin-ajax.php"
                   >
                     <input type="hidden" name="form_id" value="6" />
                     <input
@@ -4088,7 +4088,7 @@ export default function WeightLossConsultationQuiz({
                     <input
                       type="hidden"
                       name="source_site"
-                      value="https://myrocky.com"
+                      value={process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com"}
                     />
 
                     <input
@@ -5534,7 +5534,7 @@ export default function WeightLossConsultationQuiz({
                                     <div className="flex w-full items-center">
                                       <img
                                         className="w-16 h-16 object-contain mr-4"
-                                        src="https://myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png"
+                                        src="https://wpbe.myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png"
                                         id="frontPhotoPreview"
                                         alt="Upload icon"
                                       />
@@ -5566,7 +5566,7 @@ export default function WeightLossConsultationQuiz({
                                     <div className="flex w-full items-center">
                                       <img
                                         className="w-16 h-16 object-contain mr-4"
-                                        src="https://myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png"
+                                        src="https://wpbe.myrocky.com/wp-content/themes/salient-child/img/photo_upload_icon.png"
                                         id="sidePhotoPreview"
                                         alt="Upload icon"
                                       />
@@ -5820,7 +5820,7 @@ export default function WeightLossConsultationQuiz({
                           )}
                       </div>
                       <img
-                        src="https://myrocky.com/wp-content/themes/salient-child/img/please_wait_animation.gif"
+                        src="https://wpbe.myrocky.com/wp-content/themes/salient-child/img/please_wait_animation.gif"
                         alt=""
                         style={{ margin: "0 auto" }}
                       />

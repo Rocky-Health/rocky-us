@@ -5,7 +5,7 @@ const fetchProductDetails = async (productId) => {
     // Use absolute URL for client-side calls, relative for server-side
     const isServer = typeof window === 'undefined';
     const BASE_URL = isServer 
-      ? (process.env.NEXT_PUBLIC_SITE_URL || 'https://myrocky.com')
+      ? (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.myrocky.com')
       : '';
     
     const url = `${BASE_URL}/api/products/id/${productId}`;

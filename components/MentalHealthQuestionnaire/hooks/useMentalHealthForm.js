@@ -12,7 +12,7 @@ const INITIAL_FORM_STATE = {
   page_step: 1,
   completion_state: "Partial",
   completion_percentage: 10,
-  source_site: "https://myrocky.com",
+  source_site: process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com",
   email: "",
   phone: "",
   "130_3": "",

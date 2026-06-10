@@ -234,7 +234,7 @@ export async function POST(req) {
       page_step: rawData.page_step || 1,
       completion_state: rawData.completion_state || "Partial",
       completion_percentage: rawData.completion_percentage ?? 10,
-      source_site: rawData.source_site || "https://myrocky.com",
+      source_site: rawData.source_site || process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com",
       wp_user_id: userId,
       created_by: userId,
     };
@@ -348,7 +348,7 @@ async function postLongevityToCRM(data) {
     page_step: parseInt(data.page_step, 10) || 1,
     completion_state: data.completion_state || "Partial",
     completion_percentage: parseInt(data.completion_percentage, 10) || 10,
-    source_site: data.source_site || "https://myrocky.com",
+    source_site: data.source_site || process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com",
     ...resolveCrmUserIds({ cookieUserId: currentUserId, isCreate }),
     entrykey: entrykeyValue,
   };

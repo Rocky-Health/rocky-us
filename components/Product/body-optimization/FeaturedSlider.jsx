@@ -2,36 +2,36 @@ import CustomContainImage from "@/components/utils/CustomContainImage";
 
 const FeaturedSliderImages = [
   {
-    image: "https://myrocky.com/wp-content/uploads/yahoo-logo-grey.png",
+    image: "https://wpbe.myrocky.com/wp-content/uploads/yahoo-logo-grey.png",
     alt: "Yahoo",
   },
   {
-    image: "https://myrocky.com/wp-content/uploads/canhealth-logo-2x.png",
+    image: "https://wpbe.myrocky.com/wp-content/uploads/canhealth-logo-2x.png",
     alt: "canhealth",
   },
   {
-    image: "https://myrocky.com/wp-content/uploads/huf-magazine-grey.png",
+    image: "https://wpbe.myrocky.com/wp-content/uploads/huf-magazine-grey.png",
     alt: "HUF magazine",
   },
   {
-    image: "https://myrocky.com/wp-content/uploads/influencive-grey.png",
+    image: "https://wpbe.myrocky.com/wp-content/uploads/influencive-grey.png",
     alt: "influencive grey",
   },
   {
-    image: "https://myrocky.com/wp-content/uploads/market-watch-grey-new.png",
+    image: "https://wpbe.myrocky.com/wp-content/uploads/market-watch-grey-new.png",
     alt: "market watch grey",
   },
   {
     image:
-      "https://myrocky.com/wp-content/uploads/The_Globe_and_Mail_Stretched_grey.png",
+      "https://wpbe.myrocky.com/wp-content/uploads/The_Globe_and_Mail_Stretched_grey.png",
     alt: "The Globe and Mail",
   },
   {
-    image: "https://myrocky.com/wp-content/uploads/trendhunters.png",
+    image: "https://wpbe.myrocky.com/wp-content/uploads/trendhunters.png",
     alt: "trendhunters",
   },
   {
-    image: "https://myrocky.com/wp-content/uploads/voyage-grey.png",
+    image: "https://wpbe.myrocky.com/wp-content/uploads/voyage-grey.png",
     alt: "Voyage",
   },
   {

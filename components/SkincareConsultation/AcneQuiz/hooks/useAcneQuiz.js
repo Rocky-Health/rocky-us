@@ -276,7 +276,7 @@ export function useAcneQuiz() {
         page_step: stepIndex,
         completion_state: specificData?.completion_state || "Partial",
         completion_percentage: specificData?.completion_percentage || progress,
-        source_site: "https://myrocky.com",
+        source_site: process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com",
       };
 
       // Transform answers into {questionId: answerLabel}
