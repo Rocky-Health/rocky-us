@@ -83,6 +83,12 @@ export async function POST(req) {
       );
     }
 
+    // Skip $0 orders (100% discount)
+    if (parseFloat(value) <= 0) {
+      console.log(`[TikTok CAPI] Skipping $0 order ${order_id} for gateway ${gateway}`);
+      return NextResponse.json({ success: true, skipped: true, reason: 'Zero value order', gateway, order_id });
+    }
+
     if (!order_data?.billing || !order_data?.line_items) {
       console.log(`[TikTok CAPI] Fetching order ${order_id} from WooCommerce...`);
       order_data = await fetchOrderFromWooCommerce(order_id);
