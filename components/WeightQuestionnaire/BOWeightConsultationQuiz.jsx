@@ -206,6 +206,7 @@ export default function NewBOWLConsultationQuiz({
     stepIndex: currentPage,
     flowId: "weight-loss",
     stepType: "quiz",
+    isPostPurchaseConsultation: true,
   });
 
   const [progress, setProgress] = useState(0);

@@ -215,6 +215,7 @@ export default function WeightLossConsultationQuiz({
     stepIndex: currentPage,
     flowId: "weight-loss",
     stepType: "quiz",
+    isPostPurchaseConsultation: true,
   });
 
   // Fire sequence check when WL quiz reaches the completion screen

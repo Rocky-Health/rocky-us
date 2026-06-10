@@ -54,6 +54,7 @@ export default function MentalHealthQuestionnaire({
     stepIndex: currentPage,
     flowId: "mental-health",
     stepType: "quiz",
+    isPostPurchaseConsultation: true,
   });
 
   const {

@@ -57,6 +57,7 @@ export default function HairConsultationQuiz({
     stepIndex: currentPage,
     flowId: "hair",
     stepType: "quiz",
+    isPostPurchaseConsultation: true,
   });
 
   // Fire sequence check when Hair quiz reaches the completion screen (page 22)
