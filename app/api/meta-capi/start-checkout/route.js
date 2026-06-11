@@ -66,7 +66,7 @@ export async function POST(req) {
     }
 
     const payload = await req.json();
-    const { gateway, event_id, value, currency, content_id, event_source_url } = payload || {};
+    const { gateway, event_id, value, currency, content_id, rky_cat, event_source_url } = payload || {};
 
     // event_id is required — without it the server event can't dedup against the
     // browser fire and would double-count.
@@ -120,7 +120,7 @@ export async function POST(req) {
       currency: resolvedCurrency,
       content_ids: content_id ? [String(content_id)] : [],
       content_type: "item",
-      rky_cat: gateway,
+      rky_cat: rky_cat || gateway,
     };
 
     const eventSourceUrl = event_source_url || "https://www.myrocky.com/checkout";

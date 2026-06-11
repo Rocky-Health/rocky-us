@@ -197,10 +197,11 @@ export async function POST(req) {
     }
 
     const payload = await req.json();
-    let { 
-      order_id, 
-      gateway, 
-      value, 
+    let {
+      order_id,
+      gateway,
+      rky_cat,
+      value,
       subtotal,
       net_subtotal,
       shipping,
@@ -369,7 +370,7 @@ export async function POST(req) {
       content_type: 'item',
       num_items: num_items || 0,
       order_id: `${order_id}-${gateway}`,
-      rky_cat: gateway
+      rky_cat: rky_cat || gateway // NAD+ rides LONGEVITY but keeps rky_cat:'NAD'
     };
 
     // Add cost breakdown if available
