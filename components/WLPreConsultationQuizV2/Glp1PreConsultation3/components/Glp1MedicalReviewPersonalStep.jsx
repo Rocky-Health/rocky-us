@@ -34,6 +34,15 @@ const Glp1MedicalReviewPersonalStep = ({
     const [firstName, setFirstName] = useState(userData?.firstName || "");
     const [lastName, setLastName] = useState(userData?.lastName || "");
     const [province, setProvince] = useState(userData?.province || "");
+    const [errors, setErrors] = useState({});
+
+    const clearFieldError = (field) =>
+        setErrors((prev) => {
+            if (!prev[field]) return prev;
+            const next = { ...prev };
+            delete next[field];
+            return next;
+        });
 
     useEffect(() => {
         setFirstName(userData?.firstName || "");
@@ -80,11 +89,16 @@ const Glp1MedicalReviewPersonalStep = ({
     const stateOptions =
         provinceField?.options?.filter((o) => o.value !== "") || [];
 
-    const canSubmit =
-        firstName.trim() && lastName.trim() && String(province).trim() !== "";
-
     const handleSubmit = () => {
-        if (!canSubmit) return;
+        const newErrors = {};
+        if (!firstName.trim()) newErrors.firstName = "Please enter your first name.";
+        if (!lastName.trim()) newErrors.lastName = "Please enter your last name.";
+        if (String(province).trim() === "") newErrors.province = "Please select your state.";
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
+        setErrors({});
         setUserData((prev) => ({
             ...prev,
             firstName: firstName.trim(),
@@ -157,11 +171,14 @@ const Glp1MedicalReviewPersonalStep = ({
                             name="firstName"
                             type="text"
                             autoComplete="given-name"
-                            className={INPUT_CLASS}
+                            className={`${INPUT_CLASS} ${errors.firstName ? "border-red-500 focus:border-red-500" : ""}`}
                             placeholder={firstNameField?.placeholder || ""}
                             value={firstName}
-                            onChange={(e) => setFirstName(e.target.value)}
+                            onChange={(e) => { setFirstName(e.target.value); clearFieldError("firstName"); }}
                         />
+                        {errors.firstName && (
+                            <p className="text-red-500 text-[13px] mt-1">{errors.firstName}</p>
+                        )}
                     </div>
                     <div>
                         {lastNameField?.label && (
@@ -177,11 +194,14 @@ const Glp1MedicalReviewPersonalStep = ({
                             name="lastName"
                             type="text"
                             autoComplete="family-name"
-                            className={INPUT_CLASS}
+                            className={`${INPUT_CLASS} ${errors.lastName ? "border-red-500 focus:border-red-500" : ""}`}
                             placeholder={lastNameField?.placeholder || ""}
                             value={lastName}
-                            onChange={(e) => setLastName(e.target.value)}
+                            onChange={(e) => { setLastName(e.target.value); clearFieldError("lastName"); }}
                         />
+                        {errors.lastName && (
+                            <p className="text-red-500 text-[13px] mt-1">{errors.lastName}</p>
+                        )}
                     </div>
                 </div>
 
@@ -198,8 +218,8 @@ const Glp1MedicalReviewPersonalStep = ({
                                 id="glp1-pc3-med-review-state"
                                 name="province"
                                 value={province}
-                                onChange={(e) => setProvince(e.target.value)}
-                                className={SELECT_CLASS}
+                                onChange={(e) => { setProvince(e.target.value); clearFieldError("province"); }}
+                                className={`${SELECT_CLASS} ${errors.province ? "border-red-500 focus:border-red-500" : ""}`}
                             >
                                 <option value="">- State -</option>
                                 {stateOptions.map((opt) => (
@@ -215,6 +235,9 @@ const Glp1MedicalReviewPersonalStep = ({
                                 ▾
                             </span>
                         </div>
+                        {errors.province && (
+                            <p className="text-red-500 text-[13px] mt-1">{errors.province}</p>
+                        )}
                     </div>
                 )}
 
@@ -228,11 +251,8 @@ const Glp1MedicalReviewPersonalStep = ({
                     <button
                         type="button"
                         onClick={handleSubmit}
-                        disabled={!canSubmit}
-                        style={{
-                            backgroundColor: canSubmit ? ACCENT : undefined,
-                        }}
-                        className="headers-font flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none py-3 font-medium text-white focus:outline-none focus:ring-0 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600"
+                        style={{ backgroundColor: ACCENT }}
+                        className="headers-font flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none py-3 font-medium text-white focus:outline-none focus:ring-0"
                     >
                         <span>Next</span>
                         <span aria-hidden className="text-lg leading-none">

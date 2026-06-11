@@ -39,7 +39,10 @@ const NadPlusGenderHeightWeightStep = ({
     return () => onQuizChromeVisibilityChange?.(false);
   }, [onQuizChromeVisibilityChange]);
 
+  const [error, setError] = useState("");
+
   const handleSelectSex = (value) => {
+    if (error) setError("");
     setSex(value);
     setUserData((prev) => ({ ...prev, sex: value }));
   };
@@ -47,7 +50,15 @@ const NadPlusGenderHeightWeightStep = ({
   const isValid = sex && weight && Number(weight) > 0;
 
   const handleNext = () => {
-    if (!isValid) return;
+    if (!sex) {
+      setError("Please select your gender.");
+      return;
+    }
+    if (!weight || !(Number(weight) > 0)) {
+      setError("Please enter your height and weight.");
+      return;
+    }
+    setError("");
     const updated = {
       ...userData,
       sex,
@@ -147,6 +158,7 @@ const NadPlusGenderHeightWeightStep = ({
             inputMode="numeric"
             value={weight}
             onChange={(e) => {
+              if (error) setError("");
               setWeight(e.target.value);
               setUserData((prev) => ({ ...prev, weight: Number(e.target.value) }));
             }}
@@ -155,11 +167,13 @@ const NadPlusGenderHeightWeightStep = ({
           />
         </div>
 
+        {error && (
+          <p className="text-red-500 text-[13px] mt-4 text-center">{error}</p>
+        )}
         <button
           type="button"
-          disabled={!isValid}
           onClick={handleNext}
-          className="mt-10 flex h-[52px] w-full max-w-4xl items-center justify-center gap-2 self-center rounded-full font-sans text-base font-medium text-white transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45"
+          className="mt-4 flex h-[52px] w-full max-w-4xl items-center justify-center gap-2 self-center rounded-full font-sans text-base font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2"
           style={{ backgroundColor: ACCENT }}
         >
           <span>Next</span>

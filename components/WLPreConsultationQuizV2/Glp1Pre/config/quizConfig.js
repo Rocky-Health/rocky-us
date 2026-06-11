@@ -501,6 +501,8 @@ export const quizConfig = {
       title:"Do you have any further information which you would like our medical team to know? *",
       field:"tried",
       required:true,
+      // Single-select: picking an option immediately advances; no Continue button.
+      autoAdvance: true,
       options:[
         { id: "yes", label: "Yes" },
         { id: "no", label: "No" },

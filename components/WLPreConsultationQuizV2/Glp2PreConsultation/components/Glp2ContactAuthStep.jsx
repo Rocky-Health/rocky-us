@@ -52,6 +52,17 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
     const [showPasswordSection, setShowPasswordSection] = useState(false);
     const [emailExists, setEmailExists] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState({});
+
+    const setFieldError = (field, msg) =>
+        setErrors((prev) => ({ ...prev, [field]: msg }));
+    const clearFieldError = (field) =>
+        setErrors((prev) => {
+            if (!prev[field]) return prev;
+            const next = { ...prev };
+            delete next[field];
+            return next;
+        });
 
     const checkEmailExists = async (emailToCheck) => {
         if (!isValidEmail(emailToCheck)) return;
@@ -92,11 +103,13 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
         setPassword("");
         setContextPassword("");
         if (!emailTouched) setEmailTouched(true);
+        clearFieldError("email");
     };
 
     const handlePasswordChange = (e) => {
         setPassword(e.target.value);
         setContextPassword(e.target.value);
+        clearFieldError("password");
     };
 
     // Try logging in; returns true on success
@@ -208,6 +221,46 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (loading) return;
+
+        // Validate on click (button is always enabled). Show inline errors
+        // under the relevant input and stop instead of silently doing nothing.
+        if (!isValidEmail(email)) {
+            setEmailTouched(true);
+            return;
+        }
+        if (!showPasswordSection) {
+            // Email hasn't been verified yet — reveal the password section.
+            await checkEmailExists(email.trim());
+            return;
+        }
+        if (isNewUser && !isValidPhone(phone)) {
+            setFieldError("phone", "Please enter a valid phone number.");
+            return;
+        }
+        if (!password) {
+            setFieldError(
+                "password",
+                emailExists
+                    ? "Please enter your password."
+                    : "Please create a password.",
+            );
+            return;
+        }
+        if (isNewUser && !isPasswordValid(password)) {
+            setFieldError(
+                "password",
+                "Password must be at least 8 characters and include uppercase and lowercase letters.",
+            );
+            return;
+        }
+        if (!agreePrivacy) {
+            setFieldError(
+                "consent",
+                "Please agree to the terms to continue.",
+            );
+            return;
+        }
+
         setLoading(true);
         try {
             // Save email + phone into userData (password never goes to localStorage)
@@ -249,15 +302,6 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
     const isPasswordValid = (pw) => !!pw && pwRule1(pw) && pwRule2(pw);
 
     const passwordInvalid = isNewUser && password && !isPasswordValid(password);
-
-    const isDisabled =
-        loading ||
-        !isValidEmail(email) ||
-        !showPasswordSection ||
-        !password ||
-        !agreePrivacy ||
-        (isNewUser && !isValidPhone(phone)) ||
-        (isNewUser && !isPasswordValid(password));
 
     return (
         <div className="w-full h-full flex flex-col px-4 md:px-0">
@@ -325,14 +369,22 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
                                 id="glp2-phone"
                                 name="phone"
                                 value={phone}
-                                onChange={(formatted) => setPhone(formatted)}
+                                onChange={(formatted) => {
+                                    setPhone(formatted);
+                                    clearFieldError("phone");
+                                }}
                                 placeholder="(123) 456-7890"
                                 inputClassName={`w-full h-[52px] border rounded-[8px] px-4 bg-white text-[15px] text-[#251F20] focus:outline-none ${
-                                    !isValidPhone(phone) && phone
+                                    (errors.phone || (!isValidPhone(phone) && phone))
                                         ? "border-red-400 focus:border-red-400"
                                         : "border-[#E2E2E1] focus:border-[#AE7E56]"
                                 }`}
                             />
+                            {errors.phone && (
+                                <p className="mt-1 text-[12px] text-red-500">
+                                    {errors.phone}
+                                </p>
+                            )}
                         </div>
                     )}
 
@@ -353,7 +405,7 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
                                             : "Min. 8 characters"
                                     }
                                     className={`w-full h-[52px] border rounded-[8px] px-4 pr-12 bg-white text-[15px] text-[#251F20] focus:outline-none ${
-                                        passwordInvalid
+                                        passwordInvalid || errors.password
                                             ? "border-red-400 focus:border-red-400"
                                             : "border-[#E2E2E1] focus:border-[#AE7E56]"
                                     }`}
@@ -367,6 +419,11 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
                                     <EyeIcon open={showPassword} />
                                 </button>
                             </div>
+                            {errors.password && (
+                                <p className="mt-1 text-[12px] text-red-500">
+                                    {errors.password}
+                                </p>
+                            )}
                             {!emailExists && (
                                 <ul className="mt-2 text-[12px] list-disc pl-5 space-y-1">
                                     <li
@@ -398,7 +455,10 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
                             type="checkbox"
                             id="glp2-privacy"
                             checked={agreePrivacy}
-                            onChange={() => setAgreePrivacy((v) => !v)}
+                            onChange={() => {
+                                setAgreePrivacy((v) => !v);
+                                clearFieldError("consent");
+                            }}
                             className="mt-0.5 w-5 h-5 accent-black shrink-0"
                         />
                         <label
@@ -418,6 +478,11 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
                             medical partners and can opt-out at anytime.
                         </label>
                     </div>
+                    {errors.consent && (
+                        <p className="text-[12px] text-red-500">
+                            {errors.consent}
+                        </p>
+                    )}
                 </form>
             </div>
 
@@ -427,11 +492,11 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
                         type="submit"
                         form=""
                         onClick={handleSubmit}
-                        disabled={isDisabled}
+                        disabled={loading}
                         className={`w-full py-3 flex items-center justify-center gap-2 rounded-full h-[52px] font-medium border-none focus:outline-none focus:ring-0 ${
-                            !isDisabled
-                                ? "bg-black text-white"
-                                : "bg-gray-300 text-gray-700 cursor-not-allowed"
+                            loading
+                                ? "bg-gray-300 text-gray-700 cursor-not-allowed"
+                                : "bg-black text-white"
                         }`}
                     >
                         {loading ? "Please wait…" : "Next →"}

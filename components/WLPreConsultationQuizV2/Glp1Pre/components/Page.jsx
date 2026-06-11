@@ -243,6 +243,16 @@ const Page = ({
 
     if (configToRender.conditionalNavigation?.[value]) {
       onAction("navigate", configToRender.conditionalNavigation[value]);
+      return;
+    }
+
+    // Single-select auto-advance: picking an option immediately moves on.
+    // The value is already saved by the setUserData call above; advance directly
+    // (calling handleCombinedContinue here would re-save a stale userData snapshot
+    // and drop the just-selected value). Auto-advance options never show a text
+    // input, so no text-field merging is needed.
+    if (configToRender.autoAdvance) {
+      onContinue();
     }
   };
 
@@ -453,7 +463,8 @@ const Page = ({
             (q) =>
               q.type === "glp1ContactAuth" ||
               q.type === "form" ||
-              q.type === "data",
+              q.type === "data" ||
+              q.autoAdvance,
           ) ? null : (
             <>
               <div className="w-full pb-4 flex items-center justify-center z-50 ">
@@ -471,11 +482,7 @@ const Page = ({
                         handleCombinedContinue();
                       }
                     }}
-                    className={`w-full py-3 rounded-full h-[52px] font-medium border-none focus:outline-none focus:ring-0 transition-colors ${
-                      allCombinedQuestionsValid
-                        ? "bg-black text-white"
-                        : "bg-gray-400 text-white cursor-not-allowed"
-                    }`}
+                    className="w-full py-3 rounded-full h-[52px] font-medium border-none focus:outline-none focus:ring-0 transition-colors bg-black text-white"
                   >
                     Continue
                   </button>

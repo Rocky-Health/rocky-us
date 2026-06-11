@@ -172,12 +172,7 @@ const Glp2DobStep = ({ userData, setUserData, onContinue }) => {
           <button
             type="button"
             onClick={handleContinue}
-            disabled={!isComplete}
-            className={`w-full py-3 flex items-center justify-center gap-2 rounded-full h-[52px] font-medium border-none focus:outline-none focus:ring-0 ${
-              isComplete
-                ? "bg-black text-white"
-                : "bg-gray-300 text-gray-700 cursor-not-allowed"
-            }`}
+            className="w-full py-3 flex items-center justify-center gap-2 rounded-full h-[52px] font-medium border-none focus:outline-none focus:ring-0 bg-black text-white"
           >
             <span>Next</span>
             <FaArrowRight />

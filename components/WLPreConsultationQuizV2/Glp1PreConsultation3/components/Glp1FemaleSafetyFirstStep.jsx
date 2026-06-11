@@ -35,6 +35,7 @@ const Glp1FemaleSafetyFirstStep = ({
     const [selected, setSelected] = useState(
         () => userData?.femalePregnancySafety ?? null,
     );
+    const [error, setError] = useState("");
 
     useEffect(() => {
         if (userData?.femalePregnancySafety) {
@@ -43,7 +44,11 @@ const Glp1FemaleSafetyFirstStep = ({
     }, [userData?.femalePregnancySafety]);
 
     const handleNext = () => {
-        if (!selected) return;
+        if (!selected) {
+            setError("Please select an option to continue.");
+            return;
+        }
+        setError("");
         setUserData((u) => ({ ...u, femalePregnancySafety: selected }));
         if (selected === NONE_ID) {
             onContinue(selected);
@@ -69,7 +74,7 @@ const Glp1FemaleSafetyFirstStep = ({
                             <button
                                 key={id}
                                 type="button"
-                                onClick={() => setSelected(id)}
+                                onClick={() => { if (error) setError(""); setSelected(id); }}
                                 className={`flex w-full items-start gap-3 rounded-2xl border-2 bg-white px-4 py-4 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 md:px-5 md:py-4 ${
                                     isSel
                                         ? "border-[#A7885A]"
@@ -95,11 +100,15 @@ const Glp1FemaleSafetyFirstStep = ({
                     })}
                 </div>
 
+                {error && (
+                    <p className="text-red-500 text-[13px] mt-10 mb-2 text-center">
+                        {error}
+                    </p>
+                )}
                 <button
                     type="button"
-                    disabled={!selected}
                     onClick={handleNext}
-                    className="mt-10 flex h-[52px] w-full items-center justify-center gap-2 rounded-full font-sans text-base font-medium text-white transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45"
+                    className={`flex h-[52px] w-full items-center justify-center gap-2 rounded-full font-sans text-base font-medium text-white transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 ${error ? "" : "mt-10"}`}
                     style={{ backgroundColor: ACCENT }}
                 >
                     <span>Next</span>

@@ -7,9 +7,14 @@ import { FaArrowRight } from "react-icons/fa";
 const Glp2GoalWeightStep = ({ userData, setUserData, onContinue }) => {
   const bmi = userData?.bmi ? parseFloat(userData.bmi).toFixed(2) : null;
   const [goalWeight, setGoalWeight] = useState(userData?.goalWeight || "");
+  const [error, setError] = useState("");
 
   const handleNext = () => {
-    if (!goalWeight.trim()) return;
+    if (!goalWeight.trim()) {
+      setError("Please enter your goal weight.");
+      return;
+    }
+    setError("");
     setUserData((prev) => ({ ...prev, goalWeight: goalWeight.trim() }));
     onContinue?.();
   };
@@ -62,9 +67,17 @@ const Glp2GoalWeightStep = ({ userData, setUserData, onContinue }) => {
           inputMode="decimal"
           placeholder="Enter your goal weight (in lbs)"
           value={goalWeight}
-          onChange={(e) => setGoalWeight(e.target.value)}
-          className="w-full border border-[#E2E2E1] rounded-[10px] px-4 py-3 text-[16px] text-[#251F20] placeholder-[#ADADAD] focus:outline-none focus:border-[#AE7E56] mb-6"
+          onChange={(e) => {
+            setGoalWeight(e.target.value);
+            if (error) setError("");
+          }}
+          className={`w-full border rounded-[10px] px-4 py-3 text-[16px] text-[#251F20] placeholder-[#ADADAD] focus:outline-none ${
+            error
+              ? "border-red-500 focus:border-red-500"
+              : "border-[#E2E2E1] focus:border-[#AE7E56]"
+          } ${error ? "mb-2" : "mb-6"}`}
         />
+        {error && <p className="text-red-500 text-[13px] mb-6">{error}</p>}
 
         {/* Illustration */}
         <div className="relative w-full rounded-2xl overflow-hidden aspect-[16/9]">
@@ -82,9 +95,8 @@ const Glp2GoalWeightStep = ({ userData, setUserData, onContinue }) => {
         <div className="w-[335px] md:w-[520px] max-w-xl">
           <button
             type="button"
-            disabled={!goalWeight.trim()}
             onClick={handleNext}
-            className="w-full py-3 flex items-center justify-center gap-2 bg-black text-white rounded-full h-[40px] md:h-[52px] font-medium border-none focus:outline-none focus:ring-0 text-[12px] md:text-[16px] disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full py-3 flex items-center justify-center gap-2 bg-black text-white rounded-full h-[40px] md:h-[52px] font-medium border-none focus:outline-none focus:ring-0 text-[12px] md:text-[16px]"
           >
             <span>Next</span>
             <FaArrowRight />

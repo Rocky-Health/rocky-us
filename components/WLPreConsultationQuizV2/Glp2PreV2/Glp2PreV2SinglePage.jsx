@@ -162,6 +162,10 @@ const Glp2PreV2SinglePage = () => {
   const set = (field, value) =>
     setForm((prev) => ({ ...prev, [field]: value }));
 
+  // Tracks whether the user has clicked Next with an incomplete form, so we can
+  // show an inline error instead of disabling the button.
+  const [attemptedNext, setAttemptedNext] = useState(false);
+
   // ── Derived values ───────────────────────────────────────────────────────────
 
   const bmi = useMemo(() => {
@@ -225,7 +229,10 @@ const Glp2PreV2SinglePage = () => {
   // ── Submit ───────────────────────────────────────────────────────────────────
 
   const handleNext = () => {
-    if (!isValid) return;
+    if (!isValid) {
+      setAttemptedNext(true);
+      return;
+    }
     const payload = {
       height: { feet: form.heightFeet, inches: form.heightInches },
       weight: form.weight,
@@ -615,15 +622,15 @@ const Glp2PreV2SinglePage = () => {
       {/* ── Fixed Next button ─────────────────────────────────────────────────── */}
       <div className="fixed bottom-0 left-0 w-full px-5 pb-5 pt-3 z-50 bg-gradient-to-t from-white via-white/95 to-transparent">
         <div className="max-w-[680px] mx-auto">
+          {attemptedNext && !isValid && (
+            <p className="text-red-500 text-[13px] mb-2 text-center">
+              Please answer all the questions above before continuing.
+            </p>
+          )}
           <button
             type="button"
             onClick={handleNext}
-            disabled={!isValid}
-            className={`w-full h-[52px] rounded-full flex items-center justify-center gap-2 text-[16px] font-semibold transition-colors ${
-              isValid
-                ? "bg-black text-white"
-                : "bg-gray-300 text-gray-700 cursor-not-allowed"
-            }`}
+            className="w-full h-[52px] rounded-full flex items-center justify-center gap-2 text-[16px] font-semibold transition-colors bg-black text-white"
           >
             <span>Next</span>
             <FaArrowRight />

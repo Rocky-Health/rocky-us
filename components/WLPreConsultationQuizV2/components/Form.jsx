@@ -75,6 +75,17 @@ const Form = ({
     return init;
   });
   const debounceTimersRef = React.useRef({});
+  // Inline validation errors keyed by field id. Populated when the user clicks
+  // Continue with invalid/empty inputs; cleared as soon as a field changes.
+  const [fieldErrors, setFieldErrors] = useState({});
+
+  const clearFieldError = (id) =>
+    setFieldErrors((prev) => {
+      if (!prev[id]) return prev;
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
 
   // Determine whether the form includes an input with id 'password'
   const hasPasswordField = React.useMemo(() => {
@@ -211,6 +222,7 @@ const Form = ({
 
   // Toggle handler for checkbox fields
   const handleCheckboxToggle = (field, optionId) => {
+    clearFieldError(field.id);
     setFieldsState((prev) => {
       const cur = prev[field.id];
       // Multi-option checkbox (array of selected ids)
@@ -320,6 +332,7 @@ const Form = ({
   };
 
   const handleChange = (id, value) => {
+    clearFieldError(id);
     setFieldsState((prev) => ({ ...prev, [id]: value }));
 
     // Update userData immediately ONLY for fields that control conditional navigation
@@ -592,13 +605,69 @@ const Form = ({
       if (hasPasswordField) {
         const pw = fieldsState.password ?? userData?.password ?? "";
         if (pw && pw.length > 0 && pw.length < requiredPasswordLength) {
-          // Block continuation; let registerUser show the user-facing message
+          // Block continuation and surface the reason inline.
+          setFieldErrors((prev) => ({
+            ...prev,
+            password: `Password must be at least ${requiredPasswordLength} characters.`,
+          }));
           return;
         }
       }
     } catch (e) {
       // ignore any unexpected errors in this quick validation
     }
+
+    // Validate all visible fields on click. The Continue button is always
+    // enabled; invalid/empty inputs surface a red message under each field
+    // instead of silently doing nothing.
+    const newErrors = {};
+    visibleFields.forEach((field) => {
+      if (field.required === false) return;
+      const value = fieldsState[field.id];
+      let msg = "";
+      if (field.type === "date") {
+        if (!value) msg = `${field.label || "Date of birth"} is required.`;
+        else if (!isValidAge(value)) msg = "You must be at least 18 years old.";
+      } else if (field.type === "email") {
+        if (!value) msg = "Email address is required.";
+        else if (!isValidEmail(value))
+          msg = "Please enter a valid email address.";
+      } else if (field.type === "tel") {
+        if (!value) msg = "Phone number is required.";
+        else if (!isValidPhone(value))
+          msg = "Please enter a valid phone number.";
+      } else if (field.type === "checkbox") {
+        const ok = Array.isArray(field.options)
+          ? Array.isArray(value) && value.length > 0
+          : !!value;
+        if (!ok)
+          msg = Array.isArray(field.options)
+            ? "Please select at least one option."
+            : "Please check this box to continue.";
+      } else if (field.type === "select") {
+        if (!value || (typeof value === "string" && !value.trim()))
+          msg = "Please make a selection.";
+      } else {
+        if (typeof value === "string" ? !value.trim() : !value)
+          msg = `${field.label || "This field"} is required.`;
+      }
+      if (msg) newErrors[field.id] = msg;
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setFieldErrors(newErrors);
+      // Mark these fields completed so any live inline (email/phone) errors render too.
+      setCompletedFields((prev) => {
+        const upd = { ...prev };
+        Object.keys(newErrors).forEach((k) => {
+          upd[k] = true;
+        });
+        return upd;
+      });
+      return;
+    }
+    setFieldErrors({});
+
     // On Continue: check visible fields for conditionalActions and trigger them first.
     try {
       for (const field of visibleFields) {
@@ -1173,16 +1242,28 @@ const Form = ({
                       onChange={(e) => handleChange(field.id, e.target.value)}
                       onBlur={() => handleBlurMark(field.id)}
                     />
-                    {field.type === "email" &&
-                      fieldsState[field.id] &&
-                      completedFields[field.id] &&
-                      !isValidEmail(fieldsState[field.id]) && (
-                        <p className="text-red-500 text-sm mt-1">
-                          Please enter a valid email address
-                        </p>
-                      )}
                   </>
                 )}
+                {(() => {
+                  const liveEmail =
+                    field.type === "email" &&
+                    fieldsState[field.id] &&
+                    completedFields[field.id] &&
+                    !isValidEmail(fieldsState[field.id])
+                      ? "Please enter a valid email address"
+                      : "";
+                  const livePhone =
+                    field.type === "tel" &&
+                    fieldsState[field.id] &&
+                    completedFields[field.id] &&
+                    !isValidPhone(fieldsState[field.id])
+                      ? "Please enter a valid phone number."
+                      : "";
+                  const msg = fieldErrors[field.id] || liveEmail || livePhone;
+                  return msg ? (
+                    <p className="text-red-500 text-sm mt-1">{msg}</p>
+                  ) : null;
+                })()}
               </div>
             );
           })}
@@ -1236,7 +1317,7 @@ const Form = ({
 
         <StickyButton
           text="Continue"
-          disabled={!allFilled}
+          disabled={false}
           onClick={handleContinue}
         />
 
