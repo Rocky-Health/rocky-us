@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const AdContainer = ({
@@ -14,8 +15,8 @@ const AdContainer = ({
           `bg-[#E2DCD5] p-8 rounded-xl shadow-md max-w-md mx-auto` + className
         }
       >
-       <div className="h-[250px] lg:h-[190px]  w-full text-center mx-auto mb-4 ">
-       <img src={src} className="object-cover" />
+       <div className="relative h-[250px] lg:h-[190px]  w-full text-center mx-auto mb-4 ">
+       <Image src={src} fill sizes="(max-width: 768px) 100vw, 448px" className="object-cover" alt={title} />
        </div>
 
         <h2 className="text-xl font-bold text-black mb-2">{title}</h2>
