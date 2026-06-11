@@ -4,12 +4,14 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getIdentityKey, buildAdvancedMatching } from "@/utils/metaAdvancedMatching";
 
-// US bundle: only ED / WL / HL. Smoking, Skincare, and Mental-Health
-// categories are blocked at middleware level and must not be present here.
+// US bundle: ED / WL / HL + LONGEVITY (the NAD+ funnel rides the LONGEVITY
+// pixel). Smoking, Skincare, and Mental-Health categories are blocked at
+// middleware level and must not be present here.
 const PIXEL_IDS = {
   ED: process.env.NEXT_PUBLIC_FB_PIXEL_ID_ED || "522677764108011",
   WL: process.env.NEXT_PUBLIC_FB_PIXEL_ID_WL || "1451450365779499",
   HL: process.env.NEXT_PUBLIC_FB_PIXEL_ID_HL || "754893718769214",
+  LONGEVITY: process.env.NEXT_PUBLIC_FB_PIXEL_ID_LONGEVITY || "1315116483444151",
 };
 
 // Secondary pixels fired in addition to the primary above (browser-side
@@ -29,18 +31,22 @@ const ROUTE_PREFIXES = {
   ED: ["pre-ed", "ed", "ed-pre", "ed-flow", "ed-consultation", "ed-prequiz", "erectile-dysfunction", "sex"],
   WL: ["pre-wl", "wl", "wl-pre", "wl-consultation", "new-bo-wl", "old-wl", "weight-loss", "body-optimization", "bo", "glp1", "glp2"],
   HL: ["hair", "hairloss", "hair-loss", "hair-main-questionnaire", "hair-pre-consultation", "hair-flow", "hair-products"],
+  // NAD+ is merged into LONGEVITY — its LPs/quiz route to the LONGEVITY pixel.
+  LONGEVITY: ["nad", "nad-plus", "longevity", "longevity-nad", "bio-age"],
 };
 
 const CATEGORY_SLUGS = {
   ED: ["ed", "erectile-dysfunction", "sexual-health"],
   WL: ["weight-loss", "wl", "body-optimization"],
   HL: ["hair-loss", "hair", "hairloss"],
+  LONGEVITY: ["longevity", "nad"],
 };
 
 const PRODUCT_KEYWORDS = {
   ED: ["cialis", "viagra", "tadalafil", "sildenafil", "variety"],
   WL: ["ozempic", "semaglutide", "tirzepatide", "mounjaro", "wegovy", "rybelsus", "weight-loss", "body-optimization"],
   HL: ["finasteride", "minoxidil", "propecia", "hair", "hair-kit"],
+  LONGEVITY: ["nad", "longevity", "bio-age"],
 };
 
 // Maps checkout/thank-you query params to pixel categories.
@@ -49,7 +55,8 @@ const FLOW_QUERY_MAP = {
   "ed-flow": "ED",
   "wl-flow": "WL",
   "hair-flow": "HL",
-  "longevity-flow": "WL",
+  // NAD+ checkout arrives as ?longevity-flow=1 → LONGEVITY pixel (merged).
+  "longevity-flow": "LONGEVITY",
 };
 
 const hasPrefixMatch = (segments, prefixes) =>
@@ -71,11 +78,14 @@ const getPixelKeyForPath = (pathname, categories = []) => {
   const normalizedCategories = categories.map((category) => category.toLowerCase());
 
   if (normalizedCategories.length > 0) {
+    // NAD+ before WL/ED/HL: NAD products carry the `nad` (+ `longevity`) slug.
+    if (hasCategoryMatch(normalizedCategories, CATEGORY_SLUGS.LONGEVITY)) return "LONGEVITY";
     if (hasCategoryMatch(normalizedCategories, CATEGORY_SLUGS.ED)) return "ED";
     if (hasCategoryMatch(normalizedCategories, CATEGORY_SLUGS.WL)) return "WL";
     if (hasCategoryMatch(normalizedCategories, CATEGORY_SLUGS.HL)) return "HL";
   }
 
+  if (hasPrefixMatch(segments, ROUTE_PREFIXES.LONGEVITY) || hasKeywordMatch(productSlug, PRODUCT_KEYWORDS.LONGEVITY)) return "LONGEVITY";
   if (hasPrefixMatch(segments, ROUTE_PREFIXES.ED) || hasKeywordMatch(productSlug, PRODUCT_KEYWORDS.ED)) return "ED";
   if (hasPrefixMatch(segments, ROUTE_PREFIXES.WL) || hasKeywordMatch(productSlug, PRODUCT_KEYWORDS.WL)) return "WL";
   if (hasPrefixMatch(segments, ROUTE_PREFIXES.HL) || hasKeywordMatch(productSlug, PRODUCT_KEYWORDS.HL)) return "HL";

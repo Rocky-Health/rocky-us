@@ -85,6 +85,20 @@ export const categorizeProduct = (product) => {
 };
 
 /**
+ * NAD+ now rides the LONGEVITY pixel/event, but we still tag rky_cat:'NAD' in
+ * custom_data so NAD+ stays filterable in Meta reporting. A split is NAD when
+ * any of its line items carries the `nad` WC category slug.
+ * @param {Array} items - Line items in a gateway split
+ * @returns {boolean}
+ */
+export const splitHasNad = (items = []) =>
+  items.some(item =>
+    (item.categories || []).some(
+      c => (c.slug || c.name || c).toLowerCase() === 'nad'
+    )
+  );
+
+/**
  * Split order line items by gateway
  */
 export const splitOrderByGateway = (order) => {
@@ -287,6 +301,7 @@ export const trackMetaCapiPurchase = async (order, additionalData = {}, debug = 
         const payload = {
           order_id: enrichedOrder.id,
           gateway: gatewayKey,
+          rky_cat: splitHasNad(split.items) ? 'NAD' : gatewayKey,
           value: split.costs.total,
           subtotal: split.costs.subtotal,
           net_subtotal: split.costs.net_subtotal,

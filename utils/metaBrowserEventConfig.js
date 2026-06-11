@@ -20,10 +20,8 @@ export const CATEGORY_PIXEL_MAP = {
   SMOKING: process.env.NEXT_PUBLIC_FB_PIXEL_ID_SMOKING || "1311848663202831",
   HL: process.env.NEXT_PUBLIC_FB_PIXEL_ID_HL || "754893718769214",
   SKINCARE: process.env.NEXT_PUBLIC_FB_PIXEL_ID_SKINCARE || "1843271713209245",
-  // US-only Longevity vertical pixels (TK-652). NAD+ is split onto its own
-  // dedicated pixel; LONGEVITY is the parent-vertical pixel (staged for the
-  // general longevity quiz, which is CA-only until greenlit on US).
-  NAD: process.env.NEXT_PUBLIC_FB_PIXEL_ID_NAD || "959261143605875",
+  // US-only Longevity vertical pixel (TK-652). NAD+ is merged into this pixel
+  // and fires RKY_AEN_* tagged rky_cat:'NAD' — no separate NAD pixel.
   LONGEVITY: process.env.NEXT_PUBLIC_FB_PIXEL_ID_LONGEVITY || "1315116483444151",
   OTHERS: process.env.NEXT_PUBLIC_FB_PIXEL_ID_OTHERS || "799609076328562",
 };
@@ -66,7 +64,6 @@ const CATEGORY_BASE = {
   HL: "RKY_VBE",
   SMOKING: "RKY_ZXT",
   SKINCARE: "RKY_LXS",
-  NAD: "RKY_NVA",
   LONGEVITY: "RKY_AEN",
   OTHERS: "RKY_MXR",
 };
@@ -99,7 +96,8 @@ const FLOW_ID_MAP = {
   hl: "HL",
   smoking: "SMOKING",
   skincare: "SKINCARE",
-  nad: "NAD",
+  // NAD+ merged into the LONGEVITY pixel — all longevity flows resolve here.
+  nad: "LONGEVITY",
   longevity: "LONGEVITY",
   mh: "OTHERS",
 };
@@ -121,10 +119,10 @@ const QUESTIONNAIRE_ID_MAP = {
   "bo-simplified": "WL",
   "bo-simplified-2": "WL",
   "bo-weight-consultation": "WL",
-  // NAD+ quiz → dedicated NAD pixel. The quiz uses flow_id "nad" (mapped in
-  // FLOW_ID_MAP), so this questionnaire_id entry is a belt-and-suspenders backup.
+  // NAD+ quiz → LONGEVITY pixel (merged; tagged rky_cat:'NAD' downstream). The
+  // quiz uses flow_id "nad" (mapped in FLOW_ID_MAP); this is a backup entry.
   // flow_id "longevity" is reserved for the future general longevity-program quiz.
-  "nad-plus-quiz": "NAD",
+  "nad-plus-quiz": "LONGEVITY",
   "acne-quiz": "SKINCARE",
   "anti-aging-quiz": "SKINCARE",
   "hyperpigmentation-quiz": "SKINCARE",
@@ -132,6 +130,24 @@ const QUESTIONNAIRE_ID_MAP = {
   "mh-pre-consultation": "OTHERS",
   "mental-health": "OTHERS",
 };
+
+/* ------------------------------------------------------------------ */
+/*  NAD+ source tagging                                                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * NAD+ rides the LONGEVITY pixel/event but is tagged rky_cat:'NAD' so it stays
+ * filterable in Meta. These are the pure NAD funnels.
+ */
+const NAD_SOURCE_FLOW_IDS = new Set(["nad"]);
+const NAD_SOURCE_QUESTIONNAIRE_IDS = new Set(["nad-quiz", "nad-plus-quiz"]);
+
+export function isNadSource(flowId, questionnaireId) {
+  return (
+    (!!flowId && NAD_SOURCE_FLOW_IDS.has(flowId)) ||
+    (!!questionnaireId && NAD_SOURCE_QUESTIONNAIRE_IDS.has(questionnaireId))
+  );
+}
 
 /* ------------------------------------------------------------------ */
 /*  resolveCategory                                                    */

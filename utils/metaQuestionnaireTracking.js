@@ -14,6 +14,7 @@ import {
   resolveMetaEventName,
   resolveCategory,
   buildSecondaryEventName,
+  isNadSource,
   CATEGORY_PIXEL_MAP,
   SECONDARY_CATEGORY_PIXEL_MAP,
   DATALAYER_EVENT_NAMES,
@@ -57,11 +58,15 @@ function emitMetaFunnelEvent(milestone, flowId, questionnaireId, params = {}) {
     const genericEventName = GENERIC_EVENT_NAMES[milestone];
     const category = resolveCategory(flowId, questionnaireId);
 
+    // NAD+ rides the LONGEVITY pixel but stays filterable via rky_cat:'NAD'.
+    const nadTag = isNadSource(flowId, questionnaireId) ? "NAD" : null;
+
     const basePayload = {
       flow_id: flowId || null,
       questionnaire_id: questionnaireId || null,
       rk_session_id: sessionId,
       event_id: eventId,
+      ...(nadTag && { rky_cat: nadTag }),
       ...params,
     };
 
@@ -140,7 +145,7 @@ function emitMetaFunnelEvent(milestone, flowId, questionnaireId, params = {}) {
       }
     }
 
-    return { eventId, category };
+    return { eventId, category, rky_cat: nadTag };
   } catch (err) {
     logMetaTrackingError(err, { flow_id: flowId, questionnaire_id: questionnaireId, milestone });
   }
@@ -275,6 +280,7 @@ export function trackMetaStartCheckout({
           value,
           currency: currency || "USD",
           content_id,
+          ...(result.rky_cat && { rky_cat: result.rky_cat }),
           event_source_url: window.location.href,
         }),
       }).catch(() => {});
