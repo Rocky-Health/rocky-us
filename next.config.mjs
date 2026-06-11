@@ -43,6 +43,7 @@ const nextConfig = {
   // on blog URLs despite the tag being present in the HTML.
   htmlLimitedBots: /.*/,
   images: {
+    formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 2592000,
     remotePatterns: [
       {
