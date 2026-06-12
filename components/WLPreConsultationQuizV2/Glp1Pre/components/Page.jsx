@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { sanitizeHtml } from "@/utils/sanitizeHtml";
 import CheckboxQuestion from "./CheckboxQuestion";
 import RadioImagesQuestion from "./RadioImagesQuestion";
@@ -104,6 +104,9 @@ const Page = ({
 }) => {
   const [textInputs, setTextInputs] = useState({});
   const [attemptedContinue, setAttemptedContinue] = useState(false);
+  // Holds a DOM ref per combined-page question so we can scroll to the first
+  // unanswered one when the user hits Continue.
+  const questionRefs = useRef({});
   const isCombinedPage = Array.isArray(questions) && questions.length > 1;
 
   const validateQuestion = (configToValidate) => {
