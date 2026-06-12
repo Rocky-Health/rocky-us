@@ -224,14 +224,16 @@ const HeroSection = ({ onOpenMenu }) => {
                                             }}
                                             aria-hidden
                                         />
-                                        {/* Background Image — first card is the
-                                            desktop LCP candidate: preload it */}
+                                        {/* Background Image — all three cards are
+                                            above the fold on desktop; Lighthouse
+                                            picked "Regrow hair" (index 1) as LCP,
+                                            so preload the whole row */}
                                         <CustomImage
                                             src={service.image}
                                             alt={service.title}
                                             width={service.width}
                                             height={service.height}
-                                            priority={index === 0}
+                                            priority={index < 3}
                                             className={`object-cover absolute bottom-0 right-0`}
                                         />
 
