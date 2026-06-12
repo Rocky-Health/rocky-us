@@ -163,6 +163,7 @@ const TeamSection = () => {
                     <div className="relative rounded-2xl overflow-hidden w-[280px] md:w-[384px] h-[306px] md:h-[420px] mb-4 md:mb-6 ">
                       <CustomImage
                         fill
+                        sizes="(max-width: 768px) 280px, 384px"
                         src={card.image}
                         alt={card.name}
                         className={
@@ -196,6 +197,7 @@ const TeamSection = () => {
                       >
                         <CustomContainImage
                           fill
+                          sizes="160px"
                           src={card.logo1.src}
                           alt={`${card.name} logo 1`}
                           className={card.logo1.obj}
@@ -206,6 +208,7 @@ const TeamSection = () => {
                       >
                         <CustomContainImage
                           fill
+                          sizes="160px"
                           src={card.logo2.src}
                           alt={`${card.name} logo 2`}
                         />

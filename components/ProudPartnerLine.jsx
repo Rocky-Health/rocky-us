@@ -40,6 +40,7 @@ const ProudPartnerLine = ({
                             src="https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp"
                             alt="MyRocky Logo"
                             fill
+                            sizes="128px"
                         />
                     </div>
                     <p className="leading-[140%] font-[600] text-[10px]">
@@ -55,7 +56,7 @@ const ProudPartnerLine = ({
                     <div
                         className={`relative overflow-hidden scale-125 ${nbaLogoSize}`}
                     >
-                        <CustomContainImage src="/nab.png" alt="NBA" fill />
+                        <CustomContainImage src="/nab.png" alt="NBA" fill sizes="24px" />
                     </div>
                     <div
                         className={`relative overflow-hidden scale-125 ${blueJaysLogoSize}`}
@@ -64,6 +65,7 @@ const ProudPartnerLine = ({
                             src="https://myrocky.b-cdn.net/WP%20Images/proud-logo/TBJ.png"
                             alt="Toronto Blue Jays"
                             fill
+                            sizes="70px"
                         />
                     </div>
                     <div
@@ -73,6 +75,7 @@ const ProudPartnerLine = ({
                             src="https://myrocky.b-cdn.net/partner-1.png"
                             alt="Toronto Maple Leafs Logo"
                             fill
+                            sizes="53px"
                         />
                     </div>
                    

@@ -25,6 +25,7 @@ const ProudPartner = ({ section = false, bg = "bg-white" }) => {
               src="https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp"
               alt="MyRocky Logo"
               fill
+              sizes="115px"
             />
           </div>
           <p className="leading-[140%] font-[600] text-[10px]">
@@ -40,6 +41,7 @@ const ProudPartner = ({ section = false, bg = "bg-white" }) => {
               src="/nab.png"
               alt="NBA"
               fill
+              sizes="26px"
             />
           </div>
           <div className={`relative overflow-hidden ${blueJaysLogoSize}`}>
@@ -47,6 +49,7 @@ const ProudPartner = ({ section = false, bg = "bg-white" }) => {
               src="https://myrocky.b-cdn.net/WP%20Images/proud-logo/TBJ.png"
               alt="Toronto Blue Jays"
               fill
+              sizes="74px"
             />
           </div>
           <div className={`relative overflow-hidden ${mapleLeafsLogoSize}`}>
@@ -54,6 +57,7 @@ const ProudPartner = ({ section = false, bg = "bg-white" }) => {
               src="https://myrocky.b-cdn.net/partner-1.png"
               alt="Toronto Maple Leafs Logo"
               fill
+              sizes="57px"
             />
           </div>
         </div>

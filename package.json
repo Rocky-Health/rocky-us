@@ -37,6 +37,12 @@
     "swiper": "^12.1.2",
     "xss": "^1.0.15"
   },
+  "browserslist": [
+    "chrome >= 87",
+    "edge >= 88",
+    "firefox >= 78",
+    "safari >= 14"
+  ],
   "overrides": {
     "request": {
       "form-data": "2.5.5"

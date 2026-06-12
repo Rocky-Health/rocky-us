@@ -35,7 +35,7 @@ const RockyFeatures = ({ cards }) => {
           <div key={index} className="w-[271px] flex-shrink-0">
             <div className="flex items-center gap-2 h-[24px] justify-center">
               <div className="relative rounded-2xl overflow-hidden w-[24px] h-[24px]">
-                <CustomImage src={card.image} alt={card.title} fill />
+                <CustomImage src={card.image} alt={card.title} fill sizes="24px" />
               </div>
               <h3 className="text-[16px] leading-[22.4px] font-[400]">
                 {card.title}
