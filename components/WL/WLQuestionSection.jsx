@@ -19,7 +19,19 @@ const WLQuestionSection = () => {
         <div className="w-1/2">
           <div className="hidden md:block">
             <div className="w-full relative">
-              <img src="/WL/WLhero.jpg" className="rounded-2xl w-[100%]" />
+              {/* Path fixed: file on disk is wlHero.jpg — /WL/WLhero.jpg 404s on
+                  Vercel's case-sensitive filesystem. width/height are the file's
+                  intrinsic dimensions; with w-[100%] + h-auto the rendered size
+                  is identical to the previous raw <img>. */}
+              <Image
+                src="/WL/wlHero.jpg"
+                alt="Woman who reached her weight goals"
+                width={2334}
+                height={3474}
+                priority
+                sizes="(max-width: 768px) 100vw, 592px"
+                className="rounded-2xl w-[100%] h-auto"
+              />
               <div className="absolute bottom-5 right-5 lg:right-10">
                 <Popup></Popup>
               </div>
@@ -53,9 +65,14 @@ const WLQuestionSection = () => {
           <div className="relative w-full">
             <div className="flex items-end justify-end lg:w-1/2 sm:w-full">
               <div className="w-full relative">
-                <img
-                  src="/WL/WLhero.jpg"
-                  className="rounded-2xl mx-auto w-[100%] max-h-full"
+                <Image
+                  src="/WL/wlHero.jpg"
+                  alt="Woman who reached her weight goals"
+                  width={2334}
+                  height={3474}
+                  priority
+                  sizes="100vw"
+                  className="rounded-2xl mx-auto w-[100%] max-h-full h-auto"
                 />
                 <div className="absolute bottom-[-20px] left-0 right-0 m-auto  w-[297px]">
                   <Popup></Popup>

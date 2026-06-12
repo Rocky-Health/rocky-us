@@ -93,6 +93,7 @@ const Footer = ({ className }) => {
                             src="https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-white.webp"
                             alt="MyRocky Logo"
                             fill
+                            sizes="150px"
                         />
                     </div>
 
@@ -370,6 +371,7 @@ const Footer = ({ className }) => {
                             src="https://static.legitscript.com/seals/44796030.png"
                             alt="LegitScript approved"
                             fill
+                            sizes="73px"
                         />
                     </div>
                     <p className="text-[0.7rem] text-center">
@@ -384,6 +386,7 @@ const Footer = ({ className }) => {
                             src="https://myrocky.b-cdn.net/WP%20Images/Sexual%20Health/webp-images/apleepay.png"
                             alt="ApplePay"
                             fill
+                            sizes="30px"
                         />
                     </div>
                     <div className="relative overflow-hidden w-[30px] h-[30px]">
@@ -391,6 +394,7 @@ const Footer = ({ className }) => {
                             src="https://myrocky.b-cdn.net/WP%20Images/Sexual%20Health/webp-images/visa.webp"
                             alt="VISA"
                             fill
+                            sizes="30px"
                         />
                     </div>
                     <div className="relative overflow-hidden w-[30px] h-[30px]">
@@ -398,6 +402,7 @@ const Footer = ({ className }) => {
                             src="https://myrocky.b-cdn.net/WP%20Images/Sexual%20Health/webp-images/mastercard.webp"
                             alt="MasterCard"
                             fill
+                            sizes="30px"
                         />
                     </div>
                 </div>
