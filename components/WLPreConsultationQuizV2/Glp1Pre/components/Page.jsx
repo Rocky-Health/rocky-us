@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { sanitizeHtml } from "@/utils/sanitizeHtml";
 import CheckboxQuestion from "./CheckboxQuestion";
 import RadioImagesQuestion from "./RadioImagesQuestion";
@@ -104,6 +104,9 @@ const Page = ({
 }) => {
   const [textInputs, setTextInputs] = useState({});
   const [attemptedContinue, setAttemptedContinue] = useState(false);
+  // Holds a DOM ref per combined-page question so we can scroll to the first
+  // unanswered one when the user hits Continue.
+  const questionRefs = useRef({});
   const isCombinedPage = Array.isArray(questions) && questions.length > 1;
 
   const validateQuestion = (configToValidate) => {
@@ -243,6 +246,16 @@ const Page = ({
 
     if (configToRender.conditionalNavigation?.[value]) {
       onAction("navigate", configToRender.conditionalNavigation[value]);
+      return;
+    }
+
+    // Single-select auto-advance: picking an option immediately moves on.
+    // The value is already saved by the setUserData call above; advance directly
+    // (calling handleCombinedContinue here would re-save a stale userData snapshot
+    // and drop the just-selected value). Auto-advance options never show a text
+    // input, so no text-field merging is needed.
+    if (configToRender.autoAdvance) {
+      onContinue();
     }
   };
 
@@ -432,14 +445,34 @@ const Page = ({
   return (
     <>
       {isCombinedPage
-        ? questions.map((configToRender, index) => (
-            <div key={configToRender?.id || index}>
-              {index > 0 && (
-                <div className="w-full h-[1px] bg-gray-300 mb-4"></div>
-              )}
-              {renderQuestionByType(configToRender)}
-            </div>
-          ))
+        ? questions.map((configToRender, index) => {
+            // only flag genuinely-answerable required questions (skip titles/intros)
+            const invalid =
+              attemptedContinue && !validateQuestion(configToRender);
+            return (
+              <div
+                key={configToRender?.id || index}
+                ref={(el) => {
+                  if (configToRender?.id) questionRefs.current[configToRender.id] = el;
+                }}
+                className={
+                  invalid
+                    ? "rounded-2xl ring-1 ring-red-300 bg-red-50/40 px-3 py-2 scroll-mt-24 transition-colors"
+                    : "scroll-mt-24"
+                }
+              >
+                {index > 0 && (
+                  <div className="w-full h-[1px] bg-gray-300 mb-4"></div>
+                )}
+                {renderQuestionByType(configToRender)}
+                {invalid && (
+                  <p className="text-red-500 text-sm mt-2">
+                    Please answer this question to continue.
+                  </p>
+                )}
+              </div>
+            );
+          })
         : renderQuestionByType(questionConfig)}
 
       {isCombinedPage && (
@@ -453,14 +486,15 @@ const Page = ({
             (q) =>
               q.type === "glp1ContactAuth" ||
               q.type === "form" ||
-              q.type === "data",
+              q.type === "data" ||
+              q.autoAdvance,
           ) ? null : (
             <>
               <div className="w-full pb-4 flex items-center justify-center z-50 ">
                 <div className="w-full  md:max-w-[665px]">
                   {attemptedContinue && !allCombinedQuestionsValid && (
                     <p className="text-red-500 text-sm mb-2 text-center">
-                      Please answer all required questions before continuing.
+                      Please answer the highlighted question(s) above to continue.
                     </p>
                   )}
                   <button
@@ -469,13 +503,20 @@ const Page = ({
                       setAttemptedContinue(true);
                       if (allCombinedQuestionsValid) {
                         handleCombinedContinue();
+                      } else {
+                        // take the user straight to the first unanswered question
+                        const firstInvalid = (questions || []).find(
+                          (q) => !validateQuestion(q),
+                        );
+                        const el = firstInvalid?.id
+                          ? questionRefs.current[firstInvalid.id]
+                          : null;
+                        if (el?.scrollIntoView) {
+                          el.scrollIntoView({ behavior: "smooth", block: "center" });
+                        }
                       }
                     }}
-                    className={`w-full py-3 rounded-full h-[52px] font-medium border-none focus:outline-none focus:ring-0 transition-colors ${
-                      allCombinedQuestionsValid
-                        ? "bg-black text-white"
-                        : "bg-gray-400 text-white cursor-not-allowed"
-                    }`}
+                    className="w-full py-3 rounded-full h-[52px] font-medium border-none focus:outline-none focus:ring-0 transition-colors bg-black text-white"
                   >
                     Continue
                   </button>

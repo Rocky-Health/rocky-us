@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import SignInLink from "./SignInLink";
 
 const CheckboxQuestion = ({
@@ -9,11 +9,15 @@ const CheckboxQuestion = ({
   onContinue,
 }) => {
   const selectedValues = userData[config.field] || [];
+  const [error, setError] = useState("");
 
   const handleContinue = () => {
-    if (isValid && onContinue) {
-      onContinue();
+    if (!isValid) {
+      setError("Please select an option to continue.");
+      return;
     }
+    setError("");
+    onContinue?.();
   };
 
   return (
@@ -27,7 +31,10 @@ const CheckboxQuestion = ({
                 ? "border-[#A7885A] border-[2px]"
                 : "border-[#E2E2E1]"
             }`}
-            onClick={() => onToggle(option.id, option)}
+            onClick={() => {
+              if (error) setError("");
+              onToggle(option.id, option);
+            }}
           >
             <div className="flex-1">
               <span className="text-[14px] md:text-[16px] font-medium leading-[140%] tracking-[0%] text-black">
@@ -76,14 +83,14 @@ const CheckboxQuestion = ({
 
       {config.showSignIn && <SignInLink className="mt-1" />}
 
-      <div className="fixed bottom-0 left-0 w-full px-4 pb-4 flex items-center justify-center z-50 bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.8)_37.51%,#FFFFFF_63.04%)] backdrop-blur-sm">
+      <div className="fixed bottom-0 left-0 w-full px-4 pb-4 flex flex-col items-center justify-center z-50 bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.8)_37.51%,#FFFFFF_63.04%)] backdrop-blur-sm">
         <div className="w-[335px] md:w-[520px] max-w-xl">
+          {error && (
+            <p className="text-red-500 text-[13px] mb-2 text-center">{error}</p>
+          )}
           <button
             onClick={handleContinue}
-            disabled={!isValid}
-            className={` w-full py-3 h-[52px]  rounded-full font-medium ${
-              isValid ? "bg-black text-white" : "bg-[#E3E3E3] text-black"
-            }`}
+            className="w-full py-3 h-[52px] rounded-full font-medium bg-black text-white"
           >
             Continue
           </button>

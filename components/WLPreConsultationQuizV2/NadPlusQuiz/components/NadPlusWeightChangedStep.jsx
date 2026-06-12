@@ -1,10 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
-import { FaArrowRight } from "react-icons/fa";
-
-const ACCENT = "#A7885A";
 
 const NadPlusWeightChangedStep = ({
   stepConfig,
@@ -17,25 +14,14 @@ const NadPlusWeightChangedStep = ({
   const options = stepConfig?.options || [];
   const imageSrc = stepConfig?.imageSrc || "/nad+/weightloss-scale.png";
 
-  const [selected, setSelected] = useState(userData?.[field] || null);
-
   useEffect(() => {
     onQuizChromeVisibilityChange?.(false);
     return () => onQuizChromeVisibilityChange?.(false);
   }, [onQuizChromeVisibilityChange]);
 
-  useEffect(() => {
-    setSelected(userData?.[field] || null);
-  }, [userData, field]);
-
   const handleSelect = (id) => {
-    setSelected(id);
     setUserData((prev) => ({ ...prev, [field]: id }));
-  };
-
-  const handleNext = () => {
-    if (!selected) return;
-    onContinue({ ...userData, [field]: selected });
+    onContinue({ ...userData, [field]: id });
   };
 
   return (
@@ -64,7 +50,7 @@ const NadPlusWeightChangedStep = ({
 
         <div className="mt-6 flex flex-col gap-3">
           {options.map((option) => {
-            const isSel = selected === option.id;
+            const isSel = userData?.[field] === option.id;
             return (
               <button
                 key={option.id}
@@ -94,17 +80,6 @@ const NadPlusWeightChangedStep = ({
             );
           })}
         </div>
-
-        <button
-          type="button"
-          disabled={!selected}
-          onClick={handleNext}
-          className="mt-10 flex h-[52px] w-full max-w-4xl items-center justify-center gap-2 self-center rounded-full font-sans text-base font-medium text-white transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45"
-          style={{ backgroundColor: ACCENT }}
-        >
-          <span>Next</span>
-          <FaArrowRight className="text-sm" />
-        </button>
       </div>
     </div>
   );

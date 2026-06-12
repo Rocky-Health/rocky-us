@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { FaArrowRight } from "react-icons/fa";
+import React, { useEffect } from "react";
 
 const ACCENT = "#A7885A";
 
@@ -48,25 +47,14 @@ const NadPlusEnergyStep = ({
   const field = stepConfig?.field || "energyLevel";
   const options = stepConfig?.options || [];
 
-  const [selected, setSelected] = useState(userData?.[field] || null);
-
   useEffect(() => {
     onQuizChromeVisibilityChange?.(false);
     return () => onQuizChromeVisibilityChange?.(false);
   }, [onQuizChromeVisibilityChange]);
 
-  useEffect(() => {
-    setSelected(userData?.[field] || null);
-  }, [userData, field]);
-
   const handleSelect = (id) => {
-    setSelected(id);
     setUserData((prev) => ({ ...prev, [field]: id }));
-  };
-
-  const handleNext = () => {
-    if (!selected) return;
-    onContinue({ ...userData, [field]: selected });
+    onContinue({ ...userData, [field]: id });
   };
 
   return (
@@ -84,7 +72,7 @@ const NadPlusEnergyStep = ({
         <div className="lg:mt-10 mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-3 md:gap-4">
           {options.map((option) => {
             const IconComponent = ICON_MAP[option.icon];
-            const isSel = selected === option.id;
+            const isSel = userData?.[field] === option.id;
             return (
               <button
                 key={option.id}
@@ -105,17 +93,6 @@ const NadPlusEnergyStep = ({
             );
           })}
         </div>
-
-        <button
-          type="button"
-          disabled={!selected}
-          onClick={handleNext}
-          className="mt-12 flex h-[52px] w-full max-w-4xl items-center justify-center gap-2 self-center rounded-full font-sans text-base font-medium text-white transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45"
-          style={{ backgroundColor: ACCENT }}
-        >
-          <span>Next</span>
-          <FaArrowRight className="text-sm" />
-        </button>
       </div>
     </div>
   );

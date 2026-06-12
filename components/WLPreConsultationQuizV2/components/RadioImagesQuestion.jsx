@@ -1,6 +1,5 @@
 import CustomImage from "@/components/utils/CustomImage";
 import React, { useState, useEffect } from "react";
-import StickyButton from "./StickyButton";
 
 const RadioImagesQuestion = ({
   config,
@@ -35,8 +34,13 @@ const RadioImagesQuestion = ({
           <button
             key={option.id}
             className={`w-full text-center px-2  py-2  rounded-lg flex justify-start flex-col items-center gap-3 bg-white`}
-            // only set local selection on click; do not call parent onSelect yet
-            onClick={() => setSelected(option.id)}
+            // auto-advance: select and submit on click. For options requiring a
+            // text input, the dispatcher saves the value without advancing, so
+            // the textarea below still appears (keep local selection for that).
+            onClick={() => {
+              setSelected(option.id);
+              onSelect(option.id, option);
+            }}
           >
             {option.image && (
               <div
@@ -92,17 +96,6 @@ const RadioImagesQuestion = ({
         We respect your privacy. All of your information is securely stored on
         our HIPAA Compliant server.
       </div>
-      <StickyButton
-        onClick={() => {
-          const opt = config.options.find((o) => o.id === selected);
-          onSelect(selected, opt);
-        }}
-        // disabled if nothing selected or if a text input is required but empty
-        disabled={
-          selected == null || (derivedShowTextInput && !textInput.trim())
-        }
-        text="Continue"
-      />
     </>
   );
 };

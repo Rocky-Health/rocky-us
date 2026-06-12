@@ -82,6 +82,8 @@ const Glp2BMICalculatorStep = ({
               ? String(inchParsed)
               : "";
 
+    const [error, setError] = useState("");
+
     const handleAction = () => {
         logger.log(config.showPopupAfterStep);
         if (config.showPopupAfterStep) {
@@ -96,11 +98,16 @@ const Glp2BMICalculatorStep = ({
     const hasValidBmi = Number.isFinite(bmiNum);
 
     const handleNextClick = () => {
-        if (!hasValidBmi) return;
+        if (!hasValidBmi) {
+            setError("Please enter your height and weight.");
+            return;
+        }
         if (bmiNum < 27) {
+            setError("");
             setBmiDisqualShown(true);
             return;
         }
+        setError("");
         setBmiDisqualShown(false);
         handleAction();
     };
@@ -186,6 +193,7 @@ const Glp2BMICalculatorStep = ({
                                 value={feetSelectValue}
                                 onChange={(e) => {
                                     const value = e.target.value;
+                                    if (error) setError("");
                                     setUserData((prev) => ({
                                         ...prev,
                                         height: {
@@ -231,6 +239,7 @@ const Glp2BMICalculatorStep = ({
                                 value={inchesSelectValue}
                                 onChange={(e) => {
                                     const value = e.target.value;
+                                    if (error) setError("");
                                     setUserData((prev) => ({
                                         ...prev,
                                         height: {
@@ -261,7 +270,7 @@ const Glp2BMICalculatorStep = ({
                     </div>
                 </div>
 
-                <div className="mb-8">
+                <div className="mb-3">
                     <label className="block mb-2 text-lg font-medium text-[#000000]">
                         Weight (in lbs)
                     </label>
@@ -279,6 +288,7 @@ const Glp2BMICalculatorStep = ({
                         }
                         onChange={(e) => {
                             const value = e.target.value;
+                            if (error) setError("");
                             setUserData((prev) => ({
                                 ...prev,
                                 weight:
@@ -300,16 +310,13 @@ const Glp2BMICalculatorStep = ({
                     />
                 </div>
 
-                <div className="w-full max-w-4xl">
+                {error && <p className="text-red-500 text-[13px] mt-1">{error}</p>}
+
+                <div className="w-full max-w-4xl mt-8">
                     <button
                         ref={continueRef}
-                        className={`flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none py-3 font-medium focus:outline-none focus:ring-0 ${
-                            hasValidBmi
-                                ? "bg-[#A7885A] text-white"
-                                : "cursor-not-allowed bg-gray-300 text-gray-700"
-                        }`}
+                        className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none py-3 font-medium focus:outline-none focus:ring-0 bg-[#A7885A] text-white"
                         onClick={handleNextClick}
-                        disabled={!hasValidBmi}
                         type="button"
                     >
                         <span>Next</span>

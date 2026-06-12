@@ -195,7 +195,9 @@ const Glp2GenericQuestionStep = ({
         stepConfig.type === "glp1MedicalTeamAdditionalInfoQuestion") &&
       stepConfig.detailsField
     ) {
-      const choice = userData[stepConfig.field];
+      // Use the freshly-passed value (valueToCheck) — userData[field] is stale
+      // when the radio routes through handleOptionSelect synchronously (e.g. "no").
+      const choice = fieldValue;
       if (choice !== "yes" && choice !== "no") return;
       if (choice === "yes") {
         const d = userData[stepConfig.detailsField];
@@ -272,8 +274,7 @@ const Glp2GenericQuestionStep = ({
         return (
           <Glp1GenderStep
             userData={userData}
-            setUserData={setUserData}
-            onContinue={handleContinue}
+            onSelect={handleOptionSelect}
           />
         );
       case "glp1WeightGainEffects":
@@ -321,9 +322,8 @@ const Glp2GenericQuestionStep = ({
         return (
           <Glp1PrimaryReasonStep
             userData={userData}
-            setUserData={setUserData}
             config={stepConfig}
-            onContinue={onContinue}
+            onSelect={handleOptionSelect}
           />
         );
       case "glp1RecentGlp1WeightLoss":
@@ -332,7 +332,7 @@ const Glp2GenericQuestionStep = ({
             userData={userData}
             setUserData={setUserData}
             config={stepConfig}
-            onContinue={onContinue}
+            onSelect={handleOptionSelect}
           />
         );
       case "glp1PriorWeightLossMedicationDetails":
@@ -373,8 +373,7 @@ const Glp2GenericQuestionStep = ({
         return (
           <Glp2PaceQuestionStep
             userData={userData}
-            setUserData={setUserData}
-            onContinue={handleContinue}
+            onSelect={handleOptionSelect}
           />
         );
       case "paceResult":
@@ -385,18 +384,16 @@ const Glp2GenericQuestionStep = ({
         return (
           <Glp2SleepStep
             userData={userData}
-            setUserData={setUserData}
             config={stepConfig}
-            onContinue={handleContinue}
+            onSelect={handleOptionSelect}
           />
         );
       case "sleepHoursQuestion":
         return (
           <Glp2SleepHoursStep
             userData={userData}
-            setUserData={setUserData}
             config={stepConfig}
-            onContinue={handleContinue}
+            onSelect={handleOptionSelect}
           />
         );
       case "glp1MedicalContraindications":
@@ -441,27 +438,24 @@ const Glp2GenericQuestionStep = ({
         return (
           <Glp1WeightChangedStep
             userData={userData}
-            setUserData={setUserData}
             config={stepConfig}
-            onContinue={onContinue}
+            onSelect={handleOptionSelect}
           />
         );
       case "glp1BloodPressureQuestion":
         return (
           <Glp1BloodPressureStep
             userData={userData}
-            setUserData={setUserData}
             config={stepConfig}
-            onContinue={handleContinue}
+            onSelect={handleOptionSelect}
           />
         );
       case "glp1HeartRateQuestion":
         return (
           <Glp1HeartRateStep
             userData={userData}
-            setUserData={setUserData}
             config={stepConfig}
-            onContinue={handleContinue}
+            onSelect={handleOptionSelect}
           />
         );
       case "glp1CurrentMedicationsQuestion":
@@ -471,6 +465,7 @@ const Glp2GenericQuestionStep = ({
             setUserData={setUserData}
             config={stepConfig}
             onContinue={handleContinue}
+            onSelect={handleOptionSelect}
           />
         );
       case "glp1MedicalTeamAdditionalInfoQuestion":
@@ -480,15 +475,15 @@ const Glp2GenericQuestionStep = ({
             setUserData={setUserData}
             config={stepConfig}
             onContinue={handleContinue}
+            onSelect={handleOptionSelect}
           />
         );
       case "weightChangedQuestion":
         return (
           <Glp2WeightChangedStep
             userData={userData}
-            setUserData={setUserData}
             config={stepConfig}
-            onContinue={handleContinue}
+            onSelect={handleOptionSelect}
           />
         );
       case "medicationPriorityQuestion":
@@ -504,9 +499,8 @@ const Glp2GenericQuestionStep = ({
         return (
           <Glp2StateOfMindStep
             userData={userData}
-            setUserData={setUserData}
             config={stepConfig}
-            onContinue={handleContinue}
+            onSelect={handleOptionSelect}
           />
         );
       case "glp2Dob":

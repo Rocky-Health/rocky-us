@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { FaArrowRight } from "react-icons/fa";
 
 const PRIMARY = "#A7885A";
@@ -9,8 +9,10 @@ const Glp1WillingnessStep = ({ userData, setUserData, config, onContinue }) => {
     const field = config.field;
     const selectedValues = userData?.[field] || [];
     const options = config?.options || [];
+    const [error, setError] = useState("");
 
     const handleSelect = (value) => {
+        if (error) setError("");
         setUserData((prev) => {
             const current = prev[field] || [];
             let next;
@@ -27,7 +29,11 @@ const Glp1WillingnessStep = ({ userData, setUserData, config, onContinue }) => {
     };
 
     const handleNext = () => {
-        if (selectedValues.length === 0) return;
+        if (selectedValues.length === 0) {
+            setError("Please select an option to continue.");
+            return;
+        }
+        setError("");
         const next = { ...userData, [field]: selectedValues };
         setUserData(next);
         onContinue?.(next);
@@ -82,20 +88,16 @@ const Glp1WillingnessStep = ({ userData, setUserData, config, onContinue }) => {
 
             <div className=" bottom-0 left-0 z-50 flex w-full items-center justify-center bg-[linear-gradient(180deg,rgba(245,244,239,0)_0%,rgba(245,244,239,0.8)_37.51%,#F5F4EF_63.04%)] px-0 pb-4 backdrop-blur-sm">
                 <div className="w-full max-w-4xl">
+                    {error && (
+                        <p className="text-red-500 text-[13px] mb-2 text-center">
+                            {error}
+                        </p>
+                    )}
                     <button
                         type="button"
                         onClick={handleNext}
-                        disabled={selectedValues.length === 0}
-                        className={`flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none py-3 text-base font-medium focus:outline-none focus:ring-0 ${
-                            selectedValues.length > 0
-                                ? "text-white"
-                                : "cursor-not-allowed bg-gray-300 text-gray-600"
-                        }`}
-                        style={
-                            selectedValues.length > 0
-                                ? { backgroundColor: PRIMARY }
-                                : undefined
-                        }
+                        className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none py-3 text-base font-medium text-white focus:outline-none focus:ring-0"
+                        style={{ backgroundColor: PRIMARY }}
                     >
                         <span>Next</span>
                         <FaArrowRight />

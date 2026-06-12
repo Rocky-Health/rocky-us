@@ -14,13 +14,18 @@ const Glp1PrimaryReasonStep = ({
     const field = config?.field || "glp1PrimaryReason";
     const options = config?.options || [];
     const [selected, setSelected] = useState(() => userData?.[field] ?? null);
+    const [error, setError] = useState("");
 
     useEffect(() => {
         setSelected(userData?.[field] ?? null);
     }, [userData, field]);
 
     const handleNext = () => {
-        if (selected == null) return;
+        if (selected == null) {
+            setError("Please select an option to continue.");
+            return;
+        }
+        setError("");
         const next = { ...userData, [field]: selected };
         setUserData(next);
         onContinue?.(next);
@@ -52,7 +57,7 @@ const Glp1PrimaryReasonStep = ({
                             <button
                                 key={option.id}
                                 type="button"
-                                onClick={() => setSelected(option.id)}
+                                onClick={() => { if (error) setError(""); setSelected(option.id); }}
                                 className={`flex min-h-[60px] w-full items-center gap-3 rounded-xl border bg-white px-4 text-left transition-colors ${
                                     isSel
                                         ? "border-2"
@@ -86,11 +91,13 @@ const Glp1PrimaryReasonStep = ({
                     })}
                 </div>
 
+                {error && (
+                    <p className="text-red-500 text-[13px] mt-4 text-center">{error}</p>
+                )}
                 <button
                     type="button"
                     onClick={handleNext}
-                    disabled={selected == null}
-                    className="mt-10 flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none font-sans text-base font-medium text-white transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="mt-4 flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none font-sans text-base font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2"
                     style={{ backgroundColor: ACCENT }}
                 >
                     <span>Next</span>

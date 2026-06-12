@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import CustomImage from "@/components/utils/CustomImage";
 import { FaArrowRight } from "react-icons/fa";
 
@@ -12,12 +12,23 @@ const Glp2WeightChangedStep = ({
 }) => {
     const selectedValue = userData?.[config.field] || "";
     const options = config?.options || [];
+    const [error, setError] = useState("");
 
     const handleSelect = (value) => {
+        if (error) setError("");
         setUserData((prev) => ({
             ...prev,
             [config.field]: value,
         }));
+    };
+
+    const handleNext = () => {
+        if (!selectedValue) {
+            setError("Please select an option to continue.");
+            return;
+        }
+        setError("");
+        onContinue?.();
     };
 
     return (
@@ -72,15 +83,13 @@ const Glp2WeightChangedStep = ({
 
             <div className="fixed bottom-0 left-0 w-full px-4 pb-4 flex items-center justify-center z-50 bg-[linear-gradient(180deg,rgba(245,244,239,0)_0%,rgba(245,244,239,0.8)_37.51%,#F5F4EF_63.04%)] backdrop-blur-sm">
                 <div className="w-full max-w-xl">
+                    {error && (
+                        <p className="text-red-500 text-[13px] mb-2 text-center">{error}</p>
+                    )}
                     <button
                         type="button"
-                        onClick={() => onContinue?.()}
-                        disabled={!selectedValue}
-                        className={`w-full py-3 flex items-center justify-center gap-2 rounded-full h-[52px] font-medium border-none focus:outline-none focus:ring-0 ${
-                            selectedValue
-                                ? "bg-black text-white"
-                                : "bg-gray-300 text-gray-700 cursor-not-allowed"
-                        }`}
+                        onClick={handleNext}
+                        className="w-full py-3 flex items-center justify-center gap-2 rounded-full h-[52px] font-medium border-none bg-black text-white focus:outline-none focus:ring-0"
                     >
                         <span>Next</span>
                         <FaArrowRight />

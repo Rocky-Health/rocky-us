@@ -73,6 +73,15 @@ const NadPlusPersonalInfoStep = ({
   const [dobMonth, setDobMonth] = useState(userData?.dateOfBirth?.month || "");
   const [dobDay, setDobDay] = useState(userData?.dateOfBirth?.day || "");
   const [dobYear, setDobYear] = useState(userData?.dateOfBirth?.year || "");
+  const [errors, setErrors] = useState({});
+
+  const clearFieldError = (field) =>
+    setErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
 
   useEffect(() => {
     onQuizChromeVisibilityChange?.(false);
@@ -88,7 +97,18 @@ const NadPlusPersonalInfoStep = ({
     dobYear;
 
   const handleNext = () => {
-    if (!isValid) return;
+    const newErrors = {};
+    if (!firstName.trim()) newErrors.firstName = "Please enter your first name.";
+    if (!lastName.trim()) newErrors.lastName = "Please enter your last name.";
+    if (!province) newErrors.province = "Please select your state.";
+    if (!dobMonth) newErrors.dobMonth = "Please select your birth month.";
+    if (!dobDay) newErrors.dobDay = "Please select your birth day.";
+    if (!dobYear) newErrors.dobYear = "Please select your birth year.";
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+    setErrors({});
     const updated = {
       ...userData,
       firstName: firstName.trim(),
@@ -123,9 +143,12 @@ const NadPlusPersonalInfoStep = ({
             <input
               type="text"
               value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              className="w-full rounded-xl border-2 border-[#E5E2DC] bg-white px-4 py-3 font-sans text-base text-[#251F20] focus:border-[#A7885A] focus:outline-none"
+              onChange={(e) => { setFirstName(e.target.value); clearFieldError("firstName"); }}
+              className={`w-full rounded-xl border-2 bg-white px-4 py-3 font-sans text-base text-[#251F20] focus:outline-none ${errors.firstName ? "border-red-500 focus:border-red-500" : "border-[#E5E2DC] focus:border-[#A7885A]"}`}
             />
+            {errors.firstName && (
+              <p className="text-red-500 text-[13px] mt-1">{errors.firstName}</p>
+            )}
           </div>
           <div>
             <label className="mb-1 block font-sans text-base font-medium text-[#251F20]">
@@ -134,9 +157,12 @@ const NadPlusPersonalInfoStep = ({
             <input
               type="text"
               value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              className="w-full rounded-xl border-2 border-[#E5E2DC] bg-white px-4 py-3 font-sans text-base text-[#251F20] focus:border-[#A7885A] focus:outline-none"
+              onChange={(e) => { setLastName(e.target.value); clearFieldError("lastName"); }}
+              className={`w-full rounded-xl border-2 bg-white px-4 py-3 font-sans text-base text-[#251F20] focus:outline-none ${errors.lastName ? "border-red-500 focus:border-red-500" : "border-[#E5E2DC] focus:border-[#A7885A]"}`}
             />
+            {errors.lastName && (
+              <p className="text-red-500 text-[13px] mt-1">{errors.lastName}</p>
+            )}
           </div>
         </div>
 
@@ -146,14 +172,17 @@ const NadPlusPersonalInfoStep = ({
           </label>
           <select
             value={province}
-            onChange={(e) => setProvince(e.target.value)}
-            className="w-full rounded-xl border-2 border-[#E5E2DC] bg-white px-4 py-3 font-sans text-base text-[#251F20] focus:border-[#A7885A] focus:outline-none"
+            onChange={(e) => { setProvince(e.target.value); clearFieldError("province"); }}
+            className={`w-full rounded-xl border-2 bg-white px-4 py-3 font-sans text-base text-[#251F20] focus:outline-none ${errors.province ? "border-red-500 focus:border-red-500" : "border-[#E5E2DC] focus:border-[#A7885A]"}`}
           >
             <option value="">Select a state</option>
             {US_STATES.map((s) => (
               <option key={s.value} value={s.value}>{s.label}</option>
             ))}
           </select>
+          {errors.province && (
+            <p className="text-red-500 text-[13px] mt-1">{errors.province}</p>
+          )}
         </div>
 
         <h2 className="mt-8 headers-font text-3xl font-normal leading-[130%] text-[#251F20]">
@@ -167,14 +196,17 @@ const NadPlusPersonalInfoStep = ({
             </label>
             <select
               value={dobMonth}
-              onChange={(e) => setDobMonth(e.target.value)}
-              className="w-full rounded-xl border-2 border-[#E5E2DC] bg-white px-4 py-3 font-sans text-base text-[#251F20] focus:border-[#A7885A] focus:outline-none"
+              onChange={(e) => { setDobMonth(e.target.value); clearFieldError("dobMonth"); }}
+              className={`w-full rounded-xl border-2 bg-white px-4 py-3 font-sans text-base text-[#251F20] focus:outline-none ${errors.dobMonth ? "border-red-500 focus:border-red-500" : "border-[#E5E2DC] focus:border-[#A7885A]"}`}
             >
               <option value="">Month</option>
               {MONTHS.map((m, i) => (
                 <option key={m} value={String(i + 1)}>{m}</option>
               ))}
             </select>
+            {errors.dobMonth && (
+              <p className="text-red-500 text-[13px] mt-1">{errors.dobMonth}</p>
+            )}
           </div>
           <div>
             <label className="mb-1 block font-sans text-base font-medium text-[#251F20]">
@@ -182,14 +214,17 @@ const NadPlusPersonalInfoStep = ({
             </label>
             <select
               value={dobDay}
-              onChange={(e) => setDobDay(e.target.value)}
-              className="w-full rounded-xl border-2 border-[#E5E2DC] bg-white px-4 py-3 font-sans text-base text-[#251F20] focus:border-[#A7885A] focus:outline-none"
+              onChange={(e) => { setDobDay(e.target.value); clearFieldError("dobDay"); }}
+              className={`w-full rounded-xl border-2 bg-white px-4 py-3 font-sans text-base text-[#251F20] focus:outline-none ${errors.dobDay ? "border-red-500 focus:border-red-500" : "border-[#E5E2DC] focus:border-[#A7885A]"}`}
             >
               <option value="">Day</option>
               {DAYS.map((d) => (
                 <option key={d} value={String(d)}>{d}</option>
               ))}
             </select>
+            {errors.dobDay && (
+              <p className="text-red-500 text-[13px] mt-1">{errors.dobDay}</p>
+            )}
           </div>
           <div>
             <label className="mb-1 block font-sans text-base font-medium text-[#251F20]">
@@ -197,22 +232,24 @@ const NadPlusPersonalInfoStep = ({
             </label>
             <select
               value={dobYear}
-              onChange={(e) => setDobYear(e.target.value)}
-              className="w-full rounded-xl border-2 border-[#E5E2DC] bg-white px-4 py-3 font-sans text-base text-[#251F20] focus:border-[#A7885A] focus:outline-none"
+              onChange={(e) => { setDobYear(e.target.value); clearFieldError("dobYear"); }}
+              className={`w-full rounded-xl border-2 bg-white px-4 py-3 font-sans text-base text-[#251F20] focus:outline-none ${errors.dobYear ? "border-red-500 focus:border-red-500" : "border-[#E5E2DC] focus:border-[#A7885A]"}`}
             >
               <option value="">Year</option>
               {YEARS.map((y) => (
                 <option key={y} value={String(y)}>{y}</option>
               ))}
             </select>
+            {errors.dobYear && (
+              <p className="text-red-500 text-[13px] mt-1">{errors.dobYear}</p>
+            )}
           </div>
         </div>
 
         <button
           type="button"
-          disabled={!isValid}
           onClick={handleNext}
-          className="mt-10 flex h-[52px] w-full max-w-4xl items-center justify-center gap-2 self-center rounded-full font-sans text-base font-medium text-white transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45"
+          className="mt-10 flex h-[52px] w-full max-w-4xl items-center justify-center gap-2 self-center rounded-full font-sans text-base font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2"
           style={{ backgroundColor: ACCENT }}
         >
           <span>Next</span>

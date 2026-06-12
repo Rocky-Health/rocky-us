@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { FaArrowRight, FaBed, FaMeh } from "react-icons/fa";
 import { TbBedOff } from "react-icons/tb";
 
@@ -16,12 +16,23 @@ const Glp2SleepStep = ({ userData, setUserData, config, onContinue }) => {
     const field = config?.field || "overallSleep";
     const selectedValue = userData?.[field] || "";
     const options = config?.options || [];
+    const [error, setError] = useState("");
 
     const handleSelect = (value) => {
+        if (error) setError("");
         setUserData((prev) => ({
             ...prev,
             [field]: value,
         }));
+    };
+
+    const handleNext = () => {
+        if (!selectedValue) {
+            setError("Please select an option to continue.");
+            return;
+        }
+        setError("");
+        onContinue?.();
     };
 
     return (
@@ -80,11 +91,13 @@ const Glp2SleepStep = ({ userData, setUserData, config, onContinue }) => {
                     })}
                 </div>
 
+                {error && (
+                    <p className="text-red-500 text-[13px] mt-4 text-center">{error}</p>
+                )}
                 <button
                     type="button"
-                    onClick={() => onContinue?.()}
-                    disabled={!selectedValue}
-                    className="mt-10 flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none font-sans text-base font-medium text-white transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45"
+                    onClick={handleNext}
+                    className="mt-4 flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none font-sans text-base font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2"
                     style={{ backgroundColor: ACCENT }}
                 >
                     <span>Next</span>

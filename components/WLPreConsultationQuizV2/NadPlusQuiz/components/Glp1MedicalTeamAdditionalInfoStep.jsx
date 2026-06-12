@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { FaArrowRight } from "react-icons/fa";
 
 const Glp1MedicalTeamAdditionalInfoStep = ({
@@ -26,7 +26,14 @@ const Glp1MedicalTeamAdditionalInfoStep = ({
         config?.detailsLabel ??
         "Provide details here. Please do not include urgent or emergency medical information.";
 
+    const [error, setError] = useState("");
+
+    const canContinue =
+        selectedValue === "no" ||
+        (selectedValue === "yes" && String(detailsValue).trim().length > 0);
+
     const handleSelect = (value) => {
+        if (error) setError("");
         setUserData((prev) => {
             const next = { ...prev, [field]: value };
             if (value === "no" && detailsField) {
@@ -39,12 +46,18 @@ const Glp1MedicalTeamAdditionalInfoStep = ({
     const handleDetailsChange = (e) => {
         const v = e.target.value;
         if (!detailsField) return;
+        if (error) setError("");
         setUserData((prev) => ({ ...prev, [detailsField]: v }));
     };
 
-    const canContinue =
-        selectedValue === "no" ||
-        (selectedValue === "yes" && String(detailsValue).trim().length > 0);
+    const handleNext = () => {
+        if (!canContinue) {
+            setError("Please select an option to continue.");
+            return;
+        }
+        setError("");
+        onContinue?.();
+    };
 
     return (
         <div className="flex h-full w-full flex-col px-4 md:px-0">
@@ -115,15 +128,13 @@ const Glp1MedicalTeamAdditionalInfoStep = ({
 
             <div className="bottom-0 left-0 z-50 flex w-full items-center justify-center bg-[linear-gradient(180deg,rgba(245,244,239,0)_0%,rgba(245,244,239,0.8)_37.51%,#F5F4EF_63.04%)] px-0 pb-4 backdrop-blur-sm">
                 <div className="w-full max-w-4xl">
+                    {error && (
+                        <p className="text-red-500 text-[13px] mb-2 text-center">{error}</p>
+                    )}
                     <button
                         type="button"
-                        onClick={() => onContinue?.()}
-                        disabled={!canContinue}
-                        className={`flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none py-3 text-base font-medium focus:outline-none focus:ring-0 ${
-                            canContinue
-                                ? "bg-[#A7885A] text-white"
-                                : "cursor-not-allowed bg-gray-300 text-gray-700"
-                        }`}
+                        onClick={handleNext}
+                        className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none py-3 text-base font-medium bg-[#A7885A] text-white focus:outline-none focus:ring-0"
                     >
                         <span>Next</span>
                         <FaArrowRight />

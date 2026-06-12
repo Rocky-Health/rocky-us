@@ -42,6 +42,7 @@ const Glp1BodyPriorityStep = ({
     const [selectedIds, setSelectedIds] = useState(() =>
         normalizeBodyPrioritySelection(userData?.[field]),
     );
+    const [error, setError] = useState("");
 
     useEffect(() => {
         onQuizChromeVisibilityChange?.(false);
@@ -53,7 +54,11 @@ const Glp1BodyPriorityStep = ({
     }, [userData, field]);
 
     const handleNext = () => {
-        if (selectedIds.length === 0) return;
+        if (selectedIds.length === 0) {
+            setError("Please select an option to continue.");
+            return;
+        }
+        setError("");
         setUserData((prev) => ({ ...prev, [field]: selectedIds }));
         onContinue(selectedIds);
     };
@@ -86,6 +91,7 @@ const Glp1BodyPriorityStep = ({
                                 type="button"
                                 aria-pressed={isSel}
                                 onClick={() => {
+                                    if (error) setError("");
                                     setSelectedIds((prev) => {
                                         const next = toggleId(prev, option.id);
                                         setUserData((u) => ({
@@ -142,11 +148,15 @@ const Glp1BodyPriorityStep = ({
                     })}
                 </div>
 
+                {error && (
+                    <p className="text-red-500 text-[13px] mt-10 mb-2 text-center">
+                        {error}
+                    </p>
+                )}
                 <button
                     type="button"
-                    disabled={selectedIds.length === 0}
                     onClick={handleNext}
-                    className="mt-12 flex h-[52px] w-full max-w-4xl items-center justify-center gap-2 self-center rounded-full font-sans text-base font-medium text-white transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45"
+                    className={`flex h-[52px] w-full max-w-4xl items-center justify-center gap-2 self-center rounded-full font-sans text-base font-medium text-white transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 ${error ? "" : "mt-12"}`}
                     style={{ backgroundColor: ACCENT }}
                 >
                     <span>Next</span>

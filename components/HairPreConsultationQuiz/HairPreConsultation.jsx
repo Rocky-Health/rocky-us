@@ -32,6 +32,9 @@ const HairPreConsultationQuiz = () => {
 
   const [answers, setAnswers] = useState({});
   const [error, setError] = useState("");
+  const [error137, setError137] = useState("");
+  const [error138, setError138] = useState("");
+  const [error1, setError1] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showProducts, setShowProducts] = useState(false);
   const [recommendedProduct, setRecommendedProduct] = useState(null);
@@ -53,6 +56,10 @@ const HairPreConsultationQuiz = () => {
       setShowPopup(true);
       return; // Stop further processing
     }
+
+    if (questionId === 137 && error137) setError137("");
+    if (questionId === 138 && error138) setError138("");
+    if (questionId === 1 && error1) setError1("");
 
     setAnswers({
       ...answers,
@@ -86,6 +93,7 @@ const HairPreConsultationQuiz = () => {
 
     setDateValInput(value);
     setDateInput(formattedValue);
+    if (error) setError("");
 
     if (isValidDate(formattedValue)) {
       const calculatedAge = getAge(formattedValue);
@@ -194,6 +202,37 @@ const HairPreConsultationQuiz = () => {
     </div>
   );
 
+  const handleContinue137 = () => {
+    if (!answers[137]) {
+      setError137("Please select an option to continue.");
+      return;
+    }
+    setError137("");
+    handleContinue();
+  };
+
+  const handleContinue138 = () => {
+    if (!answers[138]) {
+      setError138("Please select an option to continue.");
+      return;
+    }
+    setError138("");
+    handleContinue();
+  };
+
+  const handleContinue1 = () => {
+    if (!answers[1]) {
+      setError1("Please select an option to continue.");
+      return;
+    }
+    if (answers[1] === "Female") {
+      setShowPopup(true);
+      return;
+    }
+    setError1("");
+    handleContinue();
+  };
+
   const handleContinue = () => {
     if (currentPage < maxPage) {
       if (
@@ -213,6 +252,10 @@ const HairPreConsultationQuiz = () => {
   };
 
   const handleDateSubmit = () => {
+    if (!age || !isValidDate(dateInput)) {
+      setError("Please enter your date of birth.");
+      return;
+    }
     if (age >= minAgeValidity && age <= maxAgeValidity) {
       setCurrentPage(currentPage + 1);
       setError("");
@@ -532,7 +575,12 @@ const HairPreConsultationQuiz = () => {
           />
 
           {cameFromBack && (
-            <ContinueButton onClick={handleContinue} disabled={!answers[137]} />
+            <>
+              {error137 && (
+                <p className="text-red-500 text-[13px] mt-1 mb-2">{error137}</p>
+              )}
+              <ContinueButton onClick={handleContinue137} />
+            </>
           )}
         </QuestionLayout>
 
@@ -578,7 +626,12 @@ const HairPreConsultationQuiz = () => {
           />
 
           {cameFromBack && (
-            <ContinueButton onClick={handleContinue} disabled={!answers[138]} />
+            <>
+              {error138 && (
+                <p className="text-red-500 text-[13px] mt-1 mb-2">{error138}</p>
+              )}
+              <ContinueButton onClick={handleContinue138} />
+            </>
           )}
         </QuestionLayout>
 
@@ -645,14 +698,7 @@ const HairPreConsultationQuiz = () => {
                 <button
                   type="button"
                   onClick={handleDateSubmit}
-                  disabled={
-                    !age || age < minAgeValidity || age > maxAgeValidity
-                  }
-                  className={`w-[335px] md:w-[520px]  bg-black text-white py-3 px-6 rounded-full font-medium ${
-                    !age || age < minAgeValidity || age > maxAgeValidity
-                      ? "opacity-50 cursor-not-allowed"
-                      : "hover:bg-gray-800"
-                  }`}
+                  className="w-[335px] md:w-[520px] bg-black text-white py-3 px-6 rounded-full font-medium hover:bg-gray-800"
                 >
                   Continue
                 </button>
@@ -693,6 +739,17 @@ const HairPreConsultationQuiz = () => {
                   className="w-full"
                 />
               </div>
+
+              {cameFromBack && (
+                <>
+                  {error1 && (
+                    <p className="text-red-500 text-[13px] mt-1 mb-2">
+                      {error1}
+                    </p>
+                  )}
+                  <ContinueButton onClick={handleContinue1} />
+                </>
+              )}
             </div>
           </div>
         )}

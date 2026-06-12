@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { FaArrowRight } from "react-icons/fa";
 import { sanitizeSvg } from "@/utils/sanitizeHtml";
 
 const LOW_RATE = 0.015;
@@ -69,11 +68,14 @@ const Glp2PaceQuestionStep = ({ userData, setUserData, onContinue }) => {
 
   const hasProjection = lossPerWeekLow > 0 && goalWeight > 0;
 
+  // Single-select: selecting an option immediately saves it and advances to
+  // the next step — no Continue button.
   const handleSelect = (value) => {
     setUserData((prev) => ({
       ...prev,
       pacePreference: value,
     }));
+    onContinue?.(value);
   };
 
   return (
@@ -141,24 +143,6 @@ const Glp2PaceQuestionStep = ({ userData, setUserData, onContinue }) => {
               </button>
             );
           })}
-        </div>
-      </div>
-
-      <div className="fixed bottom-0 left-0 w-full px-4 pb-4 flex items-center justify-center z-50 bg-[linear-gradient(180deg,rgba(245,244,239,0)_0%,rgba(245,244,239,0.8)_37.51%,#F5F4EF_63.04%)] backdrop-blur-sm">
-        <div className="w-[335px] md:w-[520px] max-w-xl">
-          <button
-            type="button"
-            onClick={() => onContinue?.()}
-            disabled={!selectedValue}
-            className={`w-full py-3 flex items-center justify-center gap-2 rounded-full h-[52px] font-medium border-none focus:outline-none focus:ring-0 ${
-              selectedValue
-                ? "bg-black text-white"
-                : "bg-gray-300 text-gray-700 cursor-not-allowed"
-            }`}
-          >
-            <span>Next</span>
-            <FaArrowRight />
-          </button>
         </div>
       </div>
     </div>
