@@ -19,7 +19,15 @@ const WLQuestionSection = () => {
         <div className="w-1/2">
           <div className="hidden md:block">
             <div className="w-full relative">
-              <img src="/WL/WLhero.jpg" className="rounded-2xl w-[100%]" />
+              <Image
+                src="/WL/wlHero.jpg"
+                width={2334}
+                height={3474}
+                priority
+                sizes="(max-width: 768px) 100vw, 570px"
+                className="rounded-2xl w-full h-auto"
+                alt="Weight loss program"
+              />
               <div className="absolute bottom-5 right-5 lg:right-10">
                 <Popup></Popup>
               </div>
@@ -53,9 +61,14 @@ const WLQuestionSection = () => {
           <div className="relative w-full">
             <div className="flex items-end justify-end lg:w-1/2 sm:w-full">
               <div className="w-full relative">
-                <img
-                  src="/WL/WLhero.jpg"
-                  className="rounded-2xl mx-auto w-[100%] max-h-full"
+                <Image
+                  src="/WL/wlHero.jpg"
+                  width={2334}
+                  height={3474}
+                  priority
+                  sizes="(max-width: 768px) 100vw, 570px"
+                  className="rounded-2xl mx-auto w-full h-auto max-h-full"
+                  alt="Weight loss program"
                 />
                 <div className="absolute bottom-[-20px] left-0 right-0 m-auto  w-[297px]">
                   <Popup></Popup>

@@ -156,7 +156,7 @@ export default function RootLayout({ children }) {
               </Script>
               <Script
                 id="awin-mastertag"
-                strategy="beforeInteractive"
+                strategy="afterInteractive"
                 src={`https://www.dwin1.com/${
                   process.env.AWIN_MERCHANT_ID || "101159"
                 }.js`}
@@ -258,7 +258,7 @@ export default function RootLayout({ children }) {
         </Script>
         {/* End TikTok Pixel */}
         {/* Start Microsoft Clarity */}
-        <Script id="microsoft-clarity" strategy="afterInteractive">
+        <Script id="microsoft-clarity" strategy="lazyOnload">
           {`
             (function(c,l,a,r,i,t,y){
               c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};

@@ -230,6 +230,7 @@ const HeroSection = ({ onOpenMenu }) => {
                                             alt={service.title}
                                             width={service.width}
                                             height={service.height}
+                                            priority={index === 0}
                                             className={`object-cover absolute bottom-0 right-0`}
                                         />
 
@@ -295,6 +296,7 @@ const HeroSection = ({ onOpenMenu }) => {
                                         alt={services[0].title}
                                         width={services[0].width}
                                         height={services[0].height}
+                                        priority
                                         className={`object-cover absolute bottom-0 right-0 w-[${services[0].mobile_width}px]`}
                                     />
 
