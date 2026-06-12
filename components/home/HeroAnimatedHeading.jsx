@@ -66,6 +66,13 @@ const HeroAnimatedHeading = ({
     }, []);
 
     const displayedText = currentWord.slice(0, displayedLength);
+    // Reserve the widest word's space so the heading never re-wraps while
+    // typing/deleting. Without this, every wrap shifted all content below the
+    // h1 — Lighthouse measured intermittent CLS spikes up to ~0.8.
+    const longestWord = words.reduce(
+        (a, b) => (b.length > a.length ? b : a),
+        ""
+    );
 
     return (
         <h1
@@ -73,15 +80,21 @@ const HeroAnimatedHeading = ({
         >
             {staticText}
             <span
-                className="inline-block font-[600] subheaders-font"
+                className="relative inline-block font-[600] subheaders-font"
                 style={{ color: accentColor }}
             >
-                {displayedText}
-                <span
-                    className="inline-block w-[2px] h-[0.9em] align-middle ml-[2px] bg-current animate-cursor-blink"
-                    style={{ color: accentColor }}
-                    aria-hidden
-                />
+                {/* invisible spacer keeps the line box constant */}
+                <span className="invisible" aria-hidden>
+                    {longestWord}
+                </span>
+                <span className="absolute inset-y-0 left-0 whitespace-nowrap">
+                    {displayedText}
+                    <span
+                        className="inline-block w-[2px] h-[0.9em] align-middle ml-[2px] bg-current animate-cursor-blink"
+                        style={{ color: accentColor }}
+                        aria-hidden
+                    />
+                </span>
             </span>
         </h1>
     );
