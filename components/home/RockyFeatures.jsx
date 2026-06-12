@@ -52,7 +52,7 @@ const RockyFeatures = ({ cards }) => {
         {dataToUse.map((card, index) => (
           <div key={index} className="flex items-center gap-2">
             <div className="relative rounded-2xl overflow-hidden w-[24px] h-[24px]">
-              <CustomImage src={card.image} alt={card.title} fill />
+              <CustomImage src={card.image} alt={card.title} fill sizes="24px" />
             </div>
             <h3 className="text-[16px] leading-[22.4px] font-[400]">
               {card.title}
@@ -66,7 +66,7 @@ const RockyFeatures = ({ cards }) => {
         {dataToUse.map((card, index) => (
           <div key={index} className="flex items-center gap-2">
             <div className="relative rounded-2xl overflow-hidden w-[20px] h-[20px] flex-shrink-0">
-              <CustomImage src={card.image} alt={card.title} fill />
+              <CustomImage src={card.image} alt={card.title} fill sizes="20px" />
             </div>
             <h3 className="text-[14px] leading-[19.6px] font-[400]">
               {card.title}

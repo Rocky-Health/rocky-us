@@ -57,6 +57,7 @@ const HowRockyWorks = ({ cards, title, subtitle }) => {
                                                     src={card.image}
                                                     alt={card.title}
                                                     fill
+                                                    sizes="(max-width: 768px) 240px, 384px"
                                                 />
                                                 <div className="absolute top-6 left-6 backdrop-blur-sm text-black bg-[#FFFFFFCC] rounded-[4px] py-[7px] px-3 text-sm md:text-[14px] leading-[19.6px] font-[500] w-[76px] h-[24px] flex items-center justify-center ">
                                                     {card.step}

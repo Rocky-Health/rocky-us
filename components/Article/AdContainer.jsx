@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const AdContainer = ({
@@ -15,7 +16,16 @@ const AdContainer = ({
         }
       >
        <div className="h-[250px] lg:h-[190px]  w-full text-center mx-auto mb-4 ">
-       <img src={src} className="object-cover" />
+       {/* width/height = intrinsic dimensions of the default asset; Tailwind
+           preflight (max-w-full h-auto) keeps the rendered size identical to
+           the previous raw <img>. Lazy-loaded by default (below the fold). */}
+       <Image
+         src={src}
+         alt={title}
+         width={800}
+         height={533}
+         className="object-cover"
+       />
        </div>
 
         <h2 className="text-xl font-bold text-black mb-2">{title}</h2>

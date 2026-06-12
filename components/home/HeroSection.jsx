@@ -224,12 +224,16 @@ const HeroSection = ({ onOpenMenu }) => {
                                             }}
                                             aria-hidden
                                         />
-                                        {/* Background Image */}
+                                        {/* Background Image — all three cards are
+                                            above the fold on desktop; Lighthouse
+                                            picked "Regrow hair" (index 1) as LCP,
+                                            so preload the whole row */}
                                         <CustomImage
                                             src={service.image}
                                             alt={service.title}
                                             width={service.width}
                                             height={service.height}
+                                            priority={index < 3}
                                             className={`object-cover absolute bottom-0 right-0`}
                                         />
 
@@ -289,12 +293,13 @@ const HeroSection = ({ onOpenMenu }) => {
                                         }}
                                         aria-hidden
                                     />
-                                    {/* Background Image */}
+                                    {/* Background Image — mobile LCP candidate: preload it */}
                                     <CustomImage
                                         src={services[0].image}
                                         alt={services[0].title}
                                         width={services[0].width}
                                         height={services[0].height}
+                                        priority
                                         className={`object-cover absolute bottom-0 right-0 w-[${services[0].mobile_width}px]`}
                                     />
 
@@ -460,10 +465,14 @@ const HeroSection = ({ onOpenMenu }) => {
                         <div className="flex items-center gap-4 mb-6 md:mb-0">
                             <div className="flex ">
                                 <div className="relative md:w-[89px] w-[84px]">
+                                    {/* PSI flagged this as the mobile LCP element
+                                        (lazy-load added 1.5s delay) — eager-load it */}
                                     <CustomImage
                                         src="/home/happier.png"
+                                        alt="Happy Rocky patients"
                                         width={89}
                                         height={64}
+                                        priority
                                         className="md:w-[89px] md:h-[64px] w-[84px] h-[60]"
                                     />
                                 </div>

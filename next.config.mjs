@@ -43,6 +43,10 @@ const nextConfig = {
   // on blog URLs despite the tag being present in the HTML.
   htmlLimitedBots: /.*/,
   images: {
+    // AVIF first (~20-30% smaller than WebP), WebP fallback for older browsers.
+    // Format negotiation is automatic via the Accept header — same source files,
+    // no code changes, no visual difference.
+    formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 2592000,
     remotePatterns: [
       {

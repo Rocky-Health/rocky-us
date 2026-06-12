@@ -32,12 +32,14 @@ const HeaderProudPartner = () => {
                                         src={partner.logo}
                                         alt={partner.name}
                                         fill
+                                        sizes="64px"
                                     />
                                 ) : (
                                     <CustomImage
                                         src={partner.logo}
                                         alt={partner.name}
                                         fill
+                                        sizes="64px"
                                     />
                                 )}
                             </div>
@@ -99,12 +101,14 @@ const HeaderProudPartner = () => {
                                                     src={partner.logo}
                                                     alt={partner.name}
                                                     fill
+                                                    sizes="56px"
                                                 />
                                             ) : (
                                                 <CustomImage
                                                     src={partner.logo}
                                                     alt={partner.name}
                                                     fill
+                                                    sizes="56px"
                                                 />
                                             )}
                                         </div>

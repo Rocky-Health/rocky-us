@@ -145,6 +145,13 @@ export default function RootLayout({ children }) {
           if (!isEnabled) return null;
           return (
             <>
+              {/* AWIN: consent stub stays beforeInteractive (tiny inline, no
+                  network cost) so AWIN.Tracking.AdvertiserConsent is guaranteed
+                  set before the MasterTag executes. The MasterTag itself is
+                  deferred to afterInteractive — it only needs to exist before a
+                  journey click is recorded, not before first paint. Conversion
+                  tracking fires post-purchase and is unaffected. Verify
+                  attribution on Vercel preview before merge. */}
               <Script id="awin-consent" strategy="beforeInteractive">
                 {`
                   window.AWIN = window.AWIN || {};
@@ -156,7 +163,7 @@ export default function RootLayout({ children }) {
               </Script>
               <Script
                 id="awin-mastertag"
-                strategy="beforeInteractive"
+                strategy="afterInteractive"
                 src={`https://www.dwin1.com/${
                   process.env.AWIN_MERCHANT_ID || "101159"
                 }.js`}
@@ -257,8 +264,9 @@ export default function RootLayout({ children }) {
           `}
         </Script>
         {/* End TikTok Pixel */}
-        {/* Start Microsoft Clarity */}
-        <Script id="microsoft-clarity" strategy="afterInteractive">
+        {/* Start Microsoft Clarity — lazyOnload: session replay/telemetry does not
+            need to race hydration; queued clarity() calls buffer until load. */}
+        <Script id="microsoft-clarity" strategy="lazyOnload">
           {`
             (function(c,l,a,r,i,t,y){
               c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};

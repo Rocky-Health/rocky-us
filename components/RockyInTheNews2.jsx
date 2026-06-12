@@ -112,6 +112,7 @@ const RockyInTheNews2 = () => {
                                             alt={item.text}
                                             className="object-cover rounded-2xl"
                                             fill
+                                            sizes="32px"
                                         />
                                     </div>
                                     <p className="text-sm text-gray-600">
@@ -132,6 +133,7 @@ const RockyInTheNews2 = () => {
                                             alt={item.text}
                                             className="object-cover rounded-2xl"
                                             fill
+                                            sizes="32px"
                                         />
                                     </div>
                                     <p className="text-sm text-gray-600">
@@ -157,6 +159,7 @@ const RockyInTheNews2 = () => {
                                     src={card.image}
                                     className="object-contain w-full h-full filter brightness-0 grayscale"
                                     fill
+                                    sizes="150px"
                                 />
                             </div>
                         </div>
