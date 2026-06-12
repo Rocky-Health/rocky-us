@@ -14,13 +14,18 @@ const Glp1RecentGlp1WeightLossStep = ({
     const field = config?.field || "glp1RecentGlp1WeightLoss";
     const options = config?.options || [];
     const [selected, setSelected] = useState(() => userData?.[field] ?? null);
+    const [error, setError] = useState("");
 
     useEffect(() => {
         setSelected(userData?.[field] ?? null);
     }, [userData, field]);
 
     const handleNext = () => {
-        if (selected == null) return;
+        if (selected == null) {
+            setError("Please select an option to continue.");
+            return;
+        }
+        setError("");
         let next = { ...userData, [field]: selected };
         if (selected === "no") {
             delete next.priorMedNameDoseFrequency;
@@ -50,7 +55,7 @@ const Glp1RecentGlp1WeightLossStep = ({
                             <button
                                 key={option.id}
                                 type="button"
-                                onClick={() => setSelected(option.id)}
+                                onClick={() => { if (error) setError(""); setSelected(option.id); }}
                                 className={`flex min-h-[60px] w-full items-center gap-3 rounded-xl border bg-white px-4 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 ${
                                     isSel
                                         ? "border-2"
@@ -87,16 +92,14 @@ const Glp1RecentGlp1WeightLossStep = ({
 
             <div className=" bottom-0 left-0 z-50 flex w-full items-center justify-center bg-[linear-gradient(180deg,rgba(245,244,239,0)_0%,rgba(245,244,239,0.8)_37.51%,#F5F4EF_63.04%)]  pb-4 backdrop-blur-sm">
                 <div className="w-full max-w-4xl">
+                    {error && (
+                        <p className="text-red-500 text-[13px] mb-2 text-center">{error}</p>
+                    )}
                     <button
                         type="button"
                         onClick={handleNext}
-                        disabled={selected == null}
-                        className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none py-3 text-base font-medium text-white focus:outline-none focus:ring-0 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600"
-                        style={
-                            selected != null
-                                ? { backgroundColor: ACCENT }
-                                : undefined
-                        }
+                        className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none py-3 text-base font-medium text-white focus:outline-none focus:ring-0"
+                        style={{ backgroundColor: ACCENT }}
                     >
                         <span>Next</span>
                         <FaArrowRight />

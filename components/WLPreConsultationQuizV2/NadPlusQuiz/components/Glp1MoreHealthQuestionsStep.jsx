@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { FaArrowRight } from "react-icons/fa";
 
 const PRIMARY = "#A7885A";
@@ -15,8 +15,10 @@ const Glp1MoreHealthQuestionsStep = ({
     const field = config.field;
     const options = config.options || [];
     const selectedValues = userData?.[field] || [];
+    const [error, setError] = useState("");
 
     const handleSelect = (id) => {
+        if (error) setError("");
         setUserData((prev) => {
             const current = prev[field] || [];
             let next;
@@ -33,11 +35,13 @@ const Glp1MoreHealthQuestionsStep = ({
     };
 
     const handleNext = () => {
-        if (selectedValues.length === 0) return;
+        if (selectedValues.length === 0) {
+            setError("Please select an option to continue.");
+            return;
+        }
+        setError("");
         onContinue?.();
     };
-
-    const canContinue = selectedValues.length > 0;
 
     return (
         <div className="flex h-full w-full flex-col px-4 md:px-0">
@@ -86,20 +90,16 @@ const Glp1MoreHealthQuestionsStep = ({
 
             <div className=" bottom-0 left-0 z-50 flex w-full items-center justify-center bg-[linear-gradient(180deg,rgba(245,244,239,0)_0%,rgba(245,244,239,0.8)_37.51%,#F5F4EF_63.04%)] px-4 pb-4 backdrop-blur-sm">
                 <div className="w-full max-w-4xl">
+                    {error && (
+                        <p className="text-red-500 text-[13px] mb-2 text-center">
+                            {error}
+                        </p>
+                    )}
                     <button
                         type="button"
                         onClick={handleNext}
-                        disabled={!canContinue}
-                        className={`flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none py-3 text-base font-medium focus:outline-none focus:ring-0 ${
-                            canContinue
-                                ? "text-white"
-                                : "cursor-not-allowed bg-gray-300 text-gray-600"
-                        }`}
-                        style={
-                            canContinue
-                                ? { backgroundColor: PRIMARY }
-                                : undefined
-                        }
+                        className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none py-3 text-base font-medium text-white focus:outline-none focus:ring-0"
+                        style={{ backgroundColor: PRIMARY }}
                     >
                         <span>Next</span>
                         <FaArrowRight />

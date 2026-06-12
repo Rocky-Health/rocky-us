@@ -88,7 +88,10 @@ const NadPlusAgingEffectsStep = ({
     setSelected(userData?.[field] || []);
   }, [userData, field]);
 
+  const [error, setError] = useState("");
+
   const handleToggle = (id) => {
+    if (error) setError("");
     let next;
     if (id === "none") {
       next = selected.includes("none") ? [] : ["none"];
@@ -101,7 +104,11 @@ const NadPlusAgingEffectsStep = ({
   };
 
   const handleNext = () => {
-    if (!selected.length) return;
+    if (!selected.length) {
+      setError("Please select an option to continue.");
+      return;
+    }
+    setError("");
     onContinue({ ...userData, [field]: selected });
   };
 
@@ -147,11 +154,13 @@ const NadPlusAgingEffectsStep = ({
           })}
         </div>
 
+        {error && (
+          <p className="text-red-500 text-[13px] mt-4 text-center">{error}</p>
+        )}
         <button
           type="button"
-          disabled={!selected.length}
           onClick={handleNext}
-          className="mt-12 flex h-[52px] w-full max-w-4xl items-center justify-center gap-2 self-center rounded-full font-sans text-base font-medium text-white transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45"
+          className="mt-4 flex h-[52px] w-full max-w-4xl items-center justify-center gap-2 self-center rounded-full font-sans text-base font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2"
           style={{ backgroundColor: ACCENT }}
         >
           <span>Next</span>

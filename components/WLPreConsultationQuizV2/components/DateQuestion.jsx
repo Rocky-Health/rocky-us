@@ -10,6 +10,7 @@ const DateQuestion = ({ config, userData, setUserData, onContinue }) => {
     userData && userData[config.field] ? String(userData[config.field]) : "";
   logger.log(userData);
   const [dateOfBirth, setDateOfBirth] = useState(initialDate);
+  const [error, setError] = useState("");
 
   // Always keep userData in sync with selected date, but only if not empty
   useEffect(() => {
@@ -39,26 +40,34 @@ const DateQuestion = ({ config, userData, setUserData, onContinue }) => {
 
   const handleDateChange = (value) => {
     setDateOfBirth(value);
+    if (error) setError("");
   };
 
   const handleContinue = () => {
-    if (dateOfBirth && isValidAge()) {
-      if (typeof setUserData === "function") {
-        let formattedDate = dateOfBirth;
-        if (dateOfBirth.match(/^[A-Za-z]{3} /)) {
-          const d = new Date(dateOfBirth);
-          const day = d.getDate();
-          const month = d.getMonth() + 1;
-          const year = d.getFullYear();
-          formattedDate = `${day}/${month}/${year}`;
-        }
-        setUserData((prev) => ({
-          ...prev,
-          [config.field]: formattedDate,
-        }));
-      }
-      onContinue();
+    if (!dateOfBirth) {
+      setError("Please enter your date of birth.");
+      return;
     }
+    if (!isValidAge()) {
+      setError("You must be at least 18 years old.");
+      return;
+    }
+    setError("");
+    if (typeof setUserData === "function") {
+      let formattedDate = dateOfBirth;
+      if (dateOfBirth.match(/^[A-Za-z]{3} /)) {
+        const d = new Date(dateOfBirth);
+        const day = d.getDate();
+        const month = d.getMonth() + 1;
+        const year = d.getFullYear();
+        formattedDate = `${day}/${month}/${year}`;
+      }
+      setUserData((prev) => ({
+        ...prev,
+        [config.field]: formattedDate,
+      }));
+    }
+    onContinue();
   };
 
   // Check if user is 18 or older as of today
@@ -115,6 +124,9 @@ const DateQuestion = ({ config, userData, setUserData, onContinue }) => {
             minAge={18}
             required
           />
+          {error && (
+            <p className="text-red-500 text-[13px] mt-2">{error}</p>
+          )}
         </div>
 
         <div className="text-[10px] mt-6 text-[#00000059] text-left font-[400] leading-[140%] tracking-[0%]">
@@ -126,7 +138,7 @@ const DateQuestion = ({ config, userData, setUserData, onContinue }) => {
       <StickyButton
         text="Continue"
         onClick={handleContinue}
-        disabled={!isValid}
+        disabled={false}
         showSignIn={config.showSignIn}
       />
     </div>

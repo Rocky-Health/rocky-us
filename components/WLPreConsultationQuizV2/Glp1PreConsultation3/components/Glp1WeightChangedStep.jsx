@@ -2,34 +2,18 @@
 
 import React from "react";
 import CustomImage from "@/components/utils/CustomImage";
-import { FaArrowRight } from "react-icons/fa";
 
 const PRIMARY = "#A7885A";
 
 const Glp1WeightChangedStep = ({
     userData,
-    setUserData,
     config,
-    onContinue,
+    onSelect,
 }) => {
     const field = config.field;
     const imageSrc = config.heroImageSrc || "/glp-quiz/wl-changed.png";
     const selectedValue = userData?.[field] || "";
     const options = config?.options || [];
-
-    const handleSelect = (value) => {
-        setUserData((prev) => ({
-            ...prev,
-            [field]: value,
-        }));
-    };
-
-    const handleNext = () => {
-        if (!selectedValue) return;
-        const next = { ...userData, [field]: selectedValue };
-        setUserData(next);
-        onContinue?.(next);
-    };
 
     return (
         <div className="flex h-full w-full flex-col px-4 md:px-0">
@@ -54,7 +38,7 @@ const Glp1WeightChangedStep = ({
                             <button
                                 key={option.id}
                                 type="button"
-                                onClick={() => handleSelect(option.id)}
+                                onClick={() => onSelect(option.id, option)}
                                 className={`flex min-h-[55px] w-full items-center gap-3 rounded-[8px] border bg-white px-4 text-left ${
                                     checked
                                         ? "border-[#251F20]"
@@ -90,29 +74,6 @@ const Glp1WeightChangedStep = ({
                             </button>
                         );
                     })}
-                </div>
-            </div>
-
-            <div className=" bottom-0 left-0 z-50 flex w-full items-center justify-center bg-[linear-gradient(180deg,rgba(245,244,239,0)_0%,rgba(245,244,239,0.8)_37.51%,#F5F4EF_63.04%)] px-0 pb-4 backdrop-blur-sm">
-                <div className="w-full max-w-4xl">
-                    <button
-                        type="button"
-                        onClick={handleNext}
-                        disabled={!selectedValue}
-                        className={`flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none py-3 text-base font-medium focus:outline-none focus:ring-0 ${
-                            selectedValue
-                                ? "text-white"
-                                : "cursor-not-allowed bg-gray-300 text-gray-600"
-                        }`}
-                        style={
-                            selectedValue
-                                ? { backgroundColor: PRIMARY }
-                                : undefined
-                        }
-                    >
-                        <span>Next</span>
-                        <FaArrowRight />
-                    </button>
                 </div>
             </div>
         </div>

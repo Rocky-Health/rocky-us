@@ -4,6 +4,7 @@ This document outlines all the payment-related changes made to fix customer ID t
 
 ## Overview
 
+
 The changes ensure that:
 - ✅ Stripe Customer ID is properly sent to WordPress/WooCommerce
 - ✅ Payment method tokens are saved and sent for renewals

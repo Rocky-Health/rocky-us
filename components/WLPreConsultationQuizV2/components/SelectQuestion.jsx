@@ -14,6 +14,7 @@ const SelectQuestion = ({
   const [selected, setSelected] = useState(
     userData ? userData[config.field] ?? "" : ""
   );
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (userData && typeof config?.field !== "undefined") {
@@ -38,6 +39,7 @@ const SelectQuestion = ({
           onChange={(e) => {
             const selectedId = e.target.value;
             setSelected(selectedId);
+            if (error) setError("");
           }}
         >
           {config.options.map((option) => (
@@ -56,7 +58,10 @@ const SelectQuestion = ({
         <div className="mt-6">
           <textarea
             value={textInput}
-            onChange={(e) => setTextInput(e.target.value)}
+            onChange={(e) => {
+              setTextInput(e.target.value);
+              if (error) setError("");
+            }}
             placeholder={
               config.options.find((opt) => opt.showTextInput)
                 ?.textPlaceholder || "Please specify..."
@@ -75,13 +80,26 @@ const SelectQuestion = ({
         </div>
       )}
 
+      {error && (
+        <p className="text-red-500 text-[13px] mt-1 mb-2 px-1">{error}</p>
+      )}
+
       <StickyButton
         text="Continue"
         onClick={() => {
+          if (!selected) {
+            setError("Please make a selection.");
+            return;
+          }
+          if (derivedShowTextInput && !textInput.trim()) {
+            setError("Please enter a response.");
+            return;
+          }
+          setError("");
           const opt = config.options.find((o) => o.id === selected);
           onSelect(selected, opt);
         }}
-        disabled={!selected || (derivedShowTextInput && !textInput.trim())}
+        disabled={false}
         showSignIn={config.showSignIn}
       />
     </>

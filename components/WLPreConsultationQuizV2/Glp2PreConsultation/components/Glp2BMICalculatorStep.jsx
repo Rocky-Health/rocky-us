@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { logger } from "@/utils/devLogger";
 import CustomImage from "@/components/utils/CustomImage";
 import { FaArrowRight } from "react-icons/fa";
@@ -19,6 +19,7 @@ const Glp2BMICalculatorStep = ({
   const inchesRef = useRef(null);
   const weightRef = useRef(null);
   const continueRef = useRef(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const feetNum = parseFloat(heightFeet) || 0;
@@ -42,7 +43,30 @@ const Glp2BMICalculatorStep = ({
     }));
   }, [weightPounds, heightFeet, heightInches, setUserData]);
 
+  const feetNum = parseFloat(heightFeet);
+  const inchesNum = parseFloat(heightInches);
+  const weightNum = parseFloat(weightPounds);
+  const hasAllInputs =
+    feetNum > 0 &&
+    !isNaN(inchesNum) &&
+    inchesNum >= 0 &&
+    inchesNum < 12 &&
+    weightNum > 0;
+
+  const isEligible = bmi && !isNaN(parseFloat(bmi)) && parseFloat(bmi) >= 20;
+
   const handleAction = () => {
+    if (!hasAllInputs) {
+      setError("Please enter your height and weight.");
+      return;
+    }
+    if (!isEligible) {
+      setError(
+        "Based on the information provided, you're not eligible for medical weight loss.",
+      );
+      return;
+    }
+    setError("");
     logger.log(config.showPopupAfterStep);
     if (config.showPopupAfterStep) {
       onAction("showPopup", config.showPopupAfterStep);
@@ -50,8 +74,6 @@ const Glp2BMICalculatorStep = ({
       onContinue();
     }
   };
-
-  const isEligible = bmi && !isNaN(parseFloat(bmi)) && parseFloat(bmi) >= 20;
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -96,6 +118,7 @@ const Glp2BMICalculatorStep = ({
               }
               onChange={(e) => {
                 const value = e.target.value;
+                if (error) setError("");
                 setUserData((prev) => ({
                   ...prev,
                   height: {
@@ -129,6 +152,7 @@ const Glp2BMICalculatorStep = ({
               }
               onChange={(e) => {
                 const value = e.target.value;
+                if (error) setError("");
                 setUserData((prev) => ({
                   ...prev,
                   height: {
@@ -167,6 +191,7 @@ const Glp2BMICalculatorStep = ({
             }
             onChange={(e) => {
               const value = e.target.value;
+              if (error) setError("");
               setUserData((prev) => ({
                 ...prev,
                 weight: value === "" ? "" : parseInt(value, 10) || 0,
@@ -184,17 +209,16 @@ const Glp2BMICalculatorStep = ({
             }}
           />
         </div>
+
+        {error && <p className="text-red-500 text-[13px] mt-1">{error}</p>}
       </div>
 
       <div className="fixed bottom-0 left-0 w-full px-4 pb-4 flex items-center justify-center z-50 bg-[linear-gradient(180deg,rgba(245,244,239,0)_0%,rgba(245,244,239,0.8)_37.51%,#F5F4EF_63.04%)] backdrop-blur-sm">
         <div className="w-[335px] md:w-[520px] max-w-xl">
           <button
             ref={continueRef}
-            className={`w-full py-3 flex items-center justify-center gap-2 ${
-              isEligible ? "bg-black text-white" : "bg-gray-300 text-gray-700"
-            } rounded-full h-[52px] font-medium border-none focus:outline-none focus:ring-0`}
+            className="w-full py-3 flex items-center justify-center gap-2 bg-black text-white rounded-full h-[52px] font-medium border-none focus:outline-none focus:ring-0"
             onClick={handleAction}
-            disabled={!bmi || !isEligible}
             type="button"
           >
             <span>Next</span>

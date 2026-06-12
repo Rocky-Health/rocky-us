@@ -1,30 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { FaArrowRight } from "react-icons/fa";
+import React from "react";
 
 const ACCENT = "#A7885A";
 
 const Glp1PrimaryReasonStep = ({
     userData,
-    setUserData,
     config,
-    onContinue,
+    onSelect,
 }) => {
     const field = config?.field || "glp1PrimaryReason";
     const options = config?.options || [];
-    const [selected, setSelected] = useState(() => userData?.[field] ?? null);
-
-    useEffect(() => {
-        setSelected(userData?.[field] ?? null);
-    }, [userData, field]);
-
-    const handleNext = () => {
-        if (selected == null) return;
-        const next = { ...userData, [field]: selected };
-        setUserData(next);
-        onContinue?.(next);
-    };
+    const selected = userData?.[field] ?? null;
 
     return (
         <div className="flex w-full flex-col px-4 pb-10 md:px-0">
@@ -52,7 +39,7 @@ const Glp1PrimaryReasonStep = ({
                             <button
                                 key={option.id}
                                 type="button"
-                                onClick={() => setSelected(option.id)}
+                                onClick={() => onSelect(option.id, option)}
                                 className={`flex min-h-[60px] w-full items-center gap-3 rounded-xl border bg-white px-4 text-left transition-colors ${
                                     isSel
                                         ? "border-2"
@@ -85,17 +72,6 @@ const Glp1PrimaryReasonStep = ({
                         );
                     })}
                 </div>
-
-                <button
-                    type="button"
-                    onClick={handleNext}
-                    disabled={selected == null}
-                    className="mt-10 flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none font-sans text-base font-medium text-white transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    style={{ backgroundColor: ACCENT }}
-                >
-                    <span>Next</span>
-                    <FaArrowRight className="text-sm" />
-                </button>
             </div>
         </div>
     );

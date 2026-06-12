@@ -106,6 +106,7 @@ const Glp1WeightGainEffectsStep = ({ userData, setUserData, onContinue }) => {
             ? userData.weightGainEffects
             : [],
     );
+    const [error, setError] = useState("");
 
     useEffect(() => {
         const list = Array.isArray(userData?.weightGainEffects)
@@ -123,6 +124,7 @@ const Glp1WeightGainEffectsStep = ({ userData, setUserData, onContinue }) => {
     );
 
     const handleCardClick = (id) => {
+        if (error) setError("");
         setSelected((prev) => {
             const next = toggleSelection(prev, id);
             setUserData((u) => ({ ...u, weightGainEffects: next }));
@@ -131,7 +133,11 @@ const Glp1WeightGainEffectsStep = ({ userData, setUserData, onContinue }) => {
     };
 
     const handleNext = () => {
-        if (!selected.length) return;
+        if (!selected.length) {
+            setError("Please select an option to continue.");
+            return;
+        }
+        setError("");
         setUserData((u) => ({ ...u, weightGainEffects: selected }));
         onContinue(selected);
     };
@@ -187,11 +193,15 @@ const Glp1WeightGainEffectsStep = ({ userData, setUserData, onContinue }) => {
                     })}
                 </div>
 
+                {error && (
+                    <p className="text-red-500 text-[13px] mt-10 mb-2 text-center">
+                        {error}
+                    </p>
+                )}
                 <button
                     type="button"
-                    disabled={!selected.length}
                     onClick={handleNext}
-                    className="mt-10 flex h-[52px] w-full max-w-4xl items-center justify-center gap-2 rounded-full font-sans text-base font-medium text-white transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45"
+                    className={`flex h-[52px] w-full max-w-4xl items-center justify-center gap-2 rounded-full font-sans text-base font-medium text-white transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 ${error ? "" : "mt-10"}`}
                     style={{ backgroundColor: ACCENT }}
                 >
                     <span>Next</span>

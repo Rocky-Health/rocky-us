@@ -4,6 +4,7 @@
 
 Telemedicine e-commerce platform for men's health (ED, hair loss, weight loss). Next.js frontend consuming WordPress + WooCommerce REST APIs. Patients complete medical questionnaires, get assessed, and receive treatments shipped to their door.
 
+
 ## Tech Stack
 
 - **Framework**: Next.js 16 (App Router) + React 19

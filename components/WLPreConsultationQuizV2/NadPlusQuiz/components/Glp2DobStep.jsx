@@ -189,11 +189,8 @@ const Glp2DobStep = ({ userData, setUserData, onContinue }) => {
                     <button
                         type="button"
                         onClick={handleContinue}
-                        disabled={!isComplete}
-                        style={{
-                            backgroundColor: isComplete ? BTN_GOLD : undefined,
-                        }}
-                        className="w-full py-3 flex items-center justify-center gap-2 rounded-full h-[52px] font-medium text-white headers-font border-none focus:outline-none focus:ring-0 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600"
+                        style={{ backgroundColor: BTN_GOLD }}
+                        className="w-full py-3 flex items-center justify-center gap-2 rounded-full h-[52px] font-medium text-white headers-font border-none focus:outline-none focus:ring-0"
                     >
                         <span>Next</span>
                         <span aria-hidden className="text-lg leading-none">

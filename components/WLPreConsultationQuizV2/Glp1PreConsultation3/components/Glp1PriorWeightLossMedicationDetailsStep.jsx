@@ -71,15 +71,29 @@ const Glp1PriorWeightLossMedicationDetailsStep = ({
     const [prescriberOther, setPrescriberOther] = useState(
         () => userData?.priorMedPrescriberOther ?? "",
     );
+    const [errors, setErrors] = useState({});
 
-    const canContinue =
-        medDetails.trim().length > 0 &&
-        lastDose != null &&
-        prescriber !== "" &&
-        (prescriber !== "other" || prescriberOther.trim().length > 0);
+    const setFieldError = (field, msg) =>
+        setErrors((prev) => ({ ...prev, [field]: msg }));
+    const clearFieldError = (field) =>
+        setErrors((prev) => {
+            if (!prev[field]) return prev;
+            const next = { ...prev };
+            delete next[field];
+            return next;
+        });
 
     const handleNext = () => {
-        if (!canContinue) return;
+        const newErrors = {};
+        if (!medDetails.trim()) newErrors.medDetails = "Please enter the medication name, dose, and frequency.";
+        if (lastDose == null) newErrors.lastDose = "Please select when your last dose was.";
+        if (prescriber === "") newErrors.prescriber = "Please select a prescriber.";
+        if (prescriber === "other" && !prescriberOther.trim()) newErrors.prescriberOther = "Please describe who prescribed your medication.";
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
+        setErrors({});
         const next = {
             ...userData,
             priorMedNameDoseFrequency: medDetails.trim(),
@@ -106,11 +120,14 @@ const Glp1PriorWeightLossMedicationDetailsStep = ({
                     </span>
                     <textarea
                         value={medDetails}
-                        onChange={(e) => setMedDetails(e.target.value)}
+                        onChange={(e) => { setMedDetails(e.target.value); clearFieldError("medDetails"); }}
                         placeholder={copy.placeholder}
                         rows={4}
-                        className="mt-3 w-full resize-y rounded-xl border border-[#E2E2E1] bg-white px-4 py-3 text-[15px] leading-[140%] text-[#251F20] placeholder:text-[#9CA3AF] focus:border-[#A7885A] focus:outline-none focus:ring-1 focus:ring-[#A7885A]"
+                        className={`mt-3 w-full resize-y rounded-xl border bg-white px-4 py-3 text-[15px] leading-[140%] text-[#251F20] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-1 ${errors.medDetails ? "border-red-500 focus:border-red-500 focus:ring-red-500" : "border-[#E2E2E1] focus:border-[#A7885A] focus:ring-[#A7885A]"}`}
                     />
+                    {errors.medDetails && (
+                        <p className="text-red-500 text-[13px] mt-1">{errors.medDetails}</p>
+                    )}
                 </label>
 
                 <p className="subheaders-font mt-8 text-2xl font-normal leading-[140%] text-[#251F20]">
@@ -123,7 +140,7 @@ const Glp1PriorWeightLossMedicationDetailsStep = ({
                             <button
                                 key={opt.id}
                                 type="button"
-                                onClick={() => setLastDose(opt.id)}
+                                onClick={() => { setLastDose(opt.id); clearFieldError("lastDose"); }}
                                 className={`flex min-h-[52px] w-full items-center gap-3 rounded-xl border bg-white px-4 py-3 text-left ${
                                     isSel
                                         ? "border-2"
@@ -156,6 +173,9 @@ const Glp1PriorWeightLossMedicationDetailsStep = ({
                         );
                     })}
                 </div>
+                {errors.lastDose && (
+                    <p className="text-red-500 text-[13px] mt-1">{errors.lastDose}</p>
+                )}
 
                 <div className="mt-8">
                     <p className="subheaders-font text-2xl font-normal leading-[140%] text-[#251F20]">
@@ -166,8 +186,8 @@ const Glp1PriorWeightLossMedicationDetailsStep = ({
                     </p>
                     <select
                         value={prescriber}
-                        onChange={(e) => setPrescriber(e.target.value)}
-                        className="mt-2 w-full rounded-xl border border-[#E2E2E1] bg-white px-4 py-3 text-[15px] text-[#251F20] focus:border-[#A7885A] focus:outline-none focus:ring-1 focus:ring-[#A7885A]"
+                        onChange={(e) => { setPrescriber(e.target.value); clearFieldError("prescriber"); clearFieldError("prescriberOther"); }}
+                        className={`mt-2 w-full rounded-xl border bg-white px-4 py-3 text-[15px] text-[#251F20] focus:outline-none focus:ring-1 ${errors.prescriber ? "border-red-500 focus:border-red-500 focus:ring-red-500" : "border-[#E2E2E1] focus:border-[#A7885A] focus:ring-[#A7885A]"}`}
                     >
                         {PRESCRIBER_OPTIONS.map((o) => (
                             <option key={o.value || "empty"} value={o.value}>
@@ -175,6 +195,9 @@ const Glp1PriorWeightLossMedicationDetailsStep = ({
                             </option>
                         ))}
                     </select>
+                    {errors.prescriber && (
+                        <p className="text-red-500 text-[13px] mt-1">{errors.prescriber}</p>
+                    )}
                 </div>
 
                 {prescriber === "other" ? (
@@ -184,10 +207,13 @@ const Glp1PriorWeightLossMedicationDetailsStep = ({
                         </span>
                         <textarea
                             value={prescriberOther}
-                            onChange={(e) => setPrescriberOther(e.target.value)}
+                            onChange={(e) => { setPrescriberOther(e.target.value); clearFieldError("prescriberOther"); }}
                             rows={3}
-                            className="mt-2 w-full resize-y rounded-xl border border-[#E2E2E1] bg-white px-4 py-3 text-[15px] focus:border-[#A7885A] focus:outline-none focus:ring-1 focus:ring-[#A7885A]"
+                            className={`mt-2 w-full resize-y rounded-xl border bg-white px-4 py-3 text-[15px] focus:outline-none focus:ring-1 ${errors.prescriberOther ? "border-red-500 focus:border-red-500 focus:ring-red-500" : "border-[#E2E2E1] focus:border-[#A7885A] focus:ring-[#A7885A]"}`}
                         />
+                        {errors.prescriberOther && (
+                            <p className="text-red-500 text-[13px] mt-1">{errors.prescriberOther}</p>
+                        )}
                     </label>
                 ) : null}
             </div>
@@ -197,13 +223,8 @@ const Glp1PriorWeightLossMedicationDetailsStep = ({
                     <button
                         type="button"
                         onClick={handleNext}
-                        disabled={!canContinue}
-                        className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none py-3 text-base font-medium text-white focus:outline-none focus:ring-0 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600"
-                        style={
-                            canContinue
-                                ? { backgroundColor: ACCENT }
-                                : undefined
-                        }
+                        className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none py-3 text-base font-medium text-white focus:outline-none focus:ring-0"
+                        style={{ backgroundColor: ACCENT }}
                     >
                         <span>Next</span>
                         <FaArrowRight />

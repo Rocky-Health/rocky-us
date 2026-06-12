@@ -26,7 +26,10 @@ const NadPlusMedicalConditionsStep = ({
     return () => onQuizChromeVisibilityChange?.(false);
   }, [onQuizChromeVisibilityChange]);
 
+  const [error, setError] = useState("");
+
   const toggleOption = (id) => {
+    if (error) setError("");
     setSelected((prev) => {
       let next;
       if (id === "none") {
@@ -43,7 +46,11 @@ const NadPlusMedicalConditionsStep = ({
   };
 
   const handleNext = () => {
-    if (selected.length === 0) return;
+    if (selected.length === 0) {
+      setError("Please select an option to continue.");
+      return;
+    }
+    setError("");
     onContinue({ ...userData, [field]: selected });
   };
 
@@ -107,11 +114,13 @@ const NadPlusMedicalConditionsStep = ({
           })}
         </div>
 
+        {error && (
+          <p className="text-red-500 text-[13px] mt-4 text-center">{error}</p>
+        )}
         <button
           type="button"
-          disabled={selected.length === 0}
           onClick={handleNext}
-          className="mt-10 flex h-[52px] w-full max-w-4xl items-center justify-center gap-2 self-center rounded-full font-sans text-base font-medium text-white transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45"
+          className="mt-4 flex h-[52px] w-full max-w-4xl items-center justify-center gap-2 self-center rounded-full font-sans text-base font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2"
           style={{ backgroundColor: ACCENT }}
         >
           <span>Next</span>

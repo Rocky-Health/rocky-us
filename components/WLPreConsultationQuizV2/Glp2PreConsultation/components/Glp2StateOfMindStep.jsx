@@ -1,18 +1,9 @@
 "use client";
 
 import React from "react";
-import { FaArrowRight } from "react-icons/fa";
 
-const Glp2StateOfMindStep = ({ userData, setUserData, config, onContinue }) => {
-  const selectedValue = userData?.[config.field] || "";
+const Glp2StateOfMindStep = ({ userData, config, onSelect }) => {
   const options = config?.options || [];
-
-  const handleSelect = (value) => {
-    setUserData((prev) => ({
-      ...prev,
-      [config.field]: value,
-    }));
-  };
 
   return (
     <div className="w-full h-full flex flex-col px-4 md:px-0">
@@ -24,12 +15,12 @@ const Glp2StateOfMindStep = ({ userData, setUserData, config, onContinue }) => {
 
         <div className="space-y-3">
           {options.map((option) => {
-            const checked = selectedValue === option.id;
+            const checked = userData?.[config.field] === option.id;
             return (
               <button
                 key={option.id}
                 type="button"
-                onClick={() => handleSelect(option.id)}
+                onClick={() => onSelect(option.id, option)}
                 className={`w-full min-h-[55px] rounded-[8px] border px-4 text-left flex items-center gap-3 bg-white ${
                   checked ? "border-[#AE7E56]" : "border-[#E2E2E1]"
                 }`}
@@ -49,24 +40,6 @@ const Glp2StateOfMindStep = ({ userData, setUserData, config, onContinue }) => {
               </button>
             );
           })}
-        </div>
-      </div>
-
-      <div className="fixed bottom-0 left-0 w-full px-4 pb-4 flex items-center justify-center z-50 bg-[linear-gradient(180deg,rgba(245,244,239,0)_0%,rgba(245,244,239,0.8)_37.51%,#F5F4EF_63.04%)] backdrop-blur-sm">
-        <div className="w-[335px] md:w-[520px] max-w-xl">
-          <button
-            type="button"
-            onClick={() => onContinue?.()}
-            disabled={!selectedValue}
-            className={`w-full py-3 flex items-center justify-center gap-2 rounded-full h-[52px] font-medium border-none focus:outline-none focus:ring-0 ${
-              selectedValue
-                ? "bg-black text-white"
-                : "bg-gray-300 text-gray-700 cursor-not-allowed"
-            }`}
-          >
-            <span>Next</span>
-            <FaArrowRight />
-          </button>
         </div>
       </div>
     </div>

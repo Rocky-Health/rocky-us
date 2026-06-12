@@ -18,13 +18,20 @@ const Glp1GenderStep = ({ userData, setUserData, onContinue }) => {
         }
     }, [userData?.sex]);
 
+    const [error, setError] = useState(null);
+
     const handleCardClick = (value) => {
+        if (error) setError(null);
         setSelected(value);
         setUserData((prev) => ({ ...prev, sex: value }));
     };
 
     const handleNext = () => {
-        if (!selected) return;
+        if (!selected) {
+            setError("Please select an option to continue.");
+            return;
+        }
+        setError(null);
         setUserData((prev) => ({ ...prev, sex: selected }));
         onContinue(selected);
     };
@@ -79,11 +86,13 @@ const Glp1GenderStep = ({ userData, setUserData, onContinue }) => {
                     })}
                 </div>
 
+                {error && (
+                    <p className="text-red-500 text-[13px] mt-4 text-center">{error}</p>
+                )}
                 <button
                     type="button"
-                    disabled={!selected}
                     onClick={handleNext}
-                    className="mt-10 flex h-[52px] w-full items-center justify-center gap-2 rounded-full font-sans text-base font-medium text-white transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45"
+                    className="mt-4 flex h-[52px] w-full items-center justify-center gap-2 rounded-full font-sans text-base font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2"
                     style={{ backgroundColor: ACCENT }}
                 >
                     <span>Next</span>

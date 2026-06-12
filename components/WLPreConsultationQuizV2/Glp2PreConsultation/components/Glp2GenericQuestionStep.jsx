@@ -210,6 +210,7 @@ const Glp2GenericQuestionStep = ({
             userData={userData}
             setUserData={setUserData}
             onContinue={handleContinue}
+            onSelect={handleOptionSelect}
           />
         );
       case "paceResult":
@@ -223,6 +224,7 @@ const Glp2GenericQuestionStep = ({
             setUserData={setUserData}
             config={stepConfig}
             onContinue={handleContinue}
+            onSelect={handleOptionSelect}
           />
         );
       case "willingnessQuestion":
@@ -241,6 +243,7 @@ const Glp2GenericQuestionStep = ({
             setUserData={setUserData}
             config={stepConfig}
             onContinue={handleContinue}
+            onSelect={handleOptionSelect}
           />
         );
       case "medicationPriorityQuestion":
@@ -250,6 +253,7 @@ const Glp2GenericQuestionStep = ({
             setUserData={setUserData}
             config={stepConfig}
             onContinue={handleContinue}
+            onSelect={handleOptionSelect}
           />
         );
       case "stateOfMindQuestion":
@@ -259,6 +263,7 @@ const Glp2GenericQuestionStep = ({
             setUserData={setUserData}
             config={stepConfig}
             onContinue={handleContinue}
+            onSelect={handleOptionSelect}
           />
         );
       case "glp2Dob":

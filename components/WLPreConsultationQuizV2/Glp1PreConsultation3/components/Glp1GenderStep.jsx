@@ -1,33 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { FaArrowRight, FaFemale, FaMale } from "react-icons/fa";
+import React from "react";
+import { FaFemale, FaMale } from "react-icons/fa";
 
 const ACCENT = "#A7885A";
 
-const Glp1GenderStep = ({ userData, setUserData, onContinue }) => {
-    const [selected, setSelected] = useState(() =>
-        userData?.sex === "male" || userData?.sex === "female"
-            ? userData.sex
-            : null,
-    );
-
-    useEffect(() => {
-        if (userData?.sex === "male" || userData?.sex === "female") {
-            setSelected(userData.sex);
-        }
-    }, [userData?.sex]);
-
-    const handleCardClick = (value) => {
-        setSelected(value);
-        setUserData((prev) => ({ ...prev, sex: value }));
-    };
-
-    const handleNext = () => {
-        if (!selected) return;
-        setUserData((prev) => ({ ...prev, sex: selected }));
-        onContinue(selected);
-    };
+const Glp1GenderStep = ({ userData, onSelect }) => {
+    const selected = userData?.sex ?? null;
 
     const options = [
         {
@@ -63,7 +42,7 @@ const Glp1GenderStep = ({ userData, setUserData, onContinue }) => {
                             <button
                                 key={value}
                                 type="button"
-                                onClick={() => handleCardClick(value)}
+                                onClick={() => onSelect(value, { id: value })}
                                 className={`flex flex-col items-center rounded-2xl border-2 bg-white px-4 py-6 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 md:px-6 md:py-6 ${
                                     isSel
                                         ? "border-[#A7885A]"
@@ -78,17 +57,6 @@ const Glp1GenderStep = ({ userData, setUserData, onContinue }) => {
                         );
                     })}
                 </div>
-
-                <button
-                    type="button"
-                    disabled={!selected}
-                    onClick={handleNext}
-                    className="mt-10 flex h-[52px] w-full items-center justify-center gap-2 rounded-full font-sans text-base font-medium text-white transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45"
-                    style={{ backgroundColor: ACCENT }}
-                >
-                    <span>Next</span>
-                    <FaArrowRight className="text-sm" />
-                </button>
             </div>
         </div>
     );

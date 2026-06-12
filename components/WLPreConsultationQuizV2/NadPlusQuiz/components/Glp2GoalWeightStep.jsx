@@ -9,9 +9,14 @@ const BTN_BLUE = "#A7885A";
 const Glp2GoalWeightStep = ({ userData, setUserData, onContinue }) => {
     const bmi = userData?.bmi ? parseFloat(userData.bmi).toFixed(0) : null;
     const [goalWeight, setGoalWeight] = useState(userData?.goalWeight || "");
+    const [error, setError] = useState("");
 
     const handleNext = () => {
-        if (!goalWeight.trim()) return;
+        if (!goalWeight.trim()) {
+            setError("Please enter your goal weight.");
+            return;
+        }
+        setError("");
         setUserData((prev) => ({ ...prev, goalWeight: goalWeight.trim() }));
         onContinue?.();
     };
@@ -50,25 +55,27 @@ const Glp2GoalWeightStep = ({ userData, setUserData, onContinue }) => {
                     enterKeyHint="done"
                     placeholder=""
                     value={goalWeight}
-                    onChange={(e) => setGoalWeight(e.target.value)}
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter" && goalWeight.trim())
-                            handleNext();
+                    onChange={(e) => {
+                        setGoalWeight(e.target.value);
+                        if (error) setError("");
                     }}
-                    className="mb-8 h-[52px] w-full rounded-md border border-[#E2E2E1] bg-white px-4 text-[16px] text-[#251F20] placeholder-[#ADADAD] focus:border-[#A7885A] focus:outline-none"
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") handleNext();
+                    }}
+                    className={`h-[52px] w-full rounded-md border bg-white px-4 text-[16px] text-[#251F20] placeholder-[#ADADAD] focus:outline-none ${
+                        error
+                            ? "border-red-500 focus:border-red-500 mb-2"
+                            : "border-[#E2E2E1] focus:border-[#A7885A] mb-8"
+                    }`}
                 />
+                {error && <p className="text-red-500 text-[13px] mb-8">{error}</p>}
 
                 <div className="w-full max-w-4xl">
                     <button
                         type="button"
-                        disabled={!goalWeight.trim()}
                         onClick={handleNext}
-                        style={{
-                            backgroundColor: goalWeight.trim()
-                                ? BTN_BLUE
-                                : undefined,
-                        }}
-                        className={`flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none py-3 font-medium text-white headers-font focus:outline-none focus:ring-0 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600`}
+                        style={{ backgroundColor: BTN_BLUE }}
+                        className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none py-3 font-medium text-white headers-font focus:outline-none focus:ring-0"
                     >
                         <span>Next</span>
                         <span aria-hidden className="text-lg leading-none">

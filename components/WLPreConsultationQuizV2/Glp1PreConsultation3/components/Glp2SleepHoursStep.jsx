@@ -2,21 +2,13 @@
 
 import React from "react";
 import CustomImage from "@/components/utils/CustomImage";
-import { FaArrowRight } from "react-icons/fa";
 
 const ACCENT = "#A7885A";
 
-const Glp2SleepHoursStep = ({ userData, setUserData, config, onContinue }) => {
+const Glp2SleepHoursStep = ({ userData, config, onSelect }) => {
     const field = config?.field || "sleepHours";
     const selectedValue = userData?.[field] || "";
     const options = config?.options || [];
-
-    const handleSelect = (id) => {
-        setUserData((prev) => ({
-            ...prev,
-            [field]: id,
-        }));
-    };
 
     return (
         <div className="flex w-full flex-col px-4 pb-10 md:px-0">
@@ -45,7 +37,7 @@ const Glp2SleepHoursStep = ({ userData, setUserData, config, onContinue }) => {
                             <button
                                 key={option.id}
                                 type="button"
-                                onClick={() => handleSelect(option.id)}
+                                onClick={() => onSelect(option.id, option)}
                                 className={`flex min-h-[60px] w-full items-center gap-3 rounded-xl border bg-white px-3 py-3 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 md:min-h-[64px] md:px-4 ${
                                     checked
                                         ? "border-2"
@@ -81,17 +73,6 @@ const Glp2SleepHoursStep = ({ userData, setUserData, config, onContinue }) => {
                         );
                     })}
                 </div>
-
-                <button
-                    type="button"
-                    onClick={() => onContinue?.()}
-                    disabled={!selectedValue}
-                    className="mt-10 flex h-[52px] w-full items-center justify-center gap-2 rounded-full border-none font-sans text-base font-medium text-white transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7885A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45"
-                    style={{ backgroundColor: ACCENT }}
-                >
-                    <span>Next</span>
-                    <FaArrowRight className="text-sm" />
-                </button>
             </div>
         </div>
     );
