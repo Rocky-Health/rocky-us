@@ -463,10 +463,14 @@ const HeroSection = ({ onOpenMenu }) => {
                         <div className="flex items-center gap-4 mb-6 md:mb-0">
                             <div className="flex ">
                                 <div className="relative md:w-[89px] w-[84px]">
+                                    {/* PSI flagged this as the mobile LCP element
+                                        (lazy-load added 1.5s delay) — eager-load it */}
                                     <CustomImage
                                         src="/home/happier.png"
+                                        alt="Happy Rocky patients"
                                         width={89}
                                         height={64}
+                                        priority
                                         className="md:w-[89px] md:h-[64px] w-[84px] h-[60]"
                                     />
                                 </div>
