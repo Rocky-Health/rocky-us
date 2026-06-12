@@ -442,14 +442,34 @@ const Page = ({
   return (
     <>
       {isCombinedPage
-        ? questions.map((configToRender, index) => (
-            <div key={configToRender?.id || index}>
-              {index > 0 && (
-                <div className="w-full h-[1px] bg-gray-300 mb-4"></div>
-              )}
-              {renderQuestionByType(configToRender)}
-            </div>
-          ))
+        ? questions.map((configToRender, index) => {
+            // only flag genuinely-answerable required questions (skip titles/intros)
+            const invalid =
+              attemptedContinue && !validateQuestion(configToRender);
+            return (
+              <div
+                key={configToRender?.id || index}
+                ref={(el) => {
+                  if (configToRender?.id) questionRefs.current[configToRender.id] = el;
+                }}
+                className={
+                  invalid
+                    ? "rounded-2xl ring-1 ring-red-300 bg-red-50/40 px-3 py-2 scroll-mt-24 transition-colors"
+                    : "scroll-mt-24"
+                }
+              >
+                {index > 0 && (
+                  <div className="w-full h-[1px] bg-gray-300 mb-4"></div>
+                )}
+                {renderQuestionByType(configToRender)}
+                {invalid && (
+                  <p className="text-red-500 text-sm mt-2">
+                    Please answer this question to continue.
+                  </p>
+                )}
+              </div>
+            );
+          })
         : renderQuestionByType(questionConfig)}
 
       {isCombinedPage && (
@@ -471,7 +491,7 @@ const Page = ({
                 <div className="w-full  md:max-w-[665px]">
                   {attemptedContinue && !allCombinedQuestionsValid && (
                     <p className="text-red-500 text-sm mb-2 text-center">
-                      Please answer all required questions before continuing.
+                      Please answer the highlighted question(s) above to continue.
                     </p>
                   )}
                   <button
@@ -480,6 +500,17 @@ const Page = ({
                       setAttemptedContinue(true);
                       if (allCombinedQuestionsValid) {
                         handleCombinedContinue();
+                      } else {
+                        // take the user straight to the first unanswered question
+                        const firstInvalid = (questions || []).find(
+                          (q) => !validateQuestion(q),
+                        );
+                        const el = firstInvalid?.id
+                          ? questionRefs.current[firstInvalid.id]
+                          : null;
+                        if (el?.scrollIntoView) {
+                          el.scrollIntoView({ behavior: "smooth", block: "center" });
+                        }
                       }
                     }}
                     className="w-full py-3 rounded-full h-[52px] font-medium border-none focus:outline-none focus:ring-0 transition-colors bg-black text-white"

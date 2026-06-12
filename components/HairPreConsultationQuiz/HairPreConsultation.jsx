@@ -34,6 +34,7 @@ const HairPreConsultationQuiz = () => {
   const [error, setError] = useState("");
   const [error137, setError137] = useState("");
   const [error138, setError138] = useState("");
+  const [error1, setError1] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showProducts, setShowProducts] = useState(false);
   const [recommendedProduct, setRecommendedProduct] = useState(null);
@@ -58,6 +59,7 @@ const HairPreConsultationQuiz = () => {
 
     if (questionId === 137 && error137) setError137("");
     if (questionId === 138 && error138) setError138("");
+    if (questionId === 1 && error1) setError1("");
 
     setAnswers({
       ...answers,
@@ -91,6 +93,7 @@ const HairPreConsultationQuiz = () => {
 
     setDateValInput(value);
     setDateInput(formattedValue);
+    if (error) setError("");
 
     if (isValidDate(formattedValue)) {
       const calculatedAge = getAge(formattedValue);
@@ -214,6 +217,19 @@ const HairPreConsultationQuiz = () => {
       return;
     }
     setError138("");
+    handleContinue();
+  };
+
+  const handleContinue1 = () => {
+    if (!answers[1]) {
+      setError1("Please select an option to continue.");
+      return;
+    }
+    if (answers[1] === "Female") {
+      setShowPopup(true);
+      return;
+    }
+    setError1("");
     handleContinue();
   };
 
@@ -723,6 +739,17 @@ const HairPreConsultationQuiz = () => {
                   className="w-full"
                 />
               </div>
+
+              {cameFromBack && (
+                <>
+                  {error1 && (
+                    <p className="text-red-500 text-[13px] mt-1 mb-2">
+                      {error1}
+                    </p>
+                  )}
+                  <ContinueButton onClick={handleContinue1} />
+                </>
+              )}
             </div>
           </div>
         )}

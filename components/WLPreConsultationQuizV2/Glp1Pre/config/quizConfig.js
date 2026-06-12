@@ -523,6 +523,8 @@ export const quizConfig = {
       id: "personalizedRecommendation",
       title: "Please select the following options that you are interested in *",
       type: "checkbox",
+      field: "personalizedRecommendation",
+      required: true,
       options: [
         {
           id: "maintain-muscle-mass",

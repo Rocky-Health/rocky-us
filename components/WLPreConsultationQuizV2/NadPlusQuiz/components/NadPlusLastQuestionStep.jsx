@@ -44,6 +44,10 @@ const NadPlusLastQuestionStep = ({
       setError("Please select an option to continue.");
       return;
     }
+    if (selected === "yes" && !details.trim()) {
+      setError("Please provide details to continue.");
+      return;
+    }
     setError("");
     const updated = { ...userData, [field]: selected };
     if (selected === "yes" && details) {
@@ -110,6 +114,7 @@ const NadPlusLastQuestionStep = ({
             <textarea
               value={details}
               onChange={(e) => {
+                if (error) setError("");
                 setDetails(e.target.value);
                 setUserData((prev) => ({
                   ...prev,
