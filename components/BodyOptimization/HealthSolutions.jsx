@@ -60,7 +60,7 @@ const HealthSolutions = ({ btnColor = null, consultationHref = "/wl-pre-consulta
                 <div className="flex items-center md:gap-2">
                   {item.icon && (
                     <div className="relative overflow-hidden w-[42px] h-[42px]">
-                      <CustomImage src={item.icon} fill priority />
+                      <CustomImage src={item.icon} fill priority sizes="42px" />
                     </div>
                   )}
                   <p>{item.title}</p>

@@ -72,7 +72,7 @@ const PageCover = ({ data, items }) => {
           data.imageHeight || "md:h-[696px]"
         } `}
       >
-        <CustomImage src={data.image} alt={data.title} fill />
+        <CustomImage src={data.image} alt={data.title} fill sizes="(max-width: 768px) 100vw, 592px" />
       </div>
       <div className=" md:hidden ">
         {data.proudPartner && <ProudPartner section />}

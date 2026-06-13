@@ -6,17 +6,27 @@ import HeroSection from "@/components/home/HeroSection";
 import Section from "@/components/utils/Section";
 
 import HowRockyWorks from "./HowRockyWorks";
-import DoctorTrustedSolutions from "./DoctorTrustedSolutions";
-import MenuContainer from "@/components/Navbar/MenuContainer";
-import NavHeader from "@/components/Navbar/NavHeader";
 
 import MoreQuestions from "./MoreQuestions";
-import RockyInTheNews from "@/components/BodyOptimization/bo3/NewRockyInTheNews";
+
+// Menu overlay only renders after the hamburger is clicked — load its chunk
+// on demand instead of shipping it in the initial bundle (TBT).
+const MenuContainer = dynamic(() =>
+  import("@/components/Navbar/MenuContainer")
+);
+const NavHeader = dynamic(() => import("@/components/Navbar/NavHeader"));
 
 // Below-fold sections — split into separate JS chunks loaded after initial paint.
 // Placeholders reserve approximate vertical space to keep CLS near zero.
 const Placeholder = ({ minHeight }) => (
   <div aria-hidden="true" style={{ minHeight }} />
+);
+const DoctorTrustedSolutions = dynamic(() => import("./DoctorTrustedSolutions"), {
+  loading: () => <Placeholder minHeight="760px" />,
+});
+const RockyInTheNews = dynamic(
+  () => import("@/components/BodyOptimization/bo3/NewRockyInTheNews"),
+  { loading: () => <Placeholder minHeight="120px" /> }
 );
 const ReviewsSection = dynamic(() => import("./ReviewsSection"), {
   loading: () => <Placeholder minHeight="640px" />,
@@ -31,7 +41,36 @@ const FaqsSection = dynamic(() => import("./FaqsSection"), {
   loading: () => <Placeholder minHeight="480px" />,
 });
 
-const HomePageClient = ({ menuItems, token, nameToShow, faqs }) => {
+// Cookie reader for the menu greeting. Was previously read via cookies() in
+// app/page.jsx, which forced the whole homepage dynamic. The cookies are not
+// httpOnly and the menu only opens after hydration, so resolving them here is
+// behavior-identical (same fallback order: displayName -> first name -> email).
+const readUserFromCookies = () => {
+  const get = (key) => {
+    const match = document.cookie.match(
+      new RegExp("(?:^|; )" + key + "=([^;]*)")
+    );
+    return match ? decodeURIComponent(match[1]) : undefined;
+  };
+  const displayName = get("displayName");
+  const userName = get("userName");
+  const userEmail = get("userEmail");
+  let nameToShow;
+  if (displayName) {
+    nameToShow = displayName;
+  } else if (userName) {
+    nameToShow = userName.split(" ")[0];
+  } else if (userEmail) {
+    nameToShow =
+      userEmail.length > 15 ? userEmail.substring(0, 12) + "..." : userEmail;
+  } else {
+    nameToShow = "Guest";
+  }
+  return { token: get("authToken"), nameToShow };
+};
+
+const HomePageClient = ({ menuItems, faqs }) => {
+  const [user, setUser] = useState({ token: undefined, nameToShow: "Guest" });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
   const [selectedTab, setSelectedTab] = useState("Treatments");
@@ -51,6 +90,10 @@ const HomePageClient = ({ menuItems, token, nameToShow, faqs }) => {
       setTimeout(() => setMenuVisible(true), 50);
     }
   };
+
+  useEffect(() => {
+    setUser(readUserFromCookies());
+  }, []);
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -115,8 +158,8 @@ const HomePageClient = ({ menuItems, token, nameToShow, faqs }) => {
                 menuScrollRef={menuScrollRef}
                 selectedTreatment={selectedTreatment}
                 handleToggle={handleToggle}
-                token={token}
-                nameToShow={nameToShow}
+                token={user.token}
+                nameToShow={user.nameToShow}
                 setSelectedTreatment={setSelectedTreatment}
               />
               <MenuContainer

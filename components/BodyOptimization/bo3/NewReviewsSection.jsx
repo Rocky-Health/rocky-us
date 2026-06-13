@@ -44,6 +44,7 @@ const ReviewsSection = () => {
             alt="TrustPilot"
             priority={true}
             unoptimized={true}
+            sizes="104px"
           />
         </div>
         {isClient && (

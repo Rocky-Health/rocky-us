@@ -81,6 +81,7 @@ const RockyInTheNews = ({ cards }) => {
                                             filter: "grayscale(100%) brightness(0.4) contrast(1)",
                                         }}
                                         fill
+                                        sizes="(min-width: 768px) 1px, calc(50vw - 20px)"
                                     />
                                 </div>
                             </div>
@@ -115,6 +116,7 @@ const RockyInTheNews = ({ cards }) => {
                                             src={card.image}
                                             // className="object-contain filter brightness-0 grayscale"
                                             fill
+                                            sizes="(max-width: 767px) 1px, 150px"
                                         />
                                     </div>
                                 </div>
