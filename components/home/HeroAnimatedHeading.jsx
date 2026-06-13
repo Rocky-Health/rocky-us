@@ -15,14 +15,45 @@ const HeroAnimatedHeading = ({
     className = "",
 }) => {
     const [currentWordIndex, setCurrentWordIndex] = useState(0);
-    const [displayedLength, setDisplayedLength] = useState(0);
-    const [phase, setPhase] = useState("typing"); // 'typing' | 'holding' | 'deleting'
+    // Render the FIRST WORD FULLY in the initial HTML and only start the
+    // type/delete loop on first user interaction. Reason: every time the
+    // animation painted a longer text than before, Chrome recorded a new
+    // (later) LCP candidate — Lighthouse measured LCP at 8.4s, the moment
+    // the longest word finished typing. With a complete first word at first
+    // paint and the loop gated on interaction, LCP locks at first paint
+    // while real visitors still get the animation the instant they move,
+    // scroll, or touch.
+    const [displayedLength, setDisplayedLength] = useState(
+        () => (words[0] ?? "").length
+    );
+    const [phase, setPhase] = useState("holding"); // 'typing' | 'holding' | 'deleting'
+    const [started, setStarted] = useState(false);
     const currentWord = words[currentWordIndex] ?? "";
     const tickTimeoutRef = useRef(null);
     const holdTimeoutRef = useRef(null);
 
     useEffect(() => {
-        if (words.length === 0) return;
+        const events = ["pointerdown", "touchstart", "keydown", "scroll", "mousemove"];
+        const start = () => {
+            setStarted(true);
+            setPhase("deleting");
+            events.forEach((ev) =>
+                window.removeEventListener(ev, start, true)
+            );
+        };
+        events.forEach((ev) =>
+            window.addEventListener(ev, start, {
+                passive: true,
+                capture: true,
+                once: true,
+            })
+        );
+        return () =>
+            events.forEach((ev) => window.removeEventListener(ev, start, true));
+    }, []);
+
+    useEffect(() => {
+        if (words.length === 0 || !started) return;
 
         const clearTickTimer = () => {
             if (tickTimeoutRef.current) {
@@ -57,7 +88,14 @@ const HeroAnimatedHeading = ({
         }
 
         return clearTickTimer;
-    }, [phase, displayedLength, currentWord, currentWord.length, words.length]);
+    }, [
+        phase,
+        displayedLength,
+        currentWord,
+        currentWord.length,
+        words.length,
+        started,
+    ]);
 
     useEffect(() => {
         return () => {

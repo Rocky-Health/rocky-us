@@ -42,8 +42,6 @@ const ReviewsSection = () => {
             fill
             src="https://myrocky.b-cdn.net/WP%20Images/Sexual%20Health/tp-profiles.webp"
             alt="TrustPilot"
-            priority={true}
-            unoptimized={true}
             sizes="104px"
           />
         </div>
