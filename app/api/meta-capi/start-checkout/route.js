@@ -121,6 +121,8 @@ export async function POST(req) {
       content_ids: content_id ? [String(content_id)] : [],
       content_type: "item",
       rky_cat: rky_cat || gateway,
+      // Allowlisted NAD marker — mirrors the browser fire so it survives PDM (TK-692).
+      ...(rky_cat === "NAD" && { customer_segmentation: "NVA" }),
     };
 
     const eventSourceUrl = event_source_url || "https://www.myrocky.com/checkout";

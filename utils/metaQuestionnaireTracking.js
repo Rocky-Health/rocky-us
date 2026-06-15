@@ -67,6 +67,9 @@ function emitMetaFunnelEvent(milestone, flowId, questionnaireId, params = {}) {
       rk_session_id: sessionId,
       event_id: eventId,
       ...(nadTag && { rky_cat: nadTag }),
+      // PDM strips rky_cat browser-side; customer_segmentation is allowlisted so
+      // it survives. 'NVA' is the obfuscated NAD marker (TK-692).
+      ...(nadTag && { customer_segmentation: "NVA" }),
       ...params,
     };
 
@@ -75,7 +78,10 @@ function emitMetaFunnelEvent(milestone, flowId, questionnaireId, params = {}) {
       const pixelId = CATEGORY_PIXEL_MAP[category] || CATEGORY_PIXEL_MAP.OTHERS;
       const fbqPayload = { ...basePayload };
       delete fbqPayload.content_name;
-      window.fbq("trackSingleCustom", pixelId, obfuscatedName, fbqPayload);
+      // 5th-arg eventID is what Meta dedups on (custom_data event_id isn't).
+      window.fbq("trackSingleCustom", pixelId, obfuscatedName, fbqPayload, {
+        eventID: eventId,
+      });
 
       // 1b. Secondary mirrors — for categories registered in
       // SECONDARY_CATEGORY_PIXEL_MAP, fire the same milestone to each
@@ -98,6 +104,7 @@ function emitMetaFunnelEvent(milestone, flowId, questionnaireId, params = {}) {
             mirror.pixelId,
             mirrorName,
             mirrorPayload,
+            { eventID: mirrorPayload.event_id },
           );
         } catch (mirrorErr) {
           logMetaTrackingError(mirrorErr, {
