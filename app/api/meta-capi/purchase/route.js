@@ -370,9 +370,7 @@ export async function POST(req) {
       content_type: 'item',
       num_items: num_items || 0,
       order_id: `${order_id}-${gateway}`,
-      rky_cat: rky_cat || gateway, // NAD+ rides LONGEVITY but keeps rky_cat:'NAD'
-      // Allowlisted NAD marker — one filter dimension across the funnel (TK-692).
-      ...(rky_cat === "NAD" && { customer_segmentation: "NVA" })
+      rky_cat: rky_cat || gateway // NAD+ rides LONGEVITY but keeps rky_cat:'NAD'
     };
 
     // Add cost breakdown if available
