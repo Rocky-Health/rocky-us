@@ -67,9 +67,6 @@ function emitMetaFunnelEvent(milestone, flowId, questionnaireId, params = {}) {
       rk_session_id: sessionId,
       event_id: eventId,
       ...(nadTag && { rky_cat: nadTag }),
-      // PDM strips rky_cat browser-side; customer_segmentation is allowlisted so
-      // it survives. 'NVA' is the obfuscated NAD marker (TK-692).
-      ...(nadTag && { customer_segmentation: "NVA" }),
       ...params,
     };
 
