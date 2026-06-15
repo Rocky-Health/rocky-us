@@ -14,7 +14,10 @@ import ClientLayoutProvider from "@/components/Layout/ClientLayoutProvider";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import GlobalQuebecPopup from "@/components/GlobalQuebecPopup";
-import ZendeskWidget from "@/components/Layout/ZendeskWidget";
+// TK-693: Zendesk disabled on US until the bot's routing/focus-trap is fixed
+// (mobile focus-trap kills the quiz + background polling on the funnel). Kept
+// in source to re-enable once the Zendesk team ships the fix — do not delete.
+// import ZendeskWidget from "@/components/Layout/ZendeskWidget";
 import GoogleOAuthProvider from "@/components/Layout/GoogleOAuthProvider";
 import MetaCookieInitializer from "@/components/Layout/MetaCookieInitializer";
 import FBPixelLoader from "@/components/FBPixelLoader";
@@ -314,7 +317,8 @@ export default function RootLayout({ children }) {
         />
         {/* Global Quebec Popup - Shows after registration redirect */}
         <GlobalQuebecPopup />
-        <ZendeskWidget />
+        {/* TK-693: disabled until Zendesk bot fixed — re-enable, don't delete */}
+        {/* <ZendeskWidget /> */}
         <Analytics />
         <SpeedInsights />
       </body>
