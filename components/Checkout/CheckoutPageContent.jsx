@@ -69,12 +69,19 @@ const stripePromise = getStripe();
 
 // Wrapper component to provide Stripe context
 const CheckoutPageWrapper = () => {
+  // Amount (in cents) advertised to Stripe Elements. This drives the total
+  // shown in the Apple Pay / Google Pay wallet sheets, so it must reflect the
+  // real cart total. It starts as a placeholder and is updated by
+  // CheckoutPageContent once the cart (and its totals) has loaded.
+  // react-stripe-js calls elements.update({ amount }) when this option changes.
+  const [stripeAmount, setStripeAmount] = useState(1000);
+
   return (
     <Elements
       stripe={stripePromise}
       options={{
         mode: "payment", // Setup mode for Payment Element
-        amount: 1000, // Default amount, will be updated
+        amount: stripeAmount, // Synced with the real cart total (cents)
         currency: "usd",
         appearance: {
           theme: "stripe",
@@ -83,12 +90,12 @@ const CheckoutPageWrapper = () => {
         paymentMethodTypes: ["card"],
       }}
     >
-      <CheckoutPageContent />
+      <CheckoutPageContent onStripeAmountChange={setStripeAmount} />
     </Elements>
   );
 };
 
-const CheckoutPageContent = () => {
+const CheckoutPageContent = ({ onStripeAmountChange }) => {
   const stripe = useStripe(); // Get the Stripe instance from context
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -159,6 +166,31 @@ const CheckoutPageContent = () => {
     clearStoredAddresses,
     fetchProfileData,
   } = useAddressManager();
+
+  // Keep the Stripe Elements amount in sync with the real cart total so the
+  // Apple Pay / Google Pay wallet sheets display the correct order total
+  // instead of the $10 ($1000 cents) placeholder set on the Elements provider.
+  useEffect(() => {
+    const totals = cartItems?.totals;
+    if (!totals || typeof onStripeAmountChange !== "function") {
+      return;
+    }
+
+    let cents = 0;
+    if (totals.total_price) {
+      // WC Store API exposes total_price already in minor units (cents).
+      cents = Math.round(parseFloat(totals.total_price));
+    } else if (totals.total) {
+      // Fallback: a formatted string like "$120.00" -> dollars -> cents.
+      cents = Math.round(
+        parseFloat(String(totals.total).replace(/[^0-9.]/g, "")) * 100
+      );
+    }
+
+    if (cents > 0) {
+      onStripeAmountChange(cents);
+    }
+  }, [cartItems?.totals, onStripeAmountChange]);
 
   useEffect(() => {
     if (
