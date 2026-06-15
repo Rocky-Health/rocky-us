@@ -1345,22 +1345,10 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
     dataToSend,
   ) => {
     try {
-      // CRITICAL: elements.submit() must be called before createPaymentMethod()
-      // This validates the card details and prepares the payment element
-      logger.log("Validating card details with elements.submit()...");
-      const { error: submitError } = await stripeElements.submit();
-
-      if (submitError) {
-        // Card validation failed
-        logger.error("Card validation failed:", submitError.message);
-        throw new Error(
-          submitError.message || "Please enter valid card details.",
-        );
-      }
-
-      logger.log(
-        "✅ Card details validated - proceeding with payment method creation",
-      );
+      // Don't call elements.submit() here. It opens the Apple Pay sheet, and
+      // Apple Pay only allows that straight off the user's tap — by this point
+      // we've already awaited the order creation, so it'd blow up with an
+      // IntegrationError. The callers run submit() inside the click instead.
 
       // Step 2: Get the payment method from PaymentElement
       logger.log("Getting payment method from PaymentElement...");
@@ -3027,6 +3015,23 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
           if (retryPaymentData && stripe && stripeElements) {
             try {
               logger.log("🔄 Retrying payment...");
+
+              // submit() has to run here, off the actual click, so Apple Pay can
+              // open its sheet. processStripePayment doesn't do it for us.
+              const { error: submitError } = await stripeElements.submit();
+              if (submitError) {
+                logger.error(
+                  "Card validation failed on retry:",
+                  submitError.message,
+                );
+                setPaymentError(
+                  submitError.message || "Please enter valid card details.",
+                );
+                setIsProcessingPayment(false);
+                setSubmitting(false);
+                return;
+              }
+
               // Clear error and show processing state
               setPaymentError(null);
               setIsProcessingPayment(true);
