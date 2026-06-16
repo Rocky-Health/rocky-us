@@ -36,10 +36,11 @@ export async function POST(request) {
                     user: {
                         email: email,
                     },
-                    locale: {
-                      language: "en",
-                      country: "US",
-                    },
+                    // NOTE: Attentive rejects requests that include BOTH `locale`
+                    // and `signUpSourceId` ("Found both a locale and a sign up
+                    // source id. Requests must have exclusively one of the two.").
+                    // The sign-up source (1239403) already carries its locale
+                    // config, so we send only signUpSourceId.
                     signUpSourceId: "1239403",
                     singleOptIn: false,
                     subscriptionType: "MARKETING",
