@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import { cookies } from "next/headers";
 import CouponCapture from "@/components/utils/CouponCapture";
 import HomePageClient from "@/components/home/HomePageClient";
 import { buildMetadata } from "@/lib/seo/metadata";
@@ -32,26 +31,11 @@ async function HomeContent() {
         },
     ];
 
-    const cookieStore = await cookies();
-    const token = cookieStore.get("authToken")?.value;
-    const userName = cookieStore.get("userName")?.value;
-    const userEmail = cookieStore.get("userEmail")?.value;
-    const displayName = cookieStore.get("displayName")?.value;
-
-    // Use display name with fallbacks in this order: displayName -> firstName -> userEmail
-    let nameToShow;
-    if (displayName) {
-        nameToShow = displayName;
-    } else if (userName) {
-        nameToShow = userName.split(" ")[0];
-    } else if (userEmail) {
-        nameToShow =
-            userEmail.length > 15
-                ? userEmail.substring(0, 12) + "..."
-                : userEmail;
-    } else {
-        nameToShow = "Guest";
-    }
+    // NOTE: the menu greeting (authToken/displayName cookies) is resolved
+    // client-side in HomePageClient. Reading cookies() here forced the whole
+    // homepage to render dynamically per request; the cookies are not httpOnly
+    // and the menu only opens after hydration, so the client read is
+    // behavior-identical — and the page can now be served statically.
 
     const menuItems = [
         {
@@ -226,12 +210,7 @@ async function HomeContent() {
     return (
         <>
             <CouponCapture />
-            <HomePageClient
-                menuItems={menuItems}
-                token={token}
-                nameToShow={nameToShow}
-                faqs={faqs}
-            />
+            <HomePageClient menuItems={menuItems} faqs={faqs} />
         </>
     );
 }

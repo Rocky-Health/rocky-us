@@ -42,6 +42,10 @@ const nextConfig = {
   // body-level canonicals, which caused GSC to report "User-declared canonical: None"
   // on blog URLs despite the tag being present in the HTML.
   htmlLimitedBots: /.*/,
+  experimental: {
+    // Tree-shake icon imports (295 import sites across 232 files).
+    optimizePackageImports: ["react-icons"],
+  },
   images: {
     // AVIF first (~20-30% smaller than WebP), WebP fallback for older browsers.
     // Format negotiation is automatic via the Accept header — same source files,

@@ -3,7 +3,8 @@ import { CategoryPage } from "@/components/NewBlogs/CategoryPage";
 import { logger } from "@/utils/devLogger";
 import { buildMetadata, stripHtml } from "@/lib/seo/metadata";
 
-export const dynamic = "force-dynamic";
+// ISR: cached HTML per category, regenerated at most every 5 min (was force-dynamic).
+export const revalidate = 300;
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;

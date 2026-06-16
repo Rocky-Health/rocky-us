@@ -42,8 +42,7 @@ const ReviewsSection = () => {
             fill
             src="https://myrocky.b-cdn.net/WP%20Images/Sexual%20Health/tp-profiles.webp"
             alt="TrustPilot"
-            priority={true}
-            unoptimized={true}
+            sizes="104px"
           />
         </div>
         {isClient && (
@@ -60,30 +59,34 @@ const ReviewsSection = () => {
         )}
       </div>
 
-      {isClient && (
-        <div
-          className="trustpilot-widget"
-          data-locale="en-US"
-          data-template-id="54ad5defc6454f065c28af8b"
-          data-businessunit-id="637cea41a90e1b4641b56036"
-          data-style-height="240px"
-          data-style-width="100%"
-          data-theme="light"
-          data-stars="4,5"
-          data-review-languages="en"
-          aria-label="Customer reviews from TrustPilot"
-          style={{ minHeight: "240px" }}
-        >
-          <a
-            href="https://www.trustpilot.com/review/myrocky.ca"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 hover:underline"
+      {/* Reserve the 240px height unconditionally so the async Trustpilot
+          iframe doesn't push content below it on mount (desktop CLS). */}
+      <div style={{ minHeight: "240px" }}>
+        {isClient && (
+          <div
+            className="trustpilot-widget"
+            data-locale="en-US"
+            data-template-id="54ad5defc6454f065c28af8b"
+            data-businessunit-id="637cea41a90e1b4641b56036"
+            data-style-height="240px"
+            data-style-width="100%"
+            data-theme="light"
+            data-stars="4,5"
+            data-review-languages="en"
+            aria-label="Customer reviews from TrustPilot"
+            style={{ minHeight: "240px" }}
           >
-            Trustpilot
-          </a>
-        </div>
-      )}
+            <a
+              href="https://www.trustpilot.com/review/myrocky.ca"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              Trustpilot
+            </a>
+          </div>
+        )}
+      </div>
     </section>
   );
 };

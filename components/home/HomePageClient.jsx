@@ -31,7 +31,29 @@ const FaqsSection = dynamic(() => import("./FaqsSection"), {
   loading: () => <Placeholder minHeight="480px" />,
 });
 
-const HomePageClient = ({ menuItems, token, nameToShow, faqs }) => {
+// Resolve the menu greeting from cookies on the client. Was read via cookies()
+// in app/page.jsx, which forced the homepage dynamic. Cookies are not httpOnly
+// and the menu only opens after hydration → behavior-identical, page now static.
+const readUserFromCookies = () => {
+  const get = (key) => {
+    const m = document.cookie.match(new RegExp("(?:^|; )" + key + "=([^;]*)"));
+    return m ? decodeURIComponent(m[1]) : undefined;
+  };
+  const displayName = get("displayName");
+  const userName = get("userName");
+  const userEmail = get("userEmail");
+  let nameToShow;
+  if (displayName) nameToShow = displayName;
+  else if (userName) nameToShow = userName.split(" ")[0];
+  else if (userEmail)
+    nameToShow =
+      userEmail.length > 15 ? userEmail.substring(0, 12) + "..." : userEmail;
+  else nameToShow = "Guest";
+  return { token: get("authToken"), nameToShow };
+};
+
+const HomePageClient = ({ menuItems, faqs }) => {
+  const [user, setUser] = useState({ token: undefined, nameToShow: "Guest" });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
   const [selectedTab, setSelectedTab] = useState("Treatments");
@@ -51,6 +73,10 @@ const HomePageClient = ({ menuItems, token, nameToShow, faqs }) => {
       setTimeout(() => setMenuVisible(true), 50);
     }
   };
+
+  useEffect(() => {
+    setUser(readUserFromCookies());
+  }, []);
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -115,8 +141,8 @@ const HomePageClient = ({ menuItems, token, nameToShow, faqs }) => {
                 menuScrollRef={menuScrollRef}
                 selectedTreatment={selectedTreatment}
                 handleToggle={handleToggle}
-                token={token}
-                nameToShow={nameToShow}
+                token={user.token}
+                nameToShow={user.nameToShow}
                 setSelectedTreatment={setSelectedTreatment}
               />
               <MenuContainer
