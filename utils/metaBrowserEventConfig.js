@@ -142,6 +142,13 @@ const QUESTIONNAIRE_ID_MAP = {
 const NAD_SOURCE_FLOW_IDS = new Set(["nad"]);
 const NAD_SOURCE_QUESTIONNAIRE_IDS = new Set(["nad-quiz", "nad-plus-quiz"]);
 
+// PDM-surviving NAD marker (TK-697). Meta Protected Data Mode strips custom
+// params (rky_cat) from browser fbq events, but content_ids is on the served
+// allowlist and survives. We carry the real NAD product id here: it's already
+// opaque to Meta, unique to NAD, and natively filterable in Events Manager, so
+// the whole NAD funnel filters on content_ids without any health-readable value.
+export const NAD_MARKER_CONTENT_ID = "490774";
+
 export function isNadSource(flowId, questionnaireId) {
   return (
     (!!flowId && NAD_SOURCE_FLOW_IDS.has(flowId)) ||

@@ -15,6 +15,7 @@ import {
   resolveCategory,
   buildSecondaryEventName,
   isNadSource,
+  NAD_MARKER_CONTENT_ID,
   CATEGORY_PIXEL_MAP,
   SECONDARY_CATEGORY_PIXEL_MAP,
   DATALAYER_EVENT_NAMES,
@@ -58,7 +59,9 @@ function emitMetaFunnelEvent(milestone, flowId, questionnaireId, params = {}) {
     const genericEventName = GENERIC_EVENT_NAMES[milestone];
     const category = resolveCategory(flowId, questionnaireId);
 
-    // NAD+ rides the LONGEVITY pixel but stays filterable via rky_cat:'NAD'.
+    // NAD+ rides the LONGEVITY pixel. rky_cat:'NAD' keeps it filterable server-side
+    // but PDM strips it from browser fbq events, so we also carry content_ids (an
+    // allowlisted param that survives PDM) as the browser-side NAD marker (TK-697).
     const nadTag = isNadSource(flowId, questionnaireId) ? "NAD" : null;
 
     const basePayload = {
@@ -66,7 +69,7 @@ function emitMetaFunnelEvent(milestone, flowId, questionnaireId, params = {}) {
       questionnaire_id: questionnaireId || null,
       rk_session_id: sessionId,
       event_id: eventId,
-      ...(nadTag && { rky_cat: nadTag }),
+      ...(nadTag && { rky_cat: nadTag, content_ids: [NAD_MARKER_CONTENT_ID] }),
       ...params,
     };
 
@@ -283,7 +286,9 @@ export function trackMetaStartCheckout({
           event_id: result.eventId,
           value,
           currency: currency || "USD",
-          content_id,
+          // For NAD, send the marker id so the server SC content_ids matches the
+          // browser fire and the deduped event filters cleanly (TK-697).
+          content_id: result.rky_cat === "NAD" ? NAD_MARKER_CONTENT_ID : content_id,
           ...(result.rky_cat && { rky_cat: result.rky_cat }),
           event_source_url: window.location.href,
         }),
