@@ -234,6 +234,7 @@ const HeroSection = ({ onOpenMenu }) => {
                                             width={service.width}
                                             height={service.height}
                                             priority={index < 3}
+                                            sizes="(max-width: 768px) 90vw, 420px"
                                             className={`object-cover absolute bottom-0 right-0`}
                                         />
 
@@ -300,6 +301,7 @@ const HeroSection = ({ onOpenMenu }) => {
                                         width={services[0].width}
                                         height={services[0].height}
                                         priority
+                                        sizes="(max-width: 768px) 90vw, 420px"
                                         className={`object-cover absolute bottom-0 right-0 w-[${services[0].mobile_width}px]`}
                                     />
 
@@ -363,6 +365,7 @@ const HeroSection = ({ onOpenMenu }) => {
                                                     alt={service.title}
                                                     width={service.width}
                                                     height={service.height}
+                                                    sizes="(max-width: 768px) 90vw, 420px"
                                                     className={`object-cover absolute bottom-0 right-0 w-[${service.mobile_width}px]`}
                                                 />
 

@@ -20,7 +20,7 @@ const ResultCard = ({
       <div className="flex justify-center gap-1 mb-5 md:mb-8">
         <div className="flex flex-col items-center">
           <div className="relative w-[128px] md:w-[164px] h-[187.32px] md:h-[240px] rounded-[16px] overflow-hidden bg-[#0000001F]">
-            <CustomImage src={beforeImage} alt="before" fill />
+            <CustomImage src={beforeImage} alt="before" fill sizes="(max-width: 767px) 128px, 164px" />
           </div>
           <div className="text-[14px] text-[#000000] leadding-[140%] font-[400] mt-1 dm:mt-2">
             Before
@@ -28,7 +28,7 @@ const ResultCard = ({
         </div>
         <div className="flex flex-col items-center">
           <div className="relative w-[128px] md:w-[164px] h-[187.32px] md:h-[240px] rounded-[16px] overflow-hidden bg-[#0000001F]">
-            <CustomImage src={afterImage} alt="after" fill />
+            <CustomImage src={afterImage} alt="after" fill sizes="(max-width: 767px) 128px, 164px" />
           </div>
           <div className="text-[14px] text-[#000000] leadding-[140%] font-[400] mt-1 dm:mt-2">
             After

@@ -34,7 +34,7 @@ const AfterAndBeforCard = ({
             BEFORE
           </div>
           <div className="relative overflow-hidden  w-[170px] h-[170px]">
-            <CustomImage src={beforeImage} alt="before" fill />
+            <CustomImage src={beforeImage} alt="before" fill sizes="170px" />
           </div>
           {/* <Image
             loading="lazy"
@@ -51,7 +51,7 @@ const AfterAndBeforCard = ({
           </div>
 
           <div className="relative overflow-hidden  w-[170px] h-[170px]">
-            <CustomImage src={afterImage} alt="after" fill />
+            <CustomImage src={afterImage} alt="after" fill sizes="170px" />
           </div>
           {/* <Image
             loading="lazy"

@@ -11,6 +11,7 @@ const NewProductCard = ({ product, btnColor = null, consultationHref = "/wl-pre-
           alt={product.name}
           fill
           className="!object-contain !object-center"
+          sizes="288px"
         />
       </div>
 

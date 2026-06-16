@@ -55,6 +55,7 @@ const RockyInTheNews = ({ cards }) => {
                                     src={card.image}
                                     // className="object-contain filter brightness-0 grayscale"
                                     fill
+                                    sizes="150px"
                                 />
                             </div>
                         </div>

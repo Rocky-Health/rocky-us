@@ -178,6 +178,7 @@ const TeamSection = () => {
                                                 fill
                                                 src={card.image}
                                                 alt={card.name}
+                                                sizes="(max-width: 767px) 280px, 384px"
                                             />
 
                                             <div className="absolute   bottom-[-1px] w-full  px-[20px] py-[20px] md:px-[24px] md:py-[34px]">

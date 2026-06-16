@@ -178,7 +178,7 @@ const HairProductCard = ({
 
       <div className="relative mx-auto mb-[16px]">
         <div className="relative overflow-hidden mx-auto rounded-[16px] h-[140px] w-[200px]">
-          <CustomImage src={image} alt={title} fill />
+          <CustomImage src={image} alt={title} fill sizes="200px" />
         </div>
 
         {badge && (
