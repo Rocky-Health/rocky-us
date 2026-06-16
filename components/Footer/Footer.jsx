@@ -61,7 +61,7 @@ const Footer = ({ className }) => {
                 e.target.reset();
             } else {
                 // Customize message for specific Attentive error
-                const errorText = data.error.includes("No valid creative found")
+                const errorText = data.error?.includes("No valid creative found")
                     ? "Subscription is currently unavailable. Please try again later."
                     : data.error || "Subscription failed. Please try again.";
                 setOverlayMessage({ type: "error", text: errorText });
