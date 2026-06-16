@@ -86,6 +86,7 @@ const NewWlCover = ({
           alt="Hero1Desk"
           fill
           className="desktop-image-hero object-cover  "
+          sizes="(max-width: 767px) 16px, 100vw"
         />
       </div>
       <div className="md:hidden block absolute bottom-0 left-0 h-[348px]  w-full ">
@@ -94,6 +95,7 @@ const NewWlCover = ({
           alt="HeroV1Mob"
           fill
           className="mobile-image-hero object-cover   "
+          sizes="(min-width: 768px) 16px, 100vw"
         />
       </div>
     </section>

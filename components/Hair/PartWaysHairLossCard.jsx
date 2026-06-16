@@ -12,6 +12,7 @@ const PartWaysHairLossCard = ({ image, title, description, letter }) => {
           src={image}
           alt="title"
           className="!object-contain"
+          sizes="280px"
         />
       </div>
       <div className="text-left">

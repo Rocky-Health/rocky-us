@@ -3,7 +3,8 @@ import { AllBlogsPage } from "@/components/NewBlogs/AllBlogsPage";
 import { logger } from "@/utils/devLogger";
 import { buildMetadata } from "@/lib/seo/metadata";
 
-export const dynamic = "force-dynamic";
+// ISR: cached HTML, regenerated at most every 5 min (was force-dynamic).
+export const revalidate = 300;
 
 export const metadata = buildMetadata({
   title: "All Articles",

@@ -5,7 +5,9 @@ import { MainBlogsPage } from "@/components/NewBlogs";
 import BlogPageSkeleton from "@/components/NewBlogs/components/BlogPageSkeleton";
 import { buildMetadata } from "@/lib/seo/metadata";
 
-export const dynamic = "force-dynamic";
+// ISR: cached HTML, regenerated at most every 5 min (was force-dynamic).
+// Behavior-identical except new posts appear within ≤5 min.
+export const revalidate = 300;
 
 export const metadata = buildMetadata({
   title: "MyRocky Blog — Men's Health Articles",

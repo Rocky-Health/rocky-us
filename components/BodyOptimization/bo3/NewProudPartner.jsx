@@ -29,6 +29,7 @@ const ProudPartner = ({
               alt="MyRocky Logo"
               fill
               className="object-contain"
+              sizes="72px"
             />
           </div>
           <p className="leading-[100%] font-[600] text-[8px] mt-0.5">
@@ -45,6 +46,7 @@ const ProudPartner = ({
               alt="NBA"
               fill
               className="object-contain"
+              sizes="16px"
             />
           </div>
           <div className={`relative overflow-hidden ${blueJaysLogoSize}`}>
@@ -53,6 +55,7 @@ const ProudPartner = ({
               alt="Toronto Blue Jays"
               fill
               className="object-contain"
+              sizes="45px"
             />
           </div>
           {!hideMapleLeaf && (
@@ -62,6 +65,7 @@ const ProudPartner = ({
                 alt="Toronto Maple Leafs Logo"
                 fill
                 className="object-contain"
+                sizes="34px"
               />
             </div>
           )}

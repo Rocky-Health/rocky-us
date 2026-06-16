@@ -106,6 +106,7 @@ const EnhancesWellnessJourney = () => {
                       src={item.image}
                       fill
                       className="object-cover"
+                      sizes="280px"
                     />
                   </div>
                 )}

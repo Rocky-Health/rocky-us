@@ -29,7 +29,7 @@ const AccordionList = ({ data }) => {
       </div>
       {selectedImage && (
         <div className="relative overflow-hidden rounded-[16px] hidden md:flex w-full md:w-[552px] h-[335px] md:h-[640px] justify-center lg:justify-start">
-          <CustomContainImage src={selectedImage} fill priority />
+          <CustomContainImage src={selectedImage} fill priority sizes="552px" />
         </div>
       )}
     </div>

@@ -134,6 +134,7 @@ const HowItWorks = ({ consultationHref = "/wl-offer-pre-consultation/" }) => {
                           alt={stepItem.title}
                           fill
                           className="object-cover"
+                          sizes="(max-width: 767px) 299px, 524px"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">

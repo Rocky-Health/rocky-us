@@ -142,6 +142,7 @@ const Comprehensive = () => {
                     alt={feature.title}
                     fill
                     className={`object-cover ${index === 0 || index === 2 ? 'object-top' : 'object-center'}`}
+                    sizes="(min-width: 768px) 16px, min(80vw, 350px)"
                   />
                 </div>
 
@@ -246,6 +247,7 @@ const Comprehensive = () => {
                   alt={feature.title}
                   fill
                   className={`object-cover ${index === 0 || index === 2 ? 'object-top' : 'object-center'}`}
+                  sizes="(min-width: 768px) 16px, min(80vw, 350px)"
                 />
               </div>
               {/* Desktop Image - Only for non-first cards */}
@@ -256,6 +258,7 @@ const Comprehensive = () => {
                     alt={feature.title}
                     fill
                     className="object-cover object-top"
+                    sizes="(max-width: 767px) 16px, 584px"
                   />
                 </div>
               )}
@@ -323,6 +326,7 @@ const Comprehensive = () => {
                     alt={feature.title}
                     fill
                     className="object-cover object-top"
+                    sizes="(min-width: 768px) 16px, min(80vw, 350px)"
                   />
                 </div>
                 {/* Desktop Image */}
@@ -332,6 +336,7 @@ const Comprehensive = () => {
                     alt={feature.title}
                     fill
                     className="object-cover object-top"
+                    sizes="(max-width: 767px) 16px, 584px"
                   />
                 </div>
               </div>
