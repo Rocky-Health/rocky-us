@@ -383,7 +383,10 @@ export async function DELETE(req) {
           total_items: currentCart.total_items || 0,
           total_price: currentCart.total_price || "0.00",
         },
-        { status: 500 }
+        // Business-rule rejection (not a server failure): use 409 Conflict so the
+        // client shows the message instead of treating it as a transient 500 and
+        // retrying in a loop.
+        { status: 409 }
       );
     }
 
@@ -401,8 +404,15 @@ export async function DELETE(req) {
       ...new Set([...itemKeysToRemove, ...varietyPackItemsToRemove]),
     ];
 
-    // Remove all items
+    // Remove all items. Carry the nonce forward from each WooCommerce response:
+    // cookieStore.set() only stages the cookie on the OUTGOING response, so a
+    // second cookieStore.get() within this same request would still return the
+    // already-spent nonce and the next removal would fail. Tracking it locally
+    // keeps every cascaded removal (e.g. WL product + Body Optimization Program)
+    // using a valid nonce.
     let finalCartData = currentCart;
+    let currentNonce = cookieStore.get("cart-nonce")?.value;
+    const failedKeys = [];
 
     for (const keyToRemove of allItemsToRemove) {
       try {
@@ -412,7 +422,7 @@ export async function DELETE(req) {
           {
             headers: {
               Authorization: `${encodedCredentials.value}`,
-              nonce: cookieStore.get("cart-nonce")?.value,
+              nonce: currentNonce,
             },
           }
         );
@@ -420,8 +430,9 @@ export async function DELETE(req) {
         // Update the cart data after each removal
         finalCartData = response.data;
 
-        // Update nonce if provided
+        // Carry the refreshed nonce into the next removal in this request
         if (response.headers && response.headers.nonce) {
+          currentNonce = response.headers.nonce;
           cookieStore.set("cart-nonce", response.headers.nonce);
         }
 
@@ -431,7 +442,7 @@ export async function DELETE(req) {
           `Error removing item ${keyToRemove} from cart:`,
           error.response?.data || error.message
         );
-        // Continue with other items even if one fails
+        failedKeys.push(keyToRemove);
       }
     }
 
@@ -439,6 +450,21 @@ export async function DELETE(req) {
     if (!finalCartData.items || !Array.isArray(finalCartData.items)) {
       logger.warn("Server returned invalid cart structure, fixing...");
       finalCartData.items = finalCartData.items || [];
+    }
+
+    // If any removal actually failed, do NOT report success. Returning the live
+    // cart (rather than a fake 200) prevents the client/server desync that would
+    // otherwise leave an item the user thinks is gone but the server still holds.
+    if (failedKeys.length > 0) {
+      return NextResponse.json(
+        {
+          error: "Some items couldn't be removed. Please try again.",
+          items: finalCartData.items || [],
+          total_items: finalCartData.total_items || 0,
+          total_price: finalCartData.total_price || "0.00",
+        },
+        { status: 502 }
+      );
     }
 
     return NextResponse.json(finalCartData);
