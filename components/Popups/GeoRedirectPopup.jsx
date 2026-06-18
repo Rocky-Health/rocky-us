@@ -5,6 +5,15 @@ import { useState, useEffect, useCallback } from "react";
 const SESSION_KEY = "geo-redirect-dismissed";
 const CA_SITE_URL = "https://www.myrocky.ca";
 
+function pushDataLayer(event, action) {
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    event,
+    geo_redirect_action: action,
+    geo_redirect_destination: CA_SITE_URL,
+  });
+}
+
 function getCookie(name) {
   const match = document.cookie.match(
     new RegExp("(^| )" + name + "=([^;]+)"),
@@ -24,18 +33,21 @@ export default function GeoRedirectPopup() {
       const timer = setTimeout(() => {
         setIsOpen(true);
         requestAnimationFrame(() => setIsVisible(true));
+        pushDataLayer("geo_redirect_popup", "shown");
       }, 600);
       return () => clearTimeout(timer);
     }
   }, []);
 
   const dismiss = useCallback(() => {
+    pushDataLayer("geo_redirect_popup", "dismissed");
     sessionStorage.setItem(SESSION_KEY, "true");
     setIsVisible(false);
     setTimeout(() => setIsOpen(false), 200);
   }, []);
 
   const handleRedirect = useCallback(() => {
+    pushDataLayer("geo_redirect_popup", "redirected_to_ca");
     sessionStorage.setItem(SESSION_KEY, "true");
     window.location.href = CA_SITE_URL;
   }, []);
