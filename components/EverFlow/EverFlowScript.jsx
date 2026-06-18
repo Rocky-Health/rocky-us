@@ -105,7 +105,15 @@ export function fireEverFlowConversionWhenReady({
   });
 }
 
-export default function EverFlowScript({ mode, offerId, eventId, network }) {
+export default function EverFlowScript({
+  mode,
+  offerId,
+  eventId,
+  network,
+  adv1,
+  orderId,
+  amount,
+}) {
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_EF_ENABLED !== "true") return;
     if (!NETWORK_DOMAINS[network]) return;
@@ -160,8 +168,17 @@ export default function EverFlowScript({ mode, offerId, eventId, network }) {
           // ignore
         }
 
+        // Carry the WC order number so the affiliate can reconcile EverFlow
+        // conversions against real orders: sent in both the native `order_id`
+        // field and `adv1` (sub-id fallback). `amount` is optional revenue. All
+        // only attached when present, so quiz-milestone events stay identical.
         if (mode === "conversion") {
-          EF.conversion({ offer_id: offerId });
+          const conversion = { offer_id: offerId };
+          if (adv1) conversion.adv1 = adv1;
+          if (orderId) conversion.order_id = orderId;
+          if (amount) conversion.amount = amount;
+          console.info("[EverFlow] sale conversion", conversion);
+          EF.conversion(conversion);
         } else if (mode === "event") {
           EF.conversion({ offer_id: offerId, event_id: eventId });
         }
@@ -169,7 +186,7 @@ export default function EverFlowScript({ mode, offerId, eventId, network }) {
         console.warn("[EverFlow] event failed:", err);
       }
     });
-  }, [mode, offerId, eventId, network]);
+  }, [mode, offerId, eventId, network, adv1, orderId, amount]);
 
   return null;
 }

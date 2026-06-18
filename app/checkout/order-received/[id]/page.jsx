@@ -35,6 +35,8 @@ const OrderReceivedPage = async ({ params }) => {
           mode="conversion"
           offerId={efOfferId}
           network={efOffer.network}
+          adv1={orderId}
+          orderId={orderId}
         />
       )}
       {/* AWIN noscript fallback: use order_id when available so server computes values */}
