@@ -39,6 +39,12 @@ export function middleware(req) {
       return response;
     }
 
+    // Detect visitor country from Vercel edge header or ?geo query param (local testing)
+    const geoCountry =
+      req.headers.get("x-vercel-ip-country") ||
+      req.nextUrl.searchParams.get("geo") ||
+      "";
+
     // Handle redirects for old blog structure to new blog structure
     if (pathname.startsWith("/old-blog/")) {
       // Extract the slug from the old blog URL
@@ -195,11 +201,22 @@ export function middleware(req) {
     }
 
     // Return the response with the modified headers
-    return NextResponse.next({
+    const response = NextResponse.next({
       request: {
         headers: requestHeaders,
       },
     });
+
+    if (geoCountry) {
+      response.cookies.set("geo-country", geoCountry, {
+        path: "/",
+        httpOnly: false,
+        sameSite: "lax",
+        maxAge: 86400,
+      });
+    }
+
+    return response;
   } catch (error) {
     // Log the error for debugging
     logger.error("Middleware error:", error);
