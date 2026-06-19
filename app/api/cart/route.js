@@ -252,6 +252,13 @@ export async function DELETE(req) {
         "160469", // Mounjaro
         "276274", // Wegovy
         "369795", // Rybelsus
+        // Multi-month plan variation IDs (the variation ID is sent as the cart product ID)
+        "490167", // Compounded Tirzepatide 3-month
+        "490168", // Compounded Tirzepatide 6-month
+        "490169", // Compounded Tirzepatide 12-month
+        "490164", // Compounded Semaglutide 3-month
+        "490165", // Compounded Semaglutide 6-month
+        "490166", // Compounded Semaglutide 12-month
       ];
 
       const itemToRemove = cartItems.find(
@@ -292,6 +299,13 @@ export async function DELETE(req) {
         "160469", // Mounjaro
         "276274", // Wegovy
         "369795", // Rybelsus
+        // Multi-month plan variation IDs (the variation ID is sent as the cart product ID)
+        "490167", // Compounded Tirzepatide 3-month
+        "490168", // Compounded Tirzepatide 6-month
+        "490169", // Compounded Tirzepatide 12-month
+        "490164", // Compounded Semaglutide 3-month
+        "490165", // Compounded Semaglutide 6-month
+        "490166", // Compounded Semaglutide 12-month
       ];
 
       const itemToRemove = cartItems.find(
