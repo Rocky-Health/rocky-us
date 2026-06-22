@@ -5,8 +5,11 @@ import { randomBytes } from "crypto";
 import https from "https";
 import axios from "axios";
 
+const CRM_HOST_URL =
+    process.env.CRM_HOST + "/api" || "https://crm.myrocky.com/api";
+
 const crmApi = axios.create({
-    baseURL: "https://crm.myrocky.com/api",
+    baseURL: CRM_HOST_URL,
     httpsAgent: new https.Agent({
         rejectUnauthorized: false,
     }),
@@ -20,7 +23,9 @@ async function getEntrykey() {
     try {
         const cookieStore = await cookies();
         const existingCookie = cookieStore.get("skincare_entrykey");
-        return existingCookie?.value || `skin-${randomBytes(8).toString("hex")}`;
+        return (
+            existingCookie?.value || `skin-${randomBytes(8).toString("hex")}`
+        );
     } catch (error) {
         logger.warn("Cookie reading error:", error);
         return `skin-${randomBytes(8).toString("hex")}`;
@@ -53,7 +58,14 @@ async function getUserDataFromCookies() {
         return { fName, lName, email, phone, dob, province };
     } catch (error) {
         logger.warn("Error getting user data from cookies:", error);
-        return { fName: "", lName: "", email: "", phone: "", dob: "", province: "" };
+        return {
+            fName: "",
+            lName: "",
+            email: "",
+            phone: "",
+            dob: "",
+            province: "",
+        };
     }
 }
 
@@ -82,14 +94,20 @@ export async function POST(req) {
         const contentType = req.headers.get("content-type") || "";
         if (contentType.includes("multipart/form-data")) {
             return NextResponse.json(
-                { error: true, msg: "File uploads should be handled via frontend S3 upload" },
-                { status: 400 }
+                {
+                    error: true,
+                    msg: "File uploads should be handled via frontend S3 upload",
+                },
+                { status: 400 },
             );
         }
 
         const rawData = await req.json();
         if (Object.keys(rawData).length === 0) {
-            return NextResponse.json({ error: true, msg: "Blank Data" }, { status: 400 });
+            return NextResponse.json(
+                { error: true, msg: "Blank Data" },
+                { status: 400 },
+            );
         }
 
         const data = {
@@ -105,13 +123,17 @@ export async function POST(req) {
             page_step: rawData.page_step || 1,
             completion_state: rawData.completion_state || "Partial",
             completion_percentage: rawData.completion_percentage || 10,
-            source_site: rawData.source_site || process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com",
+            source_site:
+                rawData.source_site ||
+                process.env.NEXT_PUBLIC_SITE_URL ||
+                "https://www.myrocky.com",
             wp_user_id: userId,
             created_by: userId,
         };
 
         if (
-            (data.stage === "consultation-after-checkout" || data.stage === "consultation-before-checkout") &&
+            (data.stage === "consultation-after-checkout" ||
+                data.stage === "consultation-before-checkout") &&
             !data.id &&
             !data.token
         ) {
@@ -131,7 +153,11 @@ export async function POST(req) {
         ];
 
         for (const [key, value] of Object.entries(rawData)) {
-            if (!excludedKeys.includes(key) && value !== undefined && value !== null) {
+            if (
+                !excludedKeys.includes(key) &&
+                value !== undefined &&
+                value !== null
+            ) {
                 data.form[key] = value;
             }
         }
@@ -165,8 +191,12 @@ export async function POST(req) {
     } catch (error) {
         logger.error("API route error:", error);
         return NextResponse.json(
-            { error: true, msg: "Internal server error", details: error.message },
-            { status: 500 }
+            {
+                error: true,
+                msg: "Internal server error",
+                details: error.message,
+            },
+            { status: 500 },
         );
     }
 }
@@ -189,7 +219,10 @@ async function postSkincareQuestionnaireDataToCRM(data) {
         page_step: parseInt(data.page_step) || 1,
         completion_state: data.completion_state || "Partial",
         completion_percentage: parseInt(data.completion_percentage) || 10,
-        source_site: data.source_site || process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com",
+        source_site:
+            data.source_site ||
+            process.env.NEXT_PUBLIC_SITE_URL ||
+            "https://www.myrocky.com",
         wp_user_id: data.wp_user_id || (await getUserId()),
         created_by: data.created_by || (await getUserId()),
         skincare_entrykey: data.skincare_entrykey || "",
@@ -216,8 +249,11 @@ async function postSkincareQuestionnaireDataToCRM(data) {
     }
 
     try {
-        logger.log("CRM Submission Payload:", JSON.stringify(postData, null, 2));
-
+        logger.log(
+            "CRM Submission Payload:",
+            JSON.stringify(postData, null, 2),
+        );
+        logger.log("Sending to CRM API Endpoint:", CRM_HOST_URL + apiEndpoint);
         const response = await crmApi.post(apiEndpoint, postData, {
             validateStatus: function (status) {
                 return status >= 200 && status < 300;
@@ -233,11 +269,14 @@ async function postSkincareQuestionnaireDataToCRM(data) {
                 id: response.data.data?.wp_entry_id || data.id || "",
                 token: response.data.data?.token || data.token || "",
                 skincare_entrykey: data.skincare_entrykey,
-                crm_post_response_message: response.data.message || "Submission successful",
+                crm_post_response_message:
+                    response.data.message || "Submission successful",
             };
         }
 
-        throw new Error(response.data?.message || "Unknown CRM submission error");
+        throw new Error(
+            response.data?.message || "Unknown CRM submission error",
+        );
     } catch (error) {
         logger.error("CRM API fetch error:", {
             message: error.message,
@@ -255,11 +294,13 @@ function generateUniqueId() {
     const OFFSET = 182000000000;
     let id = (Date.now() + OFFSET).toString();
     if (id.length < 16) {
-        id = id + Math.floor(Math.random() * Math.pow(10, 16 - id.length)).toString().padStart(16 - id.length, "0");
+        id =
+            id +
+            Math.floor(Math.random() * Math.pow(10, 16 - id.length))
+                .toString()
+                .padStart(16 - id.length, "0");
     } else if (id.length > 16) {
         id = id.slice(0, 16);
     }
     return id;
 }
-
-

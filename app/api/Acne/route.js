@@ -5,8 +5,11 @@ import { randomBytes } from "crypto";
 import https from "https";
 import axios from "axios";
 
+const CRM_HOST_URL =
+    process.env.CRM_HOST + "/api" || "https://crm.myrocky.com/api";
+
 const crmApi = axios.create({
-    baseURL: "https://crm.myrocky.com/api",
+    baseURL: CRM_HOST_URL,
     httpsAgent: new https.Agent({
         rejectUnauthorized: false,
     }),
@@ -64,7 +67,13 @@ async function getUserDataFromCookies() {
 
         // Log what we got from cookies
         logger.log("Acne API - Cookie data retrieved:", {
-            fName, lName, email, phone, dob, province, userName
+            fName,
+            lName,
+            email,
+            phone,
+            dob,
+            province,
+            userName,
         });
 
         // Try to get gender from profile API
@@ -75,30 +84,46 @@ async function getUserDataFromCookies() {
 
             if (authToken && userId) {
                 const BASE_URL = process.env.BASE_URL;
-                const response = await fetch(`${BASE_URL}/wp-json/rockyhealth/v1/user-profile`, {
-                    headers: {
-                        Authorization: authToken,
+                const response = await fetch(
+                    `${BASE_URL}/wp-json/rockyhealth/v1/user-profile`,
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
                     },
-                });
+                );
 
                 if (response.ok) {
                     const profileData = await response.json();
-                    if (profileData.success && profileData.custom_meta?.gender) {
+                    if (
+                        profileData.success &&
+                        profileData.custom_meta?.gender
+                    ) {
                         gender = profileData.custom_meta.gender;
                     }
                 }
             }
         } catch (genderError) {
-            logger.warn("Could not fetch gender from profile:", genderError.message);
+            logger.warn(
+                "Could not fetch gender from profile:",
+                genderError.message,
+            );
         }
 
         const userData = { fName, lName, email, phone, dob, province, gender };
         logger.log("Acne API - Final user data:", userData);
         return userData;
-
     } catch (error) {
         logger.warn("Error getting user data from cookies:", error);
-        return { fName: "", lName: "", email: "", phone: "", dob: "", province: "", gender: "" };
+        return {
+            fName: "",
+            lName: "",
+            email: "",
+            phone: "",
+            dob: "",
+            province: "",
+            gender: "",
+        };
     }
 }
 
@@ -124,14 +149,20 @@ export async function POST(req) {
         const contentType = req.headers.get("content-type") || "";
         if (contentType.includes("multipart/form-data")) {
             return NextResponse.json(
-                { error: true, msg: "File uploads should be handled via frontend S3 upload" },
-                { status: 400 }
+                {
+                    error: true,
+                    msg: "File uploads should be handled via frontend S3 upload",
+                },
+                { status: 400 },
             );
         }
 
         const rawData = await req.json();
         if (Object.keys(rawData).length === 0) {
-            return NextResponse.json({ error: true, msg: "Blank Data" }, { status: 400 });
+            return NextResponse.json(
+                { error: true, msg: "Blank Data" },
+                { status: 400 },
+            );
         }
 
         const data = {
@@ -147,7 +178,10 @@ export async function POST(req) {
             page_step: rawData.page_step || 1,
             completion_state: rawData.completion_state || "Partial",
             completion_percentage: rawData.completion_percentage || 10,
-            source_site: rawData.source_site || process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com",
+            source_site:
+                rawData.source_site ||
+                process.env.NEXT_PUBLIC_SITE_URL ||
+                "https://www.myrocky.com",
             wp_user_id: userId,
             created_by: userId,
         };
@@ -174,7 +208,11 @@ export async function POST(req) {
         ];
 
         for (const [key, value] of Object.entries(rawData)) {
-            if (!excludedKeys.includes(key) && value !== undefined && value !== null) {
+            if (
+                !excludedKeys.includes(key) &&
+                value !== undefined &&
+                value !== null
+            ) {
                 data.form[key] = value;
             }
         }
@@ -208,8 +246,12 @@ export async function POST(req) {
     } catch (error) {
         logger.error("API route error:", error);
         return NextResponse.json(
-            { error: true, msg: "Internal server error", details: error.message },
-            { status: 500 }
+            {
+                error: true,
+                msg: "Internal server error",
+                details: error.message,
+            },
+            { status: 500 },
         );
     }
 }
@@ -232,7 +274,10 @@ async function postToCRM(data) {
         page_step: parseInt(data.page_step) || 1,
         completion_state: data.completion_state || "Partial",
         completion_percentage: parseInt(data.completion_percentage) || 10,
-        source_site: data.source_site || process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com",
+        source_site:
+            data.source_site ||
+            process.env.NEXT_PUBLIC_SITE_URL ||
+            "https://www.myrocky.com",
         wp_user_id: data.wp_user_id || (await getUserId()),
         created_by: data.created_by || (await getUserId()),
         acne_entrykey: data.acne_entrykey || "",
@@ -256,7 +301,11 @@ async function postToCRM(data) {
     }
 
     try {
-        logger.log("CRM Submission Payload:", JSON.stringify(postData, null, 2));
+        logger.log(
+            "CRM Submission Payload:",
+            JSON.stringify(postData, null, 2),
+        );
+        logger.log("Sending to CRM API Endpoint:", CRM_HOST_URL + apiEndpoint);
         const response = await crmApi.post(apiEndpoint, postData, {
             validateStatus: (s) => s >= 200 && s < 300,
         });
@@ -272,7 +321,9 @@ async function postToCRM(data) {
                     response.data.message || "Submission successful",
             };
         }
-        throw new Error(response.data?.message || "Unknown CRM submission error");
+        throw new Error(
+            response.data?.message || "Unknown CRM submission error",
+        );
     } catch (error) {
         logger.error("CRM API fetch error:", {
             message: error.message,
