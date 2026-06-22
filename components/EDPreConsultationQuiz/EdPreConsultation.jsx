@@ -178,6 +178,16 @@ const EDPreConsultationQuiz = () => {
     };
 
     const handleBackClick = () => {
+        // On the recommendation screen the whole view is gated by `showProducts`,
+        // so plain page changes do nothing. Exit the recommendation back to the
+        // last question (page 5 — the last step on both quiz paths).
+        if (showProducts) {
+            setShowProducts(false);
+            setIsBackNavigation(true);
+            setCurrentPage(5);
+            return;
+        }
+
         if (currentPage > 1) {
             setIsBackNavigation(true);
             if (
@@ -222,6 +232,18 @@ const EDPreConsultationQuiz = () => {
             setIsLoading(true);
             setTimeout(() => {
                 const product = getRecommendedProduct();
+
+                // Guard against a missing product or malformed config so the
+                // recommendation step degrades gracefully instead of crashing.
+                if (!product || !product.pillOptions) {
+                    logger.error(
+                        "No recommended product resolved for answers:",
+                        answers
+                    );
+                    setIsLoading(false);
+                    return;
+                }
+
                 setRecommendedProduct(product);
 
                 // Instead of just setting selectedProduct, we need to properly select it
@@ -273,24 +295,28 @@ const EDPreConsultationQuiz = () => {
 
         if (takenBefore === "No") {
             product = varietyPackProduct;
-        } else {
-            if (
-                frequency === "4 or more times a week" &&
+        } else if (frequency === "4 or more times a week") {
+            // The high-frequency path skips the long/short-lasting question and
+            // always recommends Cialis. "Daily" defaults to generic; "when
+            // needed" honors the brand/generic answer from Q5.
+            product = cialisProduct;
+            product.selectedPreference =
                 preference === "Daily"
-            ) {
-                product = cialisProduct;
-                product.selectedPreference = "generic";
-            } else {
-                if (duration === "Long-lasting") {
-                    product = cialisProduct;
-                    product.selectedPreference =
-                        brandType?.toLowerCase() || "generic";
-                } else if (duration === "Short-lasting") {
-                    product = viagraProduct;
-                    product.selectedPreference =
-                        brandType?.toLowerCase() || "generic";
-                }
-            }
+                    ? "generic"
+                    : brandType?.toLowerCase() || "generic";
+        } else if (duration === "Long-lasting") {
+            product = cialisProduct;
+            product.selectedPreference = brandType?.toLowerCase() || "generic";
+        } else if (duration === "Short-lasting") {
+            product = viagraProduct;
+            product.selectedPreference = brandType?.toLowerCase() || "generic";
+        }
+
+        // Safety net: never return null, so the recommendation step can't crash
+        // on an answer combination that no rule above happened to cover.
+        if (!product) {
+            product = cialisProduct;
+            product.selectedPreference = brandType?.toLowerCase() || "generic";
         }
 
         return product;

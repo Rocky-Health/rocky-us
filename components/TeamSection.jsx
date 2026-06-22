@@ -121,7 +121,7 @@ const TeamSection = () => {
                         {trustedTeam.map((a) => (
                             <li
                                 key={a.title}
-                                className="!flex !items-start !gap-2 md:h-[80px] mb-[24px]"
+                                className="!flex !items-start !gap-2  mb-[24px]"
                             >
                                 <span className="!w-6 !h-6 !aspect-square mt-[2px] text-[#AE7E56] flex-shrink-0">
                                     <FaCheckCircle className="!w-5 !h-5 !aspect-square" />

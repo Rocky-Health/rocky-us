@@ -8,6 +8,7 @@ import { addItemToCart } from "@/lib/cart/cartService";
 import { addRequiredConsultation } from "@/utils/requiredConsultation";
 import { analyticsService } from "@/utils/analytics/analyticsService";
 import { formatPriceUI } from "@/utils/priceFormatter";
+import { toCartCents } from "@/utils/cartItemFormat";
 import {
   checkShippingRestriction,
   getUserState,
@@ -191,7 +192,8 @@ const ProductActions = ({
         productId: product.id,
         quantity: 1,
         name: product.name || "Product",
-        price: finalPrice,
+        // Cart stores prices in cents; finalPrice is in dollars — convert.
+        price: toCartCents(finalPrice),
         // Include product image if available - with fallback options
         image: productImageUrl,
         // Include product type

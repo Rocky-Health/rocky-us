@@ -9,6 +9,29 @@ import xss from "xss";
 // whitelist for h1–h6 is an empty array, which strips those IDs and breaks
 // the TOC. Scope is intentionally narrow — only `id` on headings.
 const headingAttrs = ["id"];
+
+// Video embeds in posts use <iframe>, which the default xss whitelist strips.
+// Allow it, but only for known video providers — an unrestricted iframe is a
+// clickjacking/phishing vector even with otherwise-trusted CMS content.
+const ALLOWED_IFRAME_HOSTS = [
+  "www.youtube.com",
+  "youtube.com",
+  "www.youtube-nocookie.com",
+  "youtube-nocookie.com",
+  "player.vimeo.com",
+  "vimeo.com",
+  "www.tiktok.com",
+];
+
+const isAllowedIframeSrc = (value) => {
+  try {
+    const { hostname } = new URL(value, "https://invalid.example");
+    return ALLOWED_IFRAME_HOSTS.includes(hostname);
+  } catch {
+    return false;
+  }
+};
+
 const blogContentFilter = new xss.FilterXSS({
   whiteList: {
     ...xss.getDefaultWhiteList(),
@@ -18,6 +41,26 @@ const blogContentFilter = new xss.FilterXSS({
     h4: [...(xss.getDefaultWhiteList().h4 || []), ...headingAttrs],
     h5: [...(xss.getDefaultWhiteList().h5 || []), ...headingAttrs],
     h6: [...(xss.getDefaultWhiteList().h6 || []), ...headingAttrs],
+    iframe: [
+      "src",
+      "width",
+      "height",
+      "frameborder",
+      "allow",
+      "allowfullscreen",
+      "title",
+      "loading",
+      "referrerpolicy",
+      "style",
+    ],
+  },
+  // Drop the src of any iframe pointing somewhere other than an allowed video
+  // host; everything else falls back to xss's default attribute handling.
+  safeAttrValue(tag, name, value, cssFilter) {
+    if (tag === "iframe" && name === "src" && !isAllowedIframeSrc(value)) {
+      return "";
+    }
+    return xss.safeAttrValue(tag, name, value, cssFilter);
   },
 });
 const sanitizeBlogHtml = (dirty) =>
@@ -242,11 +285,23 @@ const HtmlContent = ({ html, className, loading = false }) => {
       .trim();
   };
 
-  const processedHtml = useMemo(() => {
-    if (!html) return "";
+  const { processedHtml, extractedStyles } = useMemo(() => {
+    if (!html) return { processedHtml: "", extractedStyles: "" };
+
+    // Pull out any inline <style> blocks the WordPress content embeds. xss
+    // escapes <style> tags and dumps the raw CSS as visible text in the post
+    // body, so we extract them here and re-render them as real <style> elements
+    // below. <script> blocks are dropped entirely (never rendered or shown).
+    let extractedStyles = "";
+    const workingHtml = String(html)
+      .replace(/<style\b[^>]*>([\s\S]*?)<\/style>/gi, (_m, css) => {
+        extractedStyles += `${css}\n`;
+        return "";
+      })
+      .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "");
 
     // Clean up Visual Composer shortcodes and other unwanted elements
-    let cleanedHtml = html
+    let cleanedHtml = workingHtml
       // Remove Visual Composer shortcodes
       .replace(/\[vc_row[^\]]*\]/gi, "")
       .replace(/\[vc_column[^\]]*\]/gi, "")
@@ -306,7 +361,7 @@ const HtmlContent = ({ html, className, loading = false }) => {
       return match;
     });
 
-    return processed;
+    return { processedHtml: processed, extractedStyles };
   }, [html]);
 
   if (loading) {
@@ -324,6 +379,9 @@ const HtmlContent = ({ html, className, loading = false }) => {
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: BLOG_CONTENT_STYLES }} />
+      {extractedStyles ? (
+        <style dangerouslySetInnerHTML={{ __html: extractedStyles }} />
+      ) : null}
       <div
         className={`blog-content ${className || ""}`}
         dangerouslySetInnerHTML={{ __html: sanitizeBlogHtml(processedHtml) }}
