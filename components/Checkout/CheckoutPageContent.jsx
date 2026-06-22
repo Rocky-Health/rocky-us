@@ -1704,6 +1704,242 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
     }
   };
 
+  // ────────────────────────────────────────────────────────────────────────
+  // Express Checkout (Apple Pay / Google Pay) — wallet buttons above the card
+  // form. Returning Link consumers don't get wallet tabs inside the Payment
+  // Element, so the Express Checkout Element gives them one. It reuses the same
+  // order + payment pipeline as the new-card path; only the trigger differs.
+  // ────────────────────────────────────────────────────────────────────────
+
+  // Same payload the new-card path builds in handleSubmit, but always a new
+  // payment (no saved card). Keep this in sync with the dataToSend object below.
+  const buildWalletCheckoutData = () => {
+    const useShippingAddress =
+      formData.shipping_address.ship_to_different_address;
+    const { awc: awinAwc, channel: awinChannel } = getAwinFromUrlOrStorage();
+
+    return {
+      firstName: formData.billing_address.first_name,
+      lastName: formData.billing_address.last_name,
+      addressOne: formData.billing_address.address_1,
+      addressTwo: formData.billing_address.address_2,
+      city: formData.billing_address.city,
+      state: formData.billing_address.state,
+      postcode: formData.billing_address.postcode,
+      country: formData.billing_address.country,
+      phone: formData.billing_address.phone,
+      email: formData.billing_address.email,
+
+      shipToAnotherAddress: useShippingAddress || false,
+      shippingFirstName: useShippingAddress
+        ? formData.shipping_address.first_name
+        : formData.billing_address.first_name,
+      shippingLastName: useShippingAddress
+        ? formData.shipping_address.last_name
+        : formData.billing_address.last_name,
+      shippingAddressOne: useShippingAddress
+        ? formData.shipping_address.address_1
+        : formData.billing_address.address_1,
+      shippingAddressTwo: useShippingAddress
+        ? formData.shipping_address.address_2
+        : formData.billing_address.address_2,
+      shippingCity: useShippingAddress
+        ? formData.shipping_address.city
+        : formData.billing_address.city,
+      shippingState: useShippingAddress
+        ? formData.shipping_address.state
+        : formData.billing_address.state,
+      shippingPostCode: useShippingAddress
+        ? formData.shipping_address.postcode
+        : formData.billing_address.postcode,
+      shippingCountry: useShippingAddress
+        ? formData.shipping_address.country
+        : formData.billing_address.country || "CA",
+      shippingPhone: useShippingAddress
+        ? formData.shipping_address.phone
+        : formData.billing_address.phone,
+
+      discreet:
+        formData.extensions["checkout-fields-for-blocks"]._meta_discreet,
+      toMailBox:
+        formData.extensions["checkout-fields-for-blocks"]._meta_mail_box,
+      customerNotes: formData.customer_note,
+
+      // Wallet payments never use a saved card or raw card fields — Stripe
+      // hands us the payment method from the wallet.
+      cardNumber: "",
+      cardType: "",
+      cardExpMonth: "",
+      cardExpYear: "",
+      cardCVD: "",
+      savedCardToken: null,
+      savedCardId: null,
+      useSavedCard: false,
+      useStripe: true,
+
+      totalAmount:
+        cartItems.totals && cartItems.totals.total_price
+          ? parseFloat(cartItems.totals.total_price) / 100
+          : cartItems.totals && cartItems.totals.total
+            ? parseFloat(cartItems.totals.total.replace(/[^0-9.]/g, ""))
+            : 0,
+
+      isEdFlow: isEdFlow,
+      awin_awc: awinAwc || "",
+      awin_channel: awinChannel || "other",
+      cartItems: cartItems?.items || [],
+      appliedCoupons: cartItems?.coupons || [],
+    };
+  };
+
+  // Runs on the wallet tap. Has to be synchronous — Apple Pay only opens its
+  // sheet straight off the user's gesture, so no awaits before we resolve.
+  // Mirrors the synchronous guards in handleSubmit (form + age + ED/WL state).
+  // Returns true to open the wallet sheet, false to cancel it.
+  const handleExpressWalletClick = () => {
+    if (!stripe || !stripeElements) {
+      toast.error("Payment is still loading. Please try again in a moment.");
+      return false;
+    }
+
+    const validationResult = validateForm({
+      billing_address: formData.billing_address,
+      shipping_address: formData.shipping_address,
+      cardNumber: "dummy", // card fields don't apply to the wallet path
+      cardExpMonth: "12",
+      cardExpYear: "30",
+      cardCVD: "123",
+      useSavedCard: false,
+    });
+
+    if (!validationResult.isValid) {
+      toast.error(
+        validationResult.formattedMessage ||
+          "Please complete your details above before using express checkout.",
+      );
+      return false;
+    }
+
+    if (ageValidationFailed) {
+      setShowAgePopup(true);
+      return false;
+    }
+
+    if (cartItems?.items) {
+      if (hasZonnicProducts(cartItems.items)) {
+        const dob = formData.billing_address.date_of_birth;
+        if (!dob) {
+          // We can't verify age without a fetch (not allowed off the gesture),
+          // so send them to the card form which runs the full async check.
+          toast.error("Please use the card form below to complete this order.");
+          return false;
+        }
+        if (checkAgeRestriction(dob, 19).blocked) {
+          setAgeValidationFailed(true);
+          setShowAgePopup(true);
+          return false;
+        }
+      }
+
+      const useShip = formData.shipping_address.ship_to_different_address;
+      const stateToCheck =
+        (useShip
+          ? formData.shipping_address.state
+          : formData.billing_address.state) || formData.billing_address.state;
+
+      const restrictedEdItem = cartItems.items.find(isRestrictedEdCartItem);
+      if (restrictedEdItem && stateToCheck && isEdStateRestricted(stateToCheck)) {
+        setRestrictedProductName(restrictedEdItem.name || "this");
+        setShowEdRestrictionPopup(true);
+        return false;
+      }
+
+      const restrictedWlItem = cartItems.items.find(isRestrictedWlCartItem);
+      if (restrictedWlItem && stateToCheck && isWlStateRestricted(stateToCheck)) {
+        setRestrictedProductName(restrictedWlItem.name || "this");
+        setShowEdRestrictionPopup(true);
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  // Runs after the customer authorizes in the wallet sheet. The gesture rule is
+  // already satisfied (the sheet opened off the tap), so we can do async work
+  // here. submit() collects the wallet's data (not the empty card field), then
+  // we hand off to the same order + payment pipeline the card flow uses.
+  const handleExpressWalletConfirm = async () => {
+    // Tracks whether we've handed off to the processing modal yet — once we
+    // have, processStripePayment owns error display, so we don't also toast.
+    let modalShown = false;
+    try {
+      setSubmitting(true);
+
+      const { error: submitError } = await stripeElements.submit();
+      if (submitError) {
+        logger.error("Express checkout submit failed:", submitError.message);
+        toast.error(
+          submitError.message || "Could not complete the wallet payment.",
+        );
+        setSubmitting(false);
+        return;
+      }
+
+      const dataToSend = buildWalletCheckoutData();
+
+      logger.log("Creating pending order (express checkout)...");
+      const orderResponse = await fetch("/api/create-pending-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dataToSend),
+      });
+      const orderResult = await orderResponse.json();
+
+      if (!orderResult.success) {
+        throw new Error(orderResult.error || "Failed to create order");
+      }
+
+      const orderId = orderResult.data.id;
+      const orderKey = orderResult.data.order_key;
+
+      let amountInCents = 0;
+      const orderTotal = orderResult.data.total;
+      if (typeof orderTotal === "string") {
+        amountInCents = Math.round(
+          parseFloat(orderTotal.replace(/[^0-9.]/g, "")) * 100,
+        );
+      } else if (typeof orderTotal === "number") {
+        amountInCents = Math.round(orderTotal * 100);
+      }
+
+      if (amountInCents <= 0) {
+        // A $0 order shouldn't reach a wallet, but guard so we never try to
+        // charge nothing.
+        throw new Error("This order can't be paid with a wallet.");
+      }
+
+      setShowPaymentProcessingPopup(true);
+      setIsProcessingPayment(true);
+      setPaymentError(null);
+      modalShown = true;
+
+      await processStripePayment(orderId, orderKey, amountInCents, dataToSend);
+    } catch (error) {
+      logger.error("❌ Express checkout payment error:", error);
+      // processStripePayment shows its own error in the modal. For failures
+      // before it runs (submit / order creation) surface a toast instead.
+      if (!modalShown) {
+        toast.error(error.message || "Wallet payment failed. Please try again.");
+      }
+      // Don't offer the card-form retry for a wallet failure — it'd validate the
+      // empty card fields. Clearing it lets the modal just close so the user can
+      // tap the wallet again.
+      setRetryPaymentData(null);
+      setSubmitting(false);
+    }
+  };
+
   const handleSubmit = async () => {
     try {
       setSubmitting(true);
@@ -2924,6 +3160,8 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
     isPaymentValid,
     paymentValidationMessage,
     onStripeReady: setStripeElements,
+    onWalletClick: handleExpressWalletClick,
+    onWalletConfirm: handleExpressWalletConfirm,
   };
 
   return (
