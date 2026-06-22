@@ -1740,6 +1740,14 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
         return;
       }
 
+      // Soft address warning: nudge the user but let the order proceed.
+      if (validationResult.formattedWarning) {
+        logger.log("Form validation warnings:", validationResult.warnings);
+        toast.warn(
+          `${validationResult.formattedWarning}. Please double-check your address.`,
+        );
+      }
+
       logger.log("Form validation passed, proceeding with checkout");
 
       // Check if age validation has previously failed and prevent order
