@@ -78,6 +78,8 @@ const CartAndPayment = ({
         heading={isGlp2 ? "Enter your card details" : "Payment Method"}
         cardLabel={isGlp2 ? "Card details" : "Card Details"}
         fullWidth={isGlp2}
+        selectedCard={selectedCard}
+        setSelectedCard={setSelectedCard}
       />
       <button
         onClick={handleSubmit}
