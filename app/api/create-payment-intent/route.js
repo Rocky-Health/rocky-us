@@ -154,6 +154,9 @@ export async function POST(req) {
       payment_method: paymentMethodId,
       capture_method: "manual", // Authorization only - payment remains uncaptured
       confirm: true, // Confirm immediately to authorize the payment
+      // Save the card on the customer so it shows up next checkout and can be
+      // charged off-session for renewals. Stripe attaches it after confirm.
+      setup_future_usage: "off_session",
       description: `Order #${orderId}`,
       receipt_email: customerEmail || undefined,
       return_url: `${
