@@ -50,41 +50,6 @@ export async function GET(req, { params }) {
       );
     }
 
-    // Test if WordPress site is accessible
-    try {
-      const testUrl = `${process.env.BASE_URL}/wp-json/wp/v2/posts?per_page=1`;
-      logger.log("API: Testing WordPress connectivity:", testUrl);
-
-      const testResponse = await axios.get(testUrl, {
-        headers: {
-          Authorization: process.env.ADMIN_TOKEN,
-        },
-        timeout: 10000, // 10 second timeout
-      });
-
-      logger.log(
-        "API: WordPress connectivity test successful, status:",
-        testResponse.status
-      );
-    } catch (testError) {
-      logger.error(
-        "API: WordPress connectivity test failed:",
-        testError.message
-      );
-      return new Response(
-        JSON.stringify({
-          error: "WordPress site not accessible",
-          message:
-            "Cannot connect to WordPress site. Please check your BASE_URL and ensure the site is accessible.",
-          details: testError.message,
-        }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-    }
-
     // Fetch the specific blog post by slug
     const apiUrl = `${process.env.BASE_URL}/wp-json/wp/v2/posts?slug=${slug}&_embed=true`;
     logger.log("API: Calling WordPress API for specific blog:", apiUrl);
@@ -118,7 +83,10 @@ export async function GET(req, { params }) {
     // Return the first (and should be only) blog post
     return new Response(JSON.stringify(blog.data[0]), {
       status: 200,
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+      },
     });
   } catch (error) {
     logger.error("API: Error fetching blog by slug:", error);
