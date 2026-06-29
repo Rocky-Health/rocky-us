@@ -1,6 +1,4 @@
-"use client";
-
-import { useState, useEffect, use } from "react";
+import axios from "axios";
 import { logger } from "@/utils/devLogger";
 
 import Section from "@/components/utils/Section";
@@ -8,308 +6,195 @@ import MoreQuestions from "@/components/MoreQuestions";
 import CategoryBtn from "@/components/Blogs/CategoryBtn";
 import CenterContainer from "@/components/Article/CenterContainer";
 import TitleWrapper from "@/components/Article/TitleWrapper";
-import Author from "@/components/Article/Author";
 import ArticleImg from "@/components/Article/ArticleImg";
-import HtmlContent from "@/components/Article/HtmlContent";
 import Content from "@/components/Article/Content";
 import RelatedArticles from "@/components/Article/RelatedArticles";
-import Loader from "@/components/Loader";
 import NotFound from "./not-found";
 
-export default function BlogSlugPage({ params }) {
-  const resolvedParams = use(params);
-  const [Blog, setBlog] = useState(null);
-  const [BlogLoading, setBlogLoading] = useState(true);
-  const [showNotFound, setShowNotFound] = useState(false);
-  const [RelatedBlogs, setRelatedBlogs] = useState([]);
-  const [RelatedBlogsLoading, setRelatedBlogsLoading] = useState(true);
-  const [FeaturedImage, setFeaturedImage] = useState(
-    "https://www.shutterstock.com/image-vector/default-ui-image-placeholder-wireframes-600nw-1037719192.jpg"
-  );
-  const [Category, setCategory] = useState("");
-  const [EstReadTime, setEstReadTime] = useState("4 min Read");
-  const [AuthorContent, setAuthorContent] = useState("");
+const DEFAULT_FEATURED_IMAGE =
+  "https://www.shutterstock.com/image-vector/default-ui-image-placeholder-wireframes-600nw-1037719192.jpg";
 
-  const fetchBlog = async () => {
-    try {
-      setBlogLoading(true);
+// Revalidate the rendered page (ISR) every hour, matching the product route.
+export const revalidate = 3600;
 
-      // Check if slug is available
-      if (!resolvedParams || !resolvedParams.slug) {
-        logger.error("No slug available:", resolvedParams);
-        throw new Error("No slug provided");
-      }
-
-      // Use the individual blog API route
-      var url = `/api/blogs/${resolvedParams.slug}`;
-      logger.log("Fetching blog from URL:", url);
-      logger.log("Slug object:", resolvedParams);
-      logger.log("Slug slug property:", resolvedParams.slug);
-
-      const res = await fetch(url);
-      logger.log("Response status:", res.status);
-      logger.log("Response ok:", res.ok);
-
-      // If the blog is not found (404), show 404 page
-      if (res.status === 404) {
-        logger.log("Blog not found, showing 404 page");
-        setShowNotFound(true);
-        return;
-      }
-
-      if (!res.ok) {
-        throw new Error(`API call failed with status ${res.status}`);
-      }
-
-      const data = await res.json();
-      logger.log("Response data:", data);
-
-      // Check if the response contains an error indicating blog not found
-      if (data.error) {
-        if (data.error === "Blog post not found" || res.status === 404) {
-          logger.log("Blog not found via error response, showing 404 page");
-          setShowNotFound(true);
-          return;
-        }
-        throw new Error(data.error);
-      }
-
-      // Individual blog API route returns a single blog object, not an array
-      const blog = data;
-      logger.log("Blog object:", blog);
-
-      if (!blog) {
-        logger.log("No blog data received, showing 404 page");
-        setShowNotFound(true);
-        return;
-      }
-
-      // Check if blog has required properties
-      if (!blog.title || !blog.content) {
-        logger.error("Blog missing required properties:", blog);
-        logger.log("Blog data incomplete, showing 404 page");
-        setShowNotFound(true);
-        return;
-      }
-
-      setBlog(blog);
-
-      // Get author data from _embedded.author
-      if (blog._embedded && blog._embedded.author && blog._embedded.author.length > 0) {
-        const author = blog._embedded.author[0];
-
-        // Structure author data with proper avatar
-        const authorData = {
-          display_name: author.name,
-          description: author.description,
-          avatar_url: author.mpp_avatar?.full || author.avatar_urls?.[96] || ""
-        };
-
-        setAuthorContent(authorData);
-      }
-
-      if (
-        blog._embedded &&
-        blog._embedded["wp:featuredmedia"] &&
-        blog._embedded["wp:featuredmedia"][0] &&
-        blog._embedded["wp:featuredmedia"][0].source_url
-      ) {
-        setFeaturedImage(blog._embedded["wp:featuredmedia"][0].source_url);
-      }
-
-      // Get the category name
-      if (blog.class_list && blog.class_list[7]) {
-        const categoryName = blog.class_list[7]
-          .replace("category-", "")
-          .replace(/-/g, " ");
-        logger.log("Category name extracted:", categoryName);
-        setCategory(categoryName);
-      } else {
-        logger.log("No class_list[7] found, trying categories array");
-        // Try to get category from categories array
-        if (blog.categories && blog.categories.length > 0) {
-          logger.log("Found categories array:", blog.categories);
-          setCategory(blog.categories[0]);
-        } else {
-          logger.log("No categories found in blog data");
-        }
-      }
-
-      if (blog.yoast_head_json?.twitter_misc?.["Est. reading time"]) {
-        setEstReadTime(
-          blog.yoast_head_json.twitter_misc["Est. reading time"] + " read"
-        );
-      }
-    } catch (error) {
-      logger.error("Error fetching blogs:", error);
-      logger.error("Error details:", error.message);
-      logger.error("Error stack:", error.stack);
-    } finally {
-      setBlogLoading(false);
+// Pre-generate the most recent blog posts at build time.
+export async function generateStaticParams() {
+  try {
+    if (!process.env.BASE_URL || !process.env.ADMIN_TOKEN) {
+      logger.error("generateStaticParams: BASE_URL or ADMIN_TOKEN missing");
+      return [];
     }
-  };
 
-  const fetchRecentArticles = async () => {
-    try {
-      setRelatedBlogsLoading(true);
-      logger.log("Fetching recent articles as fallback");
+    const apiUrl = `${process.env.BASE_URL}/wp-json/wp/v2/posts`;
+    const res = await axios.get(apiUrl, {
+      params: { per_page: 100, _fields: "slug" },
+      headers: { Authorization: process.env.ADMIN_TOKEN },
+      timeout: 10000,
+    });
 
-      var url = `/api/blogs?per_page=3`;
-      logger.log("Recent articles URL:", url);
-
-      const res = await fetch(url);
-      logger.log("Recent articles response status:", res.status);
-
-      if (!res.ok) {
-        throw new Error(
-          `Recent articles API call failed with status ${res.status}`
-        );
-      }
-
-      const data = await res.json();
-      logger.log("Recent articles data:", data);
-
-      if (Array.isArray(data)) {
-        // Filter out the current blog from recent articles
-        const filteredData = data.filter((blog) => blog.id !== Blog?.id);
-        logger.log("Filtered recent articles:", filteredData);
-
-        // Take only the first 3 recent articles
-        const finalData = filteredData.slice(0, 3);
-        logger.log("Final recent articles (limited to 3):", finalData);
-        setRelatedBlogs(finalData);
-      } else {
-        logger.error("Recent articles data is not an array:", data);
-        setRelatedBlogs([]);
-      }
-    } catch (error) {
-      logger.error("Error fetching recent articles: ", error);
-      setRelatedBlogs([]);
-    } finally {
-      setRelatedBlogsLoading(false);
+    if (!Array.isArray(res.data)) {
+      return [];
     }
-  };
 
-  const fetchRelated = async ({ category }) => {
-    try {
-      setRelatedBlogsLoading(true);
-      logger.log("Fetching related blogs for category:", category);
+    return res.data
+      .filter((post) => post && post.slug)
+      .map((post) => ({ slug: post.slug }));
+  } catch (error) {
+    logger.error("Error in generateStaticParams:", error.message);
+    return [];
+  }
+}
 
-      // Use the main blogs API route for related blogs by category
-      // Fetch more to account for filtering out the current blog
-      var url = `/api/blogs?categories=${category}&per_page=6`;
-      logger.log("Related blogs URL:", url);
-
-      const res = await fetch(url);
-      logger.log("Related blogs response status:", res.status);
-
-      if (!res.ok) {
-        throw new Error(
-          `Related blogs API call failed with status ${res.status}`
-        );
-      }
-
-      const data = await res.json();
-      logger.log("Related blogs data:", data);
-      logger.log("Related blogs data type:", typeof data);
-      logger.log(
-        "Related blogs data length:",
-        Array.isArray(data) ? data.length : "not an array"
-      );
-
-      // Ensure data is an array
-      if (Array.isArray(data)) {
-        // Filter out the current blog from related articles
-        const filteredData = data.filter((blog) => blog.id !== Blog?.id);
-        logger.log("Filtered related blogs:", filteredData);
-
-        // Take only the first 3 related articles
-        const finalData = filteredData.slice(0, 3);
-        logger.log("Final related blogs (limited to 3):", finalData);
-        setRelatedBlogs(finalData);
-      } else {
-        logger.error("Related blogs data is not an array:", data);
-        setRelatedBlogs([]);
-      }
-    } catch (error) {
-      logger.error("Error fetching related blogs: ", error);
-      setRelatedBlogs([]); // Set empty array on error
-    } finally {
-      setRelatedBlogsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchBlog();
-  }, []);
-
-  // Fetch related blogs when blog is loaded (same as original blog-old)
-  useEffect(() => {
-    if (Blog && Blog.categories && Blog.categories.length > 0) {
-      logger.log(
-        "Blog loaded, fetching related articles for category:",
-        Blog.categories[0]
-      );
-      fetchRelated({ category: Blog.categories[0] });
-    } else if (Blog && Category) {
-      logger.log(
-        "Blog loaded, fetching related articles for category:",
-        Category
-      );
-      fetchRelated({ category: Category });
-    } else if (Blog) {
-      logger.log(
-        "Blog loaded but no categories found, fetching recent articles as fallback"
-      );
-      fetchRecentArticles();
-    }
-  }, [Blog]);
-
-  const onClickCategoryBtn = (category) => { };
-
-  // Show system loader while blog is loading
-  if (BlogLoading) {
-    return <Loader />;
+// Server-side fetch of a single blog post by slug (mirrors /api/blogs/[slug]).
+async function fetchBlogBySlug(slug) {
+  if (!slug || !process.env.BASE_URL || !process.env.ADMIN_TOKEN) {
+    return null;
   }
 
-  // Show 404 page if blog not found
-  if (showNotFound) {
+  const apiUrl = `${process.env.BASE_URL}/wp-json/wp/v2/posts?slug=${slug}&_embed=true`;
+  logger.log("Blog page: fetching blog by slug server-side:", apiUrl);
+
+  const res = await axios.get(apiUrl, {
+    headers: { Authorization: process.env.ADMIN_TOKEN },
+    timeout: 10000,
+  });
+
+  if (!res.data || res.data.length === 0) {
+    return null;
+  }
+
+  return res.data[0];
+}
+
+// Server-side fetch of related/recent articles (mirrors /api/blogs).
+async function fetchRelatedBlogs({ category, currentBlogId }) {
+  if (!process.env.BASE_URL || !process.env.ADMIN_TOKEN) {
+    return [];
+  }
+
+  try {
+    const params = { _embed: true, per_page: category ? 6 : 3, page: 1 };
+    if (category) {
+      params.categories = category;
+    }
+
+    const apiUrl = `${process.env.BASE_URL}/wp-json/wp/v2/posts`;
+    const res = await axios.get(apiUrl, {
+      params,
+      headers: { Authorization: process.env.ADMIN_TOKEN },
+      timeout: 10000,
+    });
+
+    if (!Array.isArray(res.data)) {
+      return [];
+    }
+
+    return res.data
+      .filter((blog) => blog.id !== currentBlogId)
+      .slice(0, 3);
+  } catch (error) {
+    logger.error("Error fetching related blogs server-side:", error.message);
+    return [];
+  }
+}
+
+// Derive the presentational fields the page needs from the raw blog object.
+function deriveBlogFields(blog) {
+  let featuredImage = DEFAULT_FEATURED_IMAGE;
+  let category = "";
+  let estReadTime = "4 min Read";
+  let authorContent = "";
+
+  if (
+    blog._embedded &&
+    blog._embedded.author &&
+    blog._embedded.author.length > 0
+  ) {
+    const author = blog._embedded.author[0];
+    authorContent = {
+      display_name: author.name,
+      description: author.description,
+      avatar_url: author.mpp_avatar?.full || author.avatar_urls?.[96] || "",
+    };
+  }
+
+  if (
+    blog._embedded &&
+    blog._embedded["wp:featuredmedia"] &&
+    blog._embedded["wp:featuredmedia"][0] &&
+    blog._embedded["wp:featuredmedia"][0].source_url
+  ) {
+    featuredImage = blog._embedded["wp:featuredmedia"][0].source_url;
+  }
+
+  if (blog.class_list && blog.class_list[7]) {
+    category = blog.class_list[7]
+      .replace("category-", "")
+      .replace(/-/g, " ");
+  } else if (blog.categories && blog.categories.length > 0) {
+    category = blog.categories[0];
+  }
+
+  if (blog.yoast_head_json?.twitter_misc?.["Est. reading time"]) {
+    estReadTime =
+      blog.yoast_head_json.twitter_misc["Est. reading time"] + " read";
+  }
+
+  return { featuredImage, category, estReadTime, authorContent };
+}
+
+export default async function BlogSlugPage({ params }) {
+  const { slug } = await params;
+
+  let blog;
+  try {
+    blog = await fetchBlogBySlug(slug);
+  } catch (error) {
+    logger.error("Error fetching blog server-side:", error.message);
     return <NotFound />;
   }
+
+  // Show 404 page if blog not found or missing required properties.
+  if (!blog || !blog.title || !blog.content) {
+    return <NotFound />;
+  }
+
+  const { featuredImage, category, estReadTime, authorContent } =
+    deriveBlogFields(blog);
+
+  // Fetch related articles by category, falling back to recent articles.
+  const relatedCategory =
+    blog.categories && blog.categories.length > 0
+      ? blog.categories[0]
+      : category || null;
+  const relatedBlogs = await fetchRelatedBlogs({
+    category: relatedCategory,
+    currentBlogId: blog.id,
+  });
 
   return (
     <main>
       <Section>
-        <CenterContainer loading={BlogLoading}>
-          <CategoryBtn
-            category={Category}
-            loading={BlogLoading}
-            onClick={onClickCategoryBtn}
-          ></CategoryBtn>
-          <TitleWrapper title={Blog?.title?.rendered}></TitleWrapper>
-          {/* <Author
-            name={AuthorContent?.display_name}
-            readTime={EstReadTime}
-            date={Blog?.date}
-            avatarUrl={AuthorContent?.avatar_url}
-          ></Author> */}
+        <CenterContainer loading={false}>
+          <CategoryBtn category={category} loading={false}></CategoryBtn>
+          <TitleWrapper title={blog?.title?.rendered}></TitleWrapper>
         </CenterContainer>
 
         <ArticleImg
-          src={FeaturedImage}
-          loading={BlogLoading}
-          alt={Blog?.title.rendered}
+          src={featuredImage}
+          loading={false}
+          alt={blog?.title.rendered}
         ></ArticleImg>
 
         <Content
-          html={Blog?.content?.rendered}
-          loading={BlogLoading}
-          AuthorContent={AuthorContent}
+          html={blog?.content?.rendered}
+          loading={false}
+          AuthorContent={authorContent}
         ></Content>
 
         <RelatedArticles
-          RelatedBlogs={Array.isArray(RelatedBlogs) ? RelatedBlogs : []}
-          loading={RelatedBlogsLoading}
+          RelatedBlogs={Array.isArray(relatedBlogs) ? relatedBlogs : []}
+          loading={false}
         ></RelatedArticles>
 
         <MoreQuestions
