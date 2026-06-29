@@ -45,6 +45,10 @@ const nextConfig = {
   experimental: {
     // Tree-shake icon imports (295 import sites across 232 files).
     optimizePackageImports: ["react-icons"],
+    // TK-481: inline CSS into <head> instead of a render-blocking <link>,
+    // removing the ~215 KB blocking stylesheet request (~1.7s on Slow 4G)
+    // that delayed first paint.
+    inlineCss: true,
   },
   images: {
     // AVIF first (~20-30% smaller than WebP), WebP fallback for older browsers.
