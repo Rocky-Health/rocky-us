@@ -18,6 +18,23 @@ const GoogleSignInButton = ({ onSuccess, onError, disabled, isLoading }) => {
   }, [onSuccess, onError]);
 
   useEffect(() => {
+    // TK-482: lazy-load the Google Identity Services library (~258 KB) only
+    // when this button mounts (auth surfaces) instead of on every page. The
+    // global GoogleOAuthProvider that used to inject it on every cold page
+    // load has been removed. The poller below picks up window.google once the
+    // script finishes loading.
+    const GSI_SRC = "https://accounts.google.com/gsi/client";
+    if (
+      typeof document !== "undefined" &&
+      !document.querySelector(`script[src="${GSI_SRC}"]`)
+    ) {
+      const gsiScript = document.createElement("script");
+      gsiScript.src = GSI_SRC;
+      gsiScript.async = true;
+      gsiScript.defer = true;
+      document.head.appendChild(gsiScript);
+    }
+
     // Wait for Google Identity Services library to load
     const initializeGoogle = () => {
       if (

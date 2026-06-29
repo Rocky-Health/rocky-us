@@ -19,7 +19,6 @@ import GeoRedirectPopup from "@/components/Popups/GeoRedirectPopup";
 // (mobile focus-trap kills the quiz + background polling on the funnel). Kept
 // in source to re-enable once the Zendesk team ships the fix — do not delete.
 // import ZendeskWidget from "@/components/Layout/ZendeskWidget";
-import GoogleOAuthProvider from "@/components/Layout/GoogleOAuthProvider";
 import MetaCookieInitializer from "@/components/Layout/MetaCookieInitializer";
 import FBPixelLoader from "@/components/FBPixelLoader";
 import InactivityTimeoutHandler from "@/components/InactivityTimeoutHandler";
@@ -303,12 +302,14 @@ export default function RootLayout({ children }) {
           <FBPixelLoader />
         </Suspense>
         {/* <CronHitHandler /> */}
-        <GoogleOAuthProvider>
-          <InactivityTimeoutHandler />
-          <Navbar className="navbar-main" />
-          <ClientLayoutProvider>{children}</ClientLayoutProvider>
-          <Footer className="footer-main" />
-        </GoogleOAuthProvider>
+        {/* TK-482: GoogleOAuthProvider removed from the global layout — it
+            injected the 258 KB Google Identity Services script on every page.
+            The GSI script is now lazy-loaded by GoogleSignInButton when an
+            auth surface mounts. Nothing here consumed the OAuth context. */}
+        <InactivityTimeoutHandler />
+        <Navbar className="navbar-main" />
+        <ClientLayoutProvider>{children}</ClientLayoutProvider>
+        <Footer className="footer-main" />
         <ToastContainer
           position="top-right"
           autoClose={5000}
