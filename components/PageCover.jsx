@@ -5,7 +5,7 @@ import { FaArrowRightLong } from "react-icons/fa6";
 import ProudPartner from "./ProudPartner";
 import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
-const PageCover = ({ data, items }) => {
+const PageCover = ({ data, items, priority = false }) => {
   return (
     <div className="grid md:grid-cols-2 gap-6 md:gap-20 items-center">
       <div>
@@ -72,7 +72,7 @@ const PageCover = ({ data, items }) => {
           data.imageHeight || "md:h-[696px]"
         } `}
       >
-        <CustomImage src={data.image} alt={data.title} fill sizes="(max-width: 767px) 100vw, 592px" />
+        <CustomImage src={data.image} alt={data.title} fill priority={priority} sizes="(max-width: 767px) 100vw, 592px" />
       </div>
       <div className=" md:hidden ">
         {data.proudPartner && <ProudPartner section />}

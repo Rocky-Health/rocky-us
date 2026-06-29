@@ -47,7 +47,7 @@ const WlCover = ({ btnColor = null, subtitle = null, consultationHref = "/wl-pre
   const dataWithHref = { ...data, buttons };
   return (
     <>
-      <PageCover data={dataWithHref} items={items} />
+      <PageCover data={dataWithHref} items={items} priority />
     </>
   );
 };
