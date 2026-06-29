@@ -26,7 +26,7 @@ export default function BodyOptimization() {
         <CouponCapture />
       </Suspense>
       <CoverSection>
-        <WlCover />
+        <WlCover priority={true} />
       </CoverSection>
       <RockyFeatures />
 
