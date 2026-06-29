@@ -3,16 +3,21 @@
 import { useState, useEffect } from "react";
 import { logger } from "@/utils/devLogger";
 import React from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { ProgressBar } from "../EdQuestionnaire/ProgressBar";
 import { QuestionLayout } from "../EdQuestionnaire/QuestionLayout";
 import { QuestionOption } from "../EdQuestionnaire/QuestionOption";
 import QuestionnaireNavbar from "../EdQuestionnaire/QuestionnaireNavbar";
 import QuestionOne from "./QuestionOne";
-import EdProductCards from "./EdProductCards";
 import { FAQItem } from "./FAQItem";
-import EdDosageSelection from "./EdDosageSelectionModal";
-import CrossSellModal from "../EDPlans/CrossSellModal";
+
+// These components are only rendered after user interaction (recommendation
+// screen, dosage modal, cross-sell modal) and never on first paint, so load
+// them lazily to keep the initial quiz bundle small.
+const EdProductCards = dynamic(() => import("./EdProductCards"));
+const EdDosageSelection = dynamic(() => import("./EdDosageSelectionModal"));
+const CrossSellModal = dynamic(() => import("../EDPlans/CrossSellModal"));
 import {
     handleEdProductCheckout,
     buildEdCheckoutUrl,
