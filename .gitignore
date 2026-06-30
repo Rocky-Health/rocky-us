@@ -60,3 +60,6 @@ post-copilot.bat
 *.php
 
 docs/
+
+# committed-secret file removed for security (contains plaintext credentials)
+META_TIKTOK_CAPI_VERIFICATION_PROMPT.md
