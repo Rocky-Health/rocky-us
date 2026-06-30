@@ -244,32 +244,74 @@ export default function FBPixelLoader() {
   // NOTE: if fbevents.js is still loading twice, audit GTM container
   // GTM-K9PC394B for a Meta pixel tag — remove it and rely solely on this
   // component for all pixel SDK loading.
+  //
+  // Mobile main-thread deferral: the fbevents.js download/parse is one of the
+  // heaviest non-critical third-party costs during initial load, yet it is
+  // never needed for first paint. We therefore defer the *injection* until the
+  // first user interaction (or a requestIdleCallback fallback), mirroring the
+  // GTM/TikTok load-on-interaction pattern in app/layout.jsx. This changes only
+  // WHEN the SDK loads, never WHAT fires: the module-level window.fbq stub
+  // (above) already queues every init/PageView/track call, and that queue is
+  // drained in order the moment fbevents.js arrives — so PageView, conversion
+  // events, and event de-duplication are all preserved. Bouncers who leave
+  // before interacting and before the idle timeout simply never pay the cost.
   useEffect(() => {
     if (process.env.NODE_ENV !== "production") return;
     if (typeof window === "undefined") return;
     if (window.__fbSdkInjected) return;
 
-    // If another party (e.g. GTM) already inserted the script, claim the
-    // flag and exit without inserting a duplicate.
-    const existing = document.querySelector(
-      'script[src*="connect.facebook.net"][src*="fbevents.js"]'
-    );
-    if (existing) {
-      window.__fbSdkInjected = true;
-      return;
-    }
+    const injectFbEvents = () => {
+      if (window.__fbSdkInjected) return;
 
-    window.__fbSdkInjected = true;
-    const t = document.createElement("script");
-    t.async = true;
-    t.src = "https://connect.facebook.net/en_US/fbevents.js";
-    t.onerror = (e) => console.warn("[FBPixelLoader] fbevents.js FAILED to load", e);
-    const s = document.getElementsByTagName("script")[0];
-    if (s && s.parentNode) {
-      s.parentNode.insertBefore(t, s);
-    } else {
-      document.head.appendChild(t);
-    }
+      // If another party (e.g. GTM) already inserted the script, claim the
+      // flag and exit without inserting a duplicate.
+      const existing = document.querySelector(
+        'script[src*="connect.facebook.net"][src*="fbevents.js"]'
+      );
+      if (existing) {
+        window.__fbSdkInjected = true;
+        return;
+      }
+
+      window.__fbSdkInjected = true;
+      const t = document.createElement("script");
+      t.async = true;
+      t.src = "https://connect.facebook.net/en_US/fbevents.js";
+      t.onerror = (e) => console.warn("[FBPixelLoader] fbevents.js FAILED to load", e);
+      const s = document.getElementsByTagName("script")[0];
+      if (s && s.parentNode) {
+        s.parentNode.insertBefore(t, s);
+      } else {
+        document.head.appendChild(t);
+      }
+    };
+
+    // Load on first interaction; idle fallback (15s) keeps attribution firing
+    // for engaged-but-still users, matching the GTM/TikTok bootstraps.
+    const events = ["pointerdown", "touchstart", "keydown", "scroll", "mousemove"];
+    let idleId;
+    const boot = () => {
+      events.forEach((ev) => window.removeEventListener(ev, boot, true));
+      if (idleId != null) {
+        if (window.cancelIdleCallback) window.cancelIdleCallback(idleId);
+        else window.clearTimeout(idleId);
+      }
+      injectFbEvents();
+    };
+    events.forEach((ev) =>
+      window.addEventListener(ev, boot, { passive: true, capture: true, once: true })
+    );
+    idleId = window.requestIdleCallback
+      ? window.requestIdleCallback(boot, { timeout: 15000 })
+      : window.setTimeout(boot, 15000);
+
+    return () => {
+      events.forEach((ev) => window.removeEventListener(ev, boot, true));
+      if (idleId != null) {
+        if (window.cancelIdleCallback) window.cancelIdleCallback(idleId);
+        else window.clearTimeout(idleId);
+      }
+    };
   }, []);
 
   // Lazy-init the resolved pixel (once per session) and fire a targeted
