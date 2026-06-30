@@ -65,7 +65,7 @@ const DoctorTrustedSolutions = () => {
                     className="text-[24px] md:text-[32px] font-medium leading-[120%] mb-4 capitalize tracking-[-0.48px] md:tracking-[-0.64px]"
                     style={{
                       color: '#000',
-                      fontFamily: 'Poppins, sans-serif',
+                      fontFamily: 'var(--font-poppins), Arial, sans-serif',
                     }}
                   >
                     <span>
@@ -91,7 +91,7 @@ const DoctorTrustedSolutions = () => {
                     }`}
                     style={{
                       color: 'rgba(0, 0, 0, 0.85)',
-                      fontFamily: 'Poppins, sans-serif',
+                      fontFamily: 'var(--font-poppins), Arial, sans-serif',
                     }}
                   >
                     {card.description}

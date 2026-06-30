@@ -122,7 +122,7 @@ const KeyFeatures = () => {
                 <IconComponent />
               </div>
               {/* Text */}
-              <p className="text-[14px] font-normal text-[#000] text-center font-['Poppins'] leading-[140%]">
+              <p className="text-[14px] font-normal text-[#000] text-center font-poppins leading-[140%]">
                 {feature.text}
               </p>
             </div>
@@ -144,7 +144,7 @@ const KeyFeatures = () => {
                 <IconComponent />
               </div>
               {/* Text */}
-              <p className="text-[16px] font-normal text-[#000] text-center font-['Poppins'] leading-[140%]">
+              <p className="text-[16px] font-normal text-[#000] text-center font-poppins leading-[140%]">
                 {feature.text}
               </p>
             </div>

@@ -90,8 +90,7 @@ export const WarningPopup = ({
           </h3>
 
           <p
-            className="text-[20px] md:text-[24px] mb-8 text-[#000000] text-left"
-            style={{ fontFamily: "Fellix" }}
+            className="text-[20px] md:text-[24px] mb-8 text-[#000000] text-left headers-font"
           >
             {message}
           </p>

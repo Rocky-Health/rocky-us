@@ -108,17 +108,17 @@ const HeroSection = ({
 
             <div className="flex justify-left items-center gap-2 mt-[8px]">
               <div className="bg-[#F5F4F3] rounded-[10px]">
-                <p className="font-[Poppins] font-medium leading-[100%]  text-[13px] tracking-[0px] px-3 py-1">
+                <p className="font-poppins font-medium leading-[100%]  text-[13px] tracking-[0px] px-3 py-1">
                   Made in US
                 </p>
               </div>
               <div className="bg-[#F5F4F3] rounded-[10px]">
-                <p className="font-[Poppins] font-medium leading-[100%]  text-[13px] tracking-[0px] px-3 py-1">
+                <p className="font-poppins font-medium leading-[100%]  text-[13px] tracking-[0px] px-3 py-1">
                   Non GMO - no fillers or chemicals
                 </p>
               </div>
               <div className="bg-[#F5F4F3] rounded-[10px]">
-                <p className="font-[Poppins] font-medium  leading-[100%]  text-[13px] tracking-[0px] px-3 py-1">
+                <p className="font-poppins font-medium  leading-[100%]  text-[13px] tracking-[0px] px-3 py-1">
                   Third-party tested for purity and potency
                 </p>
               </div>
@@ -371,17 +371,17 @@ const HeroSection = ({
 
             <div className="flex overflow-x-auto scrollbar-hide whitespace-nowrap gap-4 mt-[8px]">
               <div className="bg-[#F5F4F3] rounded-[10px]">
-                <p className="font-[Poppins] font-medium leading-[100%]  text-[13px] tracking-[0px] px-3 py-1">
+                <p className="font-poppins font-medium leading-[100%]  text-[13px] tracking-[0px] px-3 py-1">
                   Made in US
                 </p>
               </div>
               <div className="bg-[#F5F4F3] rounded-[10px] w-fit ">
-                <p className="font-[Poppins] font-medium leading-[100%]  text-[13px] tracking-[0px] px-3 py-1">
+                <p className="font-poppins font-medium leading-[100%]  text-[13px] tracking-[0px] px-3 py-1">
                   Non GMO - no fillers or chemicals
                 </p>
               </div>
               <div className="bg-[#F5F4F3] rounded-[10px] w-fit ">
-                <p className="font-[Poppins] font-medium  leading-[100%]  text-[13px] tracking-[0px] px-3 py-1">
+                <p className="font-poppins font-medium  leading-[100%]  text-[13px] tracking-[0px] px-3 py-1">
                   Third-party tested for purity and potency
                 </p>
               </div>

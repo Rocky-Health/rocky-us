@@ -50,18 +50,18 @@ html[data-layout="minimal"] .footer-main {
 }
 
 .headers-font {
-    font-family: var(--font-fellix-bold);
+    font-family: var(--font-fellix-bold), Arial, sans-serif;
 }
 
 .subheaders-font {
-    font-family: var(--font-fellix);
+    font-family: var(--font-fellix), Arial, sans-serif;
 }
 
 .poppins-font {
-    font-family: var(--font-poppins);
+    font-family: var(--font-poppins), Arial, sans-serif;
 }
 * {
-    font-family: var(--font-poppins);
+    font-family: var(--font-poppins), Arial, sans-serif;
 }
 
 .no-scrollbar::-webkit-scrollbar {

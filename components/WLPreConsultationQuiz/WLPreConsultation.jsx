@@ -834,11 +834,11 @@ const WeightQuestionnaire = () => {
         }
 
         .headers-font {
-          font-family: "Fellix-SemiBold", sans-serif;
+          font-family: var(--font-fellix-bold), Arial, sans-serif;
         }
 
         .subheaders-font {
-          font-family: "Fellix-MediumBold", sans-serif;
+          font-family: var(--font-fellix), Arial, sans-serif;
         }
 
         .quiz-page-wrapper {

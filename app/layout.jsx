@@ -1,7 +1,6 @@
 import "./globals.css";
 import { logger } from "@/utils/devLogger";
-import { Poppins } from "next/font/google";
-import localFont from "next/font/local";
+import { fontVariables } from "@/lib/fonts";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer/Footer";
 import LoadingOverlay from "@/components/utils/LoadingBar";
@@ -27,35 +26,6 @@ import { Suspense } from "react";
 import { SITE, ogImageUrl } from "@/lib/seo/metadata";
 
 // Layout will use client-side path detection to avoid forcing dynamic rendering
-
-// Configure Google font
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-poppins",
-  display: "swap",
-});
-
-// Configure local fonts.
-// WOFF2 + Latin subset: ~29 KB per weight (was 61 KB WOFF, 507 glyphs).
-// adjustFontFallback: "Arial" overrides Arial's metrics to match Fellix's, so
-// the FOUT swap on font arrival produces minimal layout shift.
-// preload=true emits <link rel="preload" as="font"> in <head>.
-const fellixMedium = localFont({
-  src: "../fonts/Fellix-Medium.woff2",
-  variable: "--font-fellix",
-  display: "swap",
-  adjustFontFallback: "Arial",
-  preload: true,
-});
-
-const fellixSemiBold = localFont({
-  src: "../fonts/Fellix-SemiBold.woff2",
-  variable: "--font-fellix-bold",
-  display: "swap",
-  adjustFontFallback: "Arial",
-  preload: true,
-});
 
 // Prevent iOS Safari from auto-zooming when focusing on form inputs.
 // Setting maximumScale=1 stops the zoom while keeping user-initiated pinch
@@ -129,6 +99,23 @@ export default function RootLayout({ children }) {
               layoutExemptRoutes,
             )};var p=location.pathname.split("?")[0].replace(/\\/$/,"");var m=r.some(function(x){return p===x||p.indexOf(x+"/")===0;});document.documentElement.setAttribute("data-layout",m?"minimal":"full");}catch(e){}})();`,
           }}
+        />
+        {/* Self-hosted brand fonts — preload critical weights before CSS parse so
+            cold loads never paint with unstyled system fallback (FOUT). Served
+            from /public/fonts/ with immutable cache headers via next.config.mjs. */}
+        <link
+          rel="preload"
+          href="/fonts/Poppins-Regular.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/Fellix-SemiBold.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
         />
         {/* Preconnect to critical third-party origins to overlap DNS+TLS with HTML parse.
             Limited to origins fetched on every cold load to avoid wasting handshakes.
@@ -282,7 +269,7 @@ export default function RootLayout({ children }) {
         {/* End Microsoft Clarity */}
       </head>
       <body
-        className={`${poppins.variable} ${fellixMedium.variable} ${fellixSemiBold.variable}`}
+        className={fontVariables}
         suppressHydrationWarning={true}
       >
         {/* Google Tag Manager (noscript) */}

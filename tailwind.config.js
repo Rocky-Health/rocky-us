@@ -8,6 +8,11 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        poppins: ["var(--font-poppins)", "Arial", "sans-serif"],
+        fellix: ["var(--font-fellix)", "Arial", "sans-serif"],
+        "fellix-bold": ["var(--font-fellix-bold)", "Arial", "sans-serif"],
+      },
       backgroundImage: {
         "desktop-aging-gradient":
           "linear-gradient(90deg, #F5F4EF 6.77%, #BCA889 84.86%)",

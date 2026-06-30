@@ -27,7 +27,7 @@ const SearchResults = ({ results, searchTerm, isLoading }) => {
 
       {results.map((result, index) => (
         <div key={index} className="mb-12 last:mb-0">
-          <h3 className="text-lg md:text-xl font-medium font-[Fellix] mb-4 leading-[140%] text-[#AE7E56]">
+          <h3 className="text-lg md:text-xl font-medium font-fellix-bold mb-4 leading-[140%] text-[#AE7E56]">
             {result.productName}
           </h3>
 
