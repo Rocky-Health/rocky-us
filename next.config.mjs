@@ -156,6 +156,14 @@ const nextConfig = {
         source: `/:path*.${ext}`,
         headers: thirtyDays,
       })),
+      // TK-492: favicon/icon set gets a 1-year immutable cache. Declared AFTER
+      // the media-ext rules so it overrides their 30-day value for these exact
+      // files (Next applies the last matching rule for a given header key).
+      { source: "/favicon.ico", headers: immutable },
+      { source: "/apple-touch-icon.png", headers: immutable },
+      { source: "/icon-192.png", headers: immutable },
+      { source: "/icon-512.png", headers: immutable },
+      { source: "/site.webmanifest", headers: immutable },
     ];
   },
 };
