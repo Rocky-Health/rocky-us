@@ -65,19 +65,19 @@ export const viewport = {
   maximumScale: 1,
 };
 
-const FAVICON_URL =
-  "https://mycdn.myrocky.ca/wp-content/uploads/20260520114301/favicon-mr-desktop.jpg";
-
 const DEFAULT_HOME_TITLE = "MyRocky - Online Healthcare Made For You";
 const DEFAULT_OG_IMAGE = ogImageUrl({ title: SITE.name, vertical: "home" });
 
 export const metadata = {
   metadataBase: new URL(SITE.baseUrl),
+  // TK-492: optimized local icons, each declared once (previously a 27 KB JPEG
+  // declared 3× as icon/shortcut/apple). favicon.ico is <3 KB (16/32/48);
+  // apple-touch-icon is a real PNG; PWA icons live in the web manifest.
   icons: {
-    icon: [{ url: FAVICON_URL, type: "image/jpeg" }],
-    shortcut: FAVICON_URL,
-    apple: FAVICON_URL,
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
+  manifest: "/site.webmanifest",
   title: {
     template: `%s ${SITE.titleSuffix}`,
     default: DEFAULT_HOME_TITLE,
