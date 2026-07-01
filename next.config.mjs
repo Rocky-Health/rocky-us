@@ -146,6 +146,11 @@ const nextConfig = {
 
     return [
       { source: "/:path*", headers: SECURITY_HEADERS },
+      { source: "/favicon.ico", headers: immutable },
+      { source: "/apple-touch-icon.png", headers: immutable },
+      { source: "/icon-192.png", headers: immutable },
+      { source: "/icon-512.png", headers: immutable },
+      { source: "/site.webmanifest", headers: immutable },
       { source: "/_next/static/:path*", headers: immutable },
       { source: "/_next/image", headers: thirtyDays },
       ...fontExts.map((ext) => ({
