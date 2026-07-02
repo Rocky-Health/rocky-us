@@ -177,6 +177,7 @@ const BillingDetails = ({
           name="first_name"
           placeholder="Your first name"
           required
+          autoComplete="given-name"
           value={formData.billing_address.first_name}
           onChange={handleBillingAddressChange}
         />
@@ -185,6 +186,7 @@ const BillingDetails = ({
           name="last_name"
           placeholder="Your last name"
           required
+          autoComplete="family-name"
           value={formData.billing_address.last_name?.replace(/^%20/, "")}
           onChange={handleBillingAddressChange}
         />
@@ -201,10 +203,17 @@ const BillingDetails = ({
           hidden
           onChange={null}
         />
+        <label htmlFor="billing_country_display" className="sr-only">
+          Country / Region
+        </label>
         <input
           type={"text"}
           readOnly
           disabled
+          id="billing_country_display"
+          name="billing_country_display"
+          autoComplete="country-name"
+          aria-label="Country / Region"
           className="w-full bg-white rounded-[8px] border border-solid border-[#E2E2E1] px-[16px] py-[12px] h-[44px] focus:outline-none focus:border-gray-500"
           value={"United States"}
           onChange={null}
@@ -229,6 +238,7 @@ const BillingDetails = ({
           name="address_2"
           value={formData.billing_address.address_2}
           placeholder="Enter your apartment number"
+          autoComplete="address-line2"
           disabled={isUpdatingShipping}
           onChange={handleBillingAddressChange}
         />
@@ -240,6 +250,7 @@ const BillingDetails = ({
           value={formData.billing_address.city}
           placeholder="Enter your city/town"
           required
+          autoComplete="address-level2"
           disabled={isUpdatingShipping}
           onChange={handleBillingAddressChange}
         />
@@ -247,7 +258,7 @@ const BillingDetails = ({
       <div className="mb-4 md:flex md:items-center md:gap-[16px]">
         <div className="mb-4 w-full md:mb-0">
           <label
-            htmlFor="billing_state"
+            htmlFor="state"
             className="block text-[14px] font-[500] leading-[19.6px] text-[#212121] mb-2"
           >
             State*
@@ -259,6 +270,7 @@ const BillingDetails = ({
               onChange={handleBillingAddressChange}
               id="state"
               name="state"
+              autoComplete="address-level1"
               disabled={isUpdatingShipping}
               className={`w-full bg-white rounded-[8px] border border-solid border-[#E2E2E1] px-[16px] h-[44px] focus:outline-none focus:border-gray-500 appearance-none ${
                 isUpdatingShipping ? "opacity-50 cursor-not-allowed" : ""
@@ -329,6 +341,7 @@ const BillingDetails = ({
           value={formData.billing_address.postcode}
           placeholder="Enter your ZIP code"
           required
+          autoComplete="postal-code"
           disabled={isUpdatingShipping}
           onChange={handleBillingAddressChange}
         />
