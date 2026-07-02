@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useState } from "react";
 
 function getText(html) {
-  var divContainer = document.createElement("div");
-  divContainer.innerHTML = html;
-  return divContainer.textContent || divContainer.innerText || "";
+  // SSR-safe: strip HTML tags via regex instead of using document.createElement,
+  // since this client component still renders on the server during prerender/SSR.
+  return String(html || "").replace(/<[^>]*>/g, "");
 }
 
 const Blog = ({ blog }) => {
