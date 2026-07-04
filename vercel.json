@@ -32,6 +32,17 @@
       "destination": "https://wpbe.myrocky.com/wp-json/:path*"
     }
   ],
+  "headers": [
+    {
+      "source": "/wp-json/wp/v2/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, s-maxage=300, stale-while-revalidate=600"
+        }
+      ]
+    }
+  ],
   "crons": [
     {
       "path": "/api/wp-cron",
