@@ -158,6 +158,12 @@ const CartAndPayment = ({
       <p
         className={`text-[10px] text-gray-700 mt-4 text-center w-full ${isGlp2 ? "" : "lg:max-w-[512px]"}`}
       >
+        Once your order is approved, your treatment ships discreetly and
+        typically arrives within 3–5 business days.
+      </p>
+      <p
+        className={`text-[10px] text-gray-700 mt-4 text-center w-full ${isGlp2 ? "" : "lg:max-w-[512px]"}`}
+      >
         Please note that your purchase is subject to our cancellation policy as
         outlined in our{" "}
         <Link
