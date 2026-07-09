@@ -60,7 +60,7 @@ export default function LongevityNadLpClient() {
                 headingAccent="NAD+ Injection"
                 headingAfter="for Healthy Aging"
                 priceLine="Only $99 a month"
-                description="Boost your NAD+ levels without costly infusions—all from the comfort of home. With unlimited support from longevity experts."
+                description="Boost your NAD+ levels without costly infusions, all from the comfort of home. With unlimited support from longevity experts."
                 showSecondaryBtn={false}
                 primaryBtnText="Add to Cart"
                 primaryBtnClassName={CTA_GREEN}
@@ -99,7 +99,7 @@ export default function LongevityNadLpClient() {
                 pricePrefix="Only"
                 price="$99"
                 priceAfter="a month"
-                description="A simple way to support cellular health, energy production, and overall wellness—all from the comfort of home."
+                description="A simple way to support cellular health, energy production, and overall wellness, all from the comfort of home."
                 checkPointsPosition="after"
                 ctaText="Add to Cart"
                 btnClassName="!md:w-fit !px-16 uppercase !text-sm !font-[500] !tracking-wide !bg-[#0D652D] hover:!bg-[#0D652D]"
@@ -116,6 +116,8 @@ export default function LongevityNadLpClient() {
             />
 
             <LongevityNadWhatToExpectSection
+                ctaText="Add to Cart"
+                btnClassName={CTA_GREEN}
                 onCtaClick={goToCheckout}
                 isCtaLoading={isAdding}
             />

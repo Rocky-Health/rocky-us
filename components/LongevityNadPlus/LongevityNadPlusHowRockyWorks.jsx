@@ -33,7 +33,7 @@ function StepCard({ card, className = "" }) {
     <div className={`relative rounded-2xl overflow-hidden ${className}`}>
       <CustomImage
         src={card.image}
-        alt={`${card.title} — ${card.description}`}
+        alt={`${card.title}, ${card.description}`}
         width={374}
         height={530}
         className="w-full h-auto object-cover"

@@ -11,7 +11,7 @@ export const LONGEVITY_NAD_DECLINE_DEFAULTS = {
     heading: "Reverse age-related NAD+ decline",
     paragraphs: [
         "As we age, our bodies face a natural decline in NAD+ levels. A shift that impacts your energy, vitality and overall health.",
-        "NAD+ decline is normal — accepting it doesn't have to be. By supplementing with NAD+ injections, you can support your body's natural energy production as you age.",
+        "NAD+ decline is normal. Accepting it doesn't have to be. By supplementing with NAD+ injections, you can support your body's natural energy production as you age.",
     ],
     ctaHref: "/nad-consultation-quiz",
     ctaText: "Get Started",
