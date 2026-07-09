@@ -56,13 +56,12 @@ const fellixSemiBold = localFont({
   preload: true,
 });
 
-// Prevent iOS Safari from auto-zooming when focusing on form inputs.
-// Setting maximumScale=1 stops the zoom while keeping user-initiated pinch
-// zoom functional on most modern iOS versions.
+// TK-577: do not set maximumScale / user-scalable — capping zoom blocks users
+// who need to pinch-zoom (WCAG 2.1 SC 1.4.4). Form-input auto-zoom on iOS is
+// avoided by keeping input font-size >= 16px instead.
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
 };
 
 const DEFAULT_HOME_TITLE = "MyRocky - Online Healthcare Made For You";
