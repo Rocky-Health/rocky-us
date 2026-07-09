@@ -13,12 +13,14 @@ const HeaderProudPartner = () => {
         : partners;
 
     return (
-        <div className="bg-black text-white py-2">
+        <div className="bg-black text-white h-[40px] flex md:justify-center md:items-center justify-start items-start overflow-hidden">
             {/* Desktop view - static display */}
             <div className="hidden md:flex items-center justify-center">
-                <span className="font-[500] text-[18px]">Proud partner</span>
+                <span className="font-[500] text-[12px] md:text-[14px] leading-[140%]">
+                    Proud partner
+                </span>
                 <div className="px-3">
-                    <div className="w-0 h-8 origin-top-left outline outline-1 outline-offset-[-0.50px] outline-white/50"></div>
+                    <div className="w-0 h-4 origin-top-left outline outline-1 outline-offset-[-0.50px] outline-white/50"></div>
                 </div>
 
                 {visiblePartners.map((partner, index) => (
@@ -43,13 +45,13 @@ const HeaderProudPartner = () => {
                                     />
                                 )}
                             </div>
-                            <span className="font-[500] text-[18px]">
+                            <span className=" text-[12px] md:text-[14px] leading-[115%]">
                                 {partner.name}
                             </span>
                         </div>
                         {index < visiblePartners.length - 1 && (
                             <div className="px-4">
-                                <div className="w-0 h-8 origin-top-left outline outline-1 outline-offset-[-0.50px] outline-white/50"></div>
+                                <div className="w-0 h-4 origin-top-left outline outline-1 outline-offset-[-0.50px] outline-white/50"></div>
                             </div>
                         )}
                     </div>
@@ -70,14 +72,6 @@ const HeaderProudPartner = () => {
                 <div
                     className={`relative overflow-hidden ${isGlpHeroPage ? "" : "flex-1"}`}
                 >
-                    {/* Gradient overlays - fade in when scroll starts */}
-                    {isGlpHeroPage ? null : (
-                        <>
-                            <div className="bg-[linear-gradient(270deg,#00000000_0%,#000000_100%)] absolute left-0 w-[80px] h-full z-[1] animate-gradient-delayed"></div>
-                            <div className="bg-[linear-gradient(270deg,#00000000_0%,#000000_100%)] absolute right-0 w-[80px] h-full z-[1] rotate-180 animate-gradient-delayed"></div>
-                        </>
-                    )}
-
                     {/* Partners container */}
                     <div
                         className={`flex items-center whitespace-nowrap w-fit overflow-hidden ${isGlpHeroPage ? "" : "animate-partner-scroll"}`}
