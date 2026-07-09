@@ -34,6 +34,49 @@ html[data-layout="minimal"] .footer-main {
     }
 }
 
+/* Scroll-reveal used by components/utils/Reveal.jsx — CSS replacement for the
+   framer-motion fade-in-up pattern. Tunable via CSS custom properties so one
+   rule covers fade-up (default), plain fade (--reveal-y:0) and scale-in.
+   Ported from rocky-headless for the /longevity-nad-lp port (TK-830). */
+.reveal {
+    opacity: 0;
+    transform: translateY(var(--reveal-y, 40px)) scale(var(--reveal-scale, 1));
+    transition:
+        opacity var(--reveal-dur, 0.6s) ease,
+        transform var(--reveal-dur, 0.6s) ease;
+    transition-delay: var(--reveal-delay, 0s);
+    will-change: opacity, transform;
+}
+.reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* Gentle infinite float — CSS replacement for framer's animate={{ y:[0,-6,0] }} */
+@keyframes reveal-float {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
+}
+.animate-reveal-float {
+    animation: reveal-float 3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reveal {
+        transition: none;
+        opacity: 1;
+        transform: none;
+    }
+    .animate-reveal-float {
+        animation: none;
+    }
+}
+
 /* Line clamp utilities for text truncation */
 .line-clamp-2 {
     display: -webkit-box;

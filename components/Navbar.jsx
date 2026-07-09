@@ -144,6 +144,11 @@ const menuItems = [
         //   },
         // ],
     },
+    {
+        category: "NAD+",
+        description: "Boost Your Cellular Energy",
+        link: "/longevity-nad-lp",
+    },
     // {
     //   category: "Mental Health",
     //   // image: "https://myrocky.b-cdn.net/WP%20Images/Mental%20Health/mh.webp",
