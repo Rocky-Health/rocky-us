@@ -14,7 +14,6 @@ const MentalProductCard = [
       {
         title: "Bupropion XL",
         description: "Generic for Wellbutrin XL®",
-        note: "100% money back guarantee",
         buttonName: "Get Treatment",
         link: "/mh-pre-quiz/",
         image:
@@ -23,7 +22,6 @@ const MentalProductCard = [
       {
         title: "Citalopram",
         description: "Generic for Celexa®",
-        note: "100% money back guarantee",
         buttonName: "Get Treatment",
         link: "/mh-pre-quiz/",
         image:
@@ -32,7 +30,6 @@ const MentalProductCard = [
       {
         title: "Escitalopram",
         description: "Generic for Cipralex®",
-        note: "100% money back guarantee",
         buttonName: "Get Treatment",
         link: "/mh-pre-quiz/",
         image:
@@ -41,7 +38,6 @@ const MentalProductCard = [
       {
         title: "Fluoxetine",
         description: "Generic for Prozac®",
-        note: "100% money back guarantee",
         buttonName: "Get Treatment",
         link: "/mh-pre-quiz/",
         image:
@@ -50,7 +46,6 @@ const MentalProductCard = [
       {
         title: "Paroxetine",
         description: "Generic for Paxil®",
-        note: "100% money back guarantee",
         buttonName: "Get Treatment",
         link: "/mh-pre-quiz/",
         image:
@@ -59,7 +54,6 @@ const MentalProductCard = [
       {
         title: "Sertraline",
         description: "Generic for Zoloft®",
-        note: "100% money back guarantee",
         buttonName: "Get Treatment",
         link: "/mh-pre-quiz/",
         image:
@@ -67,7 +61,6 @@ const MentalProductCard = [
       },
       {
         title: "Trazadone",
-        note: "100% money back guarantee",
         buttonName: "Get Treatment",
         link: "/mh-pre-quiz/",
         image:
@@ -76,7 +69,6 @@ const MentalProductCard = [
       {
         title: "Venlafaxine XR",
         description: "Generic for Effexor®",
-        note: "100% money back guarantee",
         buttonName: "Get Treatment",
         link: "/mh-pre-quiz/",
         image:
