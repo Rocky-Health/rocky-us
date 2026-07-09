@@ -48,6 +48,7 @@ import {
 } from "@/utils/edShippingRestrictions";
 import { getAwinFromUrlOrStorage } from "@/utils/awin";
 import { analyticsService } from "@/utils/analytics/analyticsService";
+import { hashEmail, hashPhone } from "@/utils/analytics/hash";
 import { getOrCreateSessionId } from "@/utils/dataLayerHelper";
 import {
   trackMetaStartCheckout,
@@ -202,31 +203,53 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
     }
     beginCheckoutFiredRef.current = true;
 
-    try {
-      const items = cartItems.items.map((item) => ({
-        product: {
-          id: String(item.id || item.product_id || ""),
-          sku: String(item.id || item.product_id || ""),
-          name: item.name || "",
-          price:
-            parseFloat(item.prices?.price || item.totals?.line_total || 0) /
-            100,
-          categories: [],
-          attributes: [],
-        },
-        quantity: item.quantity || 1,
-      }));
-      const sessionId = getOrCreateSessionId();
-      const cartHash = cartItems.items
-        .map((i) => i.id)
-        .sort()
-        .join("-");
-      analyticsService.trackBeginCheckout(items, {
-        event_id: `begin_checkout_${sessionId}_${cartHash}_${Date.now()}`,
-      });
-    } catch (_) {
-      // non-blocking
-    }
+    (async () => {
+      try {
+        const items = cartItems.items.map((item) => ({
+          product: {
+            id: String(item.id || item.product_id || ""),
+            sku: String(item.id || item.product_id || ""),
+            name: item.name || "",
+            price:
+              parseFloat(item.prices?.price || item.totals?.line_total || 0) /
+              100,
+            categories: [],
+            attributes: [],
+          },
+          quantity: item.quantity || 1,
+        }));
+        const sessionId = getOrCreateSessionId();
+        const cartHash = cartItems.items
+          .map((i) => i.id)
+          .sort()
+          .join("-");
+
+        // TK-560: attach hashed identity to begin_checkout so Attentive can tie
+        // the cart to a subscriber and enter the abandoned-cart journey. The
+        // Attentive GTM tag reads order_data.billing_email_hash/phone_hash on
+        // begin_checkout; without this the cart arrives anonymous and no SMS fires.
+        const billingEmail = cartItems.billing_address?.email || "";
+        const billingPhone =
+          cartItems.billing_address?.phone ||
+          cartItems.shipping_address?.phone ||
+          "";
+        const [billing_email_hash, billing_phone_hash] = await Promise.all([
+          hashEmail(billingEmail),
+          hashPhone(billingPhone, "US"),
+        ]);
+        const identity =
+          billing_email_hash || billing_phone_hash
+            ? { order_data: { billing_email_hash, billing_phone_hash } }
+            : {};
+
+        analyticsService.trackBeginCheckout(items, {
+          event_id: `begin_checkout_${sessionId}_${cartHash}_${Date.now()}`,
+          ...identity,
+        });
+      } catch (_) {
+        // non-blocking
+      }
+    })();
   }, [cartItems]);
 
   // TK-633: fire the Meta "Start Checkout" milestone (RKY_<cat>_SC) on the
