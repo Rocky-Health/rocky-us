@@ -117,18 +117,6 @@ export const PROTOCOL_DATA = {
       mobileLogoHeight: 70,
     },
     {
-      name: "Toronto Argonauts",
-      subtitle: "CFL - 18 GREY CUP CHAMPIONS",
-      image: "/NAD+/ball.png",
-      logo: "https://myrocky.b-cdn.net/WP%20Images/proud-logo/partner-2.png",
-      mobileLogo:
-        "https://myrocky.b-cdn.net/WP%20Images/proud-logo/partner-2.png",
-      logoWidth: 32,
-      logoHeight: 30,
-      mobileLogoWidth: 64,
-      mobileLogoHeight: 70,
-    },
-    {
       name: "NBA",
       subtitle: "World's premier basketball league",
       image:

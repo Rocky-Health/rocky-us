@@ -5,8 +5,8 @@ import Reveal from "@/components/utils/Reveal";
 import { PROTOCOL_DATA } from "./data/longevityNadPlusData";
 import CustomImage from "@/components/utils/CustomImage";
 
-// Mobile grid: Blue Jays | Maple Leafs / Argonauts | NBA
-const MOBILE_PARTNER_ORDER = [0, 2, 3, 1];
+// Mobile grid: Blue Jays | Maple Leafs / NBA
+const MOBILE_PARTNER_ORDER = [0, 1, 2];
 
 const PartnerLogoItem = ({ partner, forceBigLogo = false }) => {
     const useBigLogo = forceBigLogo || partner.bigLogo;
