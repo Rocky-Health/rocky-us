@@ -13,7 +13,7 @@ const HeaderProudPartner = () => {
         : partners;
 
     return (
-        <div className="bg-[#003876] text-white py-2">
+        <div className="bg-black text-white py-2">
             {/* Desktop view - static display */}
             <div className="hidden md:flex items-center justify-center">
                 <span className="font-[500] text-[18px]">Proud partner</span>
@@ -73,8 +73,8 @@ const HeaderProudPartner = () => {
                     {/* Gradient overlays - fade in when scroll starts */}
                     {isGlpHeroPage ? null : (
                         <>
-                            <div className="bg-[linear-gradient(270deg,#00387600_0%,#003876_100%)] absolute left-0 w-[80px] h-full z-[1] animate-gradient-delayed"></div>
-                            <div className="bg-[linear-gradient(270deg,#00387600_0%,#003876_100%)] absolute right-0 w-[80px] h-full z-[1] rotate-180 animate-gradient-delayed"></div>
+                            <div className="bg-[linear-gradient(270deg,#00000000_0%,#000000_100%)] absolute left-0 w-[80px] h-full z-[1] animate-gradient-delayed"></div>
+                            <div className="bg-[linear-gradient(270deg,#00000000_0%,#000000_100%)] absolute right-0 w-[80px] h-full z-[1] rotate-180 animate-gradient-delayed"></div>
                         </>
                     )}
 
