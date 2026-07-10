@@ -2,7 +2,6 @@ import CartItems from "./CartItems";
 import InitialShipping from "../CartCheckoutShared/InitialShipping";
 import CouponApply from "../CartCheckoutShared/CouponApply";
 import Payment from "./Payment";
-import ExpressCheckoutWallet from "./ExpressCheckoutWallet";
 import Link from "next/link";
 
 const CartAndPayment = ({
@@ -30,8 +29,6 @@ const CartAndPayment = ({
   isPaymentValid,
   paymentValidationMessage,
   onStripeReady, // NEW: Callback for Stripe Elements
-  onWalletClick, // Express Checkout (Apple/Google Pay) gesture guard
-  onWalletConfirm, // Express Checkout confirm handler
   layoutVariant = "default",
 }) => {
   const isGlp2 = layoutVariant === "glp2";
@@ -58,15 +55,6 @@ const CartAndPayment = ({
             setCartItems={setCartItems}
             isUpdatingShipping={isUpdatingShipping}
             formData={formData}
-          />
-        </div>
-      )}
-
-      {onWalletConfirm && (
-        <div className={isGlp2 ? "" : "lg:max-w-[512px]"}>
-          <ExpressCheckoutWallet
-            onWalletClick={onWalletClick}
-            onWalletConfirm={onWalletConfirm}
           />
         </div>
       )}
