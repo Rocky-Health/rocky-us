@@ -79,7 +79,7 @@ const HowRockyWorks = ({ cards, title, subtitle }) => {
                                             key={card.image}
                                             className="flex flex-col"
                                         >
-                                            <div className="relative overflow-hidden w-full md:!w-[384px] aspect-[1168/1320] md:aspect-auto md:h-[480px] md:max-w-auto max-w-[380px] mx-auto">
+                                            <div className="relative overflow-hidden w-full md:!w-[384px] aspect-[1168/1320] md:aspect-auto md:h-[480px] md:max-w-auto max-w-[380px] mx-auto ">
                                                 <CustomImage
                                                     src={card.image}
                                                     alt={card.title}
