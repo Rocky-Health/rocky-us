@@ -16,7 +16,6 @@ const EdProducts = ({ showonly }) => {
     const productsMap = {
       cialis: cialisProduct,
       viagra: viagraProduct,
-      // chewalis: chewalisProduct,
       variety: varietyPackProduct,
     };
 
@@ -25,7 +24,6 @@ const EdProducts = ({ showonly }) => {
       return [
         cialisProduct,
         viagraProduct,
-        // chewalisProduct,
         varietyPackProduct,
       ];
     }
@@ -39,7 +37,7 @@ const EdProducts = ({ showonly }) => {
     }
 
     // If no match is found, return all products as fallback
-    return [cialisProduct, viagraProduct, chewalisProduct, varietyPackProduct];
+    return [cialisProduct, viagraProduct, varietyPackProduct];
   };
 
   const filteredProducts = getFilteredProducts();

@@ -11,13 +11,6 @@ const cards = [
         image: "https://myrocky.b-cdn.net/WP%20Images/Foam.webp",
     },
     {
-        title: "Chewalis",
-        desc: "Lasts up to 24 - 36 hours",
-        price: "137.99",
-
-        image: "https://myrocky.b-cdn.net/WP%20Images/Global%20Images/Chewalis.webp",
-    },
-    {
         title: "Finasteride (Propecia)",
         desc: "Prevents hair loss",
         price: "109.99",

@@ -313,56 +313,6 @@ const EDProducts = {
       ],
     },
   },
-  chewalisProduct: {
-    id: 3,
-    name: "Chewalis",
-    tagline: '"The weekender"',
-    image:
-      "https://myrocky.b-cdn.net/WP%20Images/Sexual%20Health/chewalis-ed.webp",
-    activeIngredient: "Tadalafil",
-    strengths: ["10mg", "20mg"],
-    preferences: ["generic"],
-    frequencies: {
-      "monthly-supply": "One Month",
-      "quarterly-supply": "Three Months",
-    },
-    pillOptions: {
-      "monthly-supply": [
-        {
-          count: 8,
-          genericPrice: 138,
-          brandPrice: 138,
-          variationId: "219484",
-        },
-        {
-          count: 12,
-          genericPrice: 202,
-          brandPrice: 202,
-          variationId: "278229",
-        },
-      ],
-      "quarterly-supply": [
-        {
-          count: 12,
-          genericPrice: 202,
-          brandPrice: 202,
-          variationId: "278230",
-        },
-        {
-          count: 24,
-          genericPrice: 394,
-          brandPrice: 394,
-          variationId: "278231",
-        },
-        {
-          count: 36,
-          genericPrice: 586,
-          brandPrice: 586,
-          variationId: "219488",
-        },
-      ],
-    },
-  },
   varietyPackProduct: {
     id: 4,
     name: "Cialis + Viagra",

@@ -269,7 +269,6 @@ function isBlockedRoute(pathname) {
     "/zonnic",
     "/product/zonnic",
     "/smoking-consultation",
-    "/chewalis",
 
     // Recovery routes
     "/product/dhm-blend",

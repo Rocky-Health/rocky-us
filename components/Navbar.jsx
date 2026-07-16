@@ -82,7 +82,6 @@ const menuItems = [
             },
             // { text: "Viagra®", link: "/product/viagra/" },
             // { text: "Cialis®", link: "/product/cialis/" },
-            // { text: "Dissolvable Tadalafil", link: "/product/chewable-tadalafil/" },
         ],
         // prematureEjaculation: [
         //   { text: "Numb Ointment", link: "/product/lidocaine/" },

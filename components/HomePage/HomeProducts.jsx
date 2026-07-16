@@ -23,12 +23,6 @@ const edProductCard = [
         link: "/ed-flow/?onboarding=1&showonly=viagra",
         image: "/popular-treatments/viagra.webp",
       },
-      // {
-      //   title: "Chewalis",
-      //   description: "Last up to 24-36 hours",
-      //   link: "/ed-flow/?onboarding=1&showonly=chewalis",
-      //   image: "/popular-treatments/chewalis.webp",
-      // },
       {
         title: "Cialis + Viagra",
         description: "Last up to 8-36 hours",

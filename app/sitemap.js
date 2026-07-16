@@ -40,7 +40,6 @@ const staticRoutes = [
   { url: "/product-faq", priority: 0.6, changeFrequency: "monthly" },
   { url: "/body-optimization", priority: 0.8, changeFrequency: "monthly" },
   { url: "/body-optimization-trim", priority: 0.7, changeFrequency: "monthly" },
-  { url: "/chewalis", priority: 0.7, changeFrequency: "monthly" },
   { url: "/ed", priority: 0.8, changeFrequency: "monthly" },
   { url: "/hair", priority: 0.8, changeFrequency: "monthly" },
   { url: "/hair-products", priority: 0.8, changeFrequency: "monthly" },
