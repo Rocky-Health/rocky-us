@@ -3,10 +3,21 @@ import CustomImage from "@/components/utils/CustomImage";
 import Link from "next/link";
 import { useState } from "react";
 
+// SSR-safe plain-text extraction. Runs during server render/prerender too, so
+// it must not touch `document`. Strip HTML tags with a regex and decode the
+// handful of entities WordPress emits in titles/excerpts.
 function getText(html) {
-  var divContainer = document.createElement("div");
-  divContainer.innerHTML = html;
-  return divContainer.textContent || divContainer.innerText || "";
+  if (!html) return "";
+  return String(html)
+    .replace(/<[^>]*>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;/g, "'")
+    .replace(/&#x27;/g, "'")
+    .trim();
 }
 
 const Blog = ({ blog }) => {
