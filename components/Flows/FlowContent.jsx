@@ -14,13 +14,13 @@ const FlowContent = ({ flowType = "ED", pageType = null }) => {
         <>
           <div className="ed-flow flex flex-col min-h-screen">
             {/* Main Content */}
-            <main className="flex-grow bg-white">
-              <div className="max-w-[1184px] mx-auto px-5 py-10">
+            <main className="flex-grow bg-[#F0EEEA]">
+              <div className="max-w-[1184px] mx-auto px-5 md:px-0 py-10">
                 {/* ED Products Section - Pass the filter parameter */}
                 <EdProducts showonly={showonly} />
 
                 {/* FAQs Section */}
-                <EdFaqs></EdFaqs>
+                {/* <EdFaqs></EdFaqs> */}
               </div>
             </main>
 
