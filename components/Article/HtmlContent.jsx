@@ -274,6 +274,38 @@ const HtmlContent = ({ html, className, loading = false }) => {
       /<(p|div|span|strong|em|b|i|u)[^>]*>\s*(?:&nbsp;|\s)*\s*<\/\1>/gi,
       ""
     );
+
+    // Reserve layout space for images to prevent CLS. WordPress emits width/height
+    // attributes on content images; map them to an inline aspect-ratio so the
+    // browser reserves the correct per-image space before the image loads (the
+    // scoped CSS only sets height:auto, which leaves no intrinsic ratio).
+    processed = processed.replace(/<img\b[^>]*>/gi, (imgTag) => {
+      const widthMatch = imgTag.match(/\bwidth=["']?(\d+)["']?/i);
+      const heightMatch = imgTag.match(/\bheight=["']?(\d+)["']?/i);
+
+      // Only act when both dimensions are present and non-zero; otherwise leave
+      // the tag untouched rather than guessing a ratio.
+      if (!widthMatch || !heightMatch) return imgTag;
+      const width = parseInt(widthMatch[1], 10);
+      const height = parseInt(heightMatch[1], 10);
+      if (!width || !height) return imgTag;
+
+      // Skip if an aspect-ratio is already declared inline.
+      if (/style=["'][^"']*aspect-ratio/i.test(imgTag)) return imgTag;
+
+      const aspectRatioRule = `aspect-ratio: ${width} / ${height};`;
+      const styleMatch = imgTag.match(/style=["']([^"']*)["']/i);
+      if (styleMatch) {
+        const existing = styleMatch[1].trim();
+        const separator = existing && !existing.endsWith(";") ? "; " : " ";
+        return imgTag.replace(
+          styleMatch[0],
+          `style="${existing}${separator}${aspectRatioRule}"`
+        );
+      }
+      return imgTag.replace(/<img\b/i, `<img style="${aspectRatioRule}"`);
+    });
+
     const seenTexts = new Set(); // Track seen normalized text content to prevent duplicates
     const seenSlugs = new Set(); // Track seen slugs to prevent duplicate IDs
 
