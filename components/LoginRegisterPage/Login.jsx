@@ -15,6 +15,7 @@ import { processSavedFlowProducts } from "../../utils/flowCartHandler";
 import Link from "next/link";
 import { migrateLocalCartToServer } from "@/lib/cart/cartService";
 import GoogleSignInButton from "./GoogleSignInButton";
+import FieldError, { fieldInputClass, fieldLabelClass } from "./FieldError";
 import CartMigrationOverlay from "@/components/CartMigrationOverlay";
 import Image from "next/image";
 import { encryptPasswordWithServerKey } from "@/utils/encryptPasswordWithServerKey";
@@ -544,25 +545,39 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
                 </h3>
             </div>
 
-            <form onSubmit={handleSubmit}>
+            <form noValidate onSubmit={handleSubmit}>
                 <div className="flex flex-col flex-wrap items-center justify-center mx-auto py-3 px-8 pt-5 w-[100%] max-w-[400px] space-y-4">
                     <div className="w-full flex flex-col items-start justify-center gap-2">
-                        <label htmlFor="username">Email Address</label>
+                        <label
+                            htmlFor="username"
+                            className={fieldLabelClass(errors.username)}
+                        >
+                            Email Address
+                        </label>
                         <input
                             type="email"
                             id="username"
                             name="username"
-                            className="block w-[100%] rounded-[8px] h-[40px] text-md m-auto border-gray-500 border px-4 focus:outline focus:outline-2 focus:outline-black focus:ring-0 focus:border-transparent"
+                            className={fieldInputClass(errors.username)}
                             tabIndex="1"
                             autoComplete="email"
                             placeholder="Enter your email address"
                             onChange={handleChange}
                             style={{ outlineColor: "black" }}
                         />
+                        <FieldError
+                            message={errors.username}
+                            className="-mt-1.5"
+                        />
                     </div>
                     <div className="w-full flex flex-col items-start justify-center gap-2 password-field">
                         <div className="flex flex-row justify-between items-center w-full">
-                            <label htmlFor="password">Password</label>
+                            <label
+                                htmlFor="password"
+                                className={fieldLabelClass(errors.password)}
+                            >
+                                Password
+                            </label>
                             {/* <Link
                 href="/forgot-password"
                 className="text-xs text-[#AE7E56] font-normal underline"
@@ -576,33 +591,31 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
                                 id="password"
                                 placeholder="Enter your password"
                                 name="password"
-                                className="block w-[100%] rounded-[8px] h-[40px] text-md m-auto border-gray-500 border px-4 focus:outline focus:outline-2 focus:outline-black focus:ring-0 focus:border-transparent"
+                                className={fieldInputClass(errors.password)}
                                 tabIndex="2"
-                                autoComplete="off"
+                                autoComplete="current-password"
                                 onChange={handleChange}
                                 style={{ outlineColor: "black" }}
                             />
-                            {showPassword ? (
-                                <MdOutlineVisibilityOff
-                                    size={16}
-                                    className="absolute right-3 top-3 cursor-pointer"
-                                    onClick={togglePasswordVisibility}
-                                    aria-label="Hide password"
-                                />
-                            ) : (
-                                <MdOutlineRemoveRedEye
-                                    size={16}
-                                    className="absolute right-3 top-3 cursor-pointer"
-                                    onClick={togglePasswordVisibility}
-                                    aria-label="Show password"
-                                />
-                            )}
+                            <button
+                                type="button"
+                                onClick={togglePasswordVisibility}
+                                aria-label={
+                                    showPassword ? "Hide password" : "Show password"
+                                }
+                                className="absolute right-0 top-0 h-full px-3 flex items-center justify-center text-gray-600 cursor-pointer"
+                            >
+                                {showPassword ? (
+                                    <MdOutlineVisibilityOff size={16} />
+                                ) : (
+                                    <MdOutlineRemoveRedEye size={16} />
+                                )}
+                            </button>
                         </div>
-                        {errors.password && (
-                            <span className="text-red-500 text-sm">
-                                {errors.password}
-                            </span>
-                        )}
+                        <FieldError
+                            message={errors.password}
+                            className="-mt-1.5"
+                        />
                     </div>
                     <div className="quiz-option flex w-full py-2 items-center justify-between">
                         <div className="basis-1/2">
