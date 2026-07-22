@@ -183,7 +183,7 @@ export async function POST(req) {
       );
     }
 
-    const paymentIntent = await stripe.paymentIntents.create(paymentIntentData);
+    const paymentIntent = await stripe.paymentIntents.create(paymentIntentData, { idempotencyKey: `create-payment-intent-${orderId}` });
 
     logger.log("✅ PaymentIntent created and confirmed:", {
       id: paymentIntent.id,
