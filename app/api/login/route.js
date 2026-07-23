@@ -3,6 +3,13 @@ import axios from "axios";
 import { cookies } from "next/headers";
 import { logger } from "@/utils/devLogger";
 import crypto from "crypto";
+import {
+    limiters,
+    getClientIp,
+    normalizeId,
+    checkLimits,
+    tooManyRequests,
+} from "@/lib/rateLimit";
 
 const BASE_URL = process.env.BASE_URL;
 const privateKey = process.env.RSA_PRIVATE_KEY;
@@ -10,6 +17,18 @@ const privateKey = process.env.RSA_PRIVATE_KEY;
 export async function POST(req) {
     try {
         const { username, password, isEncryptedPassword } = await req.json();
+
+        // TK-441: throttle by email (5/min) and IP (20/min) to blunt
+        // credential-stuffing / enumeration.
+        const ip = getClientIp(req);
+        const rl = await checkLimits(
+            [
+                [limiters.loginEmail, normalizeId(username)],
+                [limiters.loginIp, ip],
+            ],
+            "login",
+        );
+        if (!rl.ok) return tooManyRequests(rl.retryAfter);
 
         const decryptedPassword =
             isEncryptedPassword && privateKey

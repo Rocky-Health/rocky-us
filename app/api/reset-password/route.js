@@ -1,10 +1,28 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
 import { logger } from "@/utils/devLogger";
+import {
+  limiters,
+  getClientIp,
+  normalizeId,
+  checkLimits,
+  tooManyRequests,
+} from "@/lib/rateLimit";
 
 export async function POST(request) {
   try {
     const { password, token, login } = await request.json();
+
+    // TK-441: throttle reset attempts by identifier (3/hour) and IP (10/hour).
+    const ip = getClientIp(request);
+    const rl = await checkLimits(
+      [
+        [limiters.pwEmail, normalizeId(login)],
+        [limiters.pwIp, ip],
+      ],
+      "reset-password",
+    );
+    if (!rl.ok) return tooManyRequests(rl.retryAfter);
 
     if (!password || !token || !login) {
       return NextResponse.json(

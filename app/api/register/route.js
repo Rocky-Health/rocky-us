@@ -3,6 +3,12 @@ import axios from "axios";
 import { cookies } from "next/headers";
 import { logger } from "@/utils/devLogger";
 import crypto from "crypto";
+import {
+    limiters,
+    getClientIp,
+    checkLimits,
+    tooManyRequests,
+} from "@/lib/rateLimit";
 
 const BASE_URL = process.env.BASE_URL;
 const privateKey = process.env.RSA_PRIVATE_KEY;
@@ -31,6 +37,11 @@ export async function POST(req) {
             register_step,
             isEncryptedPassword,
         } = await req.json();
+
+        // TK-441: throttle sign-ups by IP (20/hour) to curb automated abuse.
+        const ip = getClientIp(req);
+        const rl = await checkLimits([[limiters.registerIp, ip]], "register");
+        if (!rl.ok) return tooManyRequests(rl.retryAfter);
 
         const decryptedPassword =
             isEncryptedPassword && privateKey
