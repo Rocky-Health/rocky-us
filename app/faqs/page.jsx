@@ -1,121 +1,17 @@
-"use client";
+import FaqsClient from "@/components/FAQS/FaqsClient";
 
-import Section from "@/components/utils/Section";
-import { useState, useMemo } from "react";
-import { useSearch } from "@/components/utils/UseSearch";
-import CoverSection from "@/components/FAQS/CoverSection";
-import CategoryContainer from "@/components/FAQS/CategoryContainer";
-import FAQSContainer from "@/components/FAQS/FAQSContainer";
-import MoreQuestionContainer from "@/components/FAQS/MoreQuestionContainer";
-import SearchResult from "@/components/FAQS/SearchResult";
-
-const FaqsButton = ["all", "hair loss", "weight loss", "sexual health"];
-
-const Faqs = () => {
-    const [selectedCategory, setSelectedCategory] = useState("all");
-
-    // Get all FAQs data
-    const allFaqs = useMemo(() => {
-        return [
-            ...HomeFaqs.map((faq) => ({ ...faq, category: "all" })),
-            ...HairLossFaqs.map((faq) => ({ ...faq, category: "hair loss" })),
-            ...WlFaqs.map((faq) => ({ ...faq, category: "weight loss" })),
-            ...SexualHealthFaqs.map((faq) => ({
-                ...faq,
-                category: "sexual health",
-            })),
-        ];
-    }, []);
-
-    const {
-        searchValue,
-        setSearchValue,
-        debouncedValue,
-        isSearching,
-        handleSearch,
-        highlightText,
-    } = useSearch();
-
-    // Filter FAQs based on search or category
-    const displayedFaqs = useMemo(() => {
-        // If searching (with 3+ characters), search across all FAQs
-        if (debouncedValue && debouncedValue.trim().length >= 3) {
-            const searchTerm = debouncedValue.toLowerCase().trim();
-            return allFaqs
-                .filter((faq) => {
-                    return (
-                        faq.question.toLowerCase().includes(searchTerm) ||
-                        faq.answer.toLowerCase().includes(searchTerm)
-                    );
-                })
-                .map((faq) => ({
-                    ...faq,
-                    // Highlight the matched text
-                    question: highlightText(faq.question, searchTerm),
-                    answer: highlightText(faq.answer, searchTerm),
-                }));
-        }
-
-        // Otherwise, filter by category
-        switch (selectedCategory) {
-            case "weight loss":
-                return WlFaqs;
-            case "hair loss":
-                return HairLossFaqs;
-            case "sexual health":
-                return SexualHealthFaqs;
-            case "all":
-            default:
-                return HomeFaqs;
-        }
-    }, [debouncedValue, selectedCategory, allFaqs, highlightText]);
-
-    const showCategoryFilters =
-        !debouncedValue || debouncedValue.trim().length < 3;
-
+// TK-438: page is now a Server Component. Static FAQ data lives here and is
+// passed into the client island (FaqsClient) that owns search + filtering.
+export default function FaqsPage() {
     return (
-        <>
-            <CoverSection
-                setSearchValue={setSearchValue}
-                searchValue={searchValue}
-                handleSearch={handleSearch}
-            />
-            <Section>
-                {/* Show search status if searching */}
-                <SearchResult
-                    debouncedValue={debouncedValue}
-                    isSearching={isSearching}
-                    searchValue={searchValue}
-                    displayedFaqs={displayedFaqs}
-                />
-
-                {/* Only show category filters when not searching */}
-                {showCategoryFilters && (
-                    <CategoryContainer
-                        FaqsButton={FaqsButton}
-                        setSelectedCategory={setSelectedCategory}
-                        selectedCategory={selectedCategory}
-                    />
-                )}
-
-                {/* Display FAQs or loading skeleton */}
-                <FAQSContainer
-                    debouncedValue={debouncedValue}
-                    isSearching={isSearching}
-                    searchValue={searchValue}
-                    displayedFaqs={displayedFaqs}
-                />
-
-                <MoreQuestionContainer
-                    debouncedValue={debouncedValue}
-                    displayedFaqs={displayedFaqs}
-                />
-            </Section>
-        </>
+        <FaqsClient
+            homeFaqs={HomeFaqs}
+            hairLossFaqs={HairLossFaqs}
+            wlFaqs={WlFaqs}
+            sexualHealthFaqs={SexualHealthFaqs}
+        />
     );
-};
-
-export default Faqs;
+}
 
 // Keep your existing FAQ data arrays here
 const HomeFaqs = [
