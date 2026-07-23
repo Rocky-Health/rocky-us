@@ -48,6 +48,7 @@ import {
 } from "@/utils/edShippingRestrictions";
 import { getAwinFromUrlOrStorage } from "@/utils/awin";
 import { analyticsService } from "@/utils/analytics/analyticsService";
+import { hashEmail, hashPhone } from "@/utils/analytics/hash";
 import { getOrCreateSessionId } from "@/utils/dataLayerHelper";
 import {
   trackMetaStartCheckout,
@@ -202,31 +203,53 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
     }
     beginCheckoutFiredRef.current = true;
 
-    try {
-      const items = cartItems.items.map((item) => ({
-        product: {
-          id: String(item.id || item.product_id || ""),
-          sku: String(item.id || item.product_id || ""),
-          name: item.name || "",
-          price:
-            parseFloat(item.prices?.price || item.totals?.line_total || 0) /
-            100,
-          categories: [],
-          attributes: [],
-        },
-        quantity: item.quantity || 1,
-      }));
-      const sessionId = getOrCreateSessionId();
-      const cartHash = cartItems.items
-        .map((i) => i.id)
-        .sort()
-        .join("-");
-      analyticsService.trackBeginCheckout(items, {
-        event_id: `begin_checkout_${sessionId}_${cartHash}_${Date.now()}`,
-      });
-    } catch (_) {
-      // non-blocking
-    }
+    (async () => {
+      try {
+        const items = cartItems.items.map((item) => ({
+          product: {
+            id: String(item.id || item.product_id || ""),
+            sku: String(item.id || item.product_id || ""),
+            name: item.name || "",
+            price:
+              parseFloat(item.prices?.price || item.totals?.line_total || 0) /
+              100,
+            categories: [],
+            attributes: [],
+          },
+          quantity: item.quantity || 1,
+        }));
+        const sessionId = getOrCreateSessionId();
+        const cartHash = cartItems.items
+          .map((i) => i.id)
+          .sort()
+          .join("-");
+
+        // TK-560: attach hashed identity to begin_checkout so Attentive can tie
+        // the cart to a subscriber and enter the abandoned-cart journey. The
+        // Attentive GTM tag reads order_data.billing_email_hash/phone_hash on
+        // begin_checkout; without this the cart arrives anonymous and no SMS fires.
+        const billingEmail = cartItems.billing_address?.email || "";
+        const billingPhone =
+          cartItems.billing_address?.phone ||
+          cartItems.shipping_address?.phone ||
+          "";
+        const [billing_email_hash, billing_phone_hash] = await Promise.all([
+          hashEmail(billingEmail),
+          hashPhone(billingPhone, "US"),
+        ]);
+        const identity =
+          billing_email_hash || billing_phone_hash
+            ? { order_data: { billing_email_hash, billing_phone_hash } }
+            : {};
+
+        analyticsService.trackBeginCheckout(items, {
+          event_id: `begin_checkout_${sessionId}_${cartHash}_${Date.now()}`,
+          ...identity,
+        });
+      } catch (_) {
+        // non-blocking
+      }
+    })();
   }, [cartItems]);
 
   // TK-633: fire the Meta "Start Checkout" milestone (RKY_<cat>_SC) on the
@@ -1324,8 +1347,9 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
 
         logger.log("=== ADDRESS DATA ALREADY POPULATED IN FETCHCARTITEMS ===");
 
-        // STEP 3: Load saved cards (doesn't affect form data)
-        await fetchSavedCards();
+        // Saved cards are loaded by the StripeSavedCards picker itself
+        // (via /api/stripe-saved-cards). The old /api/payment-methods call was
+        // the legacy Bambora token endpoint and is no longer used.
       } catch (error) {
         logger.error("Error loading checkout data:", error);
         toast.error(
@@ -1343,6 +1367,7 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
     orderKey,
     amountInCents,
     dataToSend,
+    savedPaymentMethodId = null,
   ) => {
     try {
       // Don't call elements.submit() here. It opens the Apple Pay sheet, and
@@ -1350,37 +1375,45 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
       // we've already awaited the order creation, so it'd blow up with an
       // IntegrationError. The callers run submit() inside the click instead.
 
-      // Step 2: Get the payment method from PaymentElement
-      logger.log("Getting payment method from PaymentElement...");
-      const { error: pmError, paymentMethod } =
-        await stripe.createPaymentMethod({
-          elements: stripeElements,
-          params: {
-            billing_details: {
-              name: `${dataToSend.firstName} ${dataToSend.lastName}`,
-              email: dataToSend.email,
-              phone: dataToSend.phone,
-              address: {
-                line1: dataToSend.addressOne,
-                line2: dataToSend.addressTwo || "",
-                city: dataToSend.city,
-                state: dataToSend.state,
-                postal_code: dataToSend.postcode,
-                country: dataToSend.country,
+      // Resolve the payment method id. A saved Stripe card hands us its id
+      // directly; a new card gets tokenized from the Payment Element.
+      let paymentMethodToUse;
+      if (savedPaymentMethodId) {
+        paymentMethodToUse = savedPaymentMethodId;
+        logger.log("Using saved Stripe card:", paymentMethodToUse);
+      } else {
+        logger.log("Getting payment method from PaymentElement...");
+        const { error: pmError, paymentMethod } =
+          await stripe.createPaymentMethod({
+            elements: stripeElements,
+            params: {
+              billing_details: {
+                name: `${dataToSend.firstName} ${dataToSend.lastName}`,
+                email: dataToSend.email,
+                phone: dataToSend.phone,
+                address: {
+                  line1: dataToSend.addressOne,
+                  line2: dataToSend.addressTwo || "",
+                  city: dataToSend.city,
+                  state: dataToSend.state,
+                  postal_code: dataToSend.postcode,
+                  country: dataToSend.country,
+                },
               },
             },
-          },
-        });
+          });
 
-      if (pmError) {
-        throw new Error(pmError.message);
+        if (pmError) {
+          throw new Error(pmError.message);
+        }
+
+        if (!paymentMethod) {
+          throw new Error("Failed to create payment method");
+        }
+
+        paymentMethodToUse = paymentMethod.id;
+        logger.log("✅ Payment method created:", paymentMethodToUse);
       }
-
-      if (!paymentMethod) {
-        throw new Error("Failed to create payment method");
-      }
-
-      logger.log("✅ Payment method created:", paymentMethod.id);
 
       // Step 3: Create PaymentIntent with manual capture using the payment method
       logger.log("Creating PaymentIntent with manual capture...");
@@ -1390,7 +1423,7 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
         body: JSON.stringify({
           orderId,
           amount: amountInCents,
-          paymentMethodId: paymentMethod.id,
+          paymentMethodId: paymentMethodToUse,
           customerEmail: dataToSend.email,
           customerName: `${dataToSend.firstName} ${dataToSend.lastName}`,
         }),
@@ -1408,16 +1441,22 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
           "⚠️ Payment requires 3D Secure authentication - showing 3DS modal",
         );
 
-        // Show 3DS authentication modal using stripe.confirmPayment()
+        // Run the 3DS challenge. A saved card has no Payment Element to confirm
+        // with, so trigger the next action directly; a new card confirms via
+        // the Payment Element.
         const { error: confirmError, paymentIntent: confirmedIntent } =
-          await stripe.confirmPayment({
-            elements: stripeElements,
-            clientSecret: intentResult.clientSecret,
-            confirmParams: {
-              return_url: `${window.location.origin}/checkout/order-received/${orderId}?key=${orderKey}${buildFlowQueryString()}`,
-            },
-            redirect: "if_required", // Only redirect if absolutely necessary
-          });
+          savedPaymentMethodId
+            ? await stripe.handleNextAction({
+                clientSecret: intentResult.clientSecret,
+              })
+            : await stripe.confirmPayment({
+                elements: stripeElements,
+                clientSecret: intentResult.clientSecret,
+                confirmParams: {
+                  return_url: `${window.location.origin}/checkout/order-received/${orderId}?key=${orderKey}${buildFlowQueryString()}`,
+                },
+                redirect: "if_required", // Only redirect if absolutely necessary
+              });
 
         if (confirmError) {
           // User cancelled or 3DS failed
@@ -1694,6 +1733,7 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
         orderKey,
         amountInCents,
         dataToSend,
+        savedPaymentMethodId,
       });
       // Show error in modal
       setIsProcessingPayment(false);
@@ -1701,6 +1741,242 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
       setSubmitting(false);
       // Keep modal open to show error and retry option
       throw error; // Re-throw to be caught by caller
+    }
+  };
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Express Checkout (Apple Pay / Google Pay) — wallet buttons above the card
+  // form. Returning Link consumers don't get wallet tabs inside the Payment
+  // Element, so the Express Checkout Element gives them one. It reuses the same
+  // order + payment pipeline as the new-card path; only the trigger differs.
+  // ────────────────────────────────────────────────────────────────────────
+
+  // Same payload the new-card path builds in handleSubmit, but always a new
+  // payment (no saved card). Keep this in sync with the dataToSend object below.
+  const buildWalletCheckoutData = () => {
+    const useShippingAddress =
+      formData.shipping_address.ship_to_different_address;
+    const { awc: awinAwc, channel: awinChannel } = getAwinFromUrlOrStorage();
+
+    return {
+      firstName: formData.billing_address.first_name,
+      lastName: formData.billing_address.last_name,
+      addressOne: formData.billing_address.address_1,
+      addressTwo: formData.billing_address.address_2,
+      city: formData.billing_address.city,
+      state: formData.billing_address.state,
+      postcode: formData.billing_address.postcode,
+      country: formData.billing_address.country,
+      phone: formData.billing_address.phone,
+      email: formData.billing_address.email,
+
+      shipToAnotherAddress: useShippingAddress || false,
+      shippingFirstName: useShippingAddress
+        ? formData.shipping_address.first_name
+        : formData.billing_address.first_name,
+      shippingLastName: useShippingAddress
+        ? formData.shipping_address.last_name
+        : formData.billing_address.last_name,
+      shippingAddressOne: useShippingAddress
+        ? formData.shipping_address.address_1
+        : formData.billing_address.address_1,
+      shippingAddressTwo: useShippingAddress
+        ? formData.shipping_address.address_2
+        : formData.billing_address.address_2,
+      shippingCity: useShippingAddress
+        ? formData.shipping_address.city
+        : formData.billing_address.city,
+      shippingState: useShippingAddress
+        ? formData.shipping_address.state
+        : formData.billing_address.state,
+      shippingPostCode: useShippingAddress
+        ? formData.shipping_address.postcode
+        : formData.billing_address.postcode,
+      shippingCountry: useShippingAddress
+        ? formData.shipping_address.country
+        : formData.billing_address.country || "CA",
+      shippingPhone: useShippingAddress
+        ? formData.shipping_address.phone
+        : formData.billing_address.phone,
+
+      discreet:
+        formData.extensions["checkout-fields-for-blocks"]._meta_discreet,
+      toMailBox:
+        formData.extensions["checkout-fields-for-blocks"]._meta_mail_box,
+      customerNotes: formData.customer_note,
+
+      // Wallet payments never use a saved card or raw card fields — Stripe
+      // hands us the payment method from the wallet.
+      cardNumber: "",
+      cardType: "",
+      cardExpMonth: "",
+      cardExpYear: "",
+      cardCVD: "",
+      savedCardToken: null,
+      savedCardId: null,
+      useSavedCard: false,
+      useStripe: true,
+
+      totalAmount:
+        cartItems.totals && cartItems.totals.total_price
+          ? parseFloat(cartItems.totals.total_price) / 100
+          : cartItems.totals && cartItems.totals.total
+            ? parseFloat(cartItems.totals.total.replace(/[^0-9.]/g, ""))
+            : 0,
+
+      isEdFlow: isEdFlow,
+      awin_awc: awinAwc || "",
+      awin_channel: awinChannel || "other",
+      cartItems: cartItems?.items || [],
+      appliedCoupons: cartItems?.coupons || [],
+    };
+  };
+
+  // Runs on the wallet tap. Has to be synchronous — Apple Pay only opens its
+  // sheet straight off the user's gesture, so no awaits before we resolve.
+  // Mirrors the synchronous guards in handleSubmit (form + age + ED/WL state).
+  // Returns true to open the wallet sheet, false to cancel it.
+  const handleExpressWalletClick = () => {
+    if (!stripe || !stripeElements) {
+      toast.error("Payment is still loading. Please try again in a moment.");
+      return false;
+    }
+
+    const validationResult = validateForm({
+      billing_address: formData.billing_address,
+      shipping_address: formData.shipping_address,
+      cardNumber: "dummy", // card fields don't apply to the wallet path
+      cardExpMonth: "12",
+      cardExpYear: "30",
+      cardCVD: "123",
+      useSavedCard: false,
+    });
+
+    if (!validationResult.isValid) {
+      toast.error(
+        validationResult.formattedMessage ||
+          "Please complete your details above before using express checkout.",
+      );
+      return false;
+    }
+
+    if (ageValidationFailed) {
+      setShowAgePopup(true);
+      return false;
+    }
+
+    if (cartItems?.items) {
+      if (hasZonnicProducts(cartItems.items)) {
+        const dob = formData.billing_address.date_of_birth;
+        if (!dob) {
+          // We can't verify age without a fetch (not allowed off the gesture),
+          // so send them to the card form which runs the full async check.
+          toast.error("Please use the card form below to complete this order.");
+          return false;
+        }
+        if (checkAgeRestriction(dob, 19).blocked) {
+          setAgeValidationFailed(true);
+          setShowAgePopup(true);
+          return false;
+        }
+      }
+
+      const useShip = formData.shipping_address.ship_to_different_address;
+      const stateToCheck =
+        (useShip
+          ? formData.shipping_address.state
+          : formData.billing_address.state) || formData.billing_address.state;
+
+      const restrictedEdItem = cartItems.items.find(isRestrictedEdCartItem);
+      if (restrictedEdItem && stateToCheck && isEdStateRestricted(stateToCheck)) {
+        setRestrictedProductName(restrictedEdItem.name || "this");
+        setShowEdRestrictionPopup(true);
+        return false;
+      }
+
+      const restrictedWlItem = cartItems.items.find(isRestrictedWlCartItem);
+      if (restrictedWlItem && stateToCheck && isWlStateRestricted(stateToCheck)) {
+        setRestrictedProductName(restrictedWlItem.name || "this");
+        setShowEdRestrictionPopup(true);
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  // Runs after the customer authorizes in the wallet sheet. The gesture rule is
+  // already satisfied (the sheet opened off the tap), so we can do async work
+  // here. submit() collects the wallet's data (not the empty card field), then
+  // we hand off to the same order + payment pipeline the card flow uses.
+  const handleExpressWalletConfirm = async () => {
+    // Tracks whether we've handed off to the processing modal yet — once we
+    // have, processStripePayment owns error display, so we don't also toast.
+    let modalShown = false;
+    try {
+      setSubmitting(true);
+
+      const { error: submitError } = await stripeElements.submit();
+      if (submitError) {
+        logger.error("Express checkout submit failed:", submitError.message);
+        toast.error(
+          submitError.message || "Could not complete the wallet payment.",
+        );
+        setSubmitting(false);
+        return;
+      }
+
+      const dataToSend = buildWalletCheckoutData();
+
+      logger.log("Creating pending order (express checkout)...");
+      const orderResponse = await fetch("/api/create-pending-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dataToSend),
+      });
+      const orderResult = await orderResponse.json();
+
+      if (!orderResult.success) {
+        throw new Error(orderResult.error || "Failed to create order");
+      }
+
+      const orderId = orderResult.data.id;
+      const orderKey = orderResult.data.order_key;
+
+      let amountInCents = 0;
+      const orderTotal = orderResult.data.total;
+      if (typeof orderTotal === "string") {
+        amountInCents = Math.round(
+          parseFloat(orderTotal.replace(/[^0-9.]/g, "")) * 100,
+        );
+      } else if (typeof orderTotal === "number") {
+        amountInCents = Math.round(orderTotal * 100);
+      }
+
+      if (amountInCents <= 0) {
+        // A $0 order shouldn't reach a wallet, but guard so we never try to
+        // charge nothing.
+        throw new Error("This order can't be paid with a wallet.");
+      }
+
+      setShowPaymentProcessingPopup(true);
+      setIsProcessingPayment(true);
+      setPaymentError(null);
+      modalShown = true;
+
+      await processStripePayment(orderId, orderKey, amountInCents, dataToSend);
+    } catch (error) {
+      logger.error("❌ Express checkout payment error:", error);
+      // processStripePayment shows its own error in the modal. For failures
+      // before it runs (submit / order creation) surface a toast instead.
+      if (!modalShown) {
+        toast.error(error.message || "Wallet payment failed. Please try again.");
+      }
+      // Don't offer the card-form retry for a wallet failure — it'd validate the
+      // empty card fields. Clearing it lets the modal just close so the user can
+      // tap the wallet again.
+      setRetryPaymentData(null);
+      setSubmitting(false);
     }
   };
 
@@ -1738,6 +2014,14 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
         );
         setSubmitting(false);
         return;
+      }
+
+      // Soft address warning: nudge the user but let the order proceed.
+      if (validationResult.formattedWarning) {
+        logger.log("Form validation warnings:", validationResult.warnings);
+        toast.warn(
+          `${validationResult.formattedWarning}. Please double-check your address.`,
+        );
       }
 
       logger.log("Form validation passed, proceeding with checkout");
@@ -1979,8 +2263,10 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
         totalAmount: dataToSend.totalAmount,
       });
 
-      // For saved cards, we'll use a two-step approach but check for duplicate payments
-      if (selectedCard && cartItems.totals) {
+      // Legacy WooCommerce-token saved cards used a dedicated charge endpoint.
+      // Stripe-native saved cards (from /api/stripe-saved-cards) have no token,
+      // so they skip this and flow through the unified Stripe branch below.
+      if (selectedCard && selectedCard.token && cartItems.totals) {
         try {
           logger.log(`Processing checkout with saved card: ${selectedCard.id}`);
 
@@ -2481,18 +2767,9 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
       }
 
       // For NEW CARD payments with Stripe Elements (embedded in form)
-      if (!selectedCard && dataToSend.useStripe) {
+      if (selectedCard || dataToSend.useStripe) {
         try {
-          logger.log("Processing Stripe Elements payment...");
-
-          // VALIDATION: Check if Stripe Elements is ready and card details are entered
-          if (!stripeElements) {
-            toast.error(
-              "Payment form is not ready. Please wait and try again.",
-            );
-            setSubmitting(false);
-            return;
-          }
+          logger.log("Processing Stripe payment...");
 
           if (!stripe) {
             toast.error(
@@ -2502,26 +2779,38 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
             return;
           }
 
-          // Validate that card details are entered before creating order
-          logger.log("Validating card details are entered...");
-          const { error: submitError } = await stripeElements.submit();
+          // New cards validate + tokenize via the Payment Element. A saved card
+          // already has a payment method, so skip the element validation.
+          if (!selectedCard) {
+            if (!stripeElements) {
+              toast.error(
+                "Payment form is not ready. Please wait and try again.",
+              );
+              setSubmitting(false);
+              return;
+            }
 
-          if (submitError) {
-            // Card validation failed - DO NOT create order
-            logger.error(
-              "Card validation failed - no order created:",
-              submitError.message,
+            // Validate that card details are entered before creating order
+            logger.log("Validating card details are entered...");
+            const { error: submitError } = await stripeElements.submit();
+
+            if (submitError) {
+              // Card validation failed - DO NOT create order
+              logger.error(
+                "Card validation failed - no order created:",
+                submitError.message,
+              );
+              toast.error(
+                submitError.message || "Please enter valid card details.",
+              );
+              setSubmitting(false);
+              return;
+            }
+
+            logger.log(
+              "✅ Card details validated - proceeding with order creation",
             );
-            toast.error(
-              submitError.message || "Please enter valid card details.",
-            );
-            setSubmitting(false);
-            return;
           }
-
-          logger.log(
-            "✅ Card details validated - proceeding with order creation",
-          );
 
           // Step 1: Create pending order (card details are validated)
           logger.log("Creating pending order...");
@@ -2700,12 +2989,15 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
             return;
           }
 
-          // Process payment using reusable function
+          // Process payment using reusable function. Pass the saved card's
+          // Stripe payment-method id when one is selected; new cards tokenize
+          // inside processStripePayment.
           await processStripePayment(
             orderId,
             orderKey,
             amountInCents,
             dataToSend,
+            selectedCard?.id || null,
           );
           return;
         } catch (error) {
@@ -2916,6 +3208,8 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
     isPaymentValid,
     paymentValidationMessage,
     onStripeReady: setStripeElements,
+    onWalletClick: handleExpressWalletClick,
+    onWalletConfirm: handleExpressWalletConfirm,
   };
 
   return (
@@ -3018,18 +3312,21 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
 
               // submit() has to run here, off the actual click, so Apple Pay can
               // open its sheet. processStripePayment doesn't do it for us.
-              const { error: submitError } = await stripeElements.submit();
-              if (submitError) {
-                logger.error(
-                  "Card validation failed on retry:",
-                  submitError.message,
-                );
-                setPaymentError(
-                  submitError.message || "Please enter valid card details.",
-                );
-                setIsProcessingPayment(false);
-                setSubmitting(false);
-                return;
+              // Skip it for a saved card — there's no Payment Element to validate.
+              if (!retryPaymentData.savedPaymentMethodId) {
+                const { error: submitError } = await stripeElements.submit();
+                if (submitError) {
+                  logger.error(
+                    "Card validation failed on retry:",
+                    submitError.message,
+                  );
+                  setPaymentError(
+                    submitError.message || "Please enter valid card details.",
+                  );
+                  setIsProcessingPayment(false);
+                  setSubmitting(false);
+                  return;
+                }
               }
 
               // Clear error and show processing state
@@ -3043,6 +3340,7 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
                 retryPaymentData.orderKey,
                 retryPaymentData.amountInCents,
                 retryPaymentData.dataToSend,
+                retryPaymentData.savedPaymentMethodId || null,
               );
             } catch (error) {
               // Error is already handled in processStripePayment

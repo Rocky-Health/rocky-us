@@ -45,6 +45,7 @@ const ShippingAddress = ({
                             name="first_name"
                             placeholder="Your first name"
                             required
+                            autoComplete="given-name"
                             value={formData.shipping_address.first_name}
                             onChange={handleShippingAddressChange}
                         />
@@ -53,6 +54,7 @@ const ShippingAddress = ({
                             name="last_name"
                             placeholder="Your last name"
                             required
+                            autoComplete="family-name"
                             value={formData.shipping_address.last_name}
                             onChange={handleShippingAddressChange}
                         />
@@ -69,10 +71,20 @@ const ShippingAddress = ({
                             hidden
                             onChange={null}
                         />
+                        <label
+                            htmlFor="shipping_country_display"
+                            className="sr-only"
+                        >
+                            Country / Region
+                        </label>
                         <input
                             type={"text"}
                             readOnly
                             disabled
+                            id="shipping_country_display"
+                            name="shipping_country_display"
+                            autoComplete="country-name"
+                            aria-label="Country / Region"
                             className="w-full bg-white rounded-[8px] border border-solid border-[#E2E2E1] px-[16px] py-[12px] h-[44px] focus:outline-none focus:border-gray-500"
                             value={"United States"}
                             onChange={null}
@@ -97,6 +109,7 @@ const ShippingAddress = ({
                             name="address_2"
                             value={formData.shipping_address.address_2}
                             placeholder="Enter your apartment number"
+                            autoComplete="address-line2"
                             disabled={isUpdatingShipping}
                             onChange={handleShippingAddressChange}
                         />
@@ -108,6 +121,7 @@ const ShippingAddress = ({
                             value={formData.shipping_address.city}
                             placeholder="Enter your city/town"
                             required
+                            autoComplete="address-level2"
                             disabled={isUpdatingShipping}
                             onChange={handleShippingAddressChange}
                         />
@@ -115,7 +129,7 @@ const ShippingAddress = ({
                     <div className="mb-4 md:flex md:items-center md:gap-[16px]">
                         <div className="mb-4 md:mb-0 w-full ">
                             <label
-                                htmlFor="billing_state"
+                                htmlFor="shipping_state"
                                 className="block text-[14px] font-[500] leading-[19.6px] text-[#212121] mb-2"
                             >
                                 State*
@@ -125,8 +139,9 @@ const ShippingAddress = ({
                                     required
                                     value={formData.shipping_address.state}
                                     onChange={handleShippingAddressChange}
-                                    id="state"
+                                    id="shipping_state"
                                     name="state"
+                                    autoComplete="address-level1"
                                     disabled={isUpdatingShipping}
                                     className={`w-full bg-white rounded-[8px] border border-solid border-[#E2E2E1] px-[16px] h-[44px] focus:outline-none focus:border-gray-500 appearance-none ${
                                         isUpdatingShipping
@@ -205,6 +220,7 @@ const ShippingAddress = ({
                             value={formData.shipping_address.postcode}
                             placeholder="Enter your ZIP code"
                             required
+                            autoComplete="postal-code"
                             disabled={isUpdatingShipping}
                             onChange={handleShippingAddressChange}
                         />

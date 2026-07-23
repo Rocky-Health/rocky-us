@@ -2,6 +2,7 @@ import CartItems from "./CartItems";
 import InitialShipping from "../CartCheckoutShared/InitialShipping";
 import CouponApply from "../CartCheckoutShared/CouponApply";
 import Payment from "./Payment";
+import ExpressCheckoutWallet from "./ExpressCheckoutWallet";
 import Link from "next/link";
 
 const CartAndPayment = ({
@@ -29,6 +30,8 @@ const CartAndPayment = ({
   isPaymentValid,
   paymentValidationMessage,
   onStripeReady, // NEW: Callback for Stripe Elements
+  onWalletClick, // Express Checkout (Apple/Google Pay) gesture guard
+  onWalletConfirm, // Express Checkout confirm handler
   layoutVariant = "default",
 }) => {
   const isGlp2 = layoutVariant === "glp2";
@@ -59,6 +62,15 @@ const CartAndPayment = ({
         </div>
       )}
 
+      {onWalletConfirm && (
+        <div className={isGlp2 ? "" : "lg:max-w-[512px]"}>
+          <ExpressCheckoutWallet
+            onWalletClick={onWalletClick}
+            onWalletConfirm={onWalletConfirm}
+          />
+        </div>
+      )}
+
       <Payment
         setFormData={setFormData}
         formData={formData}
@@ -66,6 +78,8 @@ const CartAndPayment = ({
         heading={isGlp2 ? "Enter your card details" : "Payment Method"}
         cardLabel={isGlp2 ? "Card details" : "Card Details"}
         fullWidth={isGlp2}
+        selectedCard={selectedCard}
+        setSelectedCard={setSelectedCard}
       />
       <button
         onClick={handleSubmit}
@@ -140,6 +154,12 @@ const CartAndPayment = ({
       >
         256-bit SSL encryption · PCI DSS compliant. Pay securely using your
         credit card.
+      </p>
+      <p
+        className={`text-[10px] text-gray-700 mt-4 text-center w-full ${isGlp2 ? "" : "lg:max-w-[512px]"}`}
+      >
+        Once your order is approved, your treatment ships discreetly and
+        typically arrives within 3–5 business days.
       </p>
       <p
         className={`text-[10px] text-gray-700 mt-4 text-center w-full ${isGlp2 ? "" : "lg:max-w-[512px]"}`}

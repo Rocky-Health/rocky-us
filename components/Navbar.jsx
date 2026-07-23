@@ -1,7 +1,6 @@
 import NavContainer from "./Navbar/NavContainer";
 // import DesktopIcons from "./Navbar/DesktopIcons";
 import Logo from "./Navbar/Logo";
-import Trustpilot from "./Navbar/Trustpilot";
 import Navlinks from "./Navbar/Navlinks"; // Changed from MegaMenu to Navlinks, which is the correct component name
 // import MobileMenu from "./Navbar/MobileMenu";
 import { cookies } from "next/headers";
@@ -35,7 +34,6 @@ const Navbar = async ({
 
     return (
         <header className={`${className || ""}`}>
-            {!hideTrustpilot && <Trustpilot />}
             {!hidePartnerBanner && <HeaderProudPartner />}
             <NavContainer>
                 {/* <MobileMenu
@@ -145,6 +143,11 @@ const menuItems = [
         //     link: "/product/hair-growth-support/",
         //   },
         // ],
+    },
+    {
+        category: "NAD+",
+        description: "Boost Your Cellular Energy",
+        link: "/longevity-nad-lp",
     },
     // {
     //   category: "Mental Health",

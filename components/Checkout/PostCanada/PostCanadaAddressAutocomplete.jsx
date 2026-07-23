@@ -294,6 +294,12 @@ const PostCanadaAddressAutocomplete = ({
         const newValue = e.target.value;
         setInputValue(newValue);
 
+        // Forward typed text to parent form state so manual entry works
+        // even when no Google Places suggestion is selected.
+        if (onChange) {
+            onChange({ target: { name, value: newValue } });
+        }
+
         // Use debounced fetch to avoid calling API on every keystroke
         debouncedFetchSuggestions(newValue);
         setShowSuggestions(true);

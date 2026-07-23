@@ -57,6 +57,16 @@ const initializeTikTokPixel = () => {
 };
 
 /**
+ * Build a stable event_id for browser/CAPI deduplication when callers omit one.
+ */
+const buildTikTokEventId = (eventName, eventData = {}) => {
+  if (eventData.event_id) return eventData.event_id;
+  const sessionId = getOrCreateSessionId();
+  const suffix = sessionId ? sessionId.slice(-8) : Math.random().toString(36).slice(2, 10);
+  return `${eventName}_${Date.now()}_${suffix}`;
+};
+
+/**
  * Track TikTok standard event
  * @param {string} eventName - The TikTok event name (e.g., 'AddToCart', 'Purchase')
  * @param {Object} eventData - The event data object
@@ -70,15 +80,18 @@ export const trackTikTokEvent = (eventName, eventData = {}, debug = true, mirror
   try {
     initializeTikTokPixel();
 
+    const event_id = buildTikTokEventId(eventName, eventData);
+    const payload = { ...eventData, event_id };
+
     if (debug) {
-      logger.log(`[TikTok] Tracking event: ${eventName}`, eventData);
+      logger.log(`[TikTok] Tracking event: ${eventName}`, payload);
     }
 
     // Track the event with TikTok pixel (existing behavior — unchanged)
-    window.ttq.track(eventName, eventData);
+    window.ttq.track(eventName, payload);
 
     // Mirror to dataLayer for GTM visibility
-    mirrorToDataLayer(eventName, eventData, mirrorExtra);
+    mirrorToDataLayer(eventName, payload, { event_id, ...mirrorExtra });
 
     if (debug) {
       logger.log(`[TikTok] ✅ Event "${eventName}" tracked successfully`);

@@ -14,11 +14,11 @@ import ClientLayoutProvider from "@/components/Layout/ClientLayoutProvider";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import GlobalQuebecPopup from "@/components/GlobalQuebecPopup";
+import GeoRedirectPopup from "@/components/Popups/GeoRedirectPopup";
 // TK-693: Zendesk disabled on US until the bot's routing/focus-trap is fixed
 // (mobile focus-trap kills the quiz + background polling on the funnel). Kept
 // in source to re-enable once the Zendesk team ships the fix — do not delete.
 // import ZendeskWidget from "@/components/Layout/ZendeskWidget";
-import GoogleOAuthProvider from "@/components/Layout/GoogleOAuthProvider";
 import MetaCookieInitializer from "@/components/Layout/MetaCookieInitializer";
 import FBPixelLoader from "@/components/FBPixelLoader";
 import InactivityTimeoutHandler from "@/components/InactivityTimeoutHandler";
@@ -65,19 +65,19 @@ export const viewport = {
   maximumScale: 1,
 };
 
-const FAVICON_URL =
-  "https://mycdn.myrocky.ca/wp-content/uploads/20260520114301/favicon-mr-desktop.jpg";
-
 const DEFAULT_HOME_TITLE = "MyRocky - Online Healthcare Made For You";
 const DEFAULT_OG_IMAGE = ogImageUrl({ title: SITE.name, vertical: "home" });
 
 export const metadata = {
   metadataBase: new URL(SITE.baseUrl),
+  // TK-492: optimized local icons, each declared once (previously a 27 KB JPEG
+  // declared 3× as icon/shortcut/apple). favicon.ico is <3 KB (16/32/48);
+  // apple-touch-icon is a real PNG; PWA icons live in the web manifest.
   icons: {
-    icon: [{ url: FAVICON_URL, type: "image/jpeg" }],
-    shortcut: FAVICON_URL,
-    apple: FAVICON_URL,
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
+  manifest: "/site.webmanifest",
   title: {
     template: `%s ${SITE.titleSuffix}`,
     default: DEFAULT_HOME_TITLE,
@@ -237,13 +237,15 @@ export default function RootLayout({ children }) {
           src="https://cdn-4.convertexperiments.com/v1/js/10045956-10046753.js?environment=production"
         />
         {/* End Convert Experiences */}
-        {/* Start TikTok Pixel — stub installs immediately so ttq.track() calls queue;
-            the SDK (events.js + chunks + /inter polling) only loads after first user
-            interaction. Idle fallback ensures pageview attribution still fires for bouncers. */}
+        {/* TikTok Pixel — code owns ttq.load() + PageView (same pattern as
+            FBPixelLoader for Meta). SDK loads after first interaction; idle
+            fallback at 15s. ttq.load() is idempotent per pixel ID. If
+            analytics.tiktok.com still shows two main.*.js bundles, remove the
+            TikTok pixel tag from GTM-K9PC394B — do not load from both. */}
         <Script id="tiktok-pixel" strategy="afterInteractive">
           {`
             !function (w, d, t) {
-              w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
+              w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){ttq._i=ttq._i||{};if(ttq._i[e]&&ttq._i[e]._u)return;var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
 
               var __ttqId='${
                 process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID ||
@@ -254,6 +256,7 @@ export default function RootLayout({ children }) {
               function __ttqBoot(){
                 if(__ttqLoaded)return;
                 __ttqLoaded=true;
+                if(d.querySelector('script[src*="analytics.tiktok.com/i18n/pixel/events.js"]'))return;
                 try{ttq.load(__ttqId);ttq.page();}catch(e){}
                 __ttqEvents.forEach(function(ev){w.removeEventListener(ev,__ttqBoot,true);});
                 if(__ttqIdle&&w.cancelIdleCallback){w.cancelIdleCallback(__ttqIdle);}
@@ -266,7 +269,6 @@ export default function RootLayout({ children }) {
             }(window, document, 'ttq');
           `}
         </Script>
-        {/* End TikTok Pixel */}
         {/* Start Microsoft Clarity — lazyOnload: session replay/telemetry does not
             need to race hydration; queued clarity() calls buffer until load. */}
         <Script id="microsoft-clarity" strategy="lazyOnload">
@@ -302,12 +304,14 @@ export default function RootLayout({ children }) {
           <FBPixelLoader />
         </Suspense>
         {/* <CronHitHandler /> */}
-        <GoogleOAuthProvider>
-          <InactivityTimeoutHandler />
-          <Navbar className="navbar-main" />
-          <ClientLayoutProvider>{children}</ClientLayoutProvider>
-          <Footer className="footer-main" />
-        </GoogleOAuthProvider>
+        {/* TK-482: GoogleOAuthProvider removed from the global layout — it
+            injected the 258 KB Google Identity Services script on every page.
+            The GSI script is now lazy-loaded by GoogleSignInButton when an
+            auth surface mounts. Nothing here consumed the OAuth context. */}
+        <InactivityTimeoutHandler />
+        <Navbar className="navbar-main" />
+        <ClientLayoutProvider>{children}</ClientLayoutProvider>
+        <Footer className="footer-main" />
         <ToastContainer
           position="top-right"
           autoClose={5000}
@@ -317,6 +321,7 @@ export default function RootLayout({ children }) {
         />
         {/* Global Quebec Popup - Shows after registration redirect */}
         <GlobalQuebecPopup />
+        <GeoRedirectPopup />
         {/* TK-693: disabled until Zendesk bot fixed — re-enable, don't delete */}
         {/* <ZendeskWidget /> */}
         <Analytics />

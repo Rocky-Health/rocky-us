@@ -11,7 +11,8 @@ const EF_OFFERS = {
 const OrderReceivedPage = async ({ params }) => {
   const cookieStore = await cookies();
   const userId = cookieStore.get("userId")?.value;
-  const orderId = params?.id || "";
+  const resolvedParams = await params;
+  const orderId = resolvedParams?.id || "";
 
   const efOfferId = Number(cookieStore.get("ef_offer_id")?.value);
   const efOffer = EF_OFFERS[efOfferId];
@@ -35,6 +36,8 @@ const OrderReceivedPage = async ({ params }) => {
           mode="conversion"
           offerId={efOfferId}
           network={efOffer.network}
+          adv1={orderId}
+          orderId={orderId}
         />
       )}
       {/* AWIN noscript fallback: use order_id when available so server computes values */}

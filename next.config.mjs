@@ -45,6 +45,10 @@ const nextConfig = {
   experimental: {
     // Tree-shake icon imports (295 import sites across 232 files).
     optimizePackageImports: ["react-icons"],
+    // TK-481: inline CSS into <head> instead of a render-blocking <link>,
+    // removing the ~215 KB blocking stylesheet request (~1.7s on Slow 4G)
+    // that delayed first paint.
+    inlineCss: true,
   },
   images: {
     // AVIF first (~20-30% smaller than WebP), WebP fallback for older browsers.
@@ -156,6 +160,14 @@ const nextConfig = {
         source: `/:path*.${ext}`,
         headers: thirtyDays,
       })),
+      // TK-492: favicon/icon set gets a 1-year immutable cache. Declared AFTER
+      // the media-ext rules so it overrides their 30-day value for these exact
+      // files (Next applies the last matching rule for a given header key).
+      { source: "/favicon.ico", headers: immutable },
+      { source: "/apple-touch-icon.png", headers: immutable },
+      { source: "/icon-192.png", headers: immutable },
+      { source: "/icon-512.png", headers: immutable },
+      { source: "/site.webmanifest", headers: immutable },
     ];
   },
 };

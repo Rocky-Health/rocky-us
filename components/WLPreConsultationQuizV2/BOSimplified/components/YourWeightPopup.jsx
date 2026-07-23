@@ -26,10 +26,10 @@ const YourWeightPopup = ({ weight }) => {
           than you think—without restrictive diets.
         </h1>
         <div className="flex justify-center items-center mb-[24px] relative">
-          <p className="absolute top-[15px] tracking-tight left-[32px]  md:left-[115px] z-[999999] text-[56px] text-white font-medium">
+          <p className="absolute top-[15px] tracking-tight left-[42px]  md:left-[115px] z-[999999] text-[56px] text-white font-medium">
             {weightDisplay}
           </p>
-          <p className="absolute flex items-center top-[80px] text-[#DCA77B]  tracking-tight left-[32px] md:left-[115px] z-[999999] text-[34px]  font-medium">
+          <p className="absolute flex items-center top-[80px] text-[#DCA77B]  tracking-tight left-[42px] md:left-[115px] z-[999999] text-[34px]  font-medium">
             <FaArrowDown className="text-[24px]" /> {weightToLose} lbs
           </p>
           <CustomImage

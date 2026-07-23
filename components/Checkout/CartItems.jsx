@@ -171,16 +171,16 @@ const CartItem = ({ item }) => {
         )}
         {item.name === "Body Optimization Program" && (
           <div className="flex flex-col">
-            <p className="text-sm md:text-base font-[500] text-[#212121] underline text-nowrap">
+            <p className="text-[12px] font-[500] text-[#212121] underline text-nowrap">
               Monthly membership:
             </p>
-            <p className="text-sm md:text-base font-[300] text-[#212121]">
+            <p className="text-[12px] font-[300] text-[#212121]">
               Initial fee $99 | Monthly fee $99
             </p>
-            <p className="text-sm md:text-base font-[500] text-[#212121] mt-2 underline">
+            <p className="text-[12px] font-[500] text-[#212121] mt-2 underline">
               Includes:
             </p>
-            <ul className="text-sm md:text-base font-[300] text-[#212121] list-none pl-5">
+            <ul className="text-[12px] font-[300] text-[#212121] list-none pl-5">
               <li className="text-nowrap">- Monthly prescription</li>
               <li className="text-nowrap">- Follow-ups with clinicians</li>
               <li className="text-nowrap">- Pharmacist counselling</li>

@@ -234,9 +234,12 @@ export const validateBillingAddress = (billingData) => {
   if (billingData.address_1) {
     const addressValidation = validateField("address", billingData.address_1);
     if (!addressValidation.isValid) {
+      // Soft: a present-but-oddly-formatted address shouldn't block the order.
+      // Required (empty) check above still hard-blocks.
       errors.push({
         field: "address_1",
         message: addressValidation.message,
+        soft: true,
       });
     }
   }
@@ -336,9 +339,11 @@ export const validateShippingAddress = (
   if (shippingData.address_1) {
     const addressValidation = validateField("address", shippingData.address_1);
     if (!addressValidation.isValid) {
+      // Soft: see billing address note above.
       errors.push({
         field: "shipping_address_1",
         message: addressValidation.message,
+        soft: true,
       });
     }
   }
@@ -558,17 +563,24 @@ export const validateCheckoutData = (checkoutData) => {
     allErrors.push(...paymentValidation.errors);
   }
 
-  const isValid = allErrors.length === 0;
+  // Soft warnings (e.g. an odd address format) don't block checkout — they
+  // only surface a nudge. Hard errors still gate the order.
+  const errors = allErrors.filter((error) => !error.soft);
+  const warnings = allErrors.filter((error) => error.soft);
+  const isValid = errors.length === 0;
 
   logger.log("Checkout validation result:", {
     isValid,
-    errorCount: allErrors.length,
-    errors: allErrors,
+    errorCount: errors.length,
+    warningCount: warnings.length,
+    errors,
+    warnings,
   });
 
   return {
     isValid,
-    errors: allErrors,
+    errors,
+    warnings,
     billingValid: billingValidation.isValid,
     shippingValid: shippingValidation.isValid,
     paymentValid: paymentValidation.isValid,
