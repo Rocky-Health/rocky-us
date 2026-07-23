@@ -8,12 +8,52 @@ import SearchIcon from "./SearchIcon";
 import MenuContainer from "./MenuContainer";
 import NavHeader from "./NavHeader";
 
-const Navlinks = ({ menuItems, userData, token, nameToShow }) => {
+const Navlinks = ({ menuItems, userData }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [menuVisible, setMenuVisible] = useState(false);
     const [selectedTab, setSelectedTab] = useState("Treatments");
     const [selectedTreatment, setSelectedTreatment] = useState(null);
     const menuScrollRef = useRef(null);
+
+    // TK-438: derive the auth-dependent display on the CLIENT so the server
+    // Navbar no longer calls cookies() (which was forcing every route dynamic).
+    // Initial state is the neutral logged-out placeholder, which matches the
+    // prerendered static HTML exactly — no hydration mismatch and no "Guest"
+    // flicker. The real values resolve right after mount. `token` is used only
+    // to choose the account vs login link; it is never logged or exposed.
+    const [auth, setAuth] = useState({ token: undefined, nameToShow: "" });
+    useEffect(() => {
+        const readCookie = (name) => {
+            const match = document.cookie.match(
+                "(?:^|; )" + name + "=([^;]*)"
+            );
+            return match ? decodeURIComponent(match[1]) : undefined;
+        };
+
+        const cookieToken = readCookie("authToken");
+        const userName = readCookie("userName");
+        const userEmail = readCookie("userEmail");
+        const displayName = readCookie("displayName");
+
+        // Same fallback order as the old server Navbar:
+        // displayName -> first word of userName -> truncated userEmail -> "Guest".
+        let resolvedName;
+        if (displayName) {
+            resolvedName = displayName;
+        } else if (userName) {
+            resolvedName = userName.split(" ")[0];
+        } else if (userEmail) {
+            resolvedName =
+                userEmail.length > 15
+                    ? userEmail.substring(0, 12) + "..."
+                    : userEmail;
+        } else {
+            resolvedName = "Guest";
+        }
+
+        setAuth({ token: cookieToken || undefined, nameToShow: resolvedName });
+    }, []);
+    const { token, nameToShow } = auth;
 
     // Reset menu state when component mounts (new page navigation)
     useEffect(() => {
