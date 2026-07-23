@@ -1,4 +1,5 @@
-"use client";
+// TK-438: Server Component. The only client dependency (auto-apply-coupon hook)
+// lives in the CouponCapture island below.
 import CoverSection from "@/components/utils/CoverSection";
 import WlCover from "@/components/BodyOptimization/WlCover";
 import RockyFeatures from "@/components/RockyFeatures";
@@ -12,12 +13,7 @@ import MoneyBack from "@/components/MoneyBack";
 import WlFaqsSection from "@/components/BodyOptimization/WlFaqsSection";
 import ResultSection from "@/components/BodyOptimization/ResultSection";
 import { Suspense } from "react";
-import { useAutoApplyCoupon } from "@/lib/hooks/useAutoApplyCoupon";
-
-function CouponCapture() {
-  useAutoApplyCoupon();
-  return null;
-}
+import CouponCapture from "@/components/BodyOptimization/CouponCapture";
 
 export default function BodyOptimization() {
   return (
