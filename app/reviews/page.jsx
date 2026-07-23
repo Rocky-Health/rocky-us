@@ -1,5 +1,3 @@
-"use client";
-
 import RockyFeatures from "@/components/RockyFeatures";
 import CoverSection from "@/components/utils/CoverSection";
 import Section from "@/components/utils/Section";
