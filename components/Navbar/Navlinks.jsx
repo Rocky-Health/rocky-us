@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { logger } from "@/utils/devLogger";
 
 import { IoClose } from "react-icons/io5";
@@ -21,7 +22,14 @@ const Navlinks = ({ menuItems, userData }) => {
     // prerendered static HTML exactly — no hydration mismatch and no "Guest"
     // flicker. The real values resolve right after mount. `token` is used only
     // to choose the account vs login link; it is never logged or exposed.
+    const pathname = usePathname();
     const [auth, setAuth] = useState({ token: undefined, nameToShow: "" });
+    // Re-read on mount, on every route change (so it updates right after a
+    // login / register / logout redirect without a hard refresh — the server
+    // Navbar used to get this for free by re-reading cookies each request), and
+    // on window focus. Initial state is the neutral logged-out placeholder so
+    // it matches the prerendered static HTML (no hydration mismatch, no
+    // flicker). `token` only chooses account vs login link; never logged.
     useEffect(() => {
         const readCookie = (name) => {
             const match = document.cookie.match(
@@ -30,29 +38,38 @@ const Navlinks = ({ menuItems, userData }) => {
             return match ? decodeURIComponent(match[1]) : undefined;
         };
 
-        const cookieToken = readCookie("authToken");
-        const userName = readCookie("userName");
-        const userEmail = readCookie("userEmail");
-        const displayName = readCookie("displayName");
+        const readAuth = () => {
+            const cookieToken = readCookie("authToken");
+            const userName = readCookie("userName");
+            const userEmail = readCookie("userEmail");
+            const displayName = readCookie("displayName");
 
-        // Same fallback order as the old server Navbar:
-        // displayName -> first word of userName -> truncated userEmail -> "Guest".
-        let resolvedName;
-        if (displayName) {
-            resolvedName = displayName;
-        } else if (userName) {
-            resolvedName = userName.split(" ")[0];
-        } else if (userEmail) {
-            resolvedName =
-                userEmail.length > 15
-                    ? userEmail.substring(0, 12) + "..."
-                    : userEmail;
-        } else {
-            resolvedName = "Guest";
-        }
+            // Same fallback order as the old server Navbar:
+            // displayName -> first word of userName -> truncated userEmail -> "Guest".
+            let resolvedName;
+            if (displayName) {
+                resolvedName = displayName;
+            } else if (userName) {
+                resolvedName = userName.split(" ")[0];
+            } else if (userEmail) {
+                resolvedName =
+                    userEmail.length > 15
+                        ? userEmail.substring(0, 12) + "..."
+                        : userEmail;
+            } else {
+                resolvedName = "Guest";
+            }
 
-        setAuth({ token: cookieToken || undefined, nameToShow: resolvedName });
-    }, []);
+            setAuth({
+                token: cookieToken || undefined,
+                nameToShow: resolvedName,
+            });
+        };
+
+        readAuth();
+        window.addEventListener("focus", readAuth);
+        return () => window.removeEventListener("focus", readAuth);
+    }, [pathname]);
     const { token, nameToShow } = auth;
 
     // Reset menu state when component mounts (new page navigation)
