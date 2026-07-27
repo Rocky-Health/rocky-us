@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { logger } from "@/utils/devLogger";
 import { layoutExemptRoutes } from "./utils/layoutConfig";
+import { isBlockedRoute } from "@/lib/constants/blockedRoutes";
 
 export function middleware(req) {
   try {
@@ -252,54 +253,6 @@ function shouldProtectRoute(pathname) {
 
   // Check if the current path should be protected
   return protectedRoutes.some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`)
-  );
-}
-
-// Helper function to determine which routes are blocked (hashed in navbar)
-function isBlockedRoute(pathname) {
-  // List of routes that are hashed/blocked in the navbar
-  const blockedRoutes = [
-    // Mental Health routes
-    "/mental-health",
-    "/mh-pre-quiz",
-    "/mh-quiz",
-
-    // Smoking Cessation routes
-    "/zonnic",
-    "/product/zonnic",
-    "/smoking-consultation",
-
-    // Recovery routes
-    "/product/dhm-blend",
-
-    // Merch
-    "/merch",
-
-    // Skincare routes
-    "/acne-cream",
-    "/anti-aging-cream",
-    "/hyper-pigmentation-cream",
-    "/skincare",
-
-    // Old WL consultation (no longer active)
-    "/old-wl-consultation",
-
-    // Mental Health products
-    "/product/bupropion",
-    "/product/citalopram",
-    "/product/escitalopram",
-    "/product/fluoxetine",
-    "/product/paroxetine",
-    "/product/sertraline",
-    "/product/trazodone",
-    "/product/venlafaxine",
-    "/product/essential-mood-balance",
-    "/product/essential-night-boost",
-  ];
-
-  // Check if the current path should be blocked
-  return blockedRoutes.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`)
   );
 }

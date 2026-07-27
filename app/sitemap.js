@@ -1,7 +1,7 @@
 import { wooApiGet } from "@/lib/woocommerce";
 import axios from "axios";
 import { logger } from "@/utils/devLogger";
-import { cities } from "@/lib/constants/cities";
+import { isBlockedRoute } from "@/lib/constants/blockedRoutes";
 
 const BASE_SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ||
@@ -21,7 +21,11 @@ function toSitemapDate(...candidates) {
   return new Date().toISOString();
 }
 
-// Static routes – main pages, policies, and landing pages
+// Static routes – main pages, policies, and landing pages.
+// US-only, 200-status URLs only. Excluded: blocked routes (mental-health, merch,
+// zonnic – redirect to /blocked), CA-only pages (service-across-canada
+// and its cities), and dead/non-indexable URLs (/blog/all 500, /cart auth
+// redirect, /podcast 404).
 const staticRoutes = [
   { url: "", priority: 1.0, changeFrequency: "daily" },
   { url: "/about-us", priority: 0.8, changeFrequency: "monthly" },
@@ -34,8 +38,6 @@ const staticRoutes = [
   { url: "/terms-of-use", priority: 0.5, changeFrequency: "yearly" },
   { url: "/reviews", priority: 0.7, changeFrequency: "weekly" },
   { url: "/blog", priority: 0.9, changeFrequency: "daily" },
-  { url: "/blog/all", priority: 0.8, changeFrequency: "daily" },
-  { url: "/cart", priority: 0.6, changeFrequency: "always" },
   { url: "/search", priority: 0.6, changeFrequency: "always" },
   { url: "/product-faq", priority: 0.6, changeFrequency: "monthly" },
   { url: "/body-optimization", priority: 0.8, changeFrequency: "monthly" },
@@ -44,22 +46,10 @@ const staticRoutes = [
   { url: "/hair", priority: 0.8, changeFrequency: "monthly" },
   { url: "/hair-products", priority: 0.8, changeFrequency: "monthly" },
   { url: "/hairloss", priority: 0.8, changeFrequency: "monthly" },
-  { url: "/mental-health", priority: 0.8, changeFrequency: "monthly" },
-  { url: "/merch", priority: 0.7, changeFrequency: "monthly" },
-  { url: "/podcast", priority: 0.7, changeFrequency: "weekly" },
   { url: "/sex", priority: 0.8, changeFrequency: "monthly" },
   { url: "/service-coverage", priority: 0.7, changeFrequency: "monthly" },
-  { url: "/service-across-canada", priority: 0.8, changeFrequency: "monthly" },
-  { url: "/zonnic", priority: 0.7, changeFrequency: "monthly" },
   { url: "/my-rocky-combo-pack", priority: 0.7, changeFrequency: "monthly" },
 ];
-
-// Service cities – dynamic routes from constants
-const serviceCityRoutes = (cities || []).map((city) => ({
-  url: `/service-across-canada/${city.slug}`,
-  priority: 0.7,
-  changeFrequency: "monthly",
-}));
 
 async function getAllProducts() {
   const products = [];
@@ -148,8 +138,9 @@ export default async function sitemap() {
 
   const sitemapEntries = [];
 
-  // 1) Static routes
+  // 1) Static routes (guarded against the shared blocklist as a safety net)
   for (const route of staticRoutes) {
+    if (isBlockedRoute(route.url)) continue;
     sitemapEntries.push({
       url: `${BASE_SITE_URL}${route.url || "/"}`,
       lastModified: currentDate,
@@ -158,21 +149,12 @@ export default async function sitemap() {
     });
   }
 
-  // 2) Service city routes
-  for (const route of serviceCityRoutes) {
-    sitemapEntries.push({
-      url: `${BASE_SITE_URL}${route.url}`,
-      lastModified: currentDate,
-      changeFrequency: route.changeFrequency,
-      priority: route.priority,
-    });
-  }
-
-  // 3) Product URLs (WooCommerce)
+  // 2) Product URLs (WooCommerce) – skip blocked products (mental-health,
+  // smoking, etc.) that middleware redirects to /blocked.
   try {
     const products = await getAllProducts();
     for (const product of products) {
-      if (product?.slug) {
+      if (product?.slug && !isBlockedRoute(`/product/${product.slug}`)) {
         sitemapEntries.push({
           url: `${BASE_SITE_URL}/product/${product.slug}`,
           lastModified: toSitemapDate(
@@ -189,7 +171,7 @@ export default async function sitemap() {
     logger.error("[Sitemap] Failed to add products:", error.message);
   }
 
-  // 4) Blog post URLs (WordPress)
+  // 3) Blog post URLs (WordPress)
   try {
     const blogs = await getAllBlogPosts();
     for (const blog of blogs) {

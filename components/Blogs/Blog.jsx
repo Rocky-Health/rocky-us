@@ -4,9 +4,24 @@ import Link from "next/link";
 import { useState } from "react";
 
 function getText(html) {
-  var divContainer = document.createElement("div");
-  divContainer.innerHTML = html;
-  return divContainer.textContent || divContainer.innerText || "";
+  if (!html) return "";
+  // Browser: use the DOM for accurate entity/tag handling.
+  if (typeof document !== "undefined") {
+    var divContainer = document.createElement("div");
+    divContainer.innerHTML = html;
+    return divContainer.textContent || divContainer.innerText || "";
+  }
+  // Server (SSR): strip tags and decode common entities without the DOM.
+  return String(html)
+    .replace(/<[^>]*>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;|&apos;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 const Blog = ({ blog }) => {

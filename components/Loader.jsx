@@ -1,3 +1,4 @@
+"use client";
 import { DotsLoader } from "react-loaders-kit";
 
 const Loader = () => {
