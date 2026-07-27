@@ -6,6 +6,7 @@ export const metadata = buildMetadata({
   description:
     "Get in touch with MyRocky's care team — questions about treatment, prescriptions, orders, or your account. We respond within one business day.",
   path: "/contact-us",
+  caPath: "/contact-us",
 });
 
 export default async function ContactUs() {

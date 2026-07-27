@@ -6,6 +6,7 @@ export const metadata = buildMetadata({
   description:
     "Terms governing your use of MyRocky's telehealth platform, prescriptions, and services in the US.",
   path: "/terms-of-use",
+  caPath: "/terms-of-use",
 });
 
 export default function TermsOfUsePage() {

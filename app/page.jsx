@@ -8,6 +8,7 @@ export const metadata = buildMetadata({
   description:
     "Discreet online healthcare for men — ED, hair loss, weight management, mental health, skincare and more, prescribed by licensed clinicians and delivered across the US.",
   path: "/",
+  caPath: "/",
   vertical: "home",
 });
 

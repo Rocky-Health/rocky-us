@@ -6,6 +6,7 @@ export const metadata = buildMetadata({
   description:
     "Find answers about MyRocky treatments, consultations, shipping, prescriptions, and your account. Browse FAQs or reach our care team directly.",
   path: "/help-center",
+  caPath: "/help-center",
 });
 
 export default function HelpCenterPage() {

@@ -5,6 +5,7 @@ export const metadata = buildMetadata({
   description:
     "From online consultation to clinician-prescribed treatment delivered to your door — see how MyRocky makes men's healthcare in the US simple and discreet.",
   path: "/how-it-works",
+  caPath: "/how-it-works",
 });
 
 export default function HowItWorksLayout({ children }) {

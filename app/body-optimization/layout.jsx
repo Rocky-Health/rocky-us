@@ -5,6 +5,7 @@ export const metadata = buildMetadata({
   description:
     "Discover personalized body optimization and weight management solutions with MyRocky. Professional healthcare advice and effective treatments delivered across US.",
   path: "/body-optimization",
+  caPath: "/body-optimization",
   vertical: "wl",
 });
 

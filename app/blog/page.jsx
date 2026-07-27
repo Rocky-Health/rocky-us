@@ -14,6 +14,7 @@ export const metadata = buildMetadata({
   description:
     "Evidence-based articles from MyRocky on ED, hair loss, weight management, mental health, skincare, and longevity — written for men.",
   path: "/blog",
+  caPath: "/blog",
   vertical: "blog",
 });
 

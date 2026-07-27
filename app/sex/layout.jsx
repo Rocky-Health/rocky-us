@@ -5,6 +5,7 @@ export const metadata = buildMetadata({
   description:
     "Get professional sexual health treatment and solutions online with MyRocky. Discreet consultations and medication delivery across US.",
   path: "/sex",
+  caPath: "/sex",
   vertical: "ed",
 });
 

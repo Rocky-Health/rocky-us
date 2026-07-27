@@ -10,10 +10,10 @@ import { FaCheckCircle, FaInstagram, FaTwitter } from "react-icons/fa";
 import { IoIosArrowDown } from "react-icons/io";
 
 const products = [
-    { href: "/product/sildenafil-viagra/", text: "Sildenafil" },
-    { href: "/product/tadalafil-cialis/", text: "Tadalafil" },
-    { href: "/product/finasteride-minoxidil-topical-foam/", text: "Hair Foam" },
-    { href: "/product/ozempic/", text: "Ozempic" },
+    { href: "/product/sildenafil-viagra", text: "Sildenafil" },
+    { href: "/product/tadalafil-cialis", text: "Tadalafil" },
+    { href: "/product/finasteride-minoxidil-topical-foam", text: "Hair Foam" },
+    { href: "/product/ozempic", text: "Ozempic" },
     // { href: "/product/testosterone-support/", text: "Testosterone Support" },
     // { href: "/product/lidocaine-spray/", text: "Lido Spray" },
 ];
@@ -148,17 +148,19 @@ const Footer = ({ className }) => {
                         }`}
                     >
                         {[
-                            { href: "/how-it-works/", text: "How It Works" },
-                            { href: "/faqs/", text: "FAQs" },
-                            { href: "/product-faq/", text: "Product FAQs" },
-                            { href: "/about-us/", text: "About Us" },
-                            { href: "/blog/", text: "Blog" },
+                            { href: "/how-it-works", text: "How It Works" },
+                            { href: "/faqs", text: "FAQs" },
+                            { href: "/product-faq", text: "Product FAQs" },
+                            { href: "/about-us", text: "About Us" },
+                            { href: "/blog", text: "Blog" },
                             // { href: "/podcast/", text: "Podcast" },
-                            // { href: "/blog/category/hair-loss", text: "Hair Loss" },
-                            // { href: "/blog/category/lifestyle", text: "Lifestyle" },
+                            { href: "/blog/category/hair-loss", text: "Hair Loss" },
+                            { href: "/blog/category/lifestyle", text: "Lifestyle" },
+                            { href: "/blog/category/sexual-health", text: "Sexual Health" },
+                            { href: "/blog/category/weight-loss", text: "Weight Loss" },
+                            // mental-health category held: the /mental-health vertical
+                            // is blocked on US for compliance — enable only if approved
                             // { href: "/blog/category/mental-health", text: "Mental Health" },
-                            // { href: "/blog/category/sexual-health", text: "Sexual Health" },
-                            // { href: "/blog/category/weight-loss", text: "Weight Loss" },
                         ].map((link) => (
                             <Link
                                 key={link.href}
@@ -191,17 +193,17 @@ const Footer = ({ className }) => {
                         }`}
                     >
                         {[
-                            { href: "/contact-us/", text: "Contact Us" },
+                            { href: "/contact-us", text: "Contact Us" },
                             {
-                                href: "/terms-of-use/",
+                                href: "/terms-of-use",
                                 text: "Terms & Conditions",
                             },
                             {
-                                href: "/privacy-policy/",
+                                href: "/privacy-policy",
                                 text: "Privacy Policy",
                             },
                             {
-                                href: "/service-coverage/",
+                                href: "/service-coverage",
                                 text: "Service Coverage",
                             },
                         ].map((link) => (
@@ -271,9 +273,9 @@ const Footer = ({ className }) => {
                     {/* Contact Section */}
                     <div className="grid grid-cols-2 md:grid-cols-[3fr_1fr] gap-4 mt-8 mb-4">
                         <div className="flex flex-col justify-center items-center md:items-start">
-                            <h1 className="text-[#efe7df] text-[16px]">
+                            <h4 className="text-[#efe7df] text-[16px]">
                                 Have a question?
-                            </h1>
+                            </h4>
                             <Link
                                 href="mailto:contact@myrocky.com"
                                 className="underline text-[14px]"

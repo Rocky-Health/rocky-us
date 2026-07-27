@@ -5,6 +5,7 @@ export const metadata = buildMetadata({
   description:
     "Get professional hair loss treatment and solutions online with MyRocky. Effective medications and hair care products delivered discreetly across US.",
   path: "/hairloss",
+  caPath: "/hairloss",
   vertical: "hair",
 });
 

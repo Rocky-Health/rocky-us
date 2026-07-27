@@ -10,7 +10,7 @@ const homeBlog = [
     title: "All Things Men Blog",
     subtitle: "A men’s lifestyle blog connecting you with issues that matter.",
     buttonText: "Read Our Blog",
-    buttonLink: "/blog/"
+    buttonLink: "/blog"
   }
 ];
 
@@ -36,9 +36,9 @@ const RockyBlog = ({ blog }) => {
           </video>
 
           <div className="hidden relative z-10 md:flex flex-col justify-end items-center text-center text-[#FFFFFF] h-full px-4 py-12">
-            <h1 className="text-[48px] leading-[55.2px] tracking-[-0.02em]  font-[550] headers-font">
+            <h2 className="text-[48px] leading-[55.2px] tracking-[-0.02em]  font-[550] headers-font">
               {blog.title}
-            </h1>
+            </h2>
             <p className="text-[20px] leading-[28px] mt-4 ">{blog.subtitle}</p>
             {/* <Link
               href={blog.buttonLink}
@@ -57,9 +57,9 @@ const RockyBlog = ({ blog }) => {
           <div className="hidden md:block absolute inset-0 bg-black opacity-50"></div>
 
           <div className="flex md:hidden bg-[#F5F4EF] flex-col justify-end items-center text-center h-full text-black px-5 pt-6 pb-14">
-            <h1 className="text-[32px] leading-[36.8px] font-[550]  tracking-[-0.01em]">
+            <h2 className="text-[32px] leading-[36.8px] font-[550]  tracking-[-0.01em]">
               {blog.title}
-            </h1>
+            </h2>
             {blog.subtitle && (
               <p className="text-[18px] leading-[25.2px] mt-4 text-center">
                 {blog.subtitle}

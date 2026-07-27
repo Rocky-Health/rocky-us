@@ -5,6 +5,7 @@ export const metadata = buildMetadata({
   description:
     "Answers to common questions about MyRocky — consultations, prescriptions, shipping, billing, and how online telehealth works.",
   path: "/faqs",
+  caPath: "/faqs",
 });
 
 export default function FaqsLayout({ children }) {

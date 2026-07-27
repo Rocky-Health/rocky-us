@@ -5,6 +5,7 @@ export const metadata = buildMetadata({
   description:
     "Real reviews from men using MyRocky for ED, hair loss, weight management, mental health, and more. Verified Trustpilot ratings and testimonials.",
   path: "/reviews",
+  caPath: "/reviews",
 });
 
 export default function ReviewsLayout({ children }) {
