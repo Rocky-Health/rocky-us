@@ -14,6 +14,8 @@ import {
   deriveVertical,
   stripHtml,
 } from "@/lib/seo/metadata";
+import { breadcrumbSchema } from "@/lib/seo/schema";
+import JsonLd from "@/components/seo/JsonLd";
 
 // Add revalidation time (1 hour)
 export const revalidate = 3600;
@@ -118,8 +120,18 @@ export default async function ProductPage({ params }) {
       variationManager
     );
 
+    const breadcrumb = breadcrumbSchema([
+      { name: "Home", path: "/" },
+      { name: productData.name, path: `/product/${slug}` },
+    ]);
+
     // Pass the pre-fetched data to the client component
-    return <ProductClientWrapper slug={slug} initialData={pageProps} />;
+    return (
+      <>
+        <JsonLd data={breadcrumb} />
+        <ProductClientWrapper slug={slug} initialData={pageProps} />
+      </>
+    );
   } catch (error) {
     logger.error("Error in ProductPage:", error);
     return <ErrorPage />;
