@@ -760,10 +760,13 @@ export default function WeightLossConsultationQuiz({
   useEffect(() => {
     const initializeForm = async () => {
       const urlParams = new URLSearchParams(window.location.search);
+      const urlId = urlParams.get("id");
+      const urlToken = urlParams.get("token");
       const patientToken = urlParams.get("patient-token");
-      // Portal prefill owns initialization while a recovery link is present.
-      // Re-runs once the prefill effect finishes (or the link is invalid).
-      if (patientToken && !questionnairePrefillLoaded) {
+      // Portal prefill owns initialization while a complete recovery link is
+      // present. Re-runs once the prefill effect finishes. Incomplete links
+      // (missing id/token) fall through so the quiz still boots normally.
+      if (urlId && urlToken && patientToken && !questionnairePrefillLoaded) {
         return;
       }
 

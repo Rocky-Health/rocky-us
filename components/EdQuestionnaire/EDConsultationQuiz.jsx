@@ -58,7 +58,7 @@ export default function EDConsultationQuiz({
         logger.error("Error loading form data from localStorage:", e);
       }
     }
-    const nameParts = userName.split(" ");
+    const nameParts = userName ? userName.split(" ") : [];
     const fname = nameParts[0];
     const lname = nameParts[1];
     // Check for lidocaine addon selection
@@ -131,7 +131,7 @@ export default function EDConsultationQuiz({
     };
   };
 
-  const nameParts = userName.split(" ");
+  const nameParts = userName ? userName.split(" ") : [];
   const fname = nameParts[0];
   const lname = nameParts[1];
 

@@ -64,7 +64,10 @@ export async function GET(req) {
         ? authToken.substring(6)
         : authToken;
       const credentials = Buffer.from(base64Credentials, "base64").toString();
-      const [username, password] = credentials.split(":");
+      // Split on the first colon only, passwords may contain colons
+      const sepIndex = credentials.indexOf(":");
+      const username = sepIndex > 0 ? credentials.slice(0, sepIndex) : "";
+      const password = sepIndex > 0 ? credentials.slice(sepIndex + 1) : "";
       if (!username || !password) {
         throw new Error("Invalid credentials format");
       }
@@ -298,7 +301,6 @@ export async function GET(req) {
     portalUrl.searchParams.set("crm_user_id", crmUserId.toString());
     portalUrl.searchParams.set("wp_user_id", wpUserId.toString());
     portalUrl.searchParams.set("token", token);
-    portalUrl.searchParams.set("authToken", authToken);
     const finalUrl = portalUrl.toString();
 
     // Return the auto-login URL
