@@ -8,15 +8,23 @@ import { useState } from "react";
 // handful of entities WordPress emits in titles/excerpts.
 function getText(html) {
   if (!html) return "";
+  // Browser: use the DOM for accurate entity/tag handling.
+  if (typeof document !== "undefined") {
+    var divContainer = document.createElement("div");
+    divContainer.innerHTML = html;
+    return divContainer.textContent || divContainer.innerText || "";
+  }
+  // Server (SSR): strip tags and decode common entities without the DOM.
   return String(html)
     .replace(/<[^>]*>/g, "")
     .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;|&apos;/g, "'")
+    .replace(/&#x27;/g, "'")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#0?39;/g, "'")
-    .replace(/&#x27;/g, "'")
+    .replace(/\s+/g, " ")
     .trim();
 }
 

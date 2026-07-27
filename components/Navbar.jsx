@@ -3,35 +3,17 @@ import NavContainer from "./Navbar/NavContainer";
 import Logo from "./Navbar/Logo";
 import Navlinks from "./Navbar/Navlinks"; // Changed from MegaMenu to Navlinks, which is the correct component name
 // import MobileMenu from "./Navbar/MobileMenu";
-import { cookies } from "next/headers";
 import HeaderProudPartner from "./Navbar/HeaderProudPartner";
 
-const Navbar = async ({
+// TK-438: no server-side cookie read here. The auth-dependent display (name /
+// logged-in state) is derived client-side in Navlinks, so this component uses
+// no dynamic APIs and every route under the root layout can prerender as
+// static HTML. Markup, styling, and navigation are unchanged.
+const Navbar = ({
     className,
     hideTrustpilot = false,
     hidePartnerBanner = false,
 }) => {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("authToken")?.value;
-    const userName = cookieStore.get("userName")?.value;
-    const userEmail = cookieStore.get("userEmail")?.value;
-    const displayName = cookieStore.get("displayName")?.value;
-
-    // Use display name with fallbacks in this order: displayName -> firstName -> userEmail
-    let nameToShow;
-    if (displayName) {
-        nameToShow = displayName;
-    } else if (userName) {
-        nameToShow = userName.split(" ")[0];
-    } else if (userEmail) {
-        nameToShow =
-            userEmail.length > 15
-                ? userEmail.substring(0, 12) + "..."
-                : userEmail;
-    } else {
-        nameToShow = "Guest";
-    }
-
     return (
         <header className={`${className || ""}`}>
             {!hidePartnerBanner && <HeaderProudPartner />}
@@ -44,11 +26,7 @@ const Navbar = async ({
                 <Logo />
                 {/* Changed from MegaMenu to Navlinks */}
                 {/* <DesktopIcons /> */}
-                <Navlinks
-                    menuItems={menuItems}
-                    token={token}
-                    nameToShow={nameToShow}
-                />
+                <Navlinks menuItems={menuItems} />
             </NavContainer>
         </header>
     );

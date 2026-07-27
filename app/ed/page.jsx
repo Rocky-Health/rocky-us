@@ -1,5 +1,5 @@
-"use client";
-
+// TK-438: Server Component — no page-level hooks; interactive children keep
+// their own "use client" boundary.
 import HowRockyWorks from "@/components/HowRockyWorks";
 import Section from "@/components/utils/Section";
 import CoverSection from "@/components/utils/CoverSection";
