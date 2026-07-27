@@ -24,6 +24,8 @@ import FBPixelLoader from "@/components/FBPixelLoader";
 import InactivityTimeoutHandler from "@/components/InactivityTimeoutHandler";
 import { Suspense } from "react";
 import { SITE, ogImageUrl } from "@/lib/seo/metadata";
+import JsonLd from "@/components/seo/JsonLd";
+import { organizationSchema } from "@/lib/seo/schema";
 
 // Layout will use client-side path detection to avoid forcing dynamic rendering
 
@@ -113,6 +115,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en-US" suppressHydrationWarning={true}>
       <head>
+        {/* Site-wide Organization structured data (non-visual). */}
+        <JsonLd data={organizationSchema()} />
         {/* Minimal-layout pre-paint flag (CLS fix): synchronously tag <html>
             with data-layout BEFORE first paint so the global navbar/footer
             never render visibly on exempt routes (checkout, quizzes,
