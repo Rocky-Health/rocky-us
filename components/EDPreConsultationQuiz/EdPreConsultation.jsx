@@ -139,10 +139,11 @@ const EDPreConsultationQuiz = () => {
 
             logger.log("Redirecting to:", checkoutUrl);
 
-            // Close modal and navigate on success
+            // Close modal and navigate on success (client-side so Convert stays
+            // initialized once per session — matches EdProductCard checkout)
             setShowCrossSellModal(false);
             setIsCheckoutLoading(false);
-            window.location.href = checkoutUrl;
+            router.push(checkoutUrl);
         } catch (error) {
             logger.error("Error during ED PreConsultation checkout:", error);
             setError("An unexpected error occurred. Please try again.");
