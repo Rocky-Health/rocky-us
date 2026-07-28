@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { logger } from "@/utils/devLogger";
 import { layoutExemptRoutes } from "./utils/layoutConfig";
 import { isBlockedRoute } from "@/lib/constants/blockedRoutes";
+import { resolveCountry } from "./utils/geo";
 
 export function middleware(req) {
   try {
@@ -40,11 +41,11 @@ export function middleware(req) {
       return response;
     }
 
-    // Detect visitor country from Vercel edge header or ?geo query param (local testing)
+    // Resolve visitor country (cf-ipcountry primary, x-vercel-ip-country
+    // fallback - see utils/geo.js). The ?geo query param remains a last-resort
+    // override for local testing.
     const geoCountry =
-      req.headers.get("x-vercel-ip-country") ||
-      req.nextUrl.searchParams.get("geo") ||
-      "";
+      resolveCountry(req) || req.nextUrl.searchParams.get("geo") || "";
 
     // Handle redirects for old blog structure to new blog structure
     if (pathname.startsWith("/old-blog/")) {
@@ -209,12 +210,22 @@ export function middleware(req) {
     });
 
     if (geoCountry) {
+      // Non-sensitive value the client reads to decide the geo popup, so
+      // httpOnly:false is required. No `secure` so it also works over http in
+      // local dev; SameSite=Lax is sufficient. opts kept in sync with the CA
+      // middleware (maxAge lowered from 86400 to 3600 for consistency; the
+      // cookie is re-derived every request, so a shorter TTL only self-heals
+      // stale values faster and does not affect prompt frequency, which the
+      // popup gates via sessionStorage).
       response.cookies.set("geo-country", geoCountry, {
         path: "/",
-        httpOnly: false,
+        maxAge: 3600,
         sameSite: "lax",
-        maxAge: 86400,
+        httpOnly: false,
       });
+    } else {
+      // No valid country → clear any stale value so it can't persist.
+      response.cookies.delete("geo-country");
     }
 
     return response;
