@@ -182,7 +182,27 @@ export function middleware(req) {
     }
 
     // Case 3: If user is not authenticated and trying to access protected routes, redirect to register
-    if (!authToken && !isLoginPage && shouldProtectRoute(pathname)) {
+    // Patient portal links carry id, token and patient-token; let them reach the questionnaire directly
+    const patientPortalId = req.nextUrl.searchParams.get("id");
+    const patientPortalToken = req.nextUrl.searchParams.get("token");
+    const patientToken = req.nextUrl.searchParams.get("patient-token");
+    const hasPatientPortalTokens = !!(
+      patientPortalId &&
+      patientPortalToken &&
+      patientToken
+    );
+    const isQuestionnaireRoute = [
+      "/ed-consultation-quiz",
+      "/hair-main-questionnaire",
+      "/wl-consultation",
+    ].some((route) => pathname === route || pathname.startsWith(`${route}/`));
+
+    if (
+      !authToken &&
+      !isLoginPage &&
+      shouldProtectRoute(pathname) &&
+      !(hasPatientPortalTokens && isQuestionnaireRoute)
+    ) {
       // Create login URL with register view
       const loginUrl = new URL("/login-register", req.nextUrl.origin);
 
