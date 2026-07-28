@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { logger } from "@/utils/devLogger";
+import { logger, redactSensitive } from "@/utils/devLogger";
 
 export async function GET(req) {
   try {
@@ -23,24 +23,17 @@ export async function GET(req) {
     // CRM and Portal URLs from environment variables
     const crmHostUrl = process.env.CRM_HOST;
     const portalHostUrl = process.env.PORTAL_HOST;
-    const apiUsername = process.env.CRM_API_USERNAME;
-    const apiPasswordEncoded = process.env.CRM_API_PASSWORD;
 
-    // Debug: Print environment variables (without exposing the full password)
     logger.log("API: Environment variables check:", {
       crmHostUrl: crmHostUrl ? "✓ Set" : "✗ Missing",
       portalHostUrl: portalHostUrl ? "✓ Set" : "✗ Missing",
-      apiUsername: apiUsername ? "✓ Set" : "✗ Missing",
-      apiPasswordEncoded: apiPasswordEncoded ? "✓ Set" : "✗ Missing",
     });
 
     // If environment variables are not set, return an error
-    if (!crmHostUrl || !portalHostUrl || !apiUsername || !apiPasswordEncoded) {
+    if (!crmHostUrl || !portalHostUrl) {
       const missingVars = [];
       if (!crmHostUrl) missingVars.push("CRM_HOST");
       if (!portalHostUrl) missingVars.push("PORTAL_HOST");
-      if (!apiUsername) missingVars.push("CRM_API_USERNAME");
-      if (!apiPasswordEncoded) missingVars.push("CRM_API_PASSWORD");
 
       const errorMsg = `Missing required environment variables: ${missingVars.join(
         ", "
@@ -52,34 +45,68 @@ export async function GET(req) {
       );
     }
 
-    // Decode the base64 encoded password
-    let apiPassword;
-    try {
-      apiPassword = Buffer.from(apiPasswordEncoded, "base64").toString();
-      logger.log("API: Successfully decoded auth token");
-    } catch (decodeError) {
-      logger.error("API: Failed to decode base64 password:", decodeError);
+    const url = new URL(req.url);
+    const authTokenFromUrl = url.searchParams.get("authToken");
+
+    const authToken = authTokenFromUrl || cookieStore.get("authToken")?.value;
+    if (!authToken) {
+      logger.error("API: authToken not found in URL params or cookies");
       return NextResponse.json(
-        { success: false, error: "Failed to decode API password" },
-        { status: 500 }
+        { success: false, error: "User authentication token not found" },
+        { status: 401 }
       );
     }
 
-    // Extract query parameters
-    const url = new URL(req.url);
+    // Decode the user's Basic auth token into email and password
+    let apiUsername, apiPassword;
+    try {
+      const base64Credentials = authToken.startsWith("Basic ")
+        ? authToken.substring(6)
+        : authToken;
+      const credentials = Buffer.from(base64Credentials, "base64").toString();
+      // Split on the first colon only, passwords may contain colons
+      const sepIndex = credentials.indexOf(":");
+      const username = sepIndex > 0 ? credentials.slice(0, sepIndex) : "";
+      const password = sepIndex > 0 ? credentials.slice(sepIndex + 1) : "";
+      if (!username || !password) {
+        throw new Error("Invalid credentials format");
+      }
+      apiUsername = username;
+      apiPassword = password;
+      logger.log("API: Successfully extracted credentials from authToken", {
+        hasUsername: !!apiUsername,
+        hasPassword: !!apiPassword,
+      });
+    } catch (decodeError) {
+      logger.error("API: Failed to decode authToken:", decodeError);
+      return NextResponse.json(
+        { success: false, error: "Failed to decode authentication token" },
+        { status: 401 }
+      );
+    }
+
+    // Extract query parameters, redirectPath wins over redirectPage
+    const redirectPath = url.searchParams.get("redirectPath");
     const redirectPage = url.searchParams.get("redirectPage") || "dashboard";
-    logger.log("API: Redirect page set to:", redirectPage);
+    const redirectValue =
+      redirectPath != null && redirectPath !== "" ? redirectPath : redirectPage;
+    logger.log(
+      "API: Redirect set to:",
+      redirectValue,
+      redirectPath != null ? "(full path)" : "(page)"
+    );
 
     logger.log("API: Attempting CRM authentication");
-    logger.log(`API: CRM endpoint: ${crmHostUrl}/api/login`);
+    logger.log(`API: CRM endpoint: ${crmHostUrl}/api/crm-user/login`);
 
-    // Step 1: Authenticate with CRM API
+    // Step 1: Authenticate with CRM API as the actual user
     let loginResponse;
     try {
-      loginResponse = await fetch(`${crmHostUrl}/api/login`, {
+      loginResponse = await fetch(`${crmHostUrl}/api/crm-user/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "is-patient-portal": "true",
         },
         body: JSON.stringify({
           email: apiUsername,
@@ -117,7 +144,7 @@ export async function GET(req) {
       loginData = await loginResponse.json();
       logger.log(
         "API: CRM authentication response received",
-        loginData.success ? "successfully" : "with errors"
+        loginData.status ? "successfully" : "with errors"
       );
     } catch (jsonError) {
       logger.error("API: Failed to parse CRM response:", jsonError);
@@ -130,8 +157,11 @@ export async function GET(req) {
       );
     }
 
-    if (!loginData.success || !loginData.data?.token) {
-      logger.error("API: CRM authentication token not found", loginData);
+    if (!loginData?.status || !loginData?.token) {
+      logger.error(
+        "API: CRM authentication token not found",
+        redactSensitive(loginData)
+      );
       return NextResponse.json(
         {
           success: false,
@@ -142,7 +172,13 @@ export async function GET(req) {
       );
     }
 
-    const token = loginData.data.token;
+    const token = loginData.token;
+    const wpUserId = loginData.data.wp_user_id;
+    const crmUserId = loginData.data.crm_user_id;
+
+    cookieStore.set("userId", wpUserId.toString());
+    cookieStore.set("crm_user_id", crmUserId.toString());
+
     logger.log("API: Successfully obtained CRM auth token");
 
     // Step 2: Get auto-login link for the portal
@@ -155,9 +191,10 @@ export async function GET(req) {
     try {
       // Construct query parameters for GET request
       const queryParams = new URLSearchParams({
-        wp_user_id: userId,
+        wp_user_id: wpUserId,
+        crm_user_id: crmUserId,
         expiration_hour: 1,
-        redirect: redirectPage,
+        redirect: redirectValue,
       });
 
       portalResponse = await fetch(
@@ -167,6 +204,7 @@ export async function GET(req) {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+            "X-CRM-User-ID": crmUserId.toString(),
           },
         }
       );
@@ -215,7 +253,10 @@ export async function GET(req) {
     }
 
     if (!portalData.success || !portalData.data?.link) {
-      logger.error("API: Portal auto-login link not found", portalData);
+      logger.error(
+        "API: Portal auto-login link not found",
+        redactSensitive(portalData)
+      );
       return NextResponse.json(
         {
           success: false,
@@ -229,10 +270,10 @@ export async function GET(req) {
     // Verify that the returned user ID matches the current user
     if (
       portalData.data.wp_user_id &&
-      portalData.data.wp_user_id.toString() !== userId
+      portalData.data.wp_user_id.toString() !== wpUserId.toString()
     ) {
       logger.error("API: User ID mismatch", {
-        expected: userId,
+        expected: wpUserId,
         received: portalData.data.wp_user_id,
       });
       return NextResponse.json(
@@ -240,7 +281,7 @@ export async function GET(req) {
           success: false,
           error: "User ID mismatch",
           details: {
-            expected: userId,
+            expected: wpUserId,
             received: portalData.data.wp_user_id,
           },
         },
@@ -250,10 +291,22 @@ export async function GET(req) {
 
     logger.log("API: Successfully obtained portal auto-login URL");
 
+    // Force the returned link onto the portal host and append auth params
+    const portalLink = portalData.data.link;
+    const portalBase = new URL(portalHostUrl);
+    const parsedLink = new URL(portalLink, portalBase.origin);
+    const pathAndSearch =
+      parsedLink.pathname + parsedLink.search + (parsedLink.hash || "");
+    const portalUrl = new URL(pathAndSearch, portalBase.origin);
+    portalUrl.searchParams.set("crm_user_id", crmUserId.toString());
+    portalUrl.searchParams.set("wp_user_id", wpUserId.toString());
+    portalUrl.searchParams.set("token", token);
+    const finalUrl = portalUrl.toString();
+
     // Return the auto-login URL
     return NextResponse.json({
       success: true,
-      url: portalData.data.link,
+      url: finalUrl,
     });
   } catch (error) {
     logger.error("API: Error in portal login API:", error);
