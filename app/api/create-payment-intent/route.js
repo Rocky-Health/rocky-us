@@ -19,6 +19,7 @@ export async function POST(req) {
       customerName,
       billingDetails,
       metadata = {},
+      paymentAttemptId,
     } = requestData;
 
     // Validation
@@ -183,7 +184,13 @@ export async function POST(req) {
       );
     }
 
-    const paymentIntent = await stripe.paymentIntents.create(paymentIntentData);
+    // Dedupes duplicate submits of the same attempt; falls back to the
+    // payment method id for clients that don't send an attempt id yet.
+    const paymentIntent = await stripe.paymentIntents.create(paymentIntentData, {
+      idempotencyKey: `create-payment-intent-${orderId}-${
+        paymentAttemptId || paymentMethodId
+      }`,
+    });
 
     logger.log("✅ PaymentIntent created and confirmed:", {
       id: paymentIntent.id,

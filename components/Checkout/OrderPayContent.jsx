@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import Image from "next/image";
 import { logger } from "@/utils/devLogger";
+import { newPaymentAttemptId } from "@/utils/paymentAttemptId";
 import { formatPriceUI } from "@/utils/priceFormatter";
 import {
   transformPaymentError,
@@ -106,6 +107,7 @@ function OrderPayForm({
             paymentMethodId: paymentMethod.id,
             customerEmail: billingDetails.email,
             customerName: billingDetails.name,
+            paymentAttemptId: newPaymentAttemptId(),
           }),
         });
 

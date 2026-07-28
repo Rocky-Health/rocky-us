@@ -2,6 +2,7 @@
 
 import Loader from "@/components/Loader";
 import { logger } from "@/utils/devLogger";
+import { newPaymentAttemptId } from "@/utils/paymentAttemptId";
 import CheckoutSkeleton from "@/components/ui/skeletons/CheckoutSkeleton";
 import { useEffect, useRef, useState } from "react";
 import BillingAndShipping from "./BillingAndShipping";
@@ -1426,6 +1427,7 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
           paymentMethodId: paymentMethodToUse,
           customerEmail: dataToSend.email,
           customerName: `${dataToSend.firstName} ${dataToSend.lastName}`,
+          paymentAttemptId: newPaymentAttemptId(),
         }),
       });
 
