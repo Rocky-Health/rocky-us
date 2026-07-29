@@ -2,6 +2,10 @@ import React from "react";
 import CityPage from "@/components/service-across-canada/CityPage";
 import { cityData, defaultCityInfo } from "@/lib/constants/CityData";
 
+export function generateStaticParams() {
+    return Object.keys(cityData).map((city) => ({ city }));
+}
+
 export async function generateMetadata({ params }) {
     const { city } = await params;
     const cityInfo = cityData[city] || defaultCityInfo;
