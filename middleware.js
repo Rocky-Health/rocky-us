@@ -155,11 +155,50 @@ export function middleware(req) {
       const redirectTo = req.nextUrl.searchParams.get("redirect_to");
       if (redirectTo) {
         try {
-          return NextResponse.redirect(new URL(decodeURIComponent(redirectTo)));
+          const decoded = decodeURIComponent(redirectTo);
+          const isPathOnly = decoded.startsWith("/");
+          if (!isPathOnly) {
+            const redirectUrl = new URL(decoded);
+            const sameOrigin = redirectUrl.origin === req.nextUrl.origin;
+            const portalHost = process.env.PORTAL_HOST || "";
+            let portalOrigin = null;
+            try {
+              portalOrigin = portalHost ? new URL(portalHost).origin : null;
+            } catch (_) {
+              portalOrigin = null;
+            }
+            const isPortalUrl =
+              portalOrigin && redirectUrl.origin === portalOrigin;
+            if (!sameOrigin && isPortalUrl) {
+              // Portal deep link: bounce through /my-account so the auto-login
+              // link is generated before landing on the requested portal page
+              const pathAndSearch = redirectUrl.pathname + redirectUrl.search;
+              const myAccountUrl = new URL("/my-account", req.nextUrl.origin);
+              myAccountUrl.searchParams.set(
+                "redirectPath",
+                pathAndSearch.startsWith("/")
+                  ? pathAndSearch
+                  : "/" + pathAndSearch
+              );
+              return NextResponse.redirect(myAccountUrl);
+            }
+            if (!sameOrigin) {
+              // Only same-origin or portal URLs are allowed
+              return NextResponse.redirect(new URL("/", req.url));
+            }
+          }
+          if (isPathOnly) {
+            return NextResponse.redirect(new URL(decoded, req.url));
+          }
+          return NextResponse.redirect(new URL(decoded));
         } catch (e) {
-          // fallback: use as-is if decode fails, but ensure it's a proper URL
+          // fallback: use as-is if decode fails, but keep it same-origin
           try {
-            return NextResponse.redirect(new URL(redirectTo, req.url));
+            const fallbackUrl = new URL(redirectTo, req.url);
+            if (fallbackUrl.origin === req.nextUrl.origin) {
+              return NextResponse.redirect(fallbackUrl);
+            }
+            return NextResponse.redirect(new URL("/", req.url));
           } catch (fallbackError) {
             // If all else fails, redirect to home
             logger.error("Failed to redirect to:", redirectTo, fallbackError);
