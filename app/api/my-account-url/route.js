@@ -301,6 +301,9 @@ export async function GET(req) {
     portalUrl.searchParams.set("crm_user_id", crmUserId.toString());
     portalUrl.searchParams.set("wp_user_id", wpUserId.toString());
     portalUrl.searchParams.set("token", token);
+    // The portal needs the site authToken to authenticate the user back on
+    // the headless side, same as the CA implementation
+    portalUrl.searchParams.set("authToken", authToken);
     const finalUrl = portalUrl.toString();
 
     // Return the auto-login URL
