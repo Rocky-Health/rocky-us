@@ -5,10 +5,10 @@ const PodcastHeader = () => {
   return (
     <header className="flex flex-col gap-4 items-center">
       <h1 className="text-[#000000] text-[32px] md:text-6xl headers-font font-[550] leading-[115%] headers-font">
-        Useful Men's Health Podcasts
+        Useful Health Podcasts
       </h1>
       <p className="text-[#000000] text-base md:text-xl">
-        Actionable health insights helping men live stronger, healthier, happier
+        Actionable health insights helping Americans live stronger, healthier, happier
         lives.
       </p>
       <button
