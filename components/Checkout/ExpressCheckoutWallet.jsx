@@ -3,22 +3,30 @@
 import { useMemo, useState } from "react";
 import { ExpressCheckoutElement } from "@stripe/react-stripe-js";
 
-// Shipping-rate placeholders for the wallet sheet: free over the threshold,
-// flat rate under it. Amounts are in cents.
-// TODO(TK-839): confirm real shipping thresholds/rates with Tymour
-const FREE_SHIPPING_MIN_CENTS = 3000; // $30 USD
-const FLAT_SHIPPING_CENTS = 500; // $5 USD placeholder
-
-const buildShippingRates = (subtotalCents) =>
-  subtotalCents >= FREE_SHIPPING_MIN_CENTS
-    ? [{ id: "free", amount: 0, displayName: "Free shipping" }]
-    : [
-        {
-          id: "flat",
-          amount: FLAT_SHIPPING_CENTS,
-          displayName: "Standard shipping",
-        },
-      ];
+// Map WooCommerce Store API shipping rates (cartItems.shipping_rates: an array
+// of packages, each exposing its own rate choices with prices already in minor
+// units) into the shape Stripe's ExpressCheckoutElement expects:
+// { id, displayName, amount } with amount in cents. The WC-selected rate is
+// listed first so the wallet defaults to the same rate the checkout summary shows.
+const mapWooShippingRates = (packages) => {
+  if (!Array.isArray(packages)) return [];
+  const rates = [];
+  const seen = new Set();
+  for (const pkg of packages) {
+    for (const rate of pkg?.shipping_rates || []) {
+      if (!rate?.rate_id || seen.has(rate.rate_id)) continue;
+      seen.add(rate.rate_id);
+      rates.push({
+        id: rate.rate_id,
+        displayName: rate.name || "Shipping",
+        amount: Math.round(Number(rate.price) || 0),
+        selected: !!rate.selected,
+      });
+    }
+  }
+  rates.sort((a, b) => Number(b.selected) - Number(a.selected));
+  return rates.map(({ selected, ...rate }) => rate);
+};
 
 // Apple Pay / Google Pay buttons. Lives at the top of the checkout page so the
 // wallet sheet collects name/email/billing/shipping and the user can skip the
@@ -50,18 +58,18 @@ const EXPRESS_CHECKOUT_OPTIONS = {
 export default function ExpressCheckoutWallet({
   onWalletClick,
   onWalletConfirm,
-  cartSubtotalCents = 0,
+  wcShippingRates,
 }) {
   // Hidden until onReady tells us a wallet is actually available on this device.
   const [visible, setVisible] = useState(false);
 
-  // TK-839: placeholder shipping rates offered in the wallet sheet, keyed off
-  // the cart subtotal. For ExpressCheckoutElement these are supplied when the
-  // sheet opens (onClick resolve) and re-resolved on address change, not as a
-  // static element option.
+  // TK-839: real WooCommerce shipping rates for the current cart + address (the
+  // same rates the checkout summary renders), mapped to the Stripe shape. For
+  // ExpressCheckoutElement these are supplied when the sheet opens (onClick
+  // resolve) and re-offered on address change, not as a static element option.
   const shippingRates = useMemo(
-    () => buildShippingRates(cartSubtotalCents),
-    [cartSubtotalCents],
+    () => mapWooShippingRates(wcShippingRates),
+    [wcShippingRates],
   );
 
   const handleReady = (event) => {
@@ -70,7 +78,7 @@ export default function ExpressCheckoutWallet({
   };
 
   // The wallet lets the user change their shipping address; re-offer the same
-  // placeholder rates so Stripe keeps the sheet open.
+  // WC-computed rates so Stripe keeps the sheet open.
   const handleShippingAddressChange = (event) => {
     event.resolve({ shippingRates });
   };

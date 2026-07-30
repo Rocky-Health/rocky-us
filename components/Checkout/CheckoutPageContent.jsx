@@ -3245,24 +3245,16 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
     onStripeReady: setStripeElements,
   };
 
-  // TK-839: cart subtotal in minor units (WC Store API already exposes these in
-  // cents) drives the wallet's placeholder shipping rate.
-  const cartSubtotalCents = cartItems?.totals
-    ? Math.round(
-        parseFloat(
-          cartItems.totals.total_items ?? cartItems.totals.total_price ?? 0,
-        ),
-      )
-    : 0;
-
   // TK-839: express wallet (Apple/Google Pay) surfaced at the top of the page so
   // the wallet sheet can collect name/email/billing/shipping and the user can
   // skip the manual form. Rendered inside the shared <Elements> provider above.
+  // The wallet sheet is fed the real WC-computed shipping rates for the current
+  // cart + address (same source the checkout summary renders).
   const expressWallet = (
     <ExpressCheckoutWallet
       onWalletClick={handleExpressWalletClick}
       onWalletConfirm={handleExpressWalletConfirm}
-      cartSubtotalCents={cartSubtotalCents}
+      wcShippingRates={cartItems?.shipping_rates}
     />
   );
 
