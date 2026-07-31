@@ -16,7 +16,7 @@ export async function generateMetadata({ params }) {
     const categoryName = current?.name || slug.replace(/-/g, " ");
     const description =
       stripHtml(current?.description) ||
-      `Articles on ${categoryName} from MyRocky — men's health articles for the US.`;
+      `Articles on ${categoryName} from MyRocky — Health articles for the US.`;
 
     return buildMetadata({
       title: `${categoryName} Articles`,

@@ -9,7 +9,7 @@ export const revalidate = 300;
 export const metadata = buildMetadata({
   title: "All Articles",
   description:
-    "Browse every article from MyRocky's library — men's health, treatment guides, and clinician perspectives.",
+    "Browse every article from MyRocky's library — health, treatment guides, and clinician perspectives.",
   path: "/blog/all",
   vertical: "blog",
 });

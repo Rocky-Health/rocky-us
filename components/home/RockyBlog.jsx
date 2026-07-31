@@ -7,8 +7,8 @@ const homeBlog = [
   {
     videoSrc:
       "https://rockywp.s3.ca-central-1.amazonaws.com/wp-content/uploads/video/Rockyhealth-Ad-V1.mp4",
-    title: "All Things Men Blog",
-    subtitle: "A men’s lifestyle blog connecting you with issues that matter.",
+    title: "All Things Health Blog",
+    subtitle: "A lifestyle blog connecting you with issues that matter.",
     buttonText: "Read Our Blog",
     buttonLink: "/blog/"
   }

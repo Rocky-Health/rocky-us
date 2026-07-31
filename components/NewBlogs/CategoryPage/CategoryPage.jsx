@@ -62,7 +62,7 @@ export default function CategoryPage({
                         {category?.name}
                     </h1>
                     <p className="text-[16px] md:text-[18px] text-[#000000B8] max-w-md leading-[140%]">
-                        Your guide to men's health from sex and hair to mental
+                        Your guide to health from sex and hair to mental
                         health, weight loss and more.
                     </p>
                 </div>

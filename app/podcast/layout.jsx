@@ -2,9 +2,9 @@ import React from "react";
 import { buildMetadata } from "@/lib/seo/metadata";
 
 export const metadata = buildMetadata({
-  title: "MyRocky Podcast — Expert Insights on Men's Health",
+  title: "MyRocky Podcast — Expert Insights on Health",
   description:
-    "Conversations with clinicians and specialists on men's health, longevity, mental wellness, and the science behind MyRocky's treatments.",
+    "MyRocky Podcast — Expert Insights on Health",
   path: "/podcast",
 });
 
