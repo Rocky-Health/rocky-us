@@ -21,7 +21,7 @@ const PodcastEpisodes = () => {
   return (
     <SectionContainer>
       <SectionHeader
-        title="Popular Men's Health Podcast Episodes"
+        title="Popular Health Podcast Episodes"
         subtitle="Stay informed, stay healthy."
       />
 
