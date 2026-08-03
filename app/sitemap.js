@@ -1,7 +1,10 @@
 import { wooApiGet } from "@/lib/woocommerce";
 import axios from "axios";
 import { logger } from "@/utils/devLogger";
-import { isBlockedRoute } from "@/lib/constants/blockedRoutes";
+import {
+  isBlockedRoute,
+  isRestrictedProductRoute,
+} from "@/lib/constants/blockedRoutes";
 
 const BASE_SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ||
@@ -150,13 +153,19 @@ export default async function sitemap() {
   }
 
   // 2) Product URLs (WooCommerce) – skip blocked products (mental-health,
-  // smoking, etc.) that middleware redirects to /blocked.
+  // smoking, etc.) that middleware redirects to /blocked, and compounded
+  // weight-loss products that middleware redirects to the homepage.
   try {
     const products = await getAllProducts();
     for (const product of products) {
-      if (product?.slug && !isBlockedRoute(`/product/${product.slug}`)) {
+      const productPath = product?.slug ? `/product/${product.slug}` : null;
+      if (
+        productPath &&
+        !isBlockedRoute(productPath) &&
+        !isRestrictedProductRoute(productPath)
+      ) {
         sitemapEntries.push({
-          url: `${BASE_SITE_URL}/product/${product.slug}`,
+          url: `${BASE_SITE_URL}${productPath}`,
           lastModified: toSitemapDate(
             product.date_modified_gmt,
             product.date_modified,

@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { logger } from "@/utils/devLogger";
 import { layoutExemptRoutes } from "./utils/layoutConfig";
-import { isBlockedRoute } from "@/lib/constants/blockedRoutes";
+import {
+  isBlockedRoute,
+  isRestrictedProductRoute,
+} from "@/lib/constants/blockedRoutes";
 import { resolveCountry } from "./utils/geo";
 
 export function middleware(req) {
@@ -62,12 +65,7 @@ export function middleware(req) {
     }
 
     // Redirect compounded weight loss product pages to homepage
-    const restrictedProductSlugs = [
-      "/product/compounded-tirzepatide",
-      "/product/compounded-terzepatide", // Handle typo variant
-      "/product/compounded-semaglutide",
-    ];
-    if (restrictedProductSlugs.includes(pathname)) {
+    if (isRestrictedProductRoute(pathname)) {
       return NextResponse.redirect(new URL("/", req.url));
     }
 
