@@ -606,7 +606,7 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
                     name="password"
                     className="block w-[100%] rounded-[8px] h-[40px] text-md m-auto border-gray-500 border px-4 focus:outline focus:outline-2 focus:outline-black focus:ring-0 focus:border-transparent"
                     tabIndex="4"
-                    autoComplete="off"
+                    autoComplete="new-password"
                     value={formData.password}
                     onChange={handleChange}
                     style={{ outlineColor: "black" }}
@@ -675,7 +675,7 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
                     name="confirm_password"
                     className="block w-[100%] rounded-[8px] h-[40px] text-md m-auto border-gray-500 border px-4 focus:outline focus:outline-2 focus:outline-black focus:ring-0 focus:border-transparent"
                     tabIndex="4"
-                    autoComplete="off"
+                    autoComplete="new-password"
                     value={formData.confirm_password}
                     onChange={handleChange}
                     style={{ outlineColor: "black" }}
