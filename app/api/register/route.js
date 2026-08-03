@@ -228,9 +228,9 @@ export async function POST(req) {
                 );
                 const cookieStore = await cookies();
                 cookieStore.set("authToken", `Basic ${encodedCredentials}`);
-                // Marks the session start so the inactivity hook can discard
-                // stale lastActivityTime values from a previous session
-                cookieStore.set("loginTime", Date.now().toString());
+                // Per-login id so the inactivity hook can discard stale
+                // lastActivityTime values from a previous session
+                cookieStore.set("loginSession", crypto.randomUUID());
                 cookieStore.set("userId", userId.toString());
                 cookieStore.set("userName", `${first_name} ${last_name}`);
                 cookieStore.set("userEmail", email);
