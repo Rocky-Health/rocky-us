@@ -21,11 +21,11 @@ export function useNadCheckout() {
         setIsAdding(true);
 
         try {
-            // US standalone NAD+ SKU: $99/month subscription (product 490785).
+            // US standalone NAD+ SKU: $199/month subscription (product 490785).
             const mainProduct = {
                 id: "490785",
                 name: "NAD+",
-                price: "$99",
+                price: "$199",
                 isSubscription: true,
                 variationId: "490785",
             };
