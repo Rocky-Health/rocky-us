@@ -121,7 +121,8 @@ export const formatTikTokEventData = (product, quantity = 1) => {
     content_type: "product",
     content_ids: [product.sku || product.id?.toString() || ""],
     content_name: product.name || "",
-    content_category: contentCategory,
+    // Only send content_category when we have a real value, never an empty string.
+    ...(contentCategory ? { content_category: contentCategory } : {}),
     quantity: quantity,
     price: price,
     value: value,
@@ -182,10 +183,13 @@ export const trackTikTokInitiateCheckout = (
     });
   });
 
+  const contentCategory = [...categorySet].join(", ");
+
   const eventData = {
     content_type: "product",
     content_ids: content_ids,
-    content_category: [...categorySet].join(", "),
+    // Only send content_category when we have a real value, never an empty string.
+    ...(contentCategory ? { content_category: contentCategory } : {}),
     quantity: totalQuantity,
     value: totalValue,
     currency: "USD",
@@ -224,12 +228,14 @@ export const trackTikTokPurchase = (
   }
 
   const purchaseEventId = `purchase_${order.id || "na"}_${Date.now()}`;
+  const contentCategory = [...categorySet].join(", ");
 
   const eventData = {
     event_id: purchaseEventId,
     content_type: "product",
     content_ids: content_ids,
-    content_category: [...categorySet].join(", "),
+    // Only send content_category when we have a real value, never an empty string.
+    ...(contentCategory ? { content_category: contentCategory } : {}),
     quantity: totalQuantity,
     value: toMoney(order.total),
     currency: order.currency || "USD",
