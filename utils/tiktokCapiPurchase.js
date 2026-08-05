@@ -3,6 +3,7 @@ import { toMoney } from '@/utils/priceFormatter';
 import { TIKTOK_CAPI_GATEWAYS } from './tiktokCapiConfig';
 import { splitOrderByGateway, allocateCostsForSplit, reconcilePennyDifferences } from './metaCapiPurchase';
 import { enrichOrderWithProductData } from './enrichOrderData';
+import { buildTikTokPurchaseEventId } from './tiktokEventId';
 
 /**
  * Track purchase across all relevant TikTok pixels
@@ -73,7 +74,13 @@ export const trackTikTokCapiPurchase = async (order, additionalData = {}, debug 
     // Send to each gateway in parallel
     const sendPromises = Object.entries(reconciledSplits).map(async ([gatewayKey, split]) => {
       try {
+        const purchaseEventId = buildTikTokPurchaseEventId(
+          enrichedOrder.id,
+          gatewayKey,
+        );
+
         const payload = {
+          ...additionalData,
           order_id: enrichedOrder.id,
           gateway: gatewayKey,
           value: split.costs.total,
@@ -86,7 +93,7 @@ export const trackTikTokCapiPurchase = async (order, additionalData = {}, debug 
             price: toMoney(item.subtotal)
           })),
           order_data: enrichedOrder,
-          ...additionalData
+          event_id: purchaseEventId,
         };
 
         const response = await fetch('/api/tiktok-capi/purchase', {

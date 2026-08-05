@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getTikTokGatewayConfig, getTikTokEndpoint, TIKTOK_CAPI_GATEWAYS } from '@/utils/tiktokCapiConfig';
 import { hashEmail, hashPhone, hashSHA256 } from '@/utils/analytics/hashServerSide';
 import { toMoney } from '@/utils/priceFormatter';
+import { buildTikTokPurchaseEventId } from '@/utils/tiktokEventId';
 import axios from 'axios';
 
 const BASE_URL = process.env.BASE_URL;
@@ -69,7 +70,7 @@ const fetchCustomerProfile = async (customerId) => {
 export async function POST(req) {
   try {
     const payload = await req.json();
-    let { order_id, gateway, value, currency, contents, order_data } = payload;
+    let { order_id, gateway, value, currency, contents, order_data, event_id } = payload;
 
     const gatewayConfig = getTikTokGatewayConfig(gateway);
 
@@ -166,7 +167,7 @@ export async function POST(req) {
     const eventPayload = {
       pixel_code: gatewayConfig.pixelId,
       event: gatewayConfig.eventName, // 'CompletePayment'
-      event_id: `purchase_${order_id}_${gateway}`,
+      event_id: event_id || buildTikTokPurchaseEventId(order_id, gateway),
       timestamp: new Date().toISOString(),
       context: contextObj,
       properties: {

@@ -1,6 +1,13 @@
 import { logger } from "@/utils/devLogger";
 import { toMoney } from "@/utils/priceFormatter";
 import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
+import {
+  splitOrderByGateway,
+  allocateCostsForSplit,
+  reconcilePennyDifferences,
+} from "@/utils/metaCapiPurchase";
+import { TIKTOK_CAPI_GATEWAYS } from "@/utils/tiktokCapiConfig";
+import { buildTikTokPurchaseEventId } from "@/utils/tiktokEventId";
 
 /**
  * TikTok Events Utility
@@ -208,45 +215,75 @@ export const trackTikTokPurchase = (
 ) => {
   if (!order || !order.id) return;
 
-  const content_ids = [];
-  const categorySet = new Set();
-  let totalQuantity = 0;
+  const gatewaySplits = splitOrderByGateway(order);
+  const splitsWithCosts = {};
+  for (const [gateway, split] of Object.entries(gatewaySplits)) {
+    if (!TIKTOK_CAPI_GATEWAYS[gateway]) continue;
+    splitsWithCosts[gateway] = {
+      ...split,
+      costs: allocateCostsForSplit(order, split.items),
+    };
+  }
 
-  if (order.line_items && Array.isArray(order.line_items)) {
-    order.line_items.forEach((item) => {
-      content_ids.push(item.sku || item.product_id?.toString() || "");
-      totalQuantity += parseInt(item.quantity) || 1;
+  const reconciledSplits = reconcilePennyDifferences(order, splitsWithCosts);
+  const gatewayKeys = Object.keys(reconciledSplits);
+
+  if (gatewayKeys.length === 0) {
+    if (debug) {
+      logger.warn(
+        `[TikTok] No gateway splits to track for order ${order.id}`,
+      );
+    }
+    return;
+  }
+
+  for (const [gatewayKey, split] of Object.entries(reconciledSplits)) {
+    const categorySet = new Set();
+    split.items.forEach((item) => {
       (item.categories || []).forEach((c) => {
         const name = typeof c === "string" ? c : c?.name;
         if (name) categorySet.add(name);
       });
     });
+
+    const contents = split.items.map((item) => ({
+      content_id: item.sku || item.product_id?.toString(),
+      content_type: "product",
+      content_name: item.name,
+      quantity: parseInt(item.quantity) || 1,
+      price: toMoney(item.subtotal),
+    }));
+
+    const purchaseEventId = buildTikTokPurchaseEventId(order.id, gatewayKey);
+    const splitValue = toMoney(split.costs?.total ?? 0);
+
+    const eventData = {
+      event_id: purchaseEventId,
+      order_id: order.id,
+      gateway: gatewayKey,
+      content_type: "product",
+      content_ids: split.content_ids,
+      contents,
+      content_category: [...categorySet].join(", "),
+      quantity: split.num_items,
+      value: splitValue,
+      currency: order.currency || "USD",
+      description: `Order #${order.id}`,
+      order_data: additionalData.order_data || {},
+      time_of_purchase_iso: additionalData.time_of_purchase_iso || "",
+      customer_id: additionalData.customer_id || "",
+      customer_id_canonical: additionalData.customer_id_canonical || "",
+    };
+
+    trackTikTokEvent("Purchase", eventData, debug, {
+      event_id: purchaseEventId,
+      gateway: gatewayKey,
+      order_data: eventData.order_data,
+      time_of_purchase_iso: eventData.time_of_purchase_iso,
+      customer_id: eventData.customer_id,
+      customer_id_canonical: eventData.customer_id_canonical,
+    });
   }
-
-  const purchaseEventId = `purchase_${order.id || "na"}_${Date.now()}`;
-
-  const eventData = {
-    event_id: purchaseEventId,
-    content_type: "product",
-    content_ids: content_ids,
-    content_category: [...categorySet].join(", "),
-    quantity: totalQuantity,
-    value: toMoney(order.total),
-    currency: order.currency || "USD",
-    description: `Order #${order.id}`,
-    order_data: additionalData.order_data || {},
-    time_of_purchase_iso: additionalData.time_of_purchase_iso || "",
-    customer_id: additionalData.customer_id || "",
-    customer_id_canonical: additionalData.customer_id_canonical || "",
-  };
-
-  trackTikTokEvent("Purchase", eventData, debug, {
-    event_id: purchaseEventId,
-    order_data: eventData.order_data,
-    time_of_purchase_iso: eventData.time_of_purchase_iso,
-    customer_id: eventData.customer_id,
-    customer_id_canonical: eventData.customer_id_canonical,
-  });
 };
 
 /**

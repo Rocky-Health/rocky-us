@@ -9,6 +9,7 @@ import Link from "next/link";
 import { FaArrowRight } from "react-icons/fa";
 import CustomImage from "../utils/CustomImage";
 import { analyticsService } from "@/utils/analytics/analyticsService";
+import { enrichOrderWithProductData } from "@/utils/enrichOrderData";
 import { trackFunnelEventOnce } from "@/utils/clarityFunnelEvents";
 import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
 import { formatPrice, toMoney } from "@/utils/priceFormatter";
@@ -596,7 +597,7 @@ const OrderReceivedContent = ({ userId }) => {
         // Send GA4 event after successfully fetching the order
         if (data && data.id) {
           // Short delay to ensure GTM is ready
-          setTimeout(() => {
+          setTimeout(async () => {
             // Diagnostic: confirm GTM is present on order-received page
             try {
               safePush({
@@ -608,8 +609,18 @@ const OrderReceivedContent = ({ userId }) => {
               // non-fatal diagnostic
             }
 
-            // Unified analytics purchase event (GA4 + Attentive hashes)
-            analyticsService.trackPurchase(data);
+            try {
+              const enrichedOrder = await enrichOrderWithProductData(data, {
+                debug: true,
+              });
+              await analyticsService.trackPurchase(enrichedOrder);
+            } catch (err) {
+              logger.error(
+                "Error enriching order with product data:",
+                err,
+              );
+              await analyticsService.trackPurchase(data);
+            }
             try {
               window._conv_q = window._conv_q || [];
               window._conv_q.push([
