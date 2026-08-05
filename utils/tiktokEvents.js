@@ -1,6 +1,7 @@
 import { logger } from "@/utils/devLogger";
 import { toMoney } from "@/utils/priceFormatter";
 import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
+import { sanitizeTikTokEventData } from "@/utils/tiktokContentSanitize";
 
 /**
  * TikTok Events Utility
@@ -80,14 +81,15 @@ export const trackTikTokEvent = (eventName, eventData = {}, debug = true, mirror
   try {
     initializeTikTokPixel();
 
-    const event_id = buildTikTokEventId(eventName, eventData);
-    const payload = { ...eventData, event_id };
+    // Privacy: strip clinical labels before ttq + dataLayer
+    const safeEventData = sanitizeTikTokEventData(eventData);
+    const event_id = buildTikTokEventId(eventName, safeEventData);
+    const payload = { ...safeEventData, event_id };
 
     if (debug) {
       logger.log(`[TikTok] Tracking event: ${eventName}`, payload);
     }
 
-    // Track the event with TikTok pixel (existing behavior — unchanged)
     window.ttq.track(eventName, payload);
 
     // Mirror to dataLayer for GTM visibility
@@ -111,22 +113,14 @@ export const formatTikTokEventData = (product, quantity = 1) => {
   const price = toMoney(product.price);
   const value = toMoney(price * quantity);
 
-  const categories = product.categories || [];
-  const contentCategory = categories
-    .map((c) => (typeof c === "string" ? c : c?.name || ""))
-    .filter(Boolean)
-    .join(", ");
-
+  // Omit content_name / content_category / product description (clinical labels)
   return {
     content_type: "product",
     content_ids: [product.sku || product.id?.toString() || ""],
-    content_name: product.name || "",
-    content_category: contentCategory,
     quantity: quantity,
     price: price,
     value: value,
     currency: "USD",
-    description: product.short_description || product.name || "",
   };
 };
 
@@ -163,7 +157,6 @@ export const trackTikTokInitiateCheckout = (
   debug = true
 ) => {
   const content_ids = [];
-  const categorySet = new Set();
   let totalValue = 0;
   let totalQuantity = 0;
 
@@ -175,17 +168,11 @@ export const trackTikTokInitiateCheckout = (
     content_ids.push(product.sku || product.id?.toString() || "");
     totalValue += price * qty;
     totalQuantity += qty;
-
-    (product.categories || []).forEach((c) => {
-      const name = typeof c === "string" ? c : c?.name;
-      if (name) categorySet.add(name);
-    });
   });
 
   const eventData = {
     content_type: "product",
     content_ids: content_ids,
-    content_category: [...categorySet].join(", "),
     quantity: totalQuantity,
     value: totalValue,
     currency: "USD",
@@ -209,17 +196,13 @@ export const trackTikTokPurchase = (
   if (!order || !order.id) return;
 
   const content_ids = [];
-  const categorySet = new Set();
   let totalQuantity = 0;
 
+  // content_ids only (no category / product name labels)
   if (order.line_items && Array.isArray(order.line_items)) {
     order.line_items.forEach((item) => {
       content_ids.push(item.sku || item.product_id?.toString() || "");
       totalQuantity += parseInt(item.quantity) || 1;
-      (item.categories || []).forEach((c) => {
-        const name = typeof c === "string" ? c : c?.name;
-        if (name) categorySet.add(name);
-      });
     });
   }
 
@@ -229,7 +212,6 @@ export const trackTikTokPurchase = (
     event_id: purchaseEventId,
     content_type: "product",
     content_ids: content_ids,
-    content_category: [...categorySet].join(", "),
     quantity: totalQuantity,
     value: toMoney(order.total),
     currency: order.currency || "USD",

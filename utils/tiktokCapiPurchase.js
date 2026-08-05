@@ -1,6 +1,7 @@
 import { logger } from '@/utils/devLogger';
 import { toMoney } from '@/utils/priceFormatter';
 import { TIKTOK_CAPI_GATEWAYS } from './tiktokCapiConfig';
+import { sanitizeTikTokContents } from './tiktokContentSanitize';
 import { splitOrderByGateway, allocateCostsForSplit, reconcilePennyDifferences } from './metaCapiPurchase';
 import { enrichOrderWithProductData } from './enrichOrderData';
 
@@ -78,13 +79,13 @@ export const trackTikTokCapiPurchase = async (order, additionalData = {}, debug 
           gateway: gatewayKey,
           value: split.costs.total,
           currency: enrichedOrder.currency || 'USD',
-          contents: split.items.map(item => ({
+          // No content_name — product titles can be clinical (Meta omits too)
+          contents: sanitizeTikTokContents(split.items.map(item => ({
             content_id: item.sku || item.product_id?.toString(),
             content_type: 'product',
-            content_name: item.name,
             quantity: parseInt(item.quantity) || 1,
             price: toMoney(item.subtotal)
-          })),
+          }))),
           order_data: enrichedOrder,
           ...additionalData
         };

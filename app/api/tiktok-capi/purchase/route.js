@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getTikTokGatewayConfig, getTikTokEndpoint, TIKTOK_CAPI_GATEWAYS } from '@/utils/tiktokCapiConfig';
+import { sanitizeTikTokContents } from '@/utils/tiktokContentSanitize';
 import { hashEmail, hashPhone, hashSHA256 } from '@/utils/analytics/hashServerSide';
 import { toMoney } from '@/utils/priceFormatter';
 import axios from 'axios';
@@ -170,7 +171,8 @@ export async function POST(req) {
       timestamp: new Date().toISOString(),
       context: contextObj,
       properties: {
-        contents: contents || [],
+        // Defense in depth: strip content_name / content_category if present
+        contents: sanitizeTikTokContents(contents || []),
         currency: currency || 'USD',
         value: toMoney(value)
       }
