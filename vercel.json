@@ -34,7 +34,43 @@
   ],
   "headers": [
     {
-      "source": "/wp-json/wp/v2/:path*",
+      "source": "/wp-json/wp/v2/posts/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, s-maxage=300, stale-while-revalidate=600"
+        }
+      ]
+    },
+    {
+      "source": "/wp-json/wp/v2/pages/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, s-maxage=300, stale-while-revalidate=600"
+        }
+      ]
+    },
+    {
+      "source": "/wp-json/wp/v2/categories/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, s-maxage=300, stale-while-revalidate=600"
+        }
+      ]
+    },
+    {
+      "source": "/wp-json/wp/v2/media/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, s-maxage=300, stale-while-revalidate=600"
+        }
+      ]
+    },
+    {
+      "source": "/wp-json/wp/v2/search/:path*",
       "headers": [
         {
           "key": "Cache-Control",
