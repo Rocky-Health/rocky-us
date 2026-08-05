@@ -44,6 +44,16 @@ const Glp2PlanOptionsSection = ({
   onSelectPlan,
   disabled = false,
 }) => {
+  // TK-593: upfront total for the pricing-reveal A/B test (Convert-driven).
+  // total = per-month price × months (parsed from plan.id: "3month"→3, etc.).
+  // Rendered HIDDEN by default so control (Variant A) is unchanged; Convert
+  // reveals/restyles it for Variants B & C via [data-plan-total]/[data-plan-monthly].
+  const getUpfrontTotal = (plan) => {
+    const months = parseInt(String(plan?.id || ""), 10) || 1;
+    const monthly =
+      parseFloat(String(plan?.price || "").replace(/[^\d.]/g, "")) || 0;
+    return { months, total: monthly * months };
+  };
   return (
     <div className="w-full md:w-[620px] mx-auto mb-8">
       <div className="flex items-center gap-2 mb-3">
@@ -136,11 +146,42 @@ const Glp2PlanOptionsSection = ({
                   </p>
                 </div>
               ) : (
-                <div className="mt-3 rounded-[4px] bg-[#A7885A] text-center py-3">
-                  <p className="text-xl leading-none text-white">
-                    Select Plan ·{" "}
-                    <span className="font-normal">
-                      ${formatPriceUI(plan.price)}/mo
+                <div
+                  className="mt-3 rounded-[4px] bg-[#A7885A] text-center py-3"
+                  data-plan-price
+                >
+                  {/* TK-593 pricing-reveal A/B (Convert-driven). Each variant has
+                      its own correct wording; Convert toggles which shows:
+                        A (control): default line only
+                        B: reveal [data-cta-total]  → "Select Plan $X/mo · $Y total"
+                        C: hide [data-cta-default], show [data-cta-c]
+                             → "Select Plan $Y · just $X/mo" */}
+                  <p
+                    data-cta-default
+                    className="text-xl leading-none text-white flex justify-center gap-2 flex-wrap"
+                  >
+                    <span>
+                      Select Plan{" "}
+                      <span className="font-normal">
+                        ${formatPriceUI(plan.price)}/mo
+                      </span>
+                    </span>
+                    <span
+                      data-cta-total
+                      className="hidden font-normal text-white/90 text-sm"
+                    >
+                      · ${formatPriceUI(String(getUpfrontTotal(plan).total))}{" "}
+                      total
+                    </span>
+                  </p>
+                  <p
+                    data-cta-c
+                    className="hidden text-xl leading-none text-white"
+                  >
+                    Select Plan $
+                    {formatPriceUI(String(getUpfrontTotal(plan).total))}{" "}
+                    <span className="font-normal text-sm">
+                      · just ${formatPriceUI(plan.price)}/mo
                     </span>
                   </p>
                 </div>

@@ -24,6 +24,8 @@ import FBPixelLoader from "@/components/FBPixelLoader";
 import InactivityTimeoutHandler from "@/components/InactivityTimeoutHandler";
 import { Suspense } from "react";
 import { SITE, ogImageUrl } from "@/lib/seo/metadata";
+import JsonLd from "@/components/seo/JsonLd";
+import { organizationSchema } from "@/lib/seo/schema";
 
 // Layout will use client-side path detection to avoid forcing dynamic rendering
 
@@ -113,6 +115,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en-US" suppressHydrationWarning={true}>
       <head>
+        {/* Site-wide Organization structured data (non-visual). */}
+        <JsonLd data={organizationSchema()} />
         {/* Minimal-layout pre-paint flag (CLS fix): synchronously tag <html>
             with data-layout BEFORE first paint so the global navbar/footer
             never render visibly on exempt routes (checkout, quizzes,
@@ -211,39 +215,57 @@ export default function RootLayout({ children }) {
           content="uvvbdeqdbj046v74x0oqaxhl9tyq26"
         />
         {/* End Facebooc Domain Verification */}
-        {/* Start Convert Experiences — async load.
-            Inline anti-flicker hides body for up to 500ms while Convert downloads,
-            so the page reveals fast even when Convert is slow. */}
-        <Script id="convert-anti-flicker" strategy="beforeInteractive">
+        {/* Start Convert Experiences — session-aware bootstrap.
+            Anti-flicker runs only on the first full-page load per tab session so
+            funnel pages after a hard reload do not flash hidden content. Convert's
+            visitor cookie (_conv_v) carries stable assignment across reloads;
+            client-side navigation (router.push) keeps the script loaded once.
+            Verify in Convert dashboard that bucketing uses the visitor cookie. */}
+        <Script id="convert-bootstrap" strategy="beforeInteractive">
           {`
-            (function(){
-              var s=document.createElement('style');
-              s.id='__convert-anti-flicker';
-              s.appendChild(document.createTextNode('body{opacity:0!important}'));
-              (document.head||document.documentElement).appendChild(s);
-              function clear(){
-                var n=document.getElementById('__convert-anti-flicker');
-                if(n&&n.parentNode)n.parentNode.removeChild(n);
+            (function(w,d){
+              var KEY='rocky_convert_bootstrapped';
+              var SRC='https://cdn-4.convertexperiments.com/v1/js/10045956-10046753.js?environment=production';
+              w._conv_q=w._conv_q||[];
+              var bootstrapped=false;
+              try{bootstrapped=!!w.sessionStorage.getItem(KEY);}catch(e){}
+              if(bootstrapped){
+                w._conv_prevent_bodyhide=true;
+              }else{
+                var s=d.createElement('style');
+                s.id='__convert-anti-flicker';
+                s.appendChild(d.createTextNode('body{opacity:0!important}'));
+                (d.head||d.documentElement).appendChild(s);
+                function clear(){
+                  var n=d.getElementById('__convert-anti-flicker');
+                  if(n&&n.parentNode)n.parentNode.removeChild(n);
+                }
+                setTimeout(clear,500);
+                w.__convertClearAntiFlicker=clear;
               }
-              setTimeout(clear,500);
-              window.__convertClearAntiFlicker=clear;
-            })();
+              if(d.getElementById('convert-experiences'))return;
+              var sc=d.createElement('script');
+              sc.id='convert-experiences';
+              sc.async=true;
+              sc.src=SRC;
+              sc.onload=function(){
+                try{w.sessionStorage.setItem(KEY,'1');}catch(e){}
+                if(w.__convertClearAntiFlicker)w.__convertClearAntiFlicker();
+              };
+              (d.head||d.documentElement).appendChild(sc);
+            })(window,document);
           `}
         </Script>
-        <Script
-          id="convert-experiences"
-          strategy="beforeInteractive"
-          async
-          src="https://cdn-4.convertexperiments.com/v1/js/10045956-10046753.js?environment=production"
-        />
         {/* End Convert Experiences */}
-        {/* Start TikTok Pixel — stub installs immediately so ttq.track() calls queue;
-            the SDK (events.js + chunks + /inter polling) only loads after first user
-            interaction. Idle fallback ensures pageview attribution still fires for bouncers. */}
+        {/* TikTok Pixel — code owns ttq.load() + PageView (same pattern as
+            FBPixelLoader for Meta). SDK loads after first interaction; idle
+            fallback at 15s. ttq.load() is idempotent per pixel ID. If
+            analytics.tiktok.com still shows two main.*.js bundles, remove the
+            TikTok pixel tag from GTM-K9PC394B — do not load from both. */}
         <Script id="tiktok-pixel" strategy="afterInteractive">
           {`
             !function (w, d, t) {
-              w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
+              w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){ttq._i=ttq._i||{};if(ttq._i[e]&&ttq._i[e]._u)return;var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
 
               var __ttqId='${
                 process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID ||
@@ -254,6 +276,7 @@ export default function RootLayout({ children }) {
               function __ttqBoot(){
                 if(__ttqLoaded)return;
                 __ttqLoaded=true;
+                if(d.querySelector('script[src*="analytics.tiktok.com/i18n/pixel/events.js"]'))return;
                 try{ttq.load(__ttqId);ttq.page();}catch(e){}
                 __ttqEvents.forEach(function(ev){w.removeEventListener(ev,__ttqBoot,true);});
                 if(__ttqIdle&&w.cancelIdleCallback){w.cancelIdleCallback(__ttqIdle);}
@@ -266,7 +289,6 @@ export default function RootLayout({ children }) {
             }(window, document, 'ttq');
           `}
         </Script>
-        {/* End TikTok Pixel */}
         {/* Start Microsoft Clarity — lazyOnload: session replay/telemetry does not
             need to race hydration; queued clarity() calls buffer until load. */}
         <Script id="microsoft-clarity" strategy="lazyOnload">

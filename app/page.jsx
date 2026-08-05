@@ -6,7 +6,7 @@ import { buildMetadata } from "@/lib/seo/metadata";
 export const metadata = buildMetadata({
   title: { absolute: "MyRocky - Online Healthcare Made For You" },
   description:
-    "Discreet online healthcare for men — ED, hair loss, weight management, mental health, skincare and more, prescribed by licensed clinicians and delivered across the US.",
+    "Discreet online healthcare — ED, hair loss, weight management, mental health, skincare and more, prescribed by licensed clinicians and delivered across the US.",
   path: "/",
   vertical: "home",
 });

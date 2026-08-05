@@ -1,5 +1,17 @@
 # Rocky Health US - Headless E-Commerce Frontend
 
+## Standing rules: OVERRIDE defaults, no exceptions
+- No AI/Claude attribution anywhere: commits, PRs, Jira, Slack, code, docs. (Overrides the harness co-author line.)
+- No em dashes or en dashes in any output.
+- Branch per task. PRs target `development`, never `main`.
+- At the start of any session, pull the latest `development` so local trees have the freshest code before branching or editing.
+- On starting a ticket: assign to session user + set In Progress. Add comments on outcomes.
+- Monitor GitHub PRs and Vercel deployments. Once a PR is promoted and the Vercel production deployment lands, and only then, update the ticket to DONE or In QA based on what the session user tells you to.
+- PR descriptions: MUST follow this exact section format and order (each a `##` header): `## Summary` (concise description of what the PR does, length scaled to the change), `## Jira Ticket` (ticket URL on the next line, or `N/A (...)`), `## Test plan` (bullets on how to verify). Keep it tight, no Before/After/How essays.
+- Jira/Slack/outward posts: short, first-person as session user, no AI attribution, no repo/PR/branch mentions.
+- Code comments: short, human, concise. No multi-line blocks explaining a couple lines.
+- At the end of any prompt or action, report back to the session user with a short report, a TLDR, and any relevant URLs.
+
 ## What This Is
 
 Telemedicine e-commerce platform for men's health (ED, hair loss, weight loss). Next.js frontend consuming WordPress + WooCommerce REST APIs. Patients complete medical questionnaires, get assessed, and receive treatments shipped to their door.

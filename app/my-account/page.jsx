@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { logger } from "@/utils/devLogger";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Typewriter from "@/components/ui/Typewriter";
 
-export default function MyAccountPage() {
+function MyAccountContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -30,9 +31,21 @@ export default function MyAccountPage() {
     const fetchPortalUrl = async () => {
       try {
         logger.log("Fetching portal URL...");
-        // Fetch the auto-login URL from our API
-        const response = await fetch("/api/my-account-url");
-        const data = await response.json();
+        const redirectPath = searchParams.get("redirectPath");
+        const redirectPage = searchParams.get("redirectPage");
+        const params = new URLSearchParams();
+        if (redirectPath != null && redirectPath !== "")
+          params.set("redirectPath", redirectPath);
+        if (redirectPage != null && redirectPage !== "")
+          params.set("redirectPage", redirectPage);
+        const query = params.toString();
+        const apiUrl = query
+          ? `/api/my-account-url?${query}`
+          : "/api/my-account-url";
+        const response = await fetch(apiUrl);
+        // Fall back to {} if the response isn't JSON (e.g. an HTML error page)
+        // so the response.ok / data.success check below runs cleanly.
+        const data = await response.json().catch(() => ({}));
 
         // Log result for debugging with full details
         logger.log("API response:", data);
@@ -43,10 +56,11 @@ export default function MyAccountPage() {
             data.url
           );
 
-          // Add a small delay to let the user see some of the typewriter effect
+          // Redirect as soon as the portal URL is ready. Keep a short grace
+          // period so the typewriter doesn't hard-flash.
           setTimeout(() => {
             window.location.href = data.url;
-          }, 3000);
+          }, 400);
         } else {
           // Display more detailed error information
           logger.error("Error getting portal URL:", data);
@@ -78,7 +92,7 @@ export default function MyAccountPage() {
     };
 
     fetchPortalUrl();
-  }, [router]);
+  }, [router, searchParams]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#F7F3EF] px-4">
@@ -113,5 +127,21 @@ export default function MyAccountPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function MyAccountPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex flex-col items-center justify-center bg-[#F7F3EF] px-4">
+          <div className="max-w-3xl w-full text-center">
+            <p className="text-lg">Loading your account...</p>
+          </div>
+        </div>
+      }
+    >
+      <MyAccountContent />
+    </Suspense>
   );
 }

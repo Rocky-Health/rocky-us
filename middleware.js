@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { logger } from "@/utils/devLogger";
 import { layoutExemptRoutes } from "./utils/layoutConfig";
+import { isBlockedRoute } from "@/lib/constants/blockedRoutes";
+import { resolveCountry } from "./utils/geo";
 
 export function middleware(req) {
   try {
@@ -39,11 +41,11 @@ export function middleware(req) {
       return response;
     }
 
-    // Detect visitor country from Vercel edge header or ?geo query param (local testing)
+    // Resolve visitor country (cf-ipcountry primary, x-vercel-ip-country
+    // fallback - see utils/geo.js). The ?geo query param remains a last-resort
+    // override for local testing.
     const geoCountry =
-      req.headers.get("x-vercel-ip-country") ||
-      req.nextUrl.searchParams.get("geo") ||
-      "";
+      resolveCountry(req) || req.nextUrl.searchParams.get("geo") || "";
 
     // Handle redirects for old blog structure to new blog structure
     if (pathname.startsWith("/old-blog/")) {
@@ -153,11 +155,50 @@ export function middleware(req) {
       const redirectTo = req.nextUrl.searchParams.get("redirect_to");
       if (redirectTo) {
         try {
-          return NextResponse.redirect(new URL(decodeURIComponent(redirectTo)));
+          const decoded = decodeURIComponent(redirectTo);
+          const isPathOnly = decoded.startsWith("/");
+          if (!isPathOnly) {
+            const redirectUrl = new URL(decoded);
+            const sameOrigin = redirectUrl.origin === req.nextUrl.origin;
+            const portalHost = process.env.PORTAL_HOST || "";
+            let portalOrigin = null;
+            try {
+              portalOrigin = portalHost ? new URL(portalHost).origin : null;
+            } catch (_) {
+              portalOrigin = null;
+            }
+            const isPortalUrl =
+              portalOrigin && redirectUrl.origin === portalOrigin;
+            if (!sameOrigin && isPortalUrl) {
+              // Portal deep link: bounce through /my-account so the auto-login
+              // link is generated before landing on the requested portal page
+              const pathAndSearch = redirectUrl.pathname + redirectUrl.search;
+              const myAccountUrl = new URL("/my-account", req.nextUrl.origin);
+              myAccountUrl.searchParams.set(
+                "redirectPath",
+                pathAndSearch.startsWith("/")
+                  ? pathAndSearch
+                  : "/" + pathAndSearch
+              );
+              return NextResponse.redirect(myAccountUrl);
+            }
+            if (!sameOrigin) {
+              // Only same-origin or portal URLs are allowed
+              return NextResponse.redirect(new URL("/", req.url));
+            }
+          }
+          if (isPathOnly) {
+            return NextResponse.redirect(new URL(decoded, req.url));
+          }
+          return NextResponse.redirect(new URL(decoded));
         } catch (e) {
-          // fallback: use as-is if decode fails, but ensure it's a proper URL
+          // fallback: use as-is if decode fails, but keep it same-origin
           try {
-            return NextResponse.redirect(new URL(redirectTo, req.url));
+            const fallbackUrl = new URL(redirectTo, req.url);
+            if (fallbackUrl.origin === req.nextUrl.origin) {
+              return NextResponse.redirect(fallbackUrl);
+            }
+            return NextResponse.redirect(new URL("/", req.url));
           } catch (fallbackError) {
             // If all else fails, redirect to home
             logger.error("Failed to redirect to:", redirectTo, fallbackError);
@@ -180,7 +221,27 @@ export function middleware(req) {
     }
 
     // Case 3: If user is not authenticated and trying to access protected routes, redirect to register
-    if (!authToken && !isLoginPage && shouldProtectRoute(pathname)) {
+    // Patient portal links carry id, token and patient-token; let them reach the questionnaire directly
+    const patientPortalId = req.nextUrl.searchParams.get("id");
+    const patientPortalToken = req.nextUrl.searchParams.get("token");
+    const patientToken = req.nextUrl.searchParams.get("patient-token");
+    const hasPatientPortalTokens = !!(
+      patientPortalId &&
+      patientPortalToken &&
+      patientToken
+    );
+    const isQuestionnaireRoute = [
+      "/ed-consultation-quiz",
+      "/hair-main-questionnaire",
+      "/wl-consultation",
+    ].some((route) => pathname === route || pathname.startsWith(`${route}/`));
+
+    if (
+      !authToken &&
+      !isLoginPage &&
+      shouldProtectRoute(pathname) &&
+      !(hasPatientPortalTokens && isQuestionnaireRoute)
+    ) {
       // Create login URL with register view
       const loginUrl = new URL("/login-register", req.nextUrl.origin);
 
@@ -208,12 +269,22 @@ export function middleware(req) {
     });
 
     if (geoCountry) {
+      // Non-sensitive value the client reads to decide the geo popup, so
+      // httpOnly:false is required. No `secure` so it also works over http in
+      // local dev; SameSite=Lax is sufficient. opts kept in sync with the CA
+      // middleware (maxAge lowered from 86400 to 3600 for consistency; the
+      // cookie is re-derived every request, so a shorter TTL only self-heals
+      // stale values faster and does not affect prompt frequency, which the
+      // popup gates via sessionStorage).
       response.cookies.set("geo-country", geoCountry, {
         path: "/",
-        httpOnly: false,
+        maxAge: 3600,
         sameSite: "lax",
-        maxAge: 86400,
+        httpOnly: false,
       });
+    } else {
+      // No valid country → clear any stale value so it can't persist.
+      response.cookies.delete("geo-country");
     }
 
     return response;
@@ -252,55 +323,6 @@ function shouldProtectRoute(pathname) {
 
   // Check if the current path should be protected
   return protectedRoutes.some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`)
-  );
-}
-
-// Helper function to determine which routes are blocked (hashed in navbar)
-function isBlockedRoute(pathname) {
-  // List of routes that are hashed/blocked in the navbar
-  const blockedRoutes = [
-    // Mental Health routes
-    "/mental-health",
-    "/mh-pre-quiz",
-    "/mh-quiz",
-
-    // Smoking Cessation routes
-    "/zonnic",
-    "/product/zonnic",
-    "/smoking-consultation",
-    "/chewalis",
-
-    // Recovery routes
-    "/product/dhm-blend",
-
-    // Merch
-    "/merch",
-
-    // Skincare routes
-    "/acne-cream",
-    "/anti-aging-cream",
-    "/hyper-pigmentation-cream",
-    "/skincare",
-
-    // Old WL consultation (no longer active)
-    "/old-wl-consultation",
-
-    // Mental Health products
-    "/product/bupropion",
-    "/product/citalopram",
-    "/product/escitalopram",
-    "/product/fluoxetine",
-    "/product/paroxetine",
-    "/product/sertraline",
-    "/product/trazodone",
-    "/product/venlafaxine",
-    "/product/essential-mood-balance",
-    "/product/essential-night-boost",
-  ];
-
-  // Check if the current path should be blocked
-  return blockedRoutes.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`)
   );
 }

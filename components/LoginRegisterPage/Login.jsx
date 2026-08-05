@@ -578,7 +578,7 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
                                 name="password"
                                 className="block w-[100%] rounded-[8px] h-[40px] text-md m-auto border-gray-500 border px-4 focus:outline focus:outline-2 focus:outline-black focus:ring-0 focus:border-transparent"
                                 tabIndex="2"
-                                autoComplete="off"
+                                autoComplete="current-password"
                                 onChange={handleChange}
                                 style={{ outlineColor: "black" }}
                             />

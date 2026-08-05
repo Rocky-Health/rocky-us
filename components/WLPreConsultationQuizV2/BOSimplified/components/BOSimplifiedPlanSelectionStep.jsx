@@ -37,6 +37,21 @@ const BOSimplifiedPlanSelectionStep = ({
     const monthlyPlan =
         planValues.find((p) => p.id === "monthly") || planValues[0];
 
+    // TK-593: upfront total for the pricing-reveal A/B test (Convert-driven).
+    // total = per-month price × subscription length. Rendered HIDDEN by default
+    // so the control (Variant A) is unchanged; Convert reveals/restyles it for
+    // Variants B and C via the [data-plan-total] / [data-plan-monthly] hooks.
+    const getPlanUpfront = (plan) => {
+        const months =
+            parseInt(
+                String(plan?.subscriptionPeriod || "").replace(/\D/g, ""),
+                10,
+            ) || 1;
+        const monthly =
+            parseFloat(String(plan?.price || "").replace(/[^\d.]/g, "")) || 0;
+        return { months, total: monthly * months };
+    };
+
     useEffect(() => {
         if (!selectedPlan && planValues.length > 0) {
             const defaultPlan =
@@ -319,8 +334,14 @@ const BOSimplifiedPlanSelectionStep = ({
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <div className="text-right shrink-0">
-                                                    <p className="font-[600] text-[#000000] flex md:flex-row flex-col-reverse md:items-center md:gap-2 gap-0.5">
+                                                <div
+                                                    className="text-right shrink-0"
+                                                    data-plan-price
+                                                >
+                                                    <p
+                                                        className="font-[600] text-[#000000] flex md:flex-row flex-col-reverse md:items-center md:gap-2 gap-0.5"
+                                                        data-plan-monthly
+                                                    >
                                                         <span className="text-[16px] text-[#999999] line-through">
                                                             $
                                                             {formatPriceUI(
@@ -333,6 +354,25 @@ const BOSimplifiedPlanSelectionStep = ({
                                                         )}
                                                         /mo
                                                     </p>
+                                                    {/* TK-593: upfront total — hidden in control (A);
+                                                        Convert reveals/restyles for variants B & C. */}
+                                                    {getPlanUpfront(plan).months >
+                                                        1 && (
+                                                        <p
+                                                            data-plan-total
+                                                            className="hidden text-sm text-[#666666]"
+                                                        >
+                                                            $
+                                                            {formatPriceUI(
+                                                                String(
+                                                                    getPlanUpfront(
+                                                                        plan,
+                                                                    ).total,
+                                                                ),
+                                                            )}{" "}
+                                                            total
+                                                        </p>
+                                                    )}
                                                 </div>
                                             </div>
                                             <div className="flex justify-between items-center mt-3">

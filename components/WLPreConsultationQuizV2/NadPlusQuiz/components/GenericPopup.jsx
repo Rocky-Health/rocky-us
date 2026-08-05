@@ -153,11 +153,6 @@ const GenericPopup = ({
 
             {asPage && !isNotQualifiedSerifLayout && (
                 <>
-                    {/* {popupConfig.isWL && (
-            <div className="bg-black text-white text-[14px] leading-[140%] font-medium items-center text-center p-2 ">
-              Lose Weight or Your Money Back
-            </div>
-          )} */}
                     <QuestionnaireNavbar
                         onBackClick={onClose}
                         currentPage={currentPage + 1}
@@ -198,11 +193,6 @@ const GenericPopup = ({
                 >
                     {!asPage && (
                         <div className="flex items-center flex-col">
-                            {/* {popupConfig.isWL == true && (
-                <div className="bg-black text-white text-[14px] leading-[140%] font-medium items-center text-center p-2 mb-2 w-full">
-                  Lose Weight or Your Money Back
-                </div>
-              )} */}
                             <Link href="/">
                                 <CustomImage
                                     width="100"

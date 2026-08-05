@@ -129,6 +129,12 @@ const CartAndPayment = ({
         )}
       </button>
 
+      <p
+        className={`text-[10px] text-gray-700 mt-4 text-center w-full ${isGlp2 ? "" : "lg:max-w-[512px]"}`}
+      >
+        Next day shipping
+      </p>
+
       {/* Show validation message when payment is invalid */}
       {!isPaymentValid && !isUpdatingShipping && !ageValidationFailed && (
         <div className="mt-2 text-center">
@@ -158,8 +164,7 @@ const CartAndPayment = ({
       <p
         className={`text-[10px] text-gray-700 mt-4 text-center w-full ${isGlp2 ? "" : "lg:max-w-[512px]"}`}
       >
-        Once your order is approved, your treatment ships discreetly and
-        typically arrives within 3–5 business days.
+        Once your order is approved, your treatment ships discreetly.
       </p>
       <p
         className={`text-[10px] text-gray-700 mt-4 text-center w-full ${isGlp2 ? "" : "lg:max-w-[512px]"}`}

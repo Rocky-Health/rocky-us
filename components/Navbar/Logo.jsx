@@ -3,12 +3,12 @@ import Link from "next/link";
 
 const Logo = ({ hardNavigateToHome = false }) => {
   const imageBlock = (
-    <div className="h-[35px] w-[100px] relative ml-[0]">
+    <div className="h-[32px] w-[130px] relative ml-[0]">
       <Image
-        src="https://myrocky.b-cdn.net/WP%20Images/Global%20Images/my-rocky-black.webp"
+        src="/home/Homepage/Logo.svg"
         alt="MyRocky Logo"
         fill
-        sizes="100px"
+        sizes="130px"
         className="object-contain"
       />
     </div>
