@@ -1,5 +1,6 @@
 import { logger } from "@/utils/devLogger";
 import { toMoney } from "@/utils/priceFormatter";
+import { buildTikTokPurchaseEventId } from "@/utils/tiktokEventId";
 import {
   trackGA4EcommerceEvent,
   trackGA4Event,
@@ -248,6 +249,10 @@ export const analyticsService = {
         chosenMs = approximateNow;
       }
       const canonicalTimeIso = new Date(chosenMs).toISOString();
+      const tiktokPurchaseEventId = buildTikTokPurchaseEventId(
+        order.id,
+        canonicalTimeIso
+      );
 
       // Establish a canonical customer_id aligned with WP/WC and Northbeam
       // Prefer Woo user id, then email, then phone. For email/phone, prefer Northbeam schema
@@ -283,6 +288,7 @@ export const analyticsService = {
           billing_phone_hash,
         },
         // Provide canonical fields for downstream integrations
+        event_id: tiktokPurchaseEventId,
         time_of_purchase_iso: canonicalTimeIso,
         customer_id: canonicalCustomerId,
         customer_id_canonical: canonicalCustomerId,

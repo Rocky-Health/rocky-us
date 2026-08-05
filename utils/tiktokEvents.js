@@ -1,6 +1,8 @@
 import { logger } from "@/utils/devLogger";
 import { toMoney } from "@/utils/priceFormatter";
 import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
+import { identifyTikTokUser } from "@/utils/tiktokAdvancedMatching";
+import { buildTikTokPurchaseEventId } from "@/utils/tiktokEventId";
 
 /**
  * TikTok Events Utility
@@ -15,6 +17,7 @@ const TIKTOK_DL_EVENT_MAP = {
   ViewContent: "tiktok_view_content",
   AddToCart: "tiktok_add_to_cart",
   InitiateCheckout: "tiktok_initiate_checkout",
+  CompletePayment: "tiktok_purchase",
   Purchase: "tiktok_purchase",
   Search: "tiktok_search",
   CompleteRegistration: "tiktok_complete_registration",
@@ -87,15 +90,25 @@ export const trackTikTokEvent = (eventName, eventData = {}, debug = true, mirror
       logger.log(`[TikTok] Tracking event: ${eventName}`, payload);
     }
 
-    // Track the event with TikTok pixel (existing behavior — unchanged)
-    window.ttq.track(eventName, payload);
+    const fire = async () => {
+      try {
+        await identifyTikTokUser(payload);
 
-    // Mirror to dataLayer for GTM visibility
-    mirrorToDataLayer(eventName, payload, { event_id, ...mirrorExtra });
+        // Track the event with TikTok pixel (code-direct ownership on US).
+        window.ttq.track(eventName, payload);
 
-    if (debug) {
-      logger.log(`[TikTok] ✅ Event "${eventName}" tracked successfully`);
-    }
+        // Mirror to dataLayer for GTM visibility
+        mirrorToDataLayer(eventName, payload, { event_id, ...mirrorExtra });
+
+        if (debug) {
+          logger.log(`[TikTok] ✅ Event "${eventName}" tracked successfully`);
+        }
+      } catch (error) {
+        logger.error(`[TikTok] Error tracking event "${eventName}":`, error);
+      }
+    };
+
+    fire();
   } catch (error) {
     logger.error(`[TikTok] Error tracking event "${eventName}":`, error);
   }
@@ -223,7 +236,10 @@ export const trackTikTokPurchase = (
     });
   }
 
-  const purchaseEventId = `purchase_${order.id || "na"}_${Date.now()}`;
+  const timeOfPurchaseIso = additionalData.time_of_purchase_iso || "";
+  const purchaseEventId =
+    additionalData.event_id ||
+    buildTikTokPurchaseEventId(order.id || "na", timeOfPurchaseIso);
 
   const eventData = {
     event_id: purchaseEventId,
@@ -235,12 +251,12 @@ export const trackTikTokPurchase = (
     currency: order.currency || "USD",
     description: `Order #${order.id}`,
     order_data: additionalData.order_data || {},
-    time_of_purchase_iso: additionalData.time_of_purchase_iso || "",
+    time_of_purchase_iso: timeOfPurchaseIso,
     customer_id: additionalData.customer_id || "",
     customer_id_canonical: additionalData.customer_id_canonical || "",
   };
 
-  trackTikTokEvent("Purchase", eventData, debug, {
+  trackTikTokEvent("CompletePayment", eventData, debug, {
     event_id: purchaseEventId,
     order_data: eventData.order_data,
     time_of_purchase_iso: eventData.time_of_purchase_iso,
