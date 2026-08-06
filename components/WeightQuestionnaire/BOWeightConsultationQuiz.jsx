@@ -5,6 +5,7 @@
 // This component is completely independent from the default WeightConsultationQuiz
 
 import { useState, useEffect, useRef } from "react";
+import Loader from "@/components/Loader";
 import { logger } from "@/utils/devLogger";
 import { useRouter } from "next/navigation";
 import { WarningPopup } from "../EdQuestionnaire/WarningPopup";
@@ -29,6 +30,30 @@ import {
 // Total: 32 pages (added allergic reaction question, pen injector question, side effects question, and personalized dose question)
 const TOTAL_PAGES = 32;
 
+// Fallback pre-consult source: merge the legacy/variant localStorage keys into a
+// single userData-shaped object (new-bo-essential-consul + new-bo-preqiz-data).
+// Used only when the secure cookie (/api/wl/pre-state) is absent — i.e. users
+// arriving from pre-consult routes that still write localStorage.
+function readPreConsultFromLocalStorage() {
+  const source = {};
+  if (typeof window === "undefined") return source;
+  try {
+    const ec = localStorage.getItem("new-bo-essential-consul");
+    if (ec) Object.assign(source, JSON.parse(ec) || {});
+  } catch (e) {}
+  try {
+    const pq = localStorage.getItem("new-bo-preqiz-data");
+    if (pq) {
+      const parsed = JSON.parse(pq) || {};
+      Object.assign(source, parsed.userData || {});
+      Object.keys(parsed).forEach((k) => {
+        if (k.startsWith("pre_quiz_q")) source[k] = parsed[k];
+      });
+    }
+  } catch (e) {}
+  return source;
+}
+
 export default function NewBOWLConsultationQuiz({
   pn,
   userName,
@@ -37,20 +62,8 @@ export default function NewBOWLConsultationQuiz({
   dob,
 }) {
   const getInitialFormData = () => {
-    if (typeof window !== "undefined") {
-      try {
-        const now = new Date();
-        const ttl = localStorage.getItem("new-bo-wl-consultation-form-expiry");
-        if (ttl && now.getTime() < parseInt(ttl)) {
-          const stored = localStorage.getItem("new-bo-wl-consultation-form");
-          if (stored) {
-            return JSON.parse(stored);
-          }
-        }
-      } catch (e) {
-        logger.error("Error loading new BO form data from localStorage:", e);
-      }
-    }
+    // Answers are rehydrated from the server (/api/wl/resume); no PHI is read
+    // from localStorage.
     const nameParts = userName ? userName.split(" ") : [];
     const fname = nameParts[0] || "";
     const lname = nameParts[1] || "";
@@ -212,6 +225,12 @@ export default function NewBOWLConsultationQuiz({
   const [progress, setProgress] = useState(0);
   const [formData, setFormData] = useState(getInitialFormData());
   const [isClient, setIsClient] = useState(false);
+  const [serverHydrated, setServerHydrated] = useState(false);
+  // When a resumable in-progress session exists, hold on a resume/start-over
+  // prompt instead of silently jumping to the saved step.
+  const [pendingResume, setPendingResume] = useState(null);
+  // Resolved pre-consult handoff source (cookie-first, localStorage fallback).
+  const preConsultRef = useRef(null);
   const [isMovingForward, setIsMovingForward] = useState(true);
   const [showPregnancyPopup, setShowPregnancyPopup] = useState(false);
   const [showMedicationPopup, setShowMedicationPopup] = useState(false);
@@ -250,144 +269,105 @@ export default function NewBOWLConsultationQuiz({
 
   useEffect(() => {
     setIsClient(true);
-    // Load from localStorage on mount
-    const stored = localStorage.getItem("new-bo-wl-consultation-form");
-    if (stored) {
+    // Main-questionnaire answers no longer live in localStorage; clear any stale
+    // self-cache from before this change on returning devices. Page position and
+    // answers are restored from the server below.
+    try {
+      localStorage.removeItem("new-bo-wl-consultation-form");
+      localStorage.removeItem("new-bo-wl-consultation-form-expiry");
+    } catch (e) {}
+
+    // Load pre-consult handoff: COOKIE FIRST (secure /api/wl/pre-state), then
+    // fall back to the legacy/variant localStorage keys for users arriving from
+    // pre-consult routes that still write localStorage. Seeds BMI + attributes.
+    (async () => {
+      let source = null;
       try {
-        const parsed = JSON.parse(stored);
-        if (parsed.page_step) {
-          setCurrentPage(parseInt(parsed.page_step) || 1);
-          setProgress(Math.ceil((parseInt(parsed.page_step) / TOTAL_PAGES) * 100));
+        const res = await fetch("/api/wl/pre-state");
+        if (res.ok) {
+          const d = await res.json();
+          if (d?.userData && Object.keys(d.userData).length > 0) {
+            source = d.userData;
+          }
         }
       } catch (e) {
-        logger.error("Error loading stored page:", e);
+        logger.warn("pre-state cookie read failed, will try localStorage:", e.message);
       }
-    }
+      if (!source) source = readPreConsultFromLocalStorage();
+      preConsultRef.current = source || {};
 
-    // Load pre-consultation data from localStorage (same as WeightConsultationQuiz)
-    try {
-      // Load BMI data from new-bo-preqiz-data
-      let storedWeightData = localStorage.getItem("new-bo-preqiz-data");
-      if (storedWeightData) {
-        const weightData = JSON.parse(storedWeightData);
-        const userData = weightData.userData || {};
+      const s = preConsultRef.current;
+      const updates = {};
+      if (s.weight) updates.wl_weight = `${s.weight} lbs`;
+      if (s.height && s.height.feet && s.height.inches !== undefined) {
+        updates.wl_height = `${s.height.feet}ft ${s.height.inches}in`;
+      }
+      if (s.bmi) updates.wl_BMI = String(s.bmi);
 
-        if (userData.weight) {
-          setFormData((prev) => ({
-            ...prev,
-            wl_weight: `${userData.weight} lbs`,
-          }));
+      const attrKeys = [
+        "eatingDisorderDiagnosis",
+        "medicalConditions",
+        "medications",
+        "pregnantOrbreastfeeding",
+        "accomplishment",
+        "weightImpactStatements",
+      ];
+      for (const k of attrKeys) {
+        const v = s[k];
+        if (v !== undefined && v !== null && v !== "") {
+          updates[k] = Array.isArray(v) ? v.join(", ") : v;
         }
-
-        if (userData.height && userData.height.feet && userData.height.inches) {
-          setFormData((prev) => ({
-            ...prev,
-            wl_height: `${userData.height.feet}ft ${userData.height.inches}in`,
-          }));
-        }
-
-        if (userData.bmi) {
-          setFormData((prev) => ({
-            ...prev,
-            wl_BMI: userData.bmi,
-          }));
-        }
-
-        // Load pre_quiz_q fields
-        const preQuizUpdates = {};
-        Object.keys(weightData).forEach((key) => {
-          if (key.startsWith("pre_quiz_q")) {
-            preQuizUpdates[key] = weightData[key];
-          }
-        });
-
-        if (Object.keys(preQuizUpdates).length > 0) {
-          setFormData((prev) => ({
-            ...prev,
-            ...preQuizUpdates,
-          }));
+      }
+      for (const k of Object.keys(s)) {
+        if (k.startsWith("pre_quiz_q") && s[k] !== undefined && s[k] !== null && s[k] !== "") {
+          updates[k] = s[k];
         }
       }
 
-      // Load flow2 data from new-bo-essential-consul
-      let storedFlow2Data = localStorage.getItem("new-bo-essential-consul");
-      if (storedFlow2Data) {
-        const flow2Data = JSON.parse(storedFlow2Data);
+      if (Object.keys(updates).length > 0) {
+        setFormData((prev) => ({ ...prev, ...updates }));
+      }
+    })();
 
-        const flow2Updates = {};
-
-        if (flow2Data.eatingDisorderDiagnosis) {
-          flow2Updates.eatingDisorderDiagnosis =
-            flow2Data.eatingDisorderDiagnosis;
-        }
-
-        if (flow2Data.medicalConditions) {
-          flow2Updates.medicalConditions = flow2Data.medicalConditions;
-        }
-
-        if (flow2Data.medications) {
-          flow2Updates.medications = flow2Data.medications;
-        }
-
-        if (flow2Data.pregnantOrbreastfeeding) {
-          flow2Updates.pregnantOrbreastfeeding =
-            flow2Data.pregnantOrbreastfeeding;
-        }
-
-        if (flow2Data.accomplishment) {
-          if (Array.isArray(flow2Data.accomplishment)) {
-            flow2Updates.accomplishment =
-              flow2Data.accomplishment.join(", ");
+    // Resume the questionnaire's own saved answers from the server (replaces the
+    // new-bo-wl-consultation-form localStorage self-cache). id/token ride in the
+    // wl_* cookies and are applied server-side by /api/wl.
+    (async () => {
+      try {
+        const res = await fetch("/api/wl/resume");
+        const data = await res.json();
+        if (
+          data?.resumable &&
+          data.formData &&
+          Object.keys(data.formData).length > 0
+        ) {
+          const savedPage = parseInt(data.page_step) || 1;
+          if (savedPage > 1) {
+            // Real progress exists -> show the Resume vs Start over prompt.
+            setPendingResume({
+              formData: data.formData,
+              page_step: savedPage,
+              id: data.id || "",
+              token: data.token || "",
+              entrykey: data.entrykey || "",
+            });
           } else {
-            flow2Updates.accomplishment = flow2Data.accomplishment;
-          }
-        }
-
-        if (flow2Data.weightImpactStatements) {
-          if (Array.isArray(flow2Data.weightImpactStatements)) {
-            flow2Updates.weightImpactStatements =
-              flow2Data.weightImpactStatements.join(", ");
-          } else {
-            flow2Updates.weightImpactStatements =
-              flow2Data.weightImpactStatements;
-          }
-        }
-
-        // Load pre_quiz_q fields from essential-consul
-        Object.keys(flow2Data).forEach((key) => {
-          if (key.startsWith("pre_quiz_q")) {
-            flow2Updates[key] = flow2Data[key];
-          }
-        });
-
-        if (Object.keys(flow2Updates).length > 0) {
-          setFormData((prev) => ({
-            ...prev,
-            ...flow2Updates,
-          }));
-        }
-      }
-
-      // Load id/token/entrykey from localStorage if available
-      const storedForm = localStorage.getItem("new-bo-wl-consultation-form");
-      if (storedForm) {
-        try {
-          const parsed = JSON.parse(storedForm);
-          if (parsed.id || parsed.token || parsed.entrykey) {
+            // No meaningful progress -> hydrate silently, no prompt.
             setFormData((prev) => ({
               ...prev,
-              id: parsed.id || prev.id || "",
-              token: parsed.token || prev.token || "",
-              entrykey: parsed.entrykey || prev.entrykey || "",
+              ...data.formData,
+              id: data.id || prev.id || "",
+              token: data.token || prev.token || "",
+              entrykey: data.entrykey || prev.entrykey || "",
             }));
           }
-        } catch (e) {
-          logger.error("Error loading stored questionnaire data:", e);
         }
+      } catch (e) {
+        logger.error("Error hydrating questionnaire from server:", e);
+      } finally {
+        setServerHydrated(true);
       }
-    } catch (error) {
-      logger.error("Error loading new BO pre-consultation data:", error);
-    }
+    })();
   }, []);
 
   // Queue-based submission system (same as default questionnaire)
@@ -417,26 +397,10 @@ export default function NewBOWLConsultationQuiz({
     processQueue();
   }, [pendingSubmissions, isSyncing]);
 
-  const updateLocalStorage = (dataToStore = formData) => {
-    if (typeof window !== "undefined") {
-      const now = new Date();
-      const ttl = now.getTime() + 1000 * 60 * 60; // 1 hour
-      try {
-        const dataToSave = {
-          ...dataToStore,
-          id: dataToStore.id || formData.id || "",
-          token: dataToStore.token || formData.token || "",
-          entrykey: dataToStore.entrykey || formData.entrykey || "",
-        };
-        localStorage.setItem("new-bo-wl-consultation-form", JSON.stringify(dataToSave));
-        localStorage.setItem("new-bo-wl-consultation-form-expiry", ttl.toString());
-        return true;
-      } catch (error) {
-        logger.error("Error storing data in local storage:", error);
-        return false;
-      }
-    }
-    return false;
+  const updateLocalStorage = () => {
+    // No-op: main-questionnaire answers persist server-side via /api/wl, never
+    // to localStorage. Kept as a stub so existing call sites stay valid.
+    return true;
   };
 
   const updateFormDataAndStorage = (updates) => {
@@ -650,75 +614,41 @@ export default function NewBOWLConsultationQuiz({
       }
     });
 
-    // Check localStorage for new BO pre-quiz data (same pattern as WeightConsultationQuiz)
+    // Merge pre-consult handoff from the resolved source (cookie-first, set on
+    // mount; localStorage fallback if the cookie was absent / not yet resolved).
     try {
-      if (typeof window !== "undefined") {
-        // First check new-bo-essential-consul
-        const storedEssentialConsul = localStorage.getItem("new-bo-essential-consul");
-        if (storedEssentialConsul) {
-          const essentialData = JSON.parse(storedEssentialConsul);
+      const source = preConsultRef.current || readPreConsultFromLocalStorage();
 
-          // Extract fields starting with "pre_quiz_q"
-          Object.keys(essentialData).forEach((key) => {
-            if (key.startsWith("pre_quiz_q")) {
-              const value = essentialData[key];
-              if (value !== undefined && value !== null && value !== "") {
-                if (!filteredData[key] || filteredData[key] === "") {
-                  filteredData[key] = value;
-                }
-              }
-            }
-          });
-
-          // Extract flow2Fields
-          preQuizFields.forEach((field) => {
-            const value = essentialData[field];
-            if (value !== undefined && value !== null && value !== "") {
-              if (!filteredData[field] || filteredData[field] === "") {
-                if (Array.isArray(value)) {
-                  filteredData[field] = value.join(", ");
-                } else {
-                  filteredData[field] = value;
-                }
-              }
-            }
-          });
-        }
-
-        // Also check new-bo-preqiz-data for pre_quiz_q fields and BMI data
-        const storedWeightData = localStorage.getItem("new-bo-preqiz-data");
-        if (storedWeightData) {
-          const weightData = JSON.parse(storedWeightData);
-          const userData = weightData.userData || {};
-          
-          // Include BMI data from localStorage if not already in filteredData
-          if (userData.weight && (!filteredData.wl_weight || filteredData.wl_weight === "")) {
-            filteredData.wl_weight = `${userData.weight} lbs`;
-          }
-          if (userData.height && userData.height.feet && userData.height.inches && (!filteredData.wl_height || filteredData.wl_height === "")) {
-            filteredData.wl_height = `${userData.height.feet}ft ${userData.height.inches}in`;
-          }
-          if (userData.bmi && (!filteredData.wl_BMI || filteredData.wl_BMI === "")) {
-            filteredData.wl_BMI = userData.bmi;
-          }
-          
-          // Include pre_quiz_q fields from userData
-          if (userData) {
-            Object.keys(userData).forEach((key) => {
-              if (key.startsWith("pre_quiz_q")) {
-                const value = userData[key];
-                if (value !== undefined && value !== null && value !== "") {
-                  if (!filteredData[key] || filteredData[key] === "") {
-                    filteredData[key] = value;
-                  }
-                }
-              }
-            });
+      Object.keys(source).forEach((key) => {
+        if (key.startsWith("pre_quiz_q")) {
+          const v = source[key];
+          if (v !== undefined && v !== null && v !== "" &&
+              (!filteredData[key] || filteredData[key] === "")) {
+            filteredData[key] = v;
           }
         }
+      });
+
+      preQuizFields.forEach((field) => {
+        const v = source[field];
+        if (v !== undefined && v !== null && v !== "" &&
+            (!filteredData[field] || filteredData[field] === "")) {
+          filteredData[field] = Array.isArray(v) ? v.join(", ") : v;
+        }
+      });
+
+      if (source.weight && (!filteredData.wl_weight || filteredData.wl_weight === "")) {
+        filteredData.wl_weight = `${source.weight} lbs`;
+      }
+      if (source.height && source.height.feet && source.height.inches !== undefined &&
+          (!filteredData.wl_height || filteredData.wl_height === "")) {
+        filteredData.wl_height = `${source.height.feet}ft ${source.height.inches}in`;
+      }
+      if (source.bmi && (!filteredData.wl_BMI || filteredData.wl_BMI === "")) {
+        filteredData.wl_BMI = String(source.bmi);
       }
     } catch (error) {
-      logger.error("Error loading new BO pre-quiz data:", error);
+      logger.error("Error merging pre-consult source:", error);
     }
 
     return filteredData;
@@ -2877,6 +2807,89 @@ export default function NewBOWLConsultationQuiz({
     exitRight: { x: "-100%", opacity: 0, transition: { duration: 0.3, ease: "easeInOut" } },
     exitLeft: { x: "100%", opacity: 0, transition: { duration: 0.3, ease: "easeInOut" } },
   };
+
+  // Apply the saved session and jump to where the user left off.
+  const handleResumeQuiz = () => {
+    if (!pendingResume) return;
+    setFormData((prev) => ({
+      ...prev,
+      ...pendingResume.formData,
+      id: pendingResume.id || prev.id || "",
+      token: pendingResume.token || prev.token || "",
+      entrykey: pendingResume.entrykey || prev.entrykey || "",
+    }));
+    setCurrentPage(pendingResume.page_step);
+    setProgress(Math.ceil((pendingResume.page_step / TOTAL_PAGES) * 100));
+    setPendingResume(null);
+  };
+
+  // Reset the questionnaire answers on the client and go back to step 1, while
+  // KEEPING the same server session (id/token/entrykey) so the entry stays
+  // resumable. Pre-consult prefill (BMI/contact) is preserved so the user does
+  // not re-enter it. Subsequent answers overwrite the entry as the user redoes it.
+  const handleStartOver = () => {
+    setPendingResume(null);
+    const fresh = getInitialFormData();
+    // Keep the existing server session pointers.
+    fresh.id = formData.id || "";
+    fresh.token = formData.token || "";
+    fresh.entrykey = formData.entrykey || "";
+    // Preserve pre-consult prefill (BMI) from the resolved handoff source.
+    const s = preConsultRef.current || {};
+    if (s.weight) fresh.wl_weight = `${s.weight} lbs`;
+    if (s.height && s.height.feet && s.height.inches !== undefined) {
+      fresh.wl_height = `${s.height.feet}ft ${s.height.inches}in`;
+    }
+    if (s.bmi) fresh.wl_BMI = String(s.bmi);
+    setFormData(fresh);
+    setCurrentPage(1);
+    setProgress(0);
+  };
+
+  // While a resumable session exists, hold render until the server answers are
+  // hydrated so fields/step don't flash from empty to filled. Gated on isClient
+  // so SSR/first paint is unaffected; fresh sessions (no wl_id cookie) skip it.
+  if (
+    isClient &&
+    !serverHydrated &&
+    typeof document !== "undefined" &&
+    document.cookie.includes("wl_id=")
+  ) {
+    return <Loader />;
+  }
+
+  // Resume-or-start-over prompt for an in-progress session.
+  if (pendingResume) {
+    const savedPct = Math.min(
+      100,
+      Math.ceil((pendingResume.page_step / TOTAL_PAGES) * 100),
+    );
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-white px-6 text-center subheaders-font">
+        <div className="w-full max-w-md rounded-2xl border border-gray-200 p-8 shadow-sm">
+          <h2 className="mb-2 text-xl font-semibold">Welcome back</h2>
+          <p className="mb-6 text-gray-600">
+            You have a consultation already in progress ({savedPct}% complete).
+            Pick up where you left off, or start from the beginning?
+          </p>
+          <button
+            type="button"
+            onClick={handleResumeQuiz}
+            className="mb-3 w-full rounded-full bg-black px-6 py-3 font-medium text-white"
+          >
+            Resume where I left off
+          </button>
+          <button
+            type="button"
+            onClick={handleStartOver}
+            className="w-full rounded-full border border-gray-300 px-6 py-3 font-medium text-gray-800"
+          >
+            Start from the beginning
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-white subheaders-font font-medium">

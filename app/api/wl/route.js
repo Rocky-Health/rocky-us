@@ -72,19 +72,45 @@ async function getUserDataFromCookies() {
   }
 }
 
-export async function GET() {
+// Cookie domain resolution. Production shares cookies across *.myrocky.com;
+// localhost and Vercel previews (*.vercel.app) omit the domain so the browser
+// scopes them to the exact host instead of rejecting a cross-domain cookie
+// (which silently broke wl_id/wl_token persistence off production).
+function getCookieDomain(host) {
+  if (!host) return undefined;
+  const hostname = host.split(":")[0];
+  if (hostname === "myrocky.com" || hostname.endsWith(".myrocky.com")) {
+    return "myrocky.com";
+  }
+  return undefined;
+}
+
+function buildWlCookieOptions(host, expiresDate) {
+  const opts = {
+    path: "/",
+    expires: expiresDate,
+    httpOnly: false,
+    sameSite: "lax",
+  };
+  const domain = getCookieDomain(host);
+  if (domain) opts.domain = domain;
+  return opts;
+}
+
+export async function GET(req) {
   const entrykey = await getEntrykey();
 
   const data = { message: "Success", entrykey };
 
   const response = NextResponse.json(data);
-  response.cookies.set("wl_entrykey", entrykey, {
-    domain: "myrocky.com",
-    path: "/",
-    expires: new Date(Date.now() + 1800 * 1000),
-    httpOnly: false,
-    sameSite: "Lax",
-  });
+  response.cookies.set(
+    "wl_entrykey",
+    entrykey,
+    buildWlCookieOptions(
+      req.headers.get("host"),
+      new Date(Date.now() + 1800 * 1000)
+    )
+  );
 
   return response;
 }
@@ -94,6 +120,10 @@ export async function POST(req) {
     const cookieStore = await cookies();
     const ttlMs = 1800 * 1000;
     const now = Date.now();
+    const wlCookieOpts = buildWlCookieOptions(
+      req.headers.get("host"),
+      new Date(now + ttlMs)
+    );
     let entrykey = cookieStore.get("wl_entrykey")?.value;
     let id = cookieStore.get("wl_id")?.value;
     let token = cookieStore.get("wl_token")?.value;
@@ -198,48 +228,12 @@ export async function POST(req) {
       if (data.id && data.token) {
         const expires = new Date(now + ttlMs).getTime().toString();
         const response = NextResponse.json(data);
-        response.cookies.set("wl_entrykey", entrykey, {
-          domain: "myrocky.com",
-          path: "/",
-          expires: new Date(now + ttlMs),
-          httpOnly: false,
-          sameSite: "lax",
-        });
-        response.cookies.set("wl_id", data.id, {
-          domain: "myrocky.com",
-          path: "/",
-          expires: new Date(now + ttlMs),
-          httpOnly: false,
-          sameSite: "lax",
-        });
-        response.cookies.set("wl_token", data.token, {
-          domain: "myrocky.com",
-          path: "/",
-          expires: new Date(now + ttlMs),
-          httpOnly: false,
-          sameSite: "lax",
-        });
-        response.cookies.set("wl_entrykey_expires", (now + ttlMs).toString(), {
-          domain: "myrocky.com",
-          path: "/",
-          expires: new Date(now + ttlMs),
-          httpOnly: false,
-          sameSite: "lax",
-        });
-        response.cookies.set("wl_id_expires", (now + ttlMs).toString(), {
-          domain: "myrocky.com",
-          path: "/",
-          expires: new Date(now + ttlMs),
-          httpOnly: false,
-          sameSite: "lax",
-        });
-        response.cookies.set("wl_token_expires", (now + ttlMs).toString(), {
-          domain: "myrocky.com",
-          path: "/",
-          expires: new Date(now + ttlMs),
-          httpOnly: false,
-          sameSite: "lax",
-        });
+        response.cookies.set("wl_entrykey", entrykey, wlCookieOpts);
+        response.cookies.set("wl_id", data.id, wlCookieOpts);
+        response.cookies.set("wl_token", data.token, wlCookieOpts);
+        response.cookies.set("wl_entrykey_expires", (now + ttlMs).toString(), wlCookieOpts);
+        response.cookies.set("wl_id_expires", (now + ttlMs).toString(), wlCookieOpts);
+        response.cookies.set("wl_token_expires", (now + ttlMs).toString(), wlCookieOpts);
         return response;
       }
     } catch (crmError) {
@@ -248,13 +242,7 @@ export async function POST(req) {
       data.error_message = crmError.message || "CRM submission failed";
     }
     const response = NextResponse.json(data);
-    response.cookies.set("wl_entrykey", entrykey, {
-      domain: "myrocky.com",
-      path: "/",
-      expires: new Date(now + ttlMs),
-      httpOnly: false,
-      sameSite: "lax",
-    });
+    response.cookies.set("wl_entrykey", entrykey, wlCookieOpts);
     return response;
   } catch (error) {
     logger.error("API route error:", error);
@@ -490,6 +478,18 @@ async function postWeightLossQuestionnaireDataToCRM(data) {
         ].forEach((key) => {
           if (postData[key]) fieldsToKeep[key] = postData[key];
         });
+
+        // Persist navigation/completion metadata so a resume (incl. the local
+        // disk-cache fallback) lands on the correct step — page_step is not part
+        // of data.form.
+        if (data.page_step) fieldsToKeep.page_step = data.page_step;
+        if (data.completion_state)
+          fieldsToKeep.completion_state = data.completion_state;
+        if (
+          data.completion_percentage !== undefined &&
+          data.completion_percentage !== null
+        )
+          fieldsToKeep.completion_percentage = data.completion_percentage;
         Object.keys(fieldsToKeep).forEach((key) => {
           if (key.endsWith("-textarea")) {
             const basePart = key.replace("-textarea", "");

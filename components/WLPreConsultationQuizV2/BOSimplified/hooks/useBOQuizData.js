@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { logger } from "@/utils/devLogger";
 
 // Get storage keys for new BO pre-quiz
@@ -12,69 +12,68 @@ const getStorageKeys = () => {
 export const useBOQuizData = () => {
   const { STORAGE_KEY, ESSENTIAL_CONSUL_KEY } = getStorageKeys();
 
-  // Initialize from localStorage if available
-  const [userData, setUserData] = useState(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          return parsed.userData || {};
-        }
-      } catch (e) {
-        logger.error("Failed to load userData from localStorage:", e);
-      }
-    }
-    return {};
-  });
+  // Answers start empty and are rehydrated from the secure cookie on mount
+  // (see the /api/wl/pre-state hydration effect below). No PHI is read from or
+  // written to localStorage in the BO pre-consult anymore.
+  const [userData, setUserData] = useState({});
 
   const [activePopup, setActivePopup] = useState(null);
-  
-  const [selectedProduct, setSelectedProduct] = useState(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          return parsed.selectedProduct || null;
-        }
-      } catch (e) {
-        logger.error("Failed to load selectedProduct from localStorage:", e);
-      }
-    }
-    return null;
-  });
+
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const [history, setHistory] = useState([]);
+  const cookieTimer = useRef(null);
 
-  // Save to localStorage whenever userData or selectedProduct changes
-  // IMPORTANT: Password is excluded from localStorage and only kept in memory (PasswordContext)
+  // Primary secure store: persist the pre-consult answers to a server-encrypted
+  // httpOnly cookie via /api/wl/pre-state (debounced). The client never sees the
+  // plaintext or the key. Password is stripped before sending.
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        const existing = stored ? JSON.parse(stored) : {};
-        
-        // Exclude password from localStorage - it's stored in memory only via PasswordContext
-        const dataToSave = { ...userData };
-        delete dataToSave.password;
-        
-        localStorage.setItem(
-          STORAGE_KEY,
-          JSON.stringify({
-            ...existing,
-            userData: dataToSave,
-            selectedProduct,
-          })
-        );
+    if (typeof window === "undefined") return;
+    const dataToSave = { ...userData };
+    delete dataToSave.password;
+    if (cookieTimer.current) clearTimeout(cookieTimer.current);
+    cookieTimer.current = setTimeout(() => {
+      fetch("/api/wl/pre-state", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userData: dataToSave, selectedProduct }),
+      }).catch((e) => logger.warn("pre-state cookie sync failed:", e.message));
+    }, 800);
+  }, [userData, selectedProduct]);
 
-        // Save to essential-consul for transfer to post-checkout questionnaire
-        localStorage.setItem(ESSENTIAL_CONSUL_KEY, JSON.stringify(dataToSave));
+  // Hydrate from the secure cookie on mount (server-side read + decrypt), used
+  // when localStorage did not seed initial state (e.g. cleared / new device).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    // Clear any stale localStorage copies from before the cookie migration so no
+    // PHI lingers for the BO pre-consult; the secure cookie is the only store now.
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(ESSENTIAL_CONSUL_KEY);
+    } catch (e) {}
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/wl/pre-state");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (cancelled || !data) return;
+        if (data.userData && Object.keys(data.userData).length > 0) {
+          setUserData((prev) =>
+            Object.keys(prev).length ? prev : data.userData
+          );
+        }
+        if (data.selectedProduct) {
+          setSelectedProduct((prev) => prev || data.selectedProduct);
+        }
       } catch (e) {
-        logger.error("Failed to save to localStorage:", e);
+        logger.warn("pre-state hydrate failed:", e.message);
       }
-    }
-  }, [userData, selectedProduct, STORAGE_KEY, ESSENTIAL_CONSUL_KEY]);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleAction = (action, payload, onContinue) => {
     switch (action) {
@@ -117,6 +116,8 @@ export const useBOQuizData = () => {
       try {
         localStorage.removeItem(STORAGE_KEY);
         localStorage.removeItem(ESSENTIAL_CONSUL_KEY);
+        // Also clear the secure server-encrypted cookie.
+        fetch("/api/wl/pre-state", { method: "DELETE" }).catch(() => {});
         setUserData({});
         setSelectedProduct(null);
         setActivePopup(null);
