@@ -108,6 +108,6 @@ export async function GET() {
   } catch (error) {
     logger.warn("WL resume fetch error:", error.message);
     // Never fall back to client storage; a failed resume just starts fresh.
-    return NextResponse.json({ resumable: false });
+    return NextResponse.json({ resumable: false, error: error});
   }
 }
