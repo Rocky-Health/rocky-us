@@ -2,6 +2,7 @@
 import CustomImage from "@/components/utils/CustomImage";
 import Link from "next/link";
 import { useState } from "react";
+import { toBackupHost } from "@/utils/blogImageFallback";
 
 function getText(html) {
   if (!html) return "";
@@ -48,7 +49,7 @@ const Blog = ({ blog }) => {
       blog._embedded["wp:featuredmedia"][0] &&
       blog._embedded["wp:featuredmedia"][0].source_url
     ) {
-      return blog._embedded["wp:featuredmedia"][0].source_url;
+      return toBackupHost(blog._embedded["wp:featuredmedia"][0].source_url);
     }
 
     // Check for image in yoast_head_json as fallback
@@ -56,7 +57,7 @@ const Blog = ({ blog }) => {
       blog.yoast_head_json?.og_image &&
       blog.yoast_head_json.og_image[0]?.url
     ) {
-      return blog.yoast_head_json.og_image[0].url;
+      return toBackupHost(blog.yoast_head_json.og_image[0].url);
     }
 
     return defaultImage; // Default fallback

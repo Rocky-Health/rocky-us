@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import xss from "xss";
+import { toBackupHost } from "@/utils/blogImageFallback";
 
 // Per-call xss filter that extends the default whitelist to allow `id` on
 // heading tags. HtmlContent injects slug IDs onto h1–h6 so the side
@@ -306,7 +307,8 @@ const HtmlContent = ({ html, className, loading = false }) => {
       return match;
     });
 
-    return processed;
+    // WordPress upload images 403 on myrocky.com; point them at the backend host.
+    return toBackupHost(processed);
   }, [html]);
 
   if (loading) {

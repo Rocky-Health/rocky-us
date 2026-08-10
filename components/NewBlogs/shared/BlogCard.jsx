@@ -4,6 +4,7 @@ import { useState } from "react";
 import { logger } from "@/utils/devLogger";
 import Link from "next/link";
 import Image from "next/image";
+import { toBackupHost } from "@/utils/blogImageFallback";
 
 export default function BlogCard({
   blog,
@@ -92,10 +93,11 @@ export default function BlogCard({
     blog._embedded["wp:featuredmedia"].length > 0
   ) {
     const media = blog._embedded["wp:featuredmedia"][0];
-    featuredImage =
+    featuredImage = toBackupHost(
       media.source_url ||
-      media.media_details?.sizes?.medium?.source_url ||
-      media.media_details?.sizes?.large?.source_url;
+        media.media_details?.sizes?.medium?.source_url ||
+        media.media_details?.sizes?.large?.source_url
+    );
   }
 
   // Remove HTML tags from excerpt for clean display

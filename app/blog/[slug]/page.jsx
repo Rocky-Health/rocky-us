@@ -4,6 +4,7 @@ import { blogService } from "@/components/NewBlogs/services/blogService";
 import { SITE, stripHtml } from "@/lib/seo/metadata";
 import { articleSchema, breadcrumbSchema } from "@/lib/seo/schema";
 import JsonLd from "@/components/seo/JsonLd";
+import { toBackupHost } from "@/utils/blogImageFallback";
 
 import Section from "@/components/utils/Section";
 import MoreQuestions from "@/components/MoreQuestions";
@@ -39,7 +40,7 @@ function deriveCategory(blog) {
 
 function deriveFeaturedImage(blog) {
   return (
-    blog?._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
+    toBackupHost(blog?._embedded?.["wp:featuredmedia"]?.[0]?.source_url) ||
     DEFAULT_FEATURED_IMAGE
   );
 }
