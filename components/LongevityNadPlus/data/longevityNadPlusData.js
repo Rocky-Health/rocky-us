@@ -60,11 +60,11 @@ export const nadPlusFaqsV2 = [
 
 export const EXPERT_PRICING_DATA = {
   heading: "Expert-guided NAD+, at prices you can afford",
-  // US price is $99/month (SKU 490785). The "$600+ in-clinic" comparison
-  // framing is retained; it still reads correctly against $99, but the exact
+  // US price is $199/month (SKU 490785). The "$600+ in-clinic" comparison
+  // framing is retained; it still reads correctly against $199, but the exact
   // in-clinic figure may need business confirmation.
   description:
-    "In-clinic NAD+ sessions are often $600+ each, and consultations and follow-ups are typically billed separately. Our at-home NAD+ therapy is only $99 a month for a full-month supply, with everything included: clinician oversight, tailored dosing, and discreet delivery to your door.",
+    "In-clinic NAD+ sessions are often $600+ each, and consultations and follow-ups are typically billed separately. Our at-home NAD+ therapy is only $199 a month for a full-month supply, with everything included: clinician oversight, tailored dosing, and discreet delivery to your door.",
   ctaText: "Get Started",
   ctaHref: "/nad-consultation-quiz",
   image: "https://myrocky.b-cdn.net/WP%20Images/longevity-nad-plus/expert.png",
@@ -135,7 +135,7 @@ export const PROTOCOL_DATA = {
 
 // US standalone NAD+ product payload. NOTE: the US /longevity-nad-lp flow does
 // NOT consume this object — useNadCheckout.js builds its mainProduct inline
-// (SKU 490785, $99/month) and routes through utils/flowCartHandler.js. Kept
+// (SKU 490785, $199/month) and routes through utils/flowCartHandler.js. Kept
 // here for parity with the CA data module and any future direct-add use.
 // TODO(TK-830): pending Cam confirmation — pa_din "00005005" and pa_brand
 // "Create Labs" are CA-specific. Confirm these should NOT be sent for the US
@@ -146,8 +146,8 @@ export const STANDALONE_NAD_PRODUCT = {
   productId: 490785,
   variationId: 490785,
   name: "NAD+",
-  price: 99,
-  regularPrice: 99,
+  price: 199,
+  regularPrice: 199,
   isSubscription: true,
   subscriptionPeriod: "1_month",
   // TODO(TK-830): confirm US asset URL. CA CDN image retained for now.
@@ -169,7 +169,7 @@ export const PRODUCT_DATA = {
   bannerClassName: "",
   name: "NAD+",
   pricePrefix: "",
-  price: "$99",
+  price: "$199",
   priceAfter: "",
   description:
     "A simple way to support cellular health, energy production, and overall wellness.",

@@ -36,7 +36,11 @@ export const blogService = {
       }
 
       const res = await fetch(url, {
-        cache: "no-store",
+        // Server renders under ISR, so cache the WordPress fetch to match.
+        // Client-side pagination stays uncached for fresh results.
+        ...(isServerSide
+          ? { next: { revalidate: 300 } }
+          : { cache: "no-store" }),
         headers: getHeaders(),
       });
 
@@ -178,7 +182,7 @@ export const blogService = {
       const url = `${process.env.BASE_URL || "https://www.myrocky.com"
         }/wp-json/wp/v2/posts?slug=${slug}&_embed=true`;
       const res = await fetch(url, {
-        cache: "no-store",
+        next: { revalidate: 300 },
         headers: {
           Authorization: process.env.ADMIN_TOKEN || "",
           Accept: "application/json",
