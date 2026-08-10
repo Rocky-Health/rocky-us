@@ -1,6 +1,6 @@
 // Some WordPress uploads 403 on myrocky.com / www.myrocky.com; the backend
 // host wpbe.myrocky.com serves them. We keep the original URL as primary and
-// only swap to the backup host when an image actually fails to load.
+//  only swap to the backup host when an image actually fails to load.
 const UPLOAD_HOST = /:\/\/(?:www\.)?myrocky\.com\/wp-content\/uploads/g;
 const BACKUP = "://wpbe.myrocky.com/wp-content/uploads";
 
