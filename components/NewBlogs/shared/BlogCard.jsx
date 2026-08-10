@@ -17,7 +17,6 @@ export default function BlogCard({
   const [imageLoading, setImageLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
   const [imgSrc, setImgSrc] = useState(null);
-  const [useBackup, setUseBackup] = useState(false);
   const triedBackup = useRef(false);
 
   // Safety check for blog data
@@ -109,7 +108,6 @@ export default function BlogCard({
     const backup = toBackupHost(displaySrc);
     if (!triedBackup.current && backup && backup !== displaySrc) {
       triedBackup.current = true;
-      setUseBackup(true);
       setImgSrc(backup);
       return;
     }
@@ -140,7 +138,7 @@ export default function BlogCard({
             src={displaySrc}
             alt={title}
             fill
-            unoptimized={useBackup}
+            unoptimized
             className={`object-cover rounded-2xl transition-opacity duration-300 ${
               imageLoading ? "opacity-0" : "opacity-100"
             }`}

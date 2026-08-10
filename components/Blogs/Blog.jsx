@@ -28,7 +28,6 @@ function getText(html) {
 const Blog = ({ blog }) => {
   const defaultImage = "https://www.shutterstock.com/image-vector/default-ui-image-placeholder-wireframes-600nw-1037719192.jpg";
   const [imgSrc, setImgSrc] = useState(null);
-  const [useBackup, setUseBackup] = useState(false);
   const triedBackup = useRef(false);
 
   // Extract reading time from Twitter meta data if available
@@ -68,7 +67,6 @@ const Blog = ({ blog }) => {
     const backup = toBackupHost(current);
     if (!triedBackup.current && backup && backup !== current) {
       triedBackup.current = true;
-      setUseBackup(true);
       setImgSrc(backup);
       return;
     }
@@ -96,7 +94,7 @@ const Blog = ({ blog }) => {
           fill
           sizes="(max-width: 768px) 100vw, 400px"
           priority={false}
-          unoptimized={useBackup}
+          unoptimized
           onError={handleImageError}
         />
         <span className="absolute top-2 left-2 bg-white text-black text-xs px-3 py-1 rounded-full shadow z-10">
