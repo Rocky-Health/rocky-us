@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef, useEffect } from "react";
 import xss from "xss";
+import { applyBackupHostToImg } from "@/utils/blogImageFallback";
 
 // Per-call xss filter that extends the default whitelist to allow `id` on
 // heading tags. HtmlContent injects slug IDs onto h1–h6 so the side
@@ -309,6 +310,22 @@ const HtmlContent = ({ html, className, loading = false }) => {
     return processed;
   }, [html]);
 
+  // Blog body images load from their original host and only fall back to the
+  // backup host when one actually 403s / fails.
+  const contentRef = useRef(null);
+  useEffect(() => {
+    const el = contentRef.current;
+    if (!el) return;
+    const imgs = el.querySelectorAll("img");
+    const onError = (e) => applyBackupHostToImg(e.currentTarget);
+    imgs.forEach((img) => {
+      if (img.complete && img.naturalWidth === 0) applyBackupHostToImg(img);
+      img.addEventListener("error", onError);
+    });
+    return () =>
+      imgs.forEach((img) => img.removeEventListener("error", onError));
+  }, [processedHtml]);
+
   if (loading) {
     return (
       <div className={className}>
@@ -325,6 +342,7 @@ const HtmlContent = ({ html, className, loading = false }) => {
     <>
       <style dangerouslySetInnerHTML={{ __html: BLOG_CONTENT_STYLES }} />
       <div
+        ref={contentRef}
         className={`blog-content ${className || ""}`}
         dangerouslySetInnerHTML={{ __html: sanitizeBlogHtml(processedHtml) }}
       />

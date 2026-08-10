@@ -1,7 +1,8 @@
 "use client";
 import CustomImage from "@/components/utils/CustomImage";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { toBackupHost } from "@/utils/blogImageFallback";
 
 function getText(html) {
   if (!html) return "";
@@ -25,8 +26,9 @@ function getText(html) {
 }
 
 const Blog = ({ blog }) => {
-  const [imageError, setImageError] = useState(false);
   const defaultImage = "https://www.shutterstock.com/image-vector/default-ui-image-placeholder-wireframes-600nw-1037719192.jpg";
+  const [imgSrc, setImgSrc] = useState(null);
+  const triedBackup = useRef(false);
 
   // Extract reading time from Twitter meta data if available
   const getReadingTime = () => {
@@ -36,12 +38,8 @@ const Blog = ({ blog }) => {
     return "4 mins read"; // Default fallback
   };
 
-  // Get featured image URL
-  const getFeaturedImageUrl = () => {
-    if (imageError) {
-      return defaultImage;
-    }
-
+  // Original featured image URL (unmodified host).
+  const getOriginalImageUrl = () => {
     if (
       blog._embedded &&
       blog._embedded["wp:featuredmedia"] &&
@@ -51,7 +49,6 @@ const Blog = ({ blog }) => {
       return blog._embedded["wp:featuredmedia"][0].source_url;
     }
 
-    // Check for image in yoast_head_json as fallback
     if (
       blog.yoast_head_json?.og_image &&
       blog.yoast_head_json.og_image[0]?.url
@@ -59,11 +56,21 @@ const Blog = ({ blog }) => {
       return blog.yoast_head_json.og_image[0].url;
     }
 
-    return defaultImage; // Default fallback
+    return defaultImage;
   };
 
+  const getFeaturedImageUrl = () => imgSrc || getOriginalImageUrl();
+
+  // Load from the original host first; only swap to the backup host on error.
   const handleImageError = () => {
-    setImageError(true);
+    const current = getFeaturedImageUrl();
+    const backup = toBackupHost(current);
+    if (!triedBackup.current && backup && backup !== current) {
+      triedBackup.current = true;
+      setImgSrc(backup);
+      return;
+    }
+    setImgSrc(defaultImage);
   };
 
   // Get the category name
@@ -87,6 +94,7 @@ const Blog = ({ blog }) => {
           fill
           sizes="(max-width: 768px) 100vw, 400px"
           priority={false}
+          unoptimized
           onError={handleImageError}
         />
         <span className="absolute top-2 left-2 bg-white text-black text-xs px-3 py-1 rounded-full shadow z-10">
