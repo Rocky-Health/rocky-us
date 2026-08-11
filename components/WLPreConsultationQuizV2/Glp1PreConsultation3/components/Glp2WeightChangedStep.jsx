@@ -15,6 +15,7 @@ const Glp2WeightChangedStep = ({ userData, config, onSelect }) => {
                         src="/glp-quiz/wl-changed.png"
                         alt="Weight changed"
                         fill
+                        sizes="(max-width: 768px) 100vw, 520px"
                         className="object-cover"
                     />
                 </div>

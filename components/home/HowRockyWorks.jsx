@@ -84,6 +84,7 @@ const HowRockyWorks = ({ cards, title, subtitle }) => {
                                                     src={card.image}
                                                     alt={card.title}
                                                     fill
+                                                    sizes="(max-width: 768px) 380px, 384px"
                                                 />
                                             </div>
                                             <div

@@ -137,6 +137,7 @@ const Glp1BodyPriorityStep = ({
                                         src={src}
                                         alt=""
                                         fill
+                                        sizes="64px"
                                         className="object-contain"
                                     />
                                 </div>

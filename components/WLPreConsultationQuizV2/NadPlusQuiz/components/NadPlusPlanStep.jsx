@@ -104,6 +104,7 @@ const NadPlusPlanStep = ({ onContinue }) => {
                 src={NAD_PLUS_PRODUCT.image}
                 alt="NAD+ injection vial"
                 fill
+                sizes="120px"
                 className="object-contain"
               />
             </div>

@@ -32,6 +32,7 @@ const NadPlusWeightChangedStep = ({
             src={imageSrc}
             alt="Weight scale"
             fill
+            sizes="(max-width: 768px) 280px, 340px"
             className="object-cover"
             priority
           />
