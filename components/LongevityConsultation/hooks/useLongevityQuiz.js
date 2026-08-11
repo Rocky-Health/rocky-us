@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
-import { buildLongevityCrmFormPayload } from "@/utils/longevityQuizPayload";
+import {
+    buildLongevityCrmFormPayload,
+    mapLongevityCrmAnswers,
+} from "@/utils/longevityQuizPayload";
 import { getLongevityQuizRequestContext } from "@/utils/longevityQuizClientContext";
 import {
     formatPreHandoffForCrm,
@@ -53,6 +56,38 @@ function resolveNavigationTarget(navEntry, answers) {
     return navEntry;
 }
 
+/** Is a step's answer present? Checkbox needs a non-empty array; others a value. */
+function isStepAnswered(step, answers) {
+    if (!step?.field) return true;
+    const val = answers?.[step.field];
+    if (step.type === "checkbox") return Array.isArray(val) && val.length > 0;
+    return val !== undefined && val !== null && String(val).trim() !== "";
+}
+
+/**
+ * First step the user still needs to answer, walking the navigation graph from
+ * step 1. Used to drop a resumed portal visitor onto their next question rather
+ * than restarting the quiz. Returns the ID-upload / completion step when every
+ * question is already answered.
+ */
+function computeResumeStep(answers, quizConfig) {
+    let step = 1;
+    const guard = new Set();
+    while (step !== 99 && step !== 98 && !guard.has(step)) {
+        guard.add(step);
+        const cfg = quizConfig.steps?.[step];
+        if (!cfg) break;
+        if (!isStepAnswered(cfg, answers)) return step;
+        const next = resolveNavigationTarget(
+            quizConfig.navigation?.[step],
+            answers,
+        );
+        if (next === undefined) return step;
+        step = next;
+    }
+    return step;
+}
+
 /**
  * CRM completion %: maps the current step's position within the active step
  * keys to a percentage (e.g. step 1 of 4 active → 25%). Uses position rather
@@ -88,6 +123,7 @@ export function useLongevityQuiz(quizConfig) {
     const [answers, setAnswers] = useState({});
     const [popupType, setPopupType] = useState(null);
     const [isRestored, setIsRestored] = useState(false);
+    const [prefillLoaded, setPrefillLoaded] = useState(false);
     const [entrykeyPrimed, setEntrykeyPrimed] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState(null);
@@ -174,6 +210,58 @@ export function useLongevityQuiz(quizConfig) {
 
         setIsRestored(true);
     }, []);
+
+    // Patient-portal resume: opened from the portal with ?id=&token=&patient-token=,
+    // pull the saved answers from CRM (same endpoint the ED/WL/hair quizzes use),
+    // rebuild the quiz answers, and drop the user on their next question. Uses
+    // the patient-token as the authorization, so it works before the FE session
+    // is readable (mirrors the other quizzes' portal prefill).
+    useEffect(() => {
+        if (!isRestored || prefillLoaded) return;
+        const id = searchParams?.get("id") || "";
+        const token = searchParams?.get("token") || "";
+        const patientToken = searchParams?.get("patient-token") || "";
+        if (!id || !token || !patientToken) return;
+
+        let cancelled = false;
+        (async () => {
+            try {
+                const res = await fetch("/api/questionnaire-filled-answers", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({
+                        wp_entry_id: id,
+                        token,
+                        patient_token: patientToken,
+                    }),
+                });
+                const data = await res.json();
+                const crm = data?.data;
+                if (crm && !cancelled) {
+                    const prefilled = mapLongevityCrmAnswers(crm, quizConfig);
+                    const stored = readLocalStorage();
+                    const merged = { ...(stored?.answers || {}), ...prefilled };
+                    const resume = computeResumeStep(merged, quizConfig);
+                    metaRef.current = { ...metaRef.current, id, token };
+                    setAnswers(merged);
+                    setStepIndex(resume);
+                    writeLocalStorage({
+                        answers: merged,
+                        stepIndex: resume,
+                        meta: metaRef.current,
+                    });
+                }
+            } catch (e) {
+                logger.warn("Longevity quiz portal prefill failed:", e);
+            } finally {
+                if (!cancelled) setPrefillLoaded(true);
+            }
+        })();
+        return () => {
+            cancelled = true;
+        };
+    }, [isRestored, prefillLoaded, quizConfig, searchParams]);
 
     // Skincare pre-checkout pattern (e.g. useAcneQuiz): GET only when logged in.
     useEffect(() => {
