@@ -234,6 +234,7 @@ export function middleware(req) {
       "/ed-consultation-quiz",
       "/hair-main-questionnaire",
       "/wl-consultation",
+      "/nad-consultation-quiz",
     ].some((route) => pathname === route || pathname.startsWith(`${route}/`));
 
     if (
