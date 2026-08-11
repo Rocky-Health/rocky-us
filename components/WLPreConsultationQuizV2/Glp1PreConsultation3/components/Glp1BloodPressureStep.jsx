@@ -25,6 +25,7 @@ const Glp1BloodPressureStep = ({
                         src={imageSrc}
                         alt="Healthcare professional measuring blood pressure"
                         fill
+                        sizes="(max-width: 768px) 100vw, 450px"
                         className="object-contain"
                     />
                 </div>

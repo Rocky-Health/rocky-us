@@ -32,6 +32,7 @@ const NadPlusMentalPerformanceStep = ({
             src={imageSrc}
             alt="Mental performance"
             fill
+            sizes="(max-width: 768px) 280px, 340px"
             className="object-cover"
             priority
           />

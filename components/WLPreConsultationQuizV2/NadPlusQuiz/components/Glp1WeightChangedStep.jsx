@@ -45,6 +45,7 @@ const Glp1WeightChangedStep = ({
                         src={imageSrc}
                         alt="Weight and scale"
                         fill
+                        sizes="(max-width: 768px) 100vw, 450px"
                         className="object-contain"
                     />
                 </div>

@@ -40,6 +40,7 @@ const ReviewsSection = () => {
                 <div className="relative overflow-hidden w-[104px] h-[47px]">
                     <CustomContainImage
                         fill
+                        sizes="104px"
                         src="https://myrocky.b-cdn.net/WP%20Images/Sexual%20Health/tp-profiles.webp"
                         alt="TrustPilot"
                         priority={true}
