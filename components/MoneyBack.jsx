@@ -22,6 +22,8 @@ const MoneyBack = () => {
             loading="lazy"
             src="https://myrocky.b-cdn.net/WP%20Images/Global%20Images/MoneyBack.png"
             alt="Lose-Weight-or-Your-Money-Back"
+            width={147}
+            height={147}
             className="mx-auto w-full object-cover"
           />
         </div>
@@ -61,6 +63,8 @@ const MoneyBack = () => {
                 <img
                   src="https://myrocky.b-cdn.net/WP%20Images/Weight%20Loss/Lose-Weight-or-Your-Money-Back.webp"
                   alt="Lose-Weight-or-Your-Money-Back"
+                  width={80}
+                  height={80}
                   className="w-[60px] h-[60px] lg:w-[80px] lg:h-[80px]"
                 />
                 <h2 className="text-[22px] lg:text-[32px] font-[550] headers-font max-w-[182px] md:max-w-full leading-[24.53px]">
