@@ -280,6 +280,7 @@ const GenericPopup = ({
                                             >
                                                 <CustomImage
                                                     width="1000"
+                                                    sizes="(max-width: 768px) 100vw, 500px"
                                                     height="1000"
                                                     src={popupConfig.image}
                                                     alt={popupConfig.title}
@@ -401,6 +402,7 @@ const GenericPopup = ({
                                             >
                                                 <CustomImage
                                                     width="1000"
+                                                    sizes="(max-width: 768px) 100vw, 500px"
                                                     height="1000"
                                                     src={popupConfig.image}
                                                     alt={popupConfig.title}

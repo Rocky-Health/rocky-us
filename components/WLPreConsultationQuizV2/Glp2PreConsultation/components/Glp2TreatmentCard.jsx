@@ -80,7 +80,7 @@ const Glp2TreatmentCard = ({
     >
       <div className="flex items-start gap-3">
         <div className="relative w-[72px] h-[72px] md:w-[94px] md:h-[94px] rounded-[4px] bg-[#E9F0F4] flex items-center justify-center shrink-0 overflow-hidden">
-          <CustomImage src={product?.url || ""} alt={title} fill />
+          <CustomImage src={product?.url || ""} alt={title} fill sizes="(max-width: 768px) 72px, 94px" />
         </div>
 
         <div className="flex-1 min-w-0">

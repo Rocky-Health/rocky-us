@@ -21,6 +21,7 @@ const Glp2BeforeAfterStep3 = ({ onContinue }) => {
             src="/glp-quiz/Before%26After3.jpg"
             alt="Before and after testimonial"
             fill
+            sizes="(max-width: 768px) 100vw, 520px"
             className="object-cover"
           />
         </div>

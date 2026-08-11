@@ -15,6 +15,7 @@ const NadPlusQuizNavbar = () => {
                     <div className="shrink-0 flex items-center relative w-[200px] h-[16px]">
                         <CustomImage
                             fill
+                            sizes="200px"
                             className="w-full h-full object-contain object-right"
                             src="/glp-3-quiz/tp-score2.png"
                             alt="Excellent 4.6 — customer reviews"

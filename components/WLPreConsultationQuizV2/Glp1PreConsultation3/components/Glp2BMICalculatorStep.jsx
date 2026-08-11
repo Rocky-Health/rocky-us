@@ -154,6 +154,7 @@ const Glp2BMICalculatorStep = ({
                         src="https://myrocky.b-cdn.net/WP%20Images/glp-offer/step1-hdr.jpg"
                         alt="Medical weight loss"
                         fill
+                        sizes="(max-width: 768px) 100vw, 580px"
                         className="object-contain object-center"
                     />
                 </div>
@@ -341,6 +342,7 @@ const Glp2BMICalculatorStep = ({
                             src="https://static.legitscript.com/seals/44796030.png"
                             alt="LegitScript Certified"
                             fill
+                            sizes="73px"
                             className="object-contain"
                         />
                     </div>

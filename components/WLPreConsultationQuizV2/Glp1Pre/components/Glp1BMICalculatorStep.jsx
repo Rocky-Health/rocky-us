@@ -64,7 +64,7 @@ const Glp1BMICalculatorStep = ({
     <div className="w-full h-full flex flex-col">
       <div className="w-full md:w-[580px] mx-auto flex-grow">
         <div className="rounded-[16px] overflow-hidden mb-10 w-fill  md:w-[710px] h-[223.44px] md:h-[386.86px] relative ">
-          <CustomImage src="/glp-quiz/img-WL.jpg" alt="BMI calculator" fill />
+          <CustomImage src="/glp-quiz/img-WL.jpg" alt="BMI calculator" fill sizes="(max-width: 768px) 100vw, 710px" />
         </div>
 
         <h1 className="text-[32px] leading-[115%] font-[450] mb-4 text-[#251F20] headers-font">
