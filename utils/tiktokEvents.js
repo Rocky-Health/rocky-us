@@ -1,6 +1,7 @@
 import { logger } from "@/utils/devLogger";
 import { toMoney } from "@/utils/priceFormatter";
 import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
+import { getCanonicalProductId } from "@/utils/getCanonicalProductId";
 
 /**
  * TikTok Events Utility
@@ -117,9 +118,20 @@ export const formatTikTokEventData = (product, quantity = 1) => {
     .filter(Boolean)
     .join(", ");
 
+  const contentId = getCanonicalProductId(product);
+
   return {
     content_type: "product",
-    content_ids: [product.sku || product.id?.toString() || ""],
+    content_id: contentId,
+    contents: [
+      {
+        content_id: contentId,
+        content_type: "product",
+        content_name: product.name || "",
+        quantity: quantity,
+        price: price,
+      },
+    ],
     content_name: product.name || "",
     content_category: contentCategory,
     quantity: quantity,
@@ -162,7 +174,7 @@ export const trackTikTokInitiateCheckout = (
   additionalData = {},
   debug = true
 ) => {
-  const content_ids = [];
+  const contents = [];
   const categorySet = new Set();
   let totalValue = 0;
   let totalQuantity = 0;
@@ -172,7 +184,13 @@ export const trackTikTokInitiateCheckout = (
     const qty = item.quantity || 1;
     const price = parseFloat(product.price) || 0;
 
-    content_ids.push(product.sku || product.id?.toString() || "");
+    contents.push({
+      content_id: getCanonicalProductId(product),
+      content_type: "product",
+      content_name: product.name || "",
+      quantity: qty,
+      price: toMoney(price),
+    });
     totalValue += price * qty;
     totalQuantity += qty;
 
@@ -184,7 +202,7 @@ export const trackTikTokInitiateCheckout = (
 
   const eventData = {
     content_type: "product",
-    content_ids: content_ids,
+    contents: contents,
     content_category: [...categorySet].join(", "),
     quantity: totalQuantity,
     value: totalValue,
@@ -208,13 +226,19 @@ export const trackTikTokPurchase = (
 ) => {
   if (!order || !order.id) return;
 
-  const content_ids = [];
+  const contents = [];
   const categorySet = new Set();
   let totalQuantity = 0;
 
   if (order.line_items && Array.isArray(order.line_items)) {
     order.line_items.forEach((item) => {
-      content_ids.push(item.sku || item.product_id?.toString() || "");
+      contents.push({
+        content_id: getCanonicalProductId(item),
+        content_type: "product",
+        content_name: item.name || "",
+        quantity: parseInt(item.quantity) || 1,
+        price: toMoney(item.subtotal ?? item.price ?? 0),
+      });
       totalQuantity += parseInt(item.quantity) || 1;
       (item.categories || []).forEach((c) => {
         const name = typeof c === "string" ? c : c?.name;
@@ -228,7 +252,7 @@ export const trackTikTokPurchase = (
   const eventData = {
     event_id: purchaseEventId,
     content_type: "product",
-    content_ids: content_ids,
+    contents: contents,
     content_category: [...categorySet].join(", "),
     quantity: totalQuantity,
     value: toMoney(order.total),
