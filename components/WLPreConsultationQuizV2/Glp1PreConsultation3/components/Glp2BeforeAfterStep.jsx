@@ -83,6 +83,7 @@ const Glp2BeforeAfterStep = ({
                         src={variant.imageSrc}
                         alt="Before and after testimonial"
                         fill
+                        sizes="(max-width: 768px) 100vw, 520px"
                         className="!object-contain"
                     />
                 </div>

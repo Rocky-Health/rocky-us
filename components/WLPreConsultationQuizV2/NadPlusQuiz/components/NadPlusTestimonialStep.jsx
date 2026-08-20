@@ -34,6 +34,7 @@ const NadPlusTestimonialStep = ({
             src="/nad+/review-img.png"
             alt="Steve enjoying life with the benefits of Prescription NAD+"
             fill
+            sizes="(max-width: 768px) 100vw, 520px"
             className="object-cover"
           />
         </div>

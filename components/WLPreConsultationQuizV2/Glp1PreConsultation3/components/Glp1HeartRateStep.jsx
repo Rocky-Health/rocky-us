@@ -23,6 +23,7 @@ const Glp1HeartRateStep = ({ userData, config, onSelect }) => {
                         src={imageSrc}
                         alt={imageAlt}
                         fill
+                        sizes="(max-width: 768px) 100vw, 450px"
                         className="object-contain"
                     />
                 </div>

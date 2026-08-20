@@ -85,6 +85,7 @@ const Glp2GoalWeightStep = ({ userData, setUserData, onContinue }) => {
             src="/glp-quiz/goal-weight.png"
             alt="Join over 500K success stories"
             fill
+            sizes="(max-width: 768px) 100vw, 520px"
             className="object-cover"
           />
         </div>

@@ -14,6 +14,7 @@ const Glp2SleepStep = ({ userData, config, onSelect }) => {
                         src="/glp-quiz/sleep.png"
                         alt="Sleep"
                         fill
+                        sizes="(max-width: 768px) 100vw, 520px"
                         className="object-cover"
                     />
                 </div>

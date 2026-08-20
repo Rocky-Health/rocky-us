@@ -58,6 +58,7 @@ const Glp1CurrentMedicationsStep = ({
                         src={imageSrc}
                         alt={imageAlt}
                         fill
+                        sizes="(max-width: 768px) 100vw, 450px"
                         className="object-contain"
                     />
                 </div>
