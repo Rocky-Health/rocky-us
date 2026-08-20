@@ -235,6 +235,34 @@ export function middleware(req) {
       "/nad-consultation-quiz",
     ].some((route) => pathname === route || pathname.startsWith(`${route}/`));
 
+    // Portal userId adoption: a continuation link may carry ?userId= plus the
+    // patient-portal token. When there is no userId session cookie yet, hand off
+    // to the node route that sets the userId cookie and returns to the same URL
+    // with userId stripped. Gated on patient-token so a bare ?userId= on any
+    // page cannot mint a session.
+    // SECURITY: this trusts the URL userId; it is NOT a validated login. Replace
+    // with token-validated resolution once the CRM exposes a patient-token ->
+    // wp_user_id lookup.
+    const urlUserId =
+      req.nextUrl.searchParams.get("userId") ||
+      req.nextUrl.searchParams.get("user_id");
+    if (
+      urlUserId &&
+      /^\d+$/.test(urlUserId) &&
+      Number(urlUserId) > 0 &&
+      patientToken &&
+      !req.cookies.get("userId")?.value
+    ) {
+      const cleaned = req.nextUrl.clone();
+      cleaned.searchParams.delete("userId");
+      cleaned.searchParams.delete("user_id");
+      const adoptUrl = new URL("/api/adopt-user-session", req.nextUrl.origin);
+      adoptUrl.searchParams.set("userId", urlUserId);
+      adoptUrl.searchParams.set("patient-token", patientToken);
+      adoptUrl.searchParams.set("redirect", cleaned.pathname + cleaned.search);
+      return NextResponse.redirect(adoptUrl);
+    }
+
     if (
       !authToken &&
       !isLoginPage &&
