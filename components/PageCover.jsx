@@ -32,7 +32,7 @@ const PageCover = ({ data, items }) => {
         <div className="flex flex-col lg:flex-row gap-2">
           {data.buttons.map((button, index) => (
             <Link
-              key={index}
+              key={button.href ?? index}
               href={button.href}
               className={`h-11 md:px-[24px] py-3 md:py-[11.5px] rounded-[64px] flex items-center space-x-2 transition justify-center ${
                 button.width || "w-full"

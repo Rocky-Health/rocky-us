@@ -36,9 +36,11 @@ const CrossSellModal = ({
       "Invalid product data provided to CrossSellModal:",
       selectedProduct,
     );
-    // Close the modal if it was somehow opened with invalid data
+    // Close the modal if it was somehow opened with invalid data.
+    // Deferred via queueMicrotask (not setTimeout(fn, 0)) so onClose runs
+    // after this render finishes instead of during it.
     if (typeof onClose === "function") {
-      setTimeout(() => onClose(), 0);
+      queueMicrotask(() => onClose());
     }
     return null;
   }

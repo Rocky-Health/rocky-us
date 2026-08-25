@@ -31,6 +31,8 @@ const RockyFeatures = ({ cards }) => {
       <div className="bg-[linear-gradient(270deg,rgba(255,255,255,0)_0%,#ffffff_100%)] absolute -left-[5px] md:left-0 w-[80px] h-[24px] z-[1]"></div>
 
       <div className="flex items-center whitespace-nowrap w-fit overflow-hidden lg:animate-none  animate-scroll lg:pl-[50px]">
+        {/* List is concatenated with itself for the CSS marquee loop,
+            so entries repeat by design; index is the only safe key. */}
         {dataToUse.concat(dataToUse).map((card, index) => (
           <div key={index} className="w-[271px] flex-shrink-0">
             <div className="flex items-center gap-2 h-[24px] justify-center">

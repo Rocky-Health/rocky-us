@@ -18,7 +18,7 @@ const AccordionList = ({ data }) => {
         <ul className="mb-5 text-base font-normal max-w-[550px]">
           {data.map((item, index) => (
             <AccordionItem
-              key={index}
+              key={item.title ?? index}
               item={item}
               isOpen={openIndex === index}
               isFirst={index === 0}
