@@ -22,6 +22,7 @@ import {
   getPrefillStorageKey,
   mapCrmResponseToFormData,
 } from "@/lib/questionnairePrefillConfig";
+import { getQuizUserInfoError } from "@/utils/quizUserValidation";
 
 const { uploadFileToS3WithProgress } = await import(
   "@/utils/s3/frontend-upload"
@@ -169,7 +170,7 @@ export default function HairConsultationQuiz({
     completion_state: "Partial",
     completion_percentage: 10,
     source_site: process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com",
-    131: userEmail || "omkar@w3mg.in",
+    131: userEmail || "",
     132: pn || "(000) 000-0000",
     158: dob,
     "161_4": province || "Ontario",
@@ -1188,6 +1189,12 @@ export default function HairConsultationQuiz({
   };
 
   const verifyCustomerAndProceed = async () => {
+    const userInfoError = getQuizUserInfoError(formData);
+    if (userInfoError) {
+      alert(userInfoError);
+      return;
+    }
+
     if (!photoIdFile && !formData["38"]) {
       alert("Please upload a photo ID");
       return;
@@ -3363,17 +3370,17 @@ export default function HairConsultationQuiz({
               <input
                 type="hidden"
                 name="130_3"
-                value={formData["130_3"] || "Omkar"}
+                value={formData["130_3"] || ""}
               />
               <input
                 type="hidden"
                 name="130_6"
-                value={formData["130_6"] || "Test"}
+                value={formData["130_6"] || ""}
               />
               <input
                 type="hidden"
                 name="131"
-                value={formData["131"] || "omkar@w3mg.in"}
+                value={formData["131"] || ""}
               />
               <input
                 type="hidden"

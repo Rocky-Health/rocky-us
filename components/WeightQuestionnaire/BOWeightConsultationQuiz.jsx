@@ -22,6 +22,7 @@ import {
   trackQuestionnaireStepComplete,
   trackQuestionnaireSubmit,
 } from "@/utils/questionnaireTracking";
+import { getQuizUserInfoError } from "@/utils/quizUserValidation";
 
 // Pages 1-5: Migrated pre-quiz questions (moved to start)
 // Pages 6-27: Standard WL questionnaire questions (22 pages)
@@ -64,12 +65,12 @@ export default function NewBOWLConsultationQuiz({
       page_step: 1,
       completion_state: "Partial",
       completion_percentage: 0,
-      source_site: "https://myrocky.ca",
+      source_site: process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com",
       flow_type: "new-bo", // Identify this as new BO flow
       // Standard fields (same as default questionnaire)
       "130_3": fname || "",
       "130_6": lname || "",
-      131: userEmail || "@w3mg.in",
+      131: userEmail || "",
       132: pn || "",
       158: dob || "",
       "161_4": province || "",
@@ -1860,6 +1861,12 @@ export default function NewBOWLConsultationQuiz({
   };
 
   const verifyCustomerAndProceed = async () => {
+    const userInfoError = getQuizUserInfoError(formData);
+    if (userInfoError) {
+      renderError(userInfoError);
+      return;
+    }
+
     if (formData["196"] && !photoIdFile) {
       // Photo already uploaded, navigate to body photos page
       const updatedData = updateFormDataAndStorage({

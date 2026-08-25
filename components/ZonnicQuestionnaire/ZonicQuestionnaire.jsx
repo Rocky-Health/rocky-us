@@ -11,6 +11,7 @@ import QuestionnaireNavbar from "../EdQuestionnaire/QuestionnaireNavbar";
 import { ProgressBar } from "../EdQuestionnaire/ProgressBar";
 import { WarningPopup } from "../EdQuestionnaire/WarningPopup";
 import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
+import { getQuizUserInfoError } from "@/utils/quizUserValidation";
 const { uploadFileToS3WithProgress } = await import(
   "@/utils/s3/frontend-upload"
 );
@@ -856,9 +857,9 @@ export default function ZonnicConsultationQuiz({
       };
 
       const userInfo = {
-        "130_3": formData["130_3"] || "Omkar",
-        "130_6": formData["130_6"] || "Test",
-        131: formData["131"] || "omkar@w3mg.in",
+        "130_3": formData["130_3"] || "",
+        "130_6": formData["130_6"] || "",
+        131: formData["131"] || "",
         132: formData["132"] || "(000) 000-0000",
         158: formData["158"] || "2000-01-01",
         "161_4": formData["161_4"] || "Ontario",
@@ -1313,6 +1314,16 @@ export default function ZonnicConsultationQuiz({
   };
 
   const verifyCustomerAndProceed = async () => {
+    const userInfoError = getQuizUserInfoError(formData);
+    if (userInfoError) {
+      const errorBox = formRef.current?.querySelector(".error-box");
+      if (errorBox) {
+        errorBox.classList.remove("hidden");
+        errorBox.textContent = userInfoError;
+      }
+      return;
+    }
+
     try {
       setIsUploading(true);
 
@@ -1432,17 +1443,17 @@ export default function ZonnicConsultationQuiz({
                 <input
                   type="hidden"
                   name="130_3"
-                  value={formData["130_3"] || "Omkar"}
+                  value={formData["130_3"] || ""}
                 />
                 <input
                   type="hidden"
                   name="130_6"
-                  value={formData["130_6"] || "Test"}
+                  value={formData["130_6"] || ""}
                 />
                 <input
                   type="hidden"
                   name="131"
-                  value={formData["131"] || "omkar@w3mg.in"}
+                  value={formData["131"] || ""}
                 />
                 <input
                   type="hidden"

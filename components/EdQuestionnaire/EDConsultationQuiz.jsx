@@ -25,6 +25,7 @@ import {
 import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
 import { useQuizSequence } from "@/lib/questionnaire/useQuizSequence";
 import QuestionnaireIntermission from "@/components/OrderReceived/QuestionnaireIntermission";
+import { getQuizUserInfoError } from "@/utils/quizUserValidation";
 const { uploadFileToS3WithProgress } = await import(
   "@/utils/s3/frontend-upload"
 );
@@ -1403,9 +1404,9 @@ export default function EDConsultationQuiz({
       };
 
       const userInfo = {
-        "130_3": formData["130_3"] || "Omkar",
-        "130_6": formData["130_6"] || "Test",
-        131: formData["131"] || "omkar@w3mg.in",
+        "130_3": formData["130_3"] || "",
+        "130_6": formData["130_6"] || "",
+        131: formData["131"] || "",
         132: formData["132"] || "(000) 000-0000",
         158: formData["158"] || "2000-01-01",
         "161_4": formData["161_4"] || "Ontario",
@@ -1566,14 +1567,21 @@ export default function EDConsultationQuiz({
   const initializeUserDetails = () => {
     if (!localStorage.getItem("userDetails")) {
       const defaultUserDetails = {
-        firstName: "Omkar",
-        lastName: "Test",
-        email: "omkar@w3mg.in",
+        firstName: "",
+        lastName: "",
+        email: "",
       };
       localStorage.setItem("userDetails", JSON.stringify(defaultUserDetails));
     }
   };
   const verifyCustomerAndProceed = async () => {
+    const userInfoError = getQuizUserInfoError(formData);
+    if (userInfoError) {
+      setIsSubmitting(false);
+      alert(userInfoError);
+      return;
+    }
+
     if (!photoIdFile && !formData["196"]) {
       setIsSubmitting(false);
       alert("Please upload a photo ID");
@@ -4162,23 +4170,23 @@ export default function EDConsultationQuiz({
             <input
               type="hidden"
               name="source_site"
-              value="https://stg-1.rocky.health"
+              value={process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com"}
             />
 
             <input
               type="hidden"
               name="130_3"
-              value={formData["130_3"] || "Omkar"}
+              value={formData["130_3"] || ""}
             />
             <input
               type="hidden"
               name="130_6"
-              value={formData["130_6"] || "Test"}
+              value={formData["130_6"] || ""}
             />
             <input
               type="hidden"
               name="131"
-              value={formData["131"] || "omkar@w3mg.in"}
+              value={formData["131"] || ""}
             />
             <input
               type="hidden"

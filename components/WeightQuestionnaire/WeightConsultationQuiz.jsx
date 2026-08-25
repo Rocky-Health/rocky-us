@@ -22,6 +22,7 @@ import {
   mapCrmResponseToFormData,
 } from "@/lib/questionnairePrefillConfig";
 import Loader from "../Loader";
+import { getQuizUserInfoError } from "@/utils/quizUserValidation";
 
 const WL_PREFILL_KEY = getPrefillStorageKey("/wl-consultation");
 const SINGLE_CHOICE_PAGES = [1, 2, 3, 7, 10, 11, 12, 14];
@@ -64,7 +65,7 @@ export default function WeightLossConsultationQuiz({
       source_site: process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com",
       "130_3": fname || "",
       "130_6": lname || "",
-      131: userEmail || "@w3mg.in",
+      131: userEmail || "",
       132: pn || "",
       158: dob || "",
       "161_4": province || "",
@@ -2785,6 +2786,16 @@ export default function WeightLossConsultationQuiz({
   };
 
   const verifyCustomerAndProceed = async () => {
+    const userInfoError = getQuizUserInfoError(formData);
+    if (userInfoError) {
+      const errorBox = formRef.current?.querySelector(".error-box");
+      if (errorBox) {
+        errorBox.classList.remove("hidden");
+        errorBox.textContent = userInfoError;
+      }
+      return;
+    }
+
     if (formData["196"] && !photoIdFile) {
       const updatedData = updateFormDataAndStorage({
         page_step: currentPage + 1,
@@ -4298,17 +4309,17 @@ export default function WeightLossConsultationQuiz({
                     <input
                       type="hidden"
                       name="130_3"
-                      value={formData["130_3"] || "Omkar"}
+                      value={formData["130_3"] || ""}
                     />
                     <input
                       type="hidden"
                       name="130_6"
-                      value={formData["130_6"] || "Test"}
+                      value={formData["130_6"] || ""}
                     />
                     <input
                       type="hidden"
                       name="131"
-                      value={formData["131"] || "omkar@w3mg.in"}
+                      value={formData["131"] || ""}
                     />
                     <input
                       type="hidden"
