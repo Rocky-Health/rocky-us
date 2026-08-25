@@ -21,7 +21,7 @@ import GeoRedirectPopup from "@/components/Popups/GeoRedirectPopup";
 // import ZendeskWidget from "@/components/Layout/ZendeskWidget";
 import MetaCookieInitializer from "@/components/Layout/MetaCookieInitializer";
 import FBPixelLoader from "@/components/FBPixelLoader";
-import InactivityTimeoutHandler from "@/components/InactivityTimeoutHandler";
+import InactivityTimeoutGate from "@/components/InactivityTimeoutGate";
 import { Suspense } from "react";
 import { SITE, ogImageUrl } from "@/lib/seo/metadata";
 import JsonLd from "@/components/seo/JsonLd";
@@ -328,7 +328,9 @@ export default function RootLayout({ children }) {
             injected the 258 KB Google Identity Services script on every page.
             The GSI script is now lazy-loaded by GoogleSignInButton when an
             auth surface mounts. Nothing here consumed the OAuth context. */}
-        <InactivityTimeoutHandler />
+        {/* TK-429: gated — mounts only for authenticated users so guests skip
+            the activity listeners, polling interval, and modal chunk */}
+        <InactivityTimeoutGate />
         <Navbar className="navbar-main" />
         <ClientLayoutProvider>{children}</ClientLayoutProvider>
         <Footer className="footer-main" />

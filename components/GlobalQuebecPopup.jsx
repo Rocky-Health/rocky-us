@@ -1,92 +1,58 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import QuebecRestrictionPopup from "./Popups/QuebecRestrictionPopup";
+import { usePathname } from "next/navigation";
+import dynamic from "next/dynamic";
 
+const QuebecRestrictionPopup = dynamic(
+  () => import("./Popups/QuebecRestrictionPopup"),
+  { ssr: false }
+);
+
+// Registration sets the localStorage flags then router.push()es away, so the
+// flag is re-checked on route changes instead of polling on an interval. The
+// popup chunk only loads when the flag is actually set.
 const GlobalQuebecPopup = () => {
+  const pathname = usePathname();
   const [showQuebecPopup, setShowQuebecPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
 
   useEffect(() => {
-    // Function to check and show popup
-    const checkAndShowPopup = () => {
+    const checkFlag = () => {
       const shouldShowPopup = localStorage.getItem("showQuebecPopup");
       const message = localStorage.getItem("quebecPopupMessage");
-
-      if (shouldShowPopup === "true" && message) {
-        // Wait for page to fully load, then show popup after 1 second
-        const timer = setTimeout(() => {
-          setShowQuebecPopup(true);
-          setPopupMessage(message);
-          // Clear the localStorage flags
-          localStorage.removeItem("showQuebecPopup");
-          localStorage.removeItem("quebecPopupMessage");
-        }, 1000);
-
-        return timer;
-      }
-      return null;
+      if (shouldShowPopup !== "true" || !message) return null;
+      return setTimeout(() => {
+        setShowQuebecPopup(true);
+        setPopupMessage(message);
+        localStorage.removeItem("showQuebecPopup");
+        localStorage.removeItem("quebecPopupMessage");
+      }, 1000);
     };
 
-    // Check immediately on mount
-    let timer = checkAndShowPopup();
+    let timer = checkFlag();
 
-    // Listen for storage changes (when localStorage is set from registration)
+    // Cross-tab case: another tab sets the flag
     const handleStorageChange = (e) => {
       if (e.key === "showQuebecPopup" && e.newValue === "true") {
-        const message = localStorage.getItem("quebecPopupMessage");
-        if (message) {
-          // Clear any existing timer
-          if (timer) clearTimeout(timer);
-          // Set new timer
-          timer = setTimeout(() => {
-            setShowQuebecPopup(true);
-            setPopupMessage(message);
-            // Clear the localStorage flags
-            localStorage.removeItem("showQuebecPopup");
-            localStorage.removeItem("quebecPopupMessage");
-          }, 1000);
-        }
+        if (timer) clearTimeout(timer);
+        timer = checkFlag();
       }
     };
-
-    // Add event listener for storage changes
     window.addEventListener("storage", handleStorageChange);
 
-    // Also check periodically for the first few seconds (in case localStorage was set before component mounted)
-    const interval = setInterval(() => {
-      const shouldShowPopup = localStorage.getItem("showQuebecPopup");
-      if (shouldShowPopup === "true") {
-        const message = localStorage.getItem("quebecPopupMessage");
-        if (message) {
-          clearInterval(interval);
-          if (timer) clearTimeout(timer);
-          timer = setTimeout(() => {
-            setShowQuebecPopup(true);
-            setPopupMessage(message);
-            localStorage.removeItem("showQuebecPopup");
-            localStorage.removeItem("quebecPopupMessage");
-          }, 1000);
-        }
-      }
-    }, 500);
-
-    // Cleanup
     return () => {
       if (timer) clearTimeout(timer);
-      clearInterval(interval);
       window.removeEventListener("storage", handleStorageChange);
     };
-  }, []);
+  }, [pathname]);
 
-  const handleClose = () => {
-    setShowQuebecPopup(false);
-  };
+  if (!showQuebecPopup) return null;
 
   return (
     <QuebecRestrictionPopup
       isOpen={showQuebecPopup}
-      onClose={handleClose}
+      onClose={() => setShowQuebecPopup(false)}
       message={popupMessage}
     />
   );
