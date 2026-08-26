@@ -30,13 +30,12 @@ const HOW_ROCKY_WORKS_CARDS = [
 
 function StepCard({ card, className = "" }) {
   return (
-    <div className={`relative rounded-2xl overflow-hidden ${className}`}>
+    <div className={`relative aspect-[374/530] overflow-hidden rounded-2xl ${className}`}>
       <CustomImage
         src={card.image}
         alt={`${card.title}, ${card.description}`}
-        width={374}
-        height={530}
-        className="w-full h-auto object-cover"
+        fill
+        sizes="(max-width: 768px) 280px, 374px"
       />
     </div>
   );

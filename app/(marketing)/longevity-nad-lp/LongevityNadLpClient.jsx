@@ -7,6 +7,9 @@ import LongevityNadPlusExpertPricingSection from "@/components/LongevityNadPlus/
 import LongevityNadPlusHeroSection from "@/components/LongevityNadPlus/LongevityNadPlusHeroSection";
 import LongevityNadPlusProductSection from "@/components/LongevityNadPlus/LongevityNadPlusProductSection";
 import LongevityNadPlusTrustBar from "@/components/LongevityNadPlus/LongevityNadPlusTrustBar";
+import LongevityNadPressLogos from "@/components/LongevityNadPlus/LongevityNadPressLogos";
+import HomeReviewsSection from "@/components/home/ReviewsSection";
+import LongevityNadExpertsSection from "@/components/LongevityNadPlus/LongevityNadExpertsSection";
 import LongevityNadWhatToExpectSection from "@/components/LongevityNadPlus/LongevityNadWhatToExpectSection";
 import LongevityNadPlusBottomCtaSection from "@/components/LongevityNadPlus/LongevityNadPlusBottomCtaSection";
 import LongevityNadPlusFaqsSection from "@/components/LongevityNadPlus/LongevityNadPlusFaqsSection";
@@ -16,21 +19,23 @@ import LongevityNadChatWidgetMobileFix from "@/components/LongevityNadPlus/Longe
 import { nadPlusFaqsV2 } from "@/components/LongevityNadPlus/data/longevityNadPlusData";
 import { useNadCheckout } from "@/components/LongevityNadPlus/useNadCheckout";
 
-// Green sourced from the shared Cross-Sell "Added to cart" pill
-// (components/shared/CrossSellAddons.jsx -> bg-[#0D652D]). `!` important so it
-// wins over each section's default bg-black / hover:bg-gray-800.
-const CTA_GREEN = "!bg-[#0D652D] hover:!bg-[#0D652D]";
-// Decline CTA is a white button on a dark photo, so force white text too.
-const CTA_GREEN_ON_DARK = "!bg-[#0D652D] !text-white hover:!bg-[#0D652D]";
-const CTA_GREEN_BAR = "!bg-[#0D652D]";
-
 // Shared id between the hero's primary CTA and the sticky bar so the sticky
 // bar only reveals once the hero button has scrolled out of view (mobile).
 const HERO_CTA_ID = "nad-lp-hero-cta";
 
+const NAD_BENEFIT_ITEMS = [
+    { label: "Energy levels", direction: "up" },
+    { label: "Mental clarity", direction: "up" },
+    { label: "Mood", direction: "up" },
+    { label: "Sleep quality", direction: "up" },
+    { label: "Recovery", direction: "up" },
+    { label: "Cellular health", direction: "up" },
+    { label: "At-home convenience", direction: "up" },
+];
+
 const LONGEVITY_NAD_PLUS_TRUST_ITEMS = [
     {
-        label: "Certified Pharmacy",
+        label: "Licensed US Pharmacy",
         icon: "https://myrocky.b-cdn.net/WP%20Images/longevity-nad-plus/icon-4.png",
     },
     {
@@ -38,7 +43,7 @@ const LONGEVITY_NAD_PLUS_TRUST_ITEMS = [
         icon: "https://myrocky.b-cdn.net/WP%20Images/longevity-nad-plus/icon-1.png",
     },
     {
-        label: "Licensed Clinicians",
+        label: "Licensed US Clinicians",
         icon: "https://myrocky.b-cdn.net/WP%20Images/longevity-nad-plus/icon-2.png",
     },
     {
@@ -57,14 +62,14 @@ export default function LongevityNadLpClient() {
                 reviewCount="1,500+"
                 reviewRating="4.4"
                 headingBefore=""
-                headingAccent="NAD+ Injection"
+                headingAccent="NAD+ Therapy"
                 headingAfter="for Healthy Aging"
-                priceLine="Only $199 a month"
-                description="Boost your NAD+ levels without costly infusions, all from the comfort of home. With unlimited support from longevity experts."
+                priceLine="Only $199 for a month supply"
+                description="Boost your NAD+ levels without costly infusions, all from the comfort of home. Get a full month's supply with unlimited support from longevity experts."
                 showSecondaryBtn={false}
-                primaryBtnText="Add to Cart"
-                primaryBtnClassName={CTA_GREEN}
-                image="/NAD+/hero-nad.png"
+                primaryBtnText="Get Started WITH NAD+"
+                image="/NAD+/redesign/hero-couple.webp"
+                imageAlt="Two people bumping fists after a workout"
                 primaryBtnId={HERO_CTA_ID}
                 onPrimaryClick={goToCheckout}
                 isPrimaryLoading={isAdding}
@@ -76,33 +81,44 @@ export default function LongevityNadLpClient() {
             />
 
             <LongevityNadDeclineSection
-                ctaText="Add to Cart"
-                ctaClassName={CTA_GREEN_ON_DARK}
+                label="NAD+: THE FUEL YOUR CELLS NEED"
+                heading="NAD+ levels naturally decline with age."
+                paragraphs={[
+                    "NAD+ (Nicotinamide Adenine Dinucleotide) is a molecule your body naturally produces and uses to support cellular energy and function. As we get older, our NAD+ levels tend to decline.",
+                    "It's one reason NAD+ has become an area of growing interest in longevity and healthy aging research.",
+                    "NAD+ injections offer a direct way to supplement your body's natural NAD+ levels as part of a proactive approach to your health.",
+                ]}
+                chartTreatmentLabel="Stabilized NAD with treatment"
+                chartNaturalLabel="Natural NAD decline with age"
+                ctaText="Get Started WITH NAD+"
                 onCtaClick={goToCheckout}
                 isCtaLoading={isAdding}
             />
 
-            <LongevityNadPlusProtocolSection alwaysShowLogosInBig />
+            <LongevityNadPlusProtocolSection
+                headline="Official partner of the world's best athletes"
+            />
 
             <LongevityNadPlusResultsSection />
 
             <LongevityNadPlusExpertPricingSection
-                ctaText="Add to Cart"
-                ctaClassName={CTA_GREEN}
+                description="In-clinic NAD+ sessions often run $600+ each, with consultations and follow-ups billed separately. Our at-home NAD+ therapy is $199 a month for a full month supply, with everything included: clinician oversight, a protocol built on clinical evidence, and discreet delivery to your door."
+                benefitItems={NAD_BENEFIT_ITEMS}
+                ctaText="Get Started WITH NAD+"
                 onCtaClick={goToCheckout}
                 isCtaLoading={isAdding}
             />
 
             <LongevityNadPlusProductSection
                 bg="bg-[#FAFAFA]"
-                name="NAD+ Injections"
+                name="NAD+ Therapy"
                 pricePrefix="Only"
                 price="$199"
-                priceAfter="a month"
-                description="A simple way to support cellular health, energy production, and overall wellness, all from the comfort of home."
+                priceAfter="/ month"
+                description="A simple way to support cellular energy and healthy aging pathways, energy production, and overall wellness, all at the convenience of your home."
                 checkPointsPosition="after"
-                ctaText="Add to Cart"
-                btnClassName="!md:w-fit !px-16 uppercase !text-sm !font-[500] !tracking-wide !bg-[#0D652D] hover:!bg-[#0D652D]"
+                ctaText="Get Started WITH NAD+"
+                btnClassName="!md:w-fit !px-16 uppercase !text-sm !font-[500] !tracking-wide"
                 checkPointsHeading="What's included"
                 checkPoints={[
                     "Free, discreet shipping",
@@ -110,43 +126,48 @@ export default function LongevityNadLpClient() {
                     "Unlimited messaging support",
                     "No hidden fees",
                 ]}
-                banner="Same-day prescriptions  •  Free assessment"
+                banner="Same-day NAD+ prescriptions  •  Free assessment"
                 onCtaClick={goToCheckout}
                 isCtaLoading={isAdding}
             />
 
+            <LongevityNadPressLogos />
+
+            <HomeReviewsSection />
+
             <LongevityNadWhatToExpectSection
-                ctaText="Add to Cart"
-                btnClassName={CTA_GREEN}
+                label="NAD+ THERAPY"
+                ctaText="See if NAD+ is right for you"
                 onCtaClick={goToCheckout}
                 isCtaLoading={isAdding}
             />
 
             <LongevityNadPlusHowRockyWorks
-                ctaText="Add to Cart"
-                ctaClassName={CTA_GREEN}
+                title="How MyRocky NAD+ therapy works"
                 onCtaClick={goToCheckout}
                 isCtaLoading={isAdding}
             />
 
+            <LongevityNadExpertsSection />
+
             <LongevityNadPlusFaqsSection
                 faqs={nadPlusFaqsV2}
-                ctaText="Add to Cart"
-                ctaClassName={CTA_GREEN}
+                subtitle="Everything you need to know about NAD, NAD+ and its benefits."
+                ctaText="Find my treatment"
                 onCtaClick={goToCheckout}
                 isCtaLoading={isAdding}
             />
 
             <LongevityNadPlusBottomCtaSection
-                ctaText="Add to Cart"
-                ctaClassName={CTA_GREEN_ON_DARK}
+                heading="Get the NAD+ your cells need to thrive."
+                subtext="NAD+ injections are now available. Get your free consultation. No commitment required."
+                ctaText="Start Your Free Assessment"
                 onCtaClick={goToCheckout}
                 isCtaLoading={isAdding}
             />
 
             <LongevityNadPlusStickyCta
-                text="Add to Cart"
-                barClassName={CTA_GREEN_BAR}
+                text="Get Started"
                 revealAfterId={HERO_CTA_ID}
                 onCtaClick={goToCheckout}
                 isCtaLoading={isAdding}

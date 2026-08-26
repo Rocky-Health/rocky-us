@@ -51,7 +51,7 @@ export default function LongevityNadDeclineSection({
             <div className="relative z-10 max-w-[1200px] mx-auto px-5 py-14 md:py-20">
                 <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
                     <div className="flex flex-col gap-5 md:gap-6">
-                        <p className="dm-mono-font text-[12px] md:text-[14px] uppercase tracking-wide text-white font-medium">
+                        <p className="helvetica-text-font text-[12px] md:text-[14px] uppercase text-white">
                             {label}
                         </p>
                         <h2 className="helvetica-display-font text-[40px] md:text-[48px] font-medium leading-[1.1] tracking-[-0.4px] md:tracking-[-0.48px] text-white">
@@ -97,7 +97,7 @@ export default function LongevityNadDeclineSection({
                             type="button"
                             onClick={onCtaClick}
                             disabled={isCtaLoading}
-                            className={`dm-mono-font inline-flex items-center justify-center gap-2 self-start py-2.5 px-20 rounded-full bg-white text-black text-sm  font-medium hover:bg-white/80 transition-all duration-300 uppercase mt-0 tracking-wide md:hidden disabled:opacity-70 disabled:cursor-not-allowed${ctaClassName ? ` ${ctaClassName}` : ""}`}
+                            className={`dm-mono-font inline-flex items-center justify-center gap-2 w-full py-2.5 px-6 rounded-full bg-white text-black text-sm  font-medium hover:bg-white/80 transition-all duration-300 uppercase mt-0 tracking-wide whitespace-nowrap md:hidden disabled:opacity-70 disabled:cursor-not-allowed${ctaClassName ? ` ${ctaClassName}` : ""}`}
                         >
                             {ctaText}
                             <FaArrowRightLong className="w-4 h-4" />
@@ -105,7 +105,7 @@ export default function LongevityNadDeclineSection({
                     ) : (
                         <Link
                             href={ctaHref}
-                            className={`dm-mono-font inline-flex items-center justify-center gap-2 self-start py-2.5 px-20 rounded-full bg-white text-black text-sm  font-medium hover:bg-white/80 transition-all duration-300 uppercase mt-0 tracking-wide md:hidden ${ctaClassName ? ` ${ctaClassName}` : ""}`}
+                            className={`dm-mono-font inline-flex items-center justify-center gap-2 w-full py-2.5 px-6 rounded-full bg-white text-black text-sm  font-medium hover:bg-white/80 transition-all duration-300 uppercase mt-0 tracking-wide whitespace-nowrap md:hidden ${ctaClassName ? ` ${ctaClassName}` : ""}`}
                         >
                             {ctaText}
                             <FaArrowRightLong className="w-4 h-4" />

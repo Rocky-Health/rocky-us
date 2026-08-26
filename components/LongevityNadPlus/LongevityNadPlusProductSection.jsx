@@ -110,9 +110,9 @@ const LongevityNadPlusProductSection = ({
                         />
 
                         {banner ? (
-                            <div className="absolute top-0 left-0 z-10 w-full">
+                            <div className="absolute top-5 md:top-7 left-1/2 -translate-x-1/2 z-10 max-w-[calc(100%-2rem)]">
                                 <p
-                                    className={`dm-mono-font text-[10px] md:text-[12px] uppercase tracking-[0.18em] leading-normal text-white bg-black backdrop-blur-sm text-center px-4 py-2.5 ${bannerClassName ? ` ${bannerClassName}` : ""}`}
+                                    className={`helvetica-text-font whitespace-nowrap text-[12px] md:text-[14px] leading-[1.43] text-black bg-white/40 backdrop-blur-md rounded-full text-center px-6 py-2.5 ${bannerClassName ? ` ${bannerClassName}` : ""}`}
                                 >
                                     {banner}
                                 </p>
@@ -126,7 +126,6 @@ const LongevityNadPlusProductSection = ({
                                 {name}
                             </h2>
                             <p className="helvetica-display-font text-[24px] md:text-[30px] font-medium leading-[1.2] tracking-[-0.24px] md:tracking-[-0.3px] text-black flex items-center gap-1">
-                                {pricePrefix ? `${pricePrefix} ` : ""}
                                 {price}
                                 {priceAfter ? (
                                     <span className="helvetica-text-font text-[14px] leading-[1.4] tracking-[-0.28px] self-end text-[#000000A6]">

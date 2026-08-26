@@ -99,6 +99,7 @@ function BenefitsBar({ items }) {
 
 export default function LongevityNadPlusExpertPricingSection({
   heading = EXPERT_PRICING_DATA.heading,
+  headingAccent = "Expert-guided NAD+,",
   description = EXPERT_PRICING_DATA.description,
   ctaText = EXPERT_PRICING_DATA.ctaText,
   ctaHref = EXPERT_PRICING_DATA.ctaHref,
@@ -127,7 +128,14 @@ export default function LongevityNadPlusExpertPricingSection({
           </div>
           <div className="flex flex-col gap-6 md:gap-8 md:max-w-[520px]">
             <h2 className="helvetica-display-font text-[40px] md:text-[48px] font-medium leading-[1.1] tracking-[-0.4px] md:tracking-[-0.48px] text-black">
-              {heading}
+              {headingAccent && heading.startsWith(headingAccent) ? (
+                <>
+                  <span className="text-[#AE7E56]">{headingAccent}</span>
+                  {heading.slice(headingAccent.length)}
+                </>
+              ) : (
+                heading
+              )}
             </h2>
             <p className="helvetica-text-font text-[14px] md:text-[16px] leading-[1.4] tracking-[-0.28px] md:tracking-[-0.32px] text-black">
               {description}
@@ -158,7 +166,7 @@ export default function LongevityNadPlusExpertPricingSection({
               src={image}
               alt={imageAlt}
               fill
-              className="object-cover object-center"
+              className="!object-contain object-center"
               sizes="(max-width: 1024px) 100vw, 580px"
             />
           </div>

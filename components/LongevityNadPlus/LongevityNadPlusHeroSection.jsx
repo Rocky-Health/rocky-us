@@ -36,7 +36,7 @@ function HeroReviews({ reviewCount, reviewRating }) {
                     "noopener,noreferrer",
                 )
             }
-            className="dm-mono-font flex items-center gap-2 w-fit uppercase"
+            className="flex items-center gap-2 w-fit"
             aria-label={`${reviewCount} reviews on Trustpilot`}
         >
             <CustomImage

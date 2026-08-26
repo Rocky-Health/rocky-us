@@ -118,7 +118,7 @@ export default function LongevityNadPlusResultsSection({
 
             <div className="relative z-10 max-w-[1200px] mx-auto px-5">
                 <header className="mx-auto mb-10 md:mb-14 flex max-w-[760px] flex-col items-center gap-3 text-center">
-                    <p className="dm-mono-font text-[12px] md:text-[14px] uppercase tracking-wide text-black font-medium">
+                    <p className="helvetica-text-font text-[12px] md:text-[14px] uppercase text-black">
                         {label}
                     </p>
                     <h2 className="helvetica-display-font text-[40px] md:text-[48px] font-medium leading-[1.1] tracking-[-0.4px] md:tracking-[-0.48px] text-black">

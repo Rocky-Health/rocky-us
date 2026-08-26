@@ -60,9 +60,9 @@ export const nadPlusFaqsV2 = [
 
 export const EXPERT_PRICING_DATA = {
   heading: "Expert-guided NAD+, at prices you can afford",
-  // US price is $199/month (SKU 490785). The "$600+ in-clinic" comparison
-  // framing is retained; it still reads correctly against $199, but the exact
-  // in-clinic figure may need business confirmation.
+  // Ticket price is $299/month per Cam, but backend SKU 490785 is still
+  // priced at $199 — keeping copy at $199 until the WooCommerce product is
+  // updated, so displayed price matches what checkout actually charges.
   description:
     "In-clinic NAD+ sessions are often $600+ each, and consultations and follow-ups are typically billed separately. Our at-home NAD+ therapy is only $199 a month for a full-month supply, with everything included: clinician oversight, tailored dosing, and discreet delivery to your door.",
   ctaText: "Get Started",
@@ -135,13 +135,10 @@ export const PROTOCOL_DATA = {
 
 // US standalone NAD+ product payload. NOTE: the US /longevity-nad-lp flow does
 // NOT consume this object — useNadCheckout.js builds its mainProduct inline
-// (SKU 490785, $199/month) and routes through utils/flowCartHandler.js. Kept
-// here for parity with the CA data module and any future direct-add use.
-// TODO(TK-830): pending Cam confirmation — pa_din "00005005" and pa_brand
-// "Create Labs" are CA-specific. Confirm these should NOT be sent for the US
-// SKU (pa_din likely dropped). They are not user-facing and are not required
-// by the US addToCartDirectly path, so they are intentionally omitted from the
-// live US product payload in useNadCheckout.js.
+// (SKU 490785, $199/month until backend is updated) and routes through
+// utils/flowCartHandler.js. Kept here for parity with the CA data module and
+// any future direct-add use. DIN and CA brand attribute intentionally dropped
+// for the US SKU.
 export const STANDALONE_NAD_PRODUCT = {
   productId: 490785,
   variationId: 490785,
@@ -150,9 +147,8 @@ export const STANDALONE_NAD_PRODUCT = {
   regularPrice: 199,
   isSubscription: true,
   subscriptionPeriod: "1_month",
-  // TODO(TK-830): confirm US asset URL. CA CDN image retained for now.
   image:
-    "https://mycdn.myrocky.ca/wp-content/uploads/20260528123657/nad.webp",
+    "https://myrocky.b-cdn.net/WP%20Images/longevity-nad-plus/ned-plus.png",
   variation: [
     { attribute: "pa_subscription-type", value: "Monthly Supply" },
     { attribute: "pa_dose-strength", value: "500mg/5ml" },

@@ -122,40 +122,48 @@ export default function LongevityNadPlusProtocolSection({
                 {/* Sports Partners Row */}
                 <div className="max-w-[1200px] w-full flex flex-col items-center gap-12">
                     {!alwaysShowLogosInBig && (
-                        <div className="hidden w-full flex-row items-center justify-center gap-4 md:flex">
-                            {PROTOCOL_DATA.partners.map((partner) => (
-                                <PartnerCard
-                                    key={partner.name}
-                                    partner={partner}
-                                    style={{ width: 240, height: 340 }}
-                                />
-                            ))}
-                        </div>
-                    )}
-                    <Reveal
-                        y={20}
-                        duration={0.65}
-                        className={`w-full ${alwaysShowLogosInBig ? "" : "md:hidden"}`}
-                    >
-                        <div
-                            className={
-                                alwaysShowLogosInBig
-                                    ? "md:flex grid grid-cols-2 md:justify-center md:items-center md:gap-10"
-                                    : "grid grid-cols-2"
-                            }
-                        >
-                            {MOBILE_PARTNER_ORDER.map((index) => {
-                                const partner = PROTOCOL_DATA.partners[index];
-                                return (
-                                    <PartnerLogoItem
+                        <>
+                            <div className="hidden w-full flex-row items-center justify-center gap-4 md:flex">
+                                {/* w-[190px] keeps 3 cards + gaps inside the content width at the
+                                    md breakpoint (768px, before lg's wider padding); lg+ grows to
+                                    the full 240x340 design size. */}
+                                {PROTOCOL_DATA.partners.map((partner) => (
+                                    <PartnerCard
                                         key={partner.name}
                                         partner={partner}
-                                        forceBigLogo={alwaysShowLogosInBig}
+                                        className="w-[190px] h-[269px] lg:w-[240px] lg:h-[340px]"
                                     />
-                                );
-                            })}
-                        </div>
-                    </Reveal>
+                                ))}
+                            </div>
+                            <div className="w-full md:hidden">
+                                <div className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth">
+                                    {PROTOCOL_DATA.partners.map((partner) => (
+                                        <PartnerCard
+                                            key={partner.name}
+                                            partner={partner}
+                                            className="w-[200px] h-[280px] shrink-0 snap-start"
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        </>
+                    )}
+                    {alwaysShowLogosInBig && (
+                        <Reveal y={20} duration={0.65} className="w-full">
+                            <div className="md:flex grid grid-cols-2 md:justify-center md:items-center md:gap-10">
+                                {MOBILE_PARTNER_ORDER.map((index) => {
+                                    const partner = PROTOCOL_DATA.partners[index];
+                                    return (
+                                        <PartnerLogoItem
+                                            key={partner.name}
+                                            partner={partner}
+                                            forceBigLogo
+                                        />
+                                    );
+                                })}
+                            </div>
+                        </Reveal>
+                    )}
                 </div>
             </div>
         </section>

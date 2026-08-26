@@ -7,10 +7,27 @@ export const LONGEVITY_NAD_WHAT_TO_EXPECT_DEFAULTS = WHAT_TO_EXPECT_DATA;
 function TimelineRow({ item, isFirstItem = false }) {
     return (
         <article
-            className={`grid md:grid-cols-[1fr_1fr] grid-cols-2 gap-3 md:gap-16 py-8 md:py-10 border-t border-dashed border-black/20 ${isFirstItem ? "border-t-0" : ""}`}
+            className="relative grid grid-cols-1 md:grid-cols-[1fr_1fr] gap-3 md:gap-16 pl-8 md:pl-0 py-8 md:py-10"
         >
+            {!isFirstItem && (
+                <span
+                    aria-hidden
+                    className="absolute left-8 right-0 top-0 border-t border-dashed border-black/20 md:left-0"
+                />
+            )}
+            {/* Mobile rail: gold line down the left with a ring at each step */}
+            <span
+                aria-hidden
+                className={`absolute left-[5px] w-px bg-[#AE7E56]/40 md:hidden ${isFirstItem ? "top-8 bottom-0" : "inset-y-0"}`}
+            />
+            <span
+                aria-hidden
+                className="absolute left-[5px] top-8 flex h-4 w-4 -translate-x-1/2 items-center justify-center rounded-full border-2 border-[#AE7E56] bg-white md:hidden"
+            >
+                <span className="h-1.5 w-1.5 rounded-full bg-[#AE7E56]" />
+            </span>
             <div className="flex flex-col gap-2 ">
-                <p className="helvetica-text-font font-medium text-[12px] leading-[1.4] tracking-[-0.16px] text-black uppercase">
+                <p className="helvetica-text-font font-medium text-[12px] leading-[1.4] tracking-[-0.16px] text-[#AE7E56] uppercase">
                     {item.week}
                 </p>
                 <h3 className="helvetica-display-font text-[20px] md:text-[24px] font-medium leading-[1.2] tracking-[-0.2px] md:tracking-[-0.24px] text-black">
@@ -40,7 +57,7 @@ export default function LongevityNadWhatToExpectSection({
         <section className={`${bg} w-full py-14 md:py-24`}>
             <div className="max-w-[1200px] mx-auto px-5">
                 <header className="flex flex-col gap-2 mb-2">
-                    <p className="dm-mono-font text-[12px] md:text-[14px] uppercase tracking-wide text-black font-medium">
+                    <p className="helvetica-text-font text-[12px] md:text-[14px] uppercase text-black">
                         {label}
                     </p>
                     <h2 className="helvetica-display-font text-[40px] md:text-[48px] font-medium leading-[1.1] tracking-[-0.4px] md:tracking-[-0.48px] text-black">
@@ -48,7 +65,7 @@ export default function LongevityNadWhatToExpectSection({
                     </h2>
                 </header>
 
-                <div className="flex flex-col">
+                <div className="relative flex flex-col">
                     {items.map((item, index) => (
                         <TimelineRow
                             key={item.week}
@@ -58,9 +75,9 @@ export default function LongevityNadWhatToExpectSection({
                     ))}
                 </div>
 
-                <p className="helvetica-text-font text-[12px] leading-[1.4] tracking-[-0.16px] text-black/60 mt-6 md:mt-8 max-w-[640px]">
+                {/* <p className="helvetica-text-font text-[12px] leading-[1.4] tracking-[-0.16px] text-black/60 mt-6 md:mt-8 max-w-[640px]">
                     Results and timelines vary by individual experience.
-                </p>
+                </p> */}
 
                 <div className="flex justify-center mt-10 md:mt-12">
                     {onCtaClick ? (

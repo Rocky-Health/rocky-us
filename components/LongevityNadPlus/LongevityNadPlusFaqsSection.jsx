@@ -10,6 +10,8 @@ export default function LongevityNadPlusFaqsSection({
     onCtaClick,
     isCtaLoading = false,
     subtitle = "Everything you need to know about NAD+ injections.",
+    label = "Got questions?",
+    heading = "Frequently Asked Questions.",
     ctaClassName = "",
 }) {
     return (
@@ -17,11 +19,11 @@ export default function LongevityNadPlusFaqsSection({
             <div className="max-w-[1200px] mx-auto px-5">
                 <div className="grid md:grid-cols-[minmax(0,360px)_1fr] lg:grid-cols-[minmax(0,400px)_1fr] gap-10 lg:gap-24 items-start">
                     <div className="flex flex-col gap-3">
-                        <p className="dm-mono-font text-[12px] md:text-[14px] uppercase tracking-wide text-black font-medium">
-                            Got questions?
+                        <p className="helvetica-text-font text-[12px] md:text-[14px] uppercase text-black">
+                            {label}
                         </p>
                         <h2 className="helvetica-display-font text-[40px] md:text-[48px] font-medium leading-[1.1] tracking-[-0.4px] md:tracking-[-0.48px] text-black">
-                            Frequently <br className="" /> Asked Questions.
+                            {heading}
                         </h2>
                         <p className="helvetica-text-font text-[14px] md:text-[16px] leading-[1.4] tracking-[-0.28px] md:tracking-[-0.32px]">
                             {subtitle}
@@ -63,7 +65,7 @@ export default function LongevityNadPlusFaqsSection({
                             type="button"
                             onClick={onCtaClick}
                             disabled={isCtaLoading}
-                            className={`dm-mono-font inline-flex items-center justify-center self-start gap-2 py-2.5 px-10 rounded-full bg-black text-white text-base font-medium hover:bg-gray-800 transition-all mt-3 duration-300 uppercase w-full md:hidden disabled:opacity-70 disabled:cursor-not-allowed${ctaClassName ? ` ${ctaClassName}` : ""}`}
+                            className={`dm-mono-font inline-flex items-center justify-center self-start gap-2 py-2.5 px-6 rounded-full bg-black text-white text-sm font-medium hover:bg-gray-800 transition-all mt-3 duration-300 uppercase w-full whitespace-nowrap md:hidden disabled:opacity-70 disabled:cursor-not-allowed${ctaClassName ? ` ${ctaClassName}` : ""}`}
                             style={{ wordSpacing: "0.25em" }}
                         >
                             {ctaText} <FaArrowRightLong />
@@ -71,7 +73,7 @@ export default function LongevityNadPlusFaqsSection({
                     ) : (
                         <Link
                             href={ctaHref}
-                            className={`dm-mono-font inline-flex items-center justify-center self-start gap-2 py-2.5 px-10 rounded-full bg-black text-white text-base font-medium hover:bg-gray-800 transition-all mt-3 duration-300 uppercase w-full md:hidden${ctaClassName ? ` ${ctaClassName}` : ""}`}
+                            className={`dm-mono-font inline-flex items-center justify-center self-start gap-2 py-2.5 px-6 rounded-full bg-black text-white text-sm font-medium hover:bg-gray-800 transition-all mt-3 duration-300 uppercase w-full whitespace-nowrap md:hidden${ctaClassName ? ` ${ctaClassName}` : ""}`}
                             style={{ wordSpacing: "0.25em" }}
                         >
                             {ctaText} <FaArrowRightLong />

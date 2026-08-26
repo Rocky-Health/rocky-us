@@ -298,7 +298,7 @@ export default function NadDeclineTreatmentChart({ treatmentLabel = "With NAD+ s
             <div className="flex items-start justify-between gap-6 mb-5">
                 <p className="helvetica-text-font text-[14px] md:text-[16px] leading-[1.4] tracking-[-0.28px] md:tracking-[-0.32px] text-white">
                     NAD+ levels{" "}
-                    <span className="font-medium">decrease 50%</span>{" "}
+                    <span className="font-medium">decrease by 50%</span>{" "}
                     <br className="hidden md:block" /> by your 40s.
                 </p>
                 <div className="flex items-center gap-3 shrink-0">
@@ -487,10 +487,10 @@ export default function NadDeclineTreatmentChart({ treatmentLabel = "With NAD+ s
                 </text>
             </svg>
 
-            <p className="helvetica-text-font text-[11px] md:text-xs text-white/60 leading-[140%] mt-3 md:mt-4">
+            {/* <p className="helvetica-text-font text-[11px] md:text-xs text-white/60 leading-[140%] mt-3 md:mt-4">
                 Illustrative chart based on published research. Individual
                 results may vary.
-            </p>
+            </p> */}
         </div>
     );
 }

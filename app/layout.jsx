@@ -1,6 +1,6 @@
 import "./globals.css";
 import { logger } from "@/utils/devLogger";
-import { Poppins } from "next/font/google";
+import { Poppins, DM_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer/Footer";
@@ -56,6 +56,44 @@ const fellixSemiBold = localFont({
   display: "swap",
   adjustFontFallback: "Arial",
   preload: true,
+});
+
+// Helvetica Now + DM Mono: used only by the Longevity NAD+ landing page
+// (scoped under the .longevity-fonts wrapper in globals.css), not the site
+// default. Not preloaded since only one page uses them.
+const dmMono = DM_Mono({
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+  variable: "--font-dm-mono",
+  display: "swap",
+  preload: false,
+});
+
+const helveticaNowDisplay = localFont({
+  src: "../fonts/Helvetica/HelveticaNowDisplay-Medium.woff2",
+  variable: "--font-helvetica-display",
+  display: "swap",
+  preload: false,
+  adjustFontFallback: "Arial",
+});
+
+const helveticaNowText = localFont({
+  src: [
+    {
+      path: "../fonts/Helvetica/HelveticaNowText-Regular.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../fonts/Helvetica/HelveticaNowText-Medium.woff2",
+      weight: "500",
+      style: "normal",
+    },
+  ],
+  variable: "--font-helvetica-text",
+  display: "swap",
+  preload: false,
+  adjustFontFallback: "Arial",
 });
 
 // Prevent iOS Safari from auto-zooming when focusing on form inputs.
@@ -303,7 +341,7 @@ export default function RootLayout({ children }) {
         {/* End Microsoft Clarity */}
       </head>
       <body
-        className={`${poppins.variable} ${fellixMedium.variable} ${fellixSemiBold.variable}`}
+        className={`${poppins.variable} ${fellixMedium.variable} ${fellixSemiBold.variable} ${dmMono.variable} ${helveticaNowDisplay.variable} ${helveticaNowText.variable}`}
         suppressHydrationWarning={true}
       >
         {/* Google Tag Manager (noscript) */}

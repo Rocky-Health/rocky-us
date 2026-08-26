@@ -22,6 +22,8 @@ export function useNadCheckout() {
 
         try {
             // US standalone NAD+ SKU: $199/month subscription (product 490785).
+            // TODO(TK-830): backend SKU price not yet updated to $299 — revert
+            // this to $299 once the WooCommerce product/variation is updated.
             const mainProduct = {
                 id: "490785",
                 name: "NAD+",
