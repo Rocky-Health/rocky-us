@@ -722,6 +722,13 @@ export default function NewBOWLConsultationQuiz({
       logger.error("Error loading new BO pre-quiz data:", error);
     }
 
+    // User info lives in formData from cookies but the page maps skip it; send it explicitly
+    ["130_3", "130_6", "131", "132", "158", "161_4"].forEach((key) => {
+      if (formData[key]) {
+        filteredData[key] = formData[key];
+      }
+    });
+
     return filteredData;
   };
 

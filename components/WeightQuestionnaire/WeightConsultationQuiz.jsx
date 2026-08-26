@@ -3329,6 +3329,13 @@ export default function WeightLossConsultationQuiz({
         storedAttributes.eatingDisorderDiagnosis;
     }
 
+    // User info lives in formData from cookies but the page maps skip it; send it explicitly
+    ["130_3", "130_6", "131", "132", "158", "161_4"].forEach((key) => {
+      if (formData[key]) {
+        filteredData[key] = formData[key];
+      }
+    });
+
     return filteredData;
   };
 
