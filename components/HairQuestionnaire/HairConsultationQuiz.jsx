@@ -171,7 +171,7 @@ export default function HairConsultationQuiz({
     completion_percentage: 10,
     source_site: process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com",
     131: userEmail || "",
-    132: pn || "(000) 000-0000",
+    132: pn || "",
     158: dob,
     "161_4": province || "Ontario",
     "130_3": fname || "",
@@ -3385,12 +3385,12 @@ export default function HairConsultationQuiz({
               <input
                 type="hidden"
                 name="132"
-                value={formData["132"] || "(000) 000-0000"}
+                value={formData["132"] || ""}
               />
               <input
                 type="hidden"
                 name="158"
-                value={formData["158"] || "2000-01-01"}
+                value={formData["158"] || ""}
               />
               <input
                 type="hidden"

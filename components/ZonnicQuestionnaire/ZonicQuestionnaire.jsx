@@ -860,8 +860,8 @@ export default function ZonnicConsultationQuiz({
         "130_3": formData["130_3"] || "",
         "130_6": formData["130_6"] || "",
         131: formData["131"] || "",
-        132: formData["132"] || "(000) 000-0000",
-        158: formData["158"] || "2000-01-01",
+        132: formData["132"] || "",
+        158: formData["158"] || "",
         "161_4": formData["161_4"] || "Ontario",
       };
 
@@ -1458,12 +1458,12 @@ export default function ZonnicConsultationQuiz({
                 <input
                   type="hidden"
                   name="132"
-                  value={formData["132"] || "(000) 000-0000"}
+                  value={formData["132"] || ""}
                 />
                 <input
                   type="hidden"
                   name="158"
-                  value={formData["158"] || "2000-01-01"}
+                  value={formData["158"] || ""}
                 />
                 <input
                   type="hidden"

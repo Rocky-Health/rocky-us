@@ -3,11 +3,12 @@ import { cookies } from "next/headers";
 
 export default async function HairConsultationPage() {
   const cookieStore = await cookies();
-  const pn = cookieStore.get("pn")?.value;
+  // Login sets pn/dob, register sets phone/DOB; read both so neither flow loses data
+  const pn = cookieStore.get("pn")?.value || cookieStore.get("phone")?.value;
   const userName = cookieStore.get("userName")?.value;
   const userEmail = cookieStore.get("userEmail")?.value;
   const province = cookieStore.get("province")?.value;
-  const dob = cookieStore.get("dob")?.value;
+  const dob = cookieStore.get("dob")?.value || cookieStore.get("DOB")?.value;
 
   return (
     <main className="min-h-screen">
