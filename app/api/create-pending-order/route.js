@@ -17,6 +17,17 @@ const CONSUMER_SECRET = process.env.CONSUMER_SECRET;
 
 export async function POST(req) {
   try {
+    // Dispute-evidence IP capture (stopgap ahead of MAYU-822 making WooCommerce's
+    // native customer_ip_address authoritative). Read off the incoming request as
+    // early as possible so the captured timestamp reflects this request, not order
+    // creation. First hop of x-forwarded-for is the real client edge, then x-real-ip.
+    const clientIp =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("x-real-ip") ||
+      "";
+    const clientUserAgent = req.headers.get("user-agent") || "";
+    const ipCapturedAt = new Date().toISOString();
+
     const requestData = await req.json();
 
     const {
@@ -281,6 +292,10 @@ export async function POST(req) {
         { key: "_awin_awc", value: resolvedAwinAwc || "" },
         { key: "_awin_channel", value: resolvedAwinChannel },
         { key: "_is_created_from_rocky_fe", value: "true" },
+        { key: "_rocky_customer_ip", value: clientIp },
+        { key: "_rocky_customer_user_agent", value: clientUserAgent },
+        { key: "_rocky_ip_source", value: "storefront_request_header" },
+        { key: "_rocky_ip_captured_at", value: ipCapturedAt },
       ],
     };
 
@@ -324,6 +339,15 @@ export async function POST(req) {
       order_key: response.data.order_key,
       status: response.data.status,
     });
+
+    // No usable IP means this order will carry no dispute-evidence address.
+    // A quiet gap here is exactly what went unnoticed for fifteen months.
+    if (!clientIp) {
+      logger.error(
+        "create-pending-order: no customer IP resolved, order has no dispute-evidence address",
+        { order_id: response.data.id }
+      );
+    }
 
     // ========================================
     // ASYNC: Create subscriptions (non-blocking)
