@@ -1,21 +1,51 @@
 import React from "react";
+import dynamic from "next/dynamic";
 import { nadPlusQuizConfig } from "./config/nadPlusQuizConfig";
-import NadPlusPlanStep from "./components/NadPlusPlanStep";
-import Glp2DobStep from "./components/Glp2DobStep";
-import Glp2ContactAuthStep from "./components/Glp2ContactAuthStep";
-import Glp1MedicalReviewPersonalStep from "./components/Glp1MedicalReviewPersonalStep";
-import NadPlusPriorityStep from "./components/NadPlusPriorityStep";
-import NadPlusEnergyStep from "./components/NadPlusEnergyStep";
-import NadPlusMentalPerformanceStep from "./components/NadPlusMentalPerformanceStep";
-import NadPlusCellularScienceStep from "./components/NadPlusCellularScienceStep";
-import NadPlusTestimonialStep from "./components/NadPlusTestimonialStep";
-import NadPlusGenderHeightWeightStep from "./components/NadPlusGenderHeightWeightStep";
-import NadPlusMedicalConditionsStep from "./components/NadPlusMedicalConditionsStep";
-import Glp1FemaleSafetyFirstStep from "./components/Glp1FemaleSafetyFirstStep";
-import NadPlusAgingEffectsStep from "./components/NadPlusAgingEffectsStep";
-import NadPlusWeightChangedStep from "./components/NadPlusWeightChangedStep";
-import NadPlusLastQuestionStep from "./components/NadPlusLastQuestionStep";
-import NadPlusPersonalInfoStep from "./components/NadPlusPersonalInfoStep";
+
+const NadPlusPlanStep = dynamic(() => import("./components/NadPlusPlanStep"));
+const Glp2DobStep = dynamic(() => import("./components/Glp2DobStep"));
+const Glp2ContactAuthStep = dynamic(() =>
+  import("./components/Glp2ContactAuthStep")
+);
+const Glp1MedicalReviewPersonalStep = dynamic(() =>
+  import("./components/Glp1MedicalReviewPersonalStep")
+);
+const NadPlusPriorityStep = dynamic(() =>
+  import("./components/NadPlusPriorityStep")
+);
+const NadPlusEnergyStep = dynamic(() =>
+  import("./components/NadPlusEnergyStep")
+);
+const NadPlusMentalPerformanceStep = dynamic(() =>
+  import("./components/NadPlusMentalPerformanceStep")
+);
+const NadPlusCellularScienceStep = dynamic(() =>
+  import("./components/NadPlusCellularScienceStep")
+);
+const NadPlusTestimonialStep = dynamic(() =>
+  import("./components/NadPlusTestimonialStep")
+);
+const NadPlusGenderHeightWeightStep = dynamic(() =>
+  import("./components/NadPlusGenderHeightWeightStep")
+);
+const NadPlusMedicalConditionsStep = dynamic(() =>
+  import("./components/NadPlusMedicalConditionsStep")
+);
+const Glp1FemaleSafetyFirstStep = dynamic(() =>
+  import("./components/Glp1FemaleSafetyFirstStep")
+);
+const NadPlusAgingEffectsStep = dynamic(() =>
+  import("./components/NadPlusAgingEffectsStep")
+);
+const NadPlusWeightChangedStep = dynamic(() =>
+  import("./components/NadPlusWeightChangedStep")
+);
+const NadPlusLastQuestionStep = dynamic(() =>
+  import("./components/NadPlusLastQuestionStep")
+);
+const NadPlusPersonalInfoStep = dynamic(() =>
+  import("./components/NadPlusPersonalInfoStep")
+);
 const QuizStepRenderer = ({
   currentStep,
   userData,

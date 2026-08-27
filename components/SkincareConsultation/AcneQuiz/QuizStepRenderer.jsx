@@ -1,12 +1,16 @@
 import React from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import GenericQuestionStep from "../components/GenericQuestionStep";
-import GenericRecommendationStep from "../components/GenericRecommendationStep";
-import PhotoUploadStep from "../components/PhotoUploadStep";
-import IdUploadStep from "../components/IdUploadStep";
 import SkincareProductCard from "../components/SkincareProductCard";
-import ThankYouStep from "../components/ThankYouStep";
 import { quizConfig } from "./config/quizConfig";
+
+const GenericRecommendationStep = dynamic(() =>
+  import("../components/GenericRecommendationStep")
+);
+const PhotoUploadStep = dynamic(() => import("../components/PhotoUploadStep"));
+const IdUploadStep = dynamic(() => import("../components/IdUploadStep"));
+const ThankYouStep = dynamic(() => import("../components/ThankYouStep"));
 import { getProductRecommendation } from "../utils/recommendationEngine";
 
 const QuizStepRenderer = ({
