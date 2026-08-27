@@ -8,11 +8,12 @@ export const dynamic = "force-dynamic";
 // This is completely independent from /wl-consultation
 export default async function NewBOWLConsultationPage() {
   const cookieStore = await cookies();
-  const pn = cookieStore.get("pn")?.value;
+  // Login sets pn/dob, register sets phone/DOB; read both so neither flow loses data
+  const pn = cookieStore.get("pn")?.value || cookieStore.get("phone")?.value;
   const userName = cookieStore.get("userName")?.value;
   const userEmail = cookieStore.get("userEmail")?.value;
   const province = cookieStore.get("province")?.value;
-  const dob = cookieStore.get("dob")?.value;
+  const dob = cookieStore.get("dob")?.value || cookieStore.get("DOB")?.value;
 
   return (
     <main className="min-h-screen">
