@@ -20,8 +20,14 @@ export async function POST(req) {
     // Dispute-evidence IP capture (stopgap ahead of MAYU-822 making WooCommerce's
     // native customer_ip_address authoritative). Read off the incoming request as
     // early as possible so the captured timestamp reflects this request, not order
-    // creation. First hop of x-forwarded-for is the real client edge, then x-real-ip.
+    // creation. Production sits behind Cloudflare, which proxies to Vercel, so
+    // x-forwarded-for/x-real-ip only ever show Cloudflare's own edge IP (Vercel
+    // overwrites those headers with whoever connects to it directly, and that's
+    // Cloudflare, not the visitor). cf-connecting-ip is Cloudflare's real-client
+    // header and takes priority; the old chain stays as a fallback for anything
+    // not behind Cloudflare (local dev, direct preview URLs).
     const clientIp =
+      req.headers.get("cf-connecting-ip")?.trim() ||
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
       req.headers.get("x-real-ip") ||
       "";
