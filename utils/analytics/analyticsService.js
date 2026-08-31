@@ -328,14 +328,22 @@ export const analyticsService = {
       }
 
       // Track Northbeam event (await to reduce pixel-only cases)
-      // Optionally guard NB separately; allow if not sent this session
+      // Guard NB separately. The guard key is order scoped
+      // (analytics:purchase:nb:<order.id>), so a second distinct order in the
+      // same session still sends.
+      //
+      // This previously called trackNorthbeamPurchase in the else branch too,
+      // which made the guard a no-op: every purchase fired twice, roughly 100ms
+      // apart. Northbeam upserts on order_id so revenue was not double counted,
+      // but the second write silently overwrote the first, making any per-write
+      // difference resolve non-deterministically. Retry on failure is already
+      // handled inside trackNorthbeamPurchase.
       if (setOnce(guardKeyNB)) {
         await trackNorthbeamPurchase(order, additionalData, true);
       } else {
-        // If already sent this session, still attempt once more if previous attempts failed silently
-        try {
-          await trackNorthbeamPurchase(order, additionalData, true);
-        } catch (_) {}
+        logger.log("[Analytics] Northbeam purchase already sent this session", {
+          order_id: order?.id,
+        });
       }
     } catch (error) {
       logger.error("[Analytics] Error tracking purchase:", error);
