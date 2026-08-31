@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { normalizeOrderId } from "@/lib/northbeam/orderId";
+import { resolveOrderTimeIso } from "@/lib/northbeam/orderTime";
 import { logger } from "@/utils/devLogger";
 import { api as wooApi } from "@/lib/woocommerce";
 import { requireSyncApiKey } from "@/lib/northbeam/syncAuth";
@@ -195,7 +196,10 @@ export async function POST(req) {
         // Provide canonical id for parity with pixel and to override on server
         customer_id: canonicalCustomerId || String(order?.customer_id || email || ""),
         customer_id_canonical: canonicalCustomerId || String(order?.customer_id || email || ""),
-        time_of_purchase: new Date(timeCandidate || order?.date_created || Date.now()).toISOString(),
+        // timeCandidate already prefers the _gmt fields; resolveOrderTimeIso pins
+    // them to UTC and drops the bare date_created tail, which carried no
+    // offset and so resolved against the runtime's own timezone.
+    time_of_purchase: resolveOrderTimeIso(order) || new Date(timeCandidate || Date.now()).toISOString(),
         currency: order?.currency || "USD",
         purchase_total: purchaseTotal,
         tax,

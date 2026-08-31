@@ -1,4 +1,5 @@
 import { logger } from "@/utils/devLogger";
+import { resolveOrderTimeIso } from "@/lib/northbeam/orderTime";
 import { toMoney } from "@/utils/priceFormatter";
 import { getNorthbeamSourceTags, getAttributionData } from "@/utils/sourceAttribution";
 
@@ -204,9 +205,15 @@ export const trackNorthbeamPurchase = async (
     }
 
     // Prefer canonical overrides when provided
+    // Prefer an explicit override, then the order's true UTC instant. Never
+    // parse the site-local date_created directly: it carries no offset, so in
+    // the browser it resolves against the customer's device timezone and skews
+    // the timestamp per customer. Northbeam drops attribution entirely when the
+    // API timestamp precedes the pixel, so that skew silently costs orders.
     const canonicalTimeIso =
       additionalData.time_of_purchase_iso ||
-      new Date(order.date_created || Date.now()).toISOString();
+      resolveOrderTimeIso(order) ||
+      new Date().toISOString();
     const customerIdOverride = additionalData.customer_id || null;
 
     // Get source attribution tags for Northbeam
@@ -382,7 +389,9 @@ export const formatNorthbeamOrderData = async (order) => {
   return {
     order_id: order.id.toString(),
     customer_id: String(order.customer_id || order.billing?.email || ""), // Ensure customer_id is a string
-    time_of_purchase: new Date(order.date_created || new Date()).toISOString(), // Ensure proper ISO format
+    // True UTC instant. See resolveOrderTimeIso for why date_created is not
+    // used directly here.
+    time_of_purchase: resolveOrderTimeIso(order) || new Date().toISOString(),
     currency: order.currency || "USD",
     purchase_total: parseFloat(order.total) || 0, // Keep in dollars, not cents
     tax: parseFloat(order.total_tax) || 0, // Keep in dollars, not cents
