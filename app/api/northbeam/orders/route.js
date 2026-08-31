@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { evaluateSendGate } from "@/lib/northbeam/sendGate";
 import { normalizeOrderId } from "@/lib/northbeam/orderId";
 import { resolveOrderTimeIso } from "@/lib/northbeam/orderTime";
 import { logger } from "@/utils/devLogger";
@@ -231,10 +232,21 @@ export async function POST(req) {
       );
     }
 
-    // Skip $0 orders (100% discount)
-    if (parseFloat(order.purchase_total) <= 0) {
-      logger.log(`[Northbeam API] Skipping $0 order ${order.order_id} — no purchase event dispatched`);
-      return NextResponse.json({ success: true, skipped: true, reason: 'Zero value order', order_id: order.order_id });
+    // Gate the outbound call. Previously this was reachable from any
+    // environment holding Northbeam credentials, so preview deploys and QA
+    // orders reached the production dataset.
+    const gate = evaluateSendGate(order);
+    if (!gate.send) {
+      logger.log(
+        `[Northbeam API] Skipping order ${order.order_id}: ${gate.reason}`,
+        { order_id: order.order_id, reason: gate.reason, detail: gate.detail }
+      );
+      return NextResponse.json({
+        success: true,
+        skipped: true,
+        reason: gate.reason,
+        order_id: order.order_id,
+      });
     }
 
     // Build base URL from incoming request
