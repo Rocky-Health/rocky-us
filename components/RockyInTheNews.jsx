@@ -56,6 +56,7 @@ const RockyInTheNews = ({ cards }) => {
                                     // className="object-contain filter brightness-0 grayscale"
                                     fill
                                     sizes="150px"
+                                    priority={index < 4}
                                 />
                             </div>
                         </div>

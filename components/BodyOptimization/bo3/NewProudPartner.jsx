@@ -4,6 +4,7 @@ const ProudPartner = ({
   section = false,
   bg = "bg-white",
   hideMapleLeaf = false,
+  priority = false,
 }) => {
   const rockyLogoSize = "h-[28px] w-[72px]";
   const nbaLogoSize = "w-[16px] h-[36px]";
@@ -30,6 +31,7 @@ const ProudPartner = ({
               fill
               className="object-contain"
               sizes="72px"
+              priority={priority}
             />
           </div>
           <p className="leading-[100%] font-[600] text-[8px] mt-0.5">
@@ -47,6 +49,7 @@ const ProudPartner = ({
               fill
               className="object-contain"
               sizes="16px"
+              priority={priority}
             />
           </div>
           <div className={`relative overflow-hidden ${blueJaysLogoSize}`}>
@@ -56,6 +59,7 @@ const ProudPartner = ({
               fill
               className="object-contain"
               sizes="45px"
+              priority={priority}
             />
           </div>
           {!hideMapleLeaf && (
@@ -66,6 +70,7 @@ const ProudPartner = ({
                 fill
                 className="object-contain"
                 sizes="34px"
+                priority={priority}
               />
             </div>
           )}
