@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { normalizeOrderId } from "@/lib/northbeam/orderId";
+import { resolveOrderTimeIso } from "@/lib/northbeam/orderTime";
 import { logger } from "@/utils/devLogger";
 import { api as wooApi } from "@/lib/woocommerce";
 import { requireSyncApiKey } from "@/lib/northbeam/syncAuth";
@@ -159,10 +161,17 @@ const mapWooToNorthbeamOrder = (order) => {
   }
 
   return {
-    order_id: String(order?.id),
+    // Northbeam dedupes on order_id, so a non primary key here becomes a
+    // separate record for the same purchase. String(order?.id) on a
+    // missing id yields the string "undefined", which survives a
+    // truthiness check downstream, so normalize explicitly.
+    order_id: normalizeOrderId(order?.id),
     customer_id: canonicalCustomerId || String(order?.customer_id || email || ""),
     customer_id_canonical: canonicalCustomerId || String(order?.customer_id || email || ""),
-    time_of_purchase: new Date(timeCandidate || order?.date_created || Date.now()).toISOString(),
+    // timeCandidate already prefers the _gmt fields; resolveOrderTimeIso pins
+    // them to UTC and drops the bare date_created tail, which carried no
+    // offset and so resolved against the runtime's own timezone.
+    time_of_purchase: resolveOrderTimeIso(order) || new Date(timeCandidate || Date.now()).toISOString(),
     currency: order?.currency || "USD",
     purchase_total: purchaseTotal,
     tax,

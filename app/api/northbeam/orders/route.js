@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { normalizeOrderId } from "@/lib/northbeam/orderId";
+import { resolveOrderTimeIso } from "@/lib/northbeam/orderTime";
 import { logger } from "@/utils/devLogger";
 
 /**
@@ -204,7 +206,10 @@ export async function POST(req) {
     }
 
     const order = orderData.orders[0];
-    if (!order.order_id) {
+    // A falsy check is not enough here. String(undefined) produces the string
+    // "undefined", which is truthy, so a mapper that lost the primary key would
+    // pass this gate and create a phantom order in Northbeam under that key.
+    if (!normalizeOrderId(order.order_id)) {
       return NextResponse.json(
         { error: "Invalid order data: order_id is required" },
         { status: 400 }
@@ -244,14 +249,18 @@ export async function POST(req) {
     );
 
     // Derive canonical timestamp and customer_id
+    // Explicit overrides first, then the order's true UTC instant.
+    //
+    // The site-local tail (date_paid / date_completed / date_created) was
+    // removed deliberately: those fields carry no offset, so Date.parse resolves
+    // them against the runtime's own timezone and silently shifts the instant by
+    // the store offset. The _gmt fields are bare strings too, which is why they
+    // now go through resolveOrderTimeIso to be pinned to UTC rather than parsed
+    // loosely here.
     const rawClientTime =
       order.time_of_purchase ||
       order.timeOfPurchase ||
-      order.date_paid_gmt ||
-      order.date_created_gmt ||
-      order.date_paid ||
-      order.date_completed ||
-      order.date_created;
+      resolveOrderTimeIso(order);
 
     const nowMs = Date.now();
     let parsedMs = Number.isFinite(Date.parse(rawClientTime))
