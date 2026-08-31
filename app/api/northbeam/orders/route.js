@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { normalizeOrderId } from "@/lib/northbeam/orderId";
 import { logger } from "@/utils/devLogger";
 
 /**
@@ -204,7 +205,10 @@ export async function POST(req) {
     }
 
     const order = orderData.orders[0];
-    if (!order.order_id) {
+    // A falsy check is not enough here. String(undefined) produces the string
+    // "undefined", which is truthy, so a mapper that lost the primary key would
+    // pass this gate and create a phantom order in Northbeam under that key.
+    if (!normalizeOrderId(order.order_id)) {
       return NextResponse.json(
         { error: "Invalid order data: order_id is required" },
         { status: 400 }
