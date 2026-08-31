@@ -104,11 +104,20 @@ export async function POST(req) {
     
     logger.log(`[NB Auto-Retry] Calling backfill endpoint with ${orderIds.length} orders`);
     
+    // The backfill endpoint now requires the shared sync secret. Without this
+    // header the cron would start receiving 401s the moment TK-1024 deploys.
+    const backfillHeaders = { "Content-Type": "application/json" };
+    if (process.env.NORTHBEAM_SYNC_API_KEY) {
+      backfillHeaders["X-API-Key"] = process.env.NORTHBEAM_SYNC_API_KEY;
+    } else {
+      logger.error(
+        "[NB Auto-Retry] NORTHBEAM_SYNC_API_KEY not configured, the backfill call will be rejected"
+      );
+    }
+
     const backfillResponse = await fetch(backfillUrl, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: backfillHeaders,
       body: JSON.stringify({
         order_ids: orderIds,
         dry_run: false,
