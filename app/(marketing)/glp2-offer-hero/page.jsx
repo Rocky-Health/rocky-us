@@ -27,6 +27,8 @@ export const metadata = buildMetadata({
   noindex: true,
 });
 
+export const revalidate = 3600;
+
 export default async function GLP2OfferHeroPage() {
   const ctaHref = "/glp2-pre-consultation";
 
