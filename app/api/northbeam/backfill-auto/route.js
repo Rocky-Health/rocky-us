@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { logger } from "@/utils/devLogger";
 import { api as wooApi } from "@/lib/woocommerce";
+import { requireSyncApiKey } from "@/lib/northbeam/syncAuth";
 
 /**
  * POST /api/northbeam/backfill-auto
@@ -185,6 +186,9 @@ export async function POST(req) {
   const startTime = Date.now();
   
   try {
+    const unauthorized = requireSyncApiKey(req, "NB Backfill Auto", logger);
+    if (unauthorized) return unauthorized;
+
     const body = await req.json().catch(() => ({}));
     const ids = Array.isArray(body?.order_ids) ? body.order_ids : [];
     const batchId = body?.batch_id || `batch_${Date.now()}`;
