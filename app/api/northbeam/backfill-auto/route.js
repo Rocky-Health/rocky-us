@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { normalizeOrderId } from "@/lib/northbeam/orderId";
 import { logger } from "@/utils/devLogger";
 import { api as wooApi } from "@/lib/woocommerce";
 import { requireSyncApiKey } from "@/lib/northbeam/syncAuth";
@@ -159,7 +160,11 @@ const mapWooToNorthbeamOrder = (order) => {
   }
 
   return {
-    order_id: String(order?.id),
+    // Northbeam dedupes on order_id, so a non primary key here becomes a
+    // separate record for the same purchase. String(order?.id) on a
+    // missing id yields the string "undefined", which survives a
+    // truthiness check downstream, so normalize explicitly.
+    order_id: normalizeOrderId(order?.id),
     customer_id: canonicalCustomerId || String(order?.customer_id || email || ""),
     customer_id_canonical: canonicalCustomerId || String(order?.customer_id || email || ""),
     time_of_purchase: new Date(timeCandidate || order?.date_created || Date.now()).toISOString(),
