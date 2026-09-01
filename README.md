@@ -89,6 +89,47 @@ Define variables in your deployment environment. Never commit secrets.
 - Northbeam
   - `NB_CLIENT_ID` or `NORTHBEAM_CLIENT_ID`
   - `NB_API_KEY` or `NORTHBEAM_AUTH_TOKEN`
+- Customer.io (Pipelines / CDP relay, server-side only)
+  - `CUSTOMERIO_ENABLED`: `true` enables the integration. Anything else, including unset,
+    disables it and produces zero outbound Customer.io requests.
+  - `CUSTOMERIO_WORKSPACE`: which workspace to write to. Exactly one of `sample`, `ca`, `us`.
+    Any other value fails closed.
+  - `CUSTOMERIO_SAMPLE_WRITE_KEY`: Pipelines write key for the shared integration-testing
+    workspace.
+  - `CUSTOMERIO_CA_WRITE_KEY`: Pipelines write key for the Rocky Canada production workspace.
+  - `CUSTOMERIO_US_WRITE_KEY`: Pipelines write key for the Rocky USA production workspace.
+
+  Empty template:
+
+  ```env
+  CUSTOMERIO_ENABLED=
+  CUSTOMERIO_WORKSPACE=
+  CUSTOMERIO_SAMPLE_WRITE_KEY=
+  CUSTOMERIO_CA_WRITE_KEY=
+  CUSTOMERIO_US_WRITE_KEY=
+  ```
+
+  There is no fallback between workspaces, on purpose. Selecting `ca` while
+  `CUSTOMERIO_CA_WRITE_KEY` is absent sends nothing at all; it does not quietly write Canadian
+  production traffic into the sample workspace. The same holds for `us`. An invalid workspace
+  value, a missing key, or `CUSTOMERIO_ENABLED` not being `true` all mean zero requests.
+
+  A target's write key only has to exist when that target is selected, so the two production
+  keys may be absent for as long as the integration points at `sample`.
+
+  Current state and the future switch:
+
+  ```text
+  Current testing:  CUSTOMERIO_WORKSPACE=sample
+  Future CA:        CUSTOMERIO_WORKSPACE=ca
+  Future US:        CUSTOMERIO_WORKSPACE=us
+  ```
+
+  Activating a production workspace is an environment change only. Add that workspace's write
+  key, flip `CUSTOMERIO_WORKSPACE`, redeploy. No code change is required.
+
+  Account region is US, so the Pipelines host is `https://cdp.customer.io`. The EU host is not
+  implemented: region is fixed at workspace creation and ours is US.
 - AWS S3 (uploads)
   - `AWS_ACCESS_KEY_ID`
   - `AWS_SECRET_ACCESS_KEY`
@@ -101,6 +142,8 @@ Notes:
 
 - Client-exposed vars must be prefixed `NEXT_PUBLIC_` per Next.js convention.
 - Keys like `CONSUMER_SECRET`, `ADMIN_TOKEN`, and Northbeam credentials must remain server-only.
+- The `CUSTOMERIO_*` write keys are server-only and must never be given a `NEXT_PUBLIC_`
+  name. They are read inside `app/api/customerio/*` and nowhere else.
 
 ## Local Development
 

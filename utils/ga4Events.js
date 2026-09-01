@@ -7,6 +7,7 @@
 import { logger } from "@/utils/devLogger";
 import { getOrCreateSessionId } from "@/utils/dataLayerHelper";
 import { toMoney } from "@/utils/priceFormatter";
+import { sendCustomerioProductViewed } from "@/utils/customerioEvents";
 import {
   trackTikTokAddToCart,
   trackTikTokInitiateCheckout,
@@ -248,6 +249,11 @@ export const trackViewItem = (product, additionalData = {}, debug = true) => {
 
   // Track TikTok event
   trackTikTokViewContent(product, additionalData, debug);
+
+  // Customer.io Product Viewed (relay decides whether it is live; see customerioEvents.js).
+  // Hooked here rather than in analyticsService.trackViewItem, which has no callers: the
+  // product page runs useProductTracking -> trackProductView -> this function.
+  sendCustomerioProductViewed(ecommerceData);
 };
 
 /**
