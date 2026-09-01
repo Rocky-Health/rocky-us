@@ -267,12 +267,12 @@ export async function POST(req) {
                 // identify with the Woo ID as userId and the same email as a trait. There is no
                 // Attentive subscribe call in this route to sit beside, so this goes after the
                 // cookie writes and their verification, and before the success response. Never
-                // fatal: identifyCustomerioProfile resolves rather than throwing.
+                // fatal: identifyCustomerioProfile resolves rather than throwing. Not
+                // deduplicated on purpose: see the note in lib/customerio/server.js.
                 await identifyCustomerioProfile({
                     wooCustomerId: userId,
                     email,
                     phone: normalizePhoneToE164(phone, "US"),
-                    dedupeKey: `register|${userId}`,
                 });
 
                 return NextResponse.json({
