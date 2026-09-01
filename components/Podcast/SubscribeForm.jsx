@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import { identifyCustomerioProfile } from "@/utils/customerioEvents";
 
 const SubscribeForm = () => {
   const [isSubscribed, setIsSubscribed] = useState(false);
@@ -32,6 +33,10 @@ const SubscribeForm = () => {
       const data = await response.json();
 
       if (response.ok && data.success) {
+        // Customer.io lead identify. Fire and forget, independent of the Attentive
+        // subscription above; the relay decides whether Customer.io is live.
+        identifyCustomerioProfile({ email });
+
         setIsSubscribed(true);
         setOverlayMessage({
           type: "success",

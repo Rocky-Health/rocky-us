@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import axios from "axios";
 import { cookies } from "next/headers";
 import { logger } from "@/utils/devLogger";
+import { normalizePhoneToE164 } from "@/utils/analytics/hash";
+import { identifyCustomerioProfile } from "@/lib/customerio/server";
 import crypto from "crypto";
 
 const BASE_URL = process.env.BASE_URL;
@@ -259,6 +261,19 @@ export async function POST(req) {
                         { status: 500 },
                     );
                 }
+
+                // Customer.io: the moment a WooCommerce customer ID exists is the moment the
+                // email-only lead profile and the known-customer profile must converge, so
+                // identify with the Woo ID as userId and the same email as a trait. There is no
+                // Attentive subscribe call in this route to sit beside, so this goes after the
+                // cookie writes and their verification, and before the success response. Never
+                // fatal: identifyCustomerioProfile resolves rather than throwing.
+                await identifyCustomerioProfile({
+                    wooCustomerId: userId,
+                    email,
+                    phone: normalizePhoneToE164(phone, "US"),
+                    dedupeKey: `register|${userId}`,
+                });
 
                 return NextResponse.json({
                     success: true,
