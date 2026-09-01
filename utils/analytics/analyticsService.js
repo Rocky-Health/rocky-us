@@ -14,6 +14,10 @@ import {
 } from "@/utils/tiktokEvents";
 import { trackNorthbeamPurchase } from "@/utils/northbeamEvents";
 import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
+import {
+  sendCustomerioCheckoutStarted,
+  sendCustomerioProductAdded,
+} from "@/utils/customerioEvents";
 import { hashEmail, hashPhone } from "./hash";
 import { mapOrderToEcommerce } from "./mappers";
 
@@ -130,6 +134,10 @@ export const analyticsService = {
 
       // Track TikTok event
       trackTikTokAddToCart(product, quantity, additionalData, true);
+
+      // Customer.io Product Added. Nothing in this method returns early, so the last position
+      // in the try block reaches every add_to_cart. The relay decides whether it is live.
+      sendCustomerioProductAdded(ecommerce);
     } catch (error) {
       logger.error("[Analytics] Error tracking add_to_cart:", error);
     }
@@ -187,6 +195,10 @@ export const analyticsService = {
 
       // Track TikTok event
       trackTikTokInitiateCheckout(cartItems, additionalData, true);
+
+      // Customer.io Checkout Started. Above the diagnostic block so it cannot end up behind
+      // anything added there later; nothing in this method returns early today.
+      sendCustomerioCheckoutStarted(ecommerce);
 
       // Diagnostic: fire before checkout redirect for GTM Tag Assistant validation
       try {

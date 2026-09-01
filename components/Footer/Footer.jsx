@@ -8,6 +8,7 @@ import CustomImage from "../utils/CustomImage";
 import { FaCircleExclamation, FaFacebookF } from "react-icons/fa6";
 import { FaCheckCircle, FaInstagram, FaTwitter } from "react-icons/fa";
 import { IoIosArrowDown } from "react-icons/io";
+import { identifyCustomerioProfile } from "@/utils/customerioEvents";
 
 const products = [
     { href: "/product/sildenafil-viagra/", text: "Sildenafil" },
@@ -53,6 +54,10 @@ const Footer = ({ className }) => {
             logger.log("Response data:", data);
 
             if (response.ok && data.success) {
+                // Customer.io lead identify. Fire and forget, independent of the Attentive
+                // subscription above; the relay decides whether Customer.io is live.
+                identifyCustomerioProfile({ email });
+
                 setIsSubscribed(true);
                 setOverlayMessage({
                     type: "success",
