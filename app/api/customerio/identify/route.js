@@ -46,8 +46,6 @@ export async function POST(req) {
       email,
       phone,
       anonymousId: sessionId,
-      // One identify per identity per session is enough; a remount must not create a second.
-      dedupeKey: `${cookieIdentity.wooCustomerId || email}|${sessionId}`,
       context: resolveRequestContext(req),
     });
 
