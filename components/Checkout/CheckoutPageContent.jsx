@@ -50,6 +50,7 @@ import { getAwinFromUrlOrStorage } from "@/utils/awin";
 import { analyticsService } from "@/utils/analytics/analyticsService";
 import { hashEmail, hashPhone } from "@/utils/analytics/hash";
 import { getOrCreateSessionId } from "@/utils/dataLayerHelper";
+import { getAttributionData, deriveSourceName } from "@/utils/sourceAttribution";
 import {
   trackMetaStartCheckout,
   logMetaTrackingError,
@@ -1744,6 +1745,54 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
     }
   };
 
+  // Shapes this storefront's session-scoped attribution (utils/sourceAttribution.js)
+  // into what lib/northbeam/sourceAttribution.js's buildSourceAttributionMeta expects,
+  // so the order carries the utm params, referrer and landing page that only ever
+  // existed in this browser session.
+  //
+  // This module keeps one clickId plus a clickIdType label rather than one field
+  // per vendor, and the label is many to one (gclid, gbraid and wbraid all report
+  // "Google Ads"), so the original parameter name cannot be recovered from it. The
+  // pair is passed through as is and the seam records it under its own reserved
+  // keys. gbraid and wbraid are the exception: this module stores those two
+  // separately under their real names, so they map across directly.
+  //
+  // Whole body is guarded because this runs inside the payment submit path. Losing
+  // attribution on an order is recoverable; failing the checkout is not.
+  const buildSourceAttributionPayload = () => {
+    try {
+      const attribution = getAttributionData();
+
+      let referrerDomain = "";
+      if (attribution.referrer) {
+        try {
+          referrerDomain = new URL(attribution.referrer).hostname;
+        } catch (_) {
+          referrerDomain = "";
+        }
+      }
+
+      return {
+        utm_source: attribution.source || "",
+        utm_medium: attribution.medium || "",
+        utm_campaign: attribution.campaign || "",
+        utm_term: attribution.term || "",
+        utm_content: attribution.content || "",
+        referrer: attribution.referrer || "",
+        referrer_domain: referrerDomain,
+        landing_page: attribution.landingPage || "",
+        source_name: deriveSourceName(attribution) || "",
+        session_id: getOrCreateSessionId() || "",
+        gbraid: attribution.gbraid || "",
+        wbraid: attribution.wbraid || "",
+        click_id: attribution.clickId || "",
+        click_id_type: attribution.clickIdType || "",
+      };
+    } catch (_) {
+      return {};
+    }
+  };
+
   // ────────────────────────────────────────────────────────────────────────
   // Express Checkout (Apple Pay / Google Pay) — wallet buttons above the card
   // form. Returning Link consumers don't get wallet tabs inside the Payment
@@ -1827,6 +1876,7 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
       isEdFlow: isEdFlow,
       awin_awc: awinAwc || "",
       awin_channel: awinChannel || "other",
+      source_attribution: buildSourceAttributionPayload(),
       cartItems: cartItems?.items || [],
       appliedCoupons: cartItems?.coupons || [],
     };
@@ -2234,6 +2284,9 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
         // AWIN affiliate metadata (frontend-sourced)
         awin_awc: awinAwc || "",
         awin_channel: awinChannel || "other",
+
+        // Session-scoped marketing source attribution (TK-1026)
+        source_attribution: buildSourceAttributionPayload(),
 
         // OPTIMIZATION: Pass cart items to avoid server-side fetch (saves 500-1000ms)
         cartItems: cartItems?.items || [],

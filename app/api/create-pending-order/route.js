@@ -10,10 +10,25 @@ import {
   validateCheckoutData,
   formatValidationErrors,
 } from "@/utils/checkoutValidation";
+import { buildSourceAttributionMeta } from "@/lib/northbeam/sourceAttribution";
 
 const BASE_URL = process.env.BASE_URL;
 const CONSUMER_KEY = process.env.CONSUMER_KEY;
 const CONSUMER_SECRET = process.env.CONSUMER_SECRET;
+
+// Plain name/value cookie map from the raw header, matching the pattern
+// app/api/meta-capi/start-checkout/route.js already uses. buildSourceAttributionMeta
+// wants a plain object, not the next/headers RequestCookies instance this route
+// otherwise reads auth cookies from.
+const parseCookies = (req) => {
+  const header = req.headers.get("cookie") || "";
+  const out = {};
+  header.split(";").forEach((c) => {
+    const [k, ...v] = c.split("=");
+    if (k && v.length) out[k.trim()] = v.join("=").trim();
+  });
+  return out;
+};
 
 export async function POST(req) {
   try {
@@ -33,6 +48,14 @@ export async function POST(req) {
       "";
     const clientUserAgent = req.headers.get("user-agent") || "";
     const ipCapturedAt = new Date().toISOString();
+
+    // Host serving this request, for the seam's own-domain referrer check.
+    // Cloudflare/Vercel put the original host in x-forwarded-host; fall back
+    // to host for anything not proxied that way (local dev).
+    const requestHost =
+      req.headers.get("x-forwarded-host")?.trim() ||
+      req.headers.get("host")?.trim() ||
+      "";
 
     const requestData = await req.json();
 
@@ -71,6 +94,7 @@ export async function POST(req) {
       totalAmount,
       awin_awc,
       awin_channel,
+      source_attribution,
     } = requestData;
 
     // Validate checkout data before processing
@@ -257,6 +281,17 @@ export async function POST(req) {
     const resolvedAwinAwc = (awin_awc || "").trim() || awcCookie;
     const resolvedAwinChannel = (awin_channel || "").trim() || "other";
 
+    // Marketing source attribution only ever lived in the shopper's browser
+    // session, so this is the one place a server side writer can still see it.
+    // capturedAt reuses ipCapturedAt so both provenance timestamps on the order
+    // agree instead of drifting by however long order creation takes.
+    const sourceAttributionMeta = buildSourceAttributionMeta({
+      source: source_attribution,
+      cookies: parseCookies(req),
+      requestHost,
+      capturedAt: ipCapturedAt,
+    });
+
     // Build order data for WooCommerce REST API v3
     const orderData = {
       status: "pending", // Create order without payment processing
@@ -302,6 +337,7 @@ export async function POST(req) {
         { key: "_rocky_customer_user_agent", value: clientUserAgent },
         { key: "_rocky_ip_source", value: "storefront_request_header" },
         { key: "_rocky_ip_captured_at", value: ipCapturedAt },
+        ...sourceAttributionMeta,
       ],
     };
 
