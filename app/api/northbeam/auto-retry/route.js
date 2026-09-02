@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { logger } from "@/utils/devLogger";
 import { api as wooApi } from "@/lib/woocommerce";
+import { NB_WRITE_CONTEXT } from "@/lib/northbeam/writeContext";
 
 /**
  * Automatic Northbeam Order Retry Cron Job
@@ -61,12 +62,16 @@ export async function POST(req) {
     const maxOrdersToRetry = parseInt(process.env.NB_RETRY_MAX_ORDERS) || 50; // Safety limit
     const afterDate = new Date(Date.now() - lookbackMinutes * 60 * 1000);
 
-    logger.log(`[NB Auto-Retry] Looking for orders after ${afterDate.toISOString()}`);
+    logger.log(`[NB Auto-Retry] Looking for orders modified after ${afterDate.toISOString()}`);
 
-    // Query WooCommerce for recent orders
-    // Filter for orders that should be tracked in Northbeam
+    // Query WooCommerce for recently modified orders. Filtering on creation
+    // date missed a failed-payment order that customer service recovers
+    // manually, since that recovery usually lands outside the lookback window
+    // measured from when the order was first created. Filtering on
+    // modification date catches the recovery regardless of when the order
+    // was created.
     const { data: orders } = await wooApi.get("orders", {
-      after: afterDate.toISOString(),
+      modified_after: afterDate.toISOString(),
       status: ["processing", "completed"], // Only retry orders we care about
       per_page: maxOrdersToRetry,
       orderby: "date",
@@ -121,6 +126,9 @@ export async function POST(req) {
       body: JSON.stringify({
         order_ids: orderIds,
         dry_run: false,
+        // These orders had a pixel fire and failed their live send, so the
+        // recovered write still needs the guard, not the historical default.
+        write_context: NB_WRITE_CONTEXT.LIVE_PURCHASE,
       }),
     });
 

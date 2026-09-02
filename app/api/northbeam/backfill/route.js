@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { normalizeOrderId } from "@/lib/northbeam/orderId";
 import { resolveOrderTimeIso } from "@/lib/northbeam/orderTime";
+import { normalizeWriteContext } from "@/lib/northbeam/writeContext";
 import { logger } from "@/utils/devLogger";
 import { api as wooApi } from "@/lib/woocommerce";
 import { requireSyncApiKey } from "@/lib/northbeam/syncAuth";
@@ -84,6 +85,12 @@ export async function POST(req) {
     const body = await req.json().catch(() => ({}));
     const ids = Array.isArray(body?.order_ids) ? body.order_ids : [];
     const dryRun = Boolean(body?.dry_run);
+    // Threaded through explicitly rather than guessed. auto-retry recovers
+    // orders whose live send already failed after a pixel had fired, so it
+    // declares live_purchase; anything else defaults to historical, which
+    // normalizeWriteContext already guarantees for an absent or unrecognised
+    // value.
+    const writeContext = normalizeWriteContext(body?.write_context);
     // Pass-through debug echo controls to internal NB orders route (URL param only)
     const debugParam = req.nextUrl?.searchParams?.get("debug") === "1";
 
@@ -215,6 +222,7 @@ export async function POST(req) {
         is_recurring_order: Boolean(order?.is_recurring_order),
         order_tags: [getStatusTag(status), lifecycle],
         products,
+        nb_write_context: writeContext,
         ...(shippingAddress ? { customer_shipping_address: shippingAddress } : {}),
       };
     };

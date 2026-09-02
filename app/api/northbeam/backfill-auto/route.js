@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { normalizeOrderId } from "@/lib/northbeam/orderId";
 import { resolveOrderTimeIso } from "@/lib/northbeam/orderTime";
+import { NB_WRITE_CONTEXT } from "@/lib/northbeam/writeContext";
 import { logger } from "@/utils/devLogger";
 import { api as wooApi } from "@/lib/woocommerce";
 import { requireSyncApiKey } from "@/lib/northbeam/syncAuth";
@@ -187,6 +188,7 @@ const mapWooToNorthbeamOrder = (order) => {
     is_recurring_order: Boolean(order?.is_recurring_order),
     order_tags: [getStatusTag(status), lifecycle],
     products,
+    nb_write_context: NB_WRITE_CONTEXT.HISTORICAL_BACKFILL,
     ...(shippingAddress ? { customer_shipping_address: shippingAddress } : {}),
   };
 };
