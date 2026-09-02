@@ -1,7 +1,16 @@
 import { NextResponse } from "next/server";
 import { evaluateSendGate } from "@/lib/northbeam/sendGate";
 import { normalizeOrderId } from "@/lib/northbeam/orderId";
-import { resolveOrderTimeIso } from "@/lib/northbeam/orderTime";
+import {
+  resolveOrderTimeIso,
+  applyPixelGuardBounded,
+  isWithinLiveWindow,
+} from "@/lib/northbeam/orderTime";
+import {
+  normalizeWriteContext,
+  shouldApplyPixelGuard,
+} from "@/lib/northbeam/writeContext";
+import { acceptCustomerIdOverride } from "@/lib/northbeam/customerId";
 import { logger } from "@/utils/devLogger";
 
 /**
@@ -278,24 +287,61 @@ export async function POST(req) {
     let parsedMs = Number.isFinite(Date.parse(rawClientTime))
       ? Date.parse(rawClientTime)
       : NaN;
-    // If invalid or far from now (>2h), clamp to server receipt time
-    if (
-      !Number.isFinite(parsedMs) ||
-      Math.abs(nowMs - parsedMs) > 2 * 60 * 60 * 1000
-    ) {
+
+    // CRITICAL FIX: Allow historical orders for backfill
+    // Only clamp timestamp if:
+    // 1. Invalid date, OR
+    // 2. Future date (>2h in future) - prevents clock skew
+    // Do NOT clamp past dates - they're valid for backfill!
+    const isFutureDate = Number.isFinite(parsedMs) && (parsedMs - nowMs) > 2 * 60 * 60 * 1000;
+
+    if (!Number.isFinite(parsedMs) || isFutureDate) {
       if (rawClientTime) {
         logger.warn(
-          "[Northbeam API] Adjusting time_of_purchase due to large skew",
+          "[Northbeam API] Adjusting time_of_purchase (invalid or future date)",
           {
             order_id: order.order_id,
             rawClientTime,
             nowIso: new Date(nowMs).toISOString(),
+            reason: !Number.isFinite(parsedMs) ? 'invalid_date' : 'future_date'
           }
         );
       }
       parsedMs = nowMs;
     }
-    const timeOfPurchaseIso = new Date(parsedMs).toISOString();
+    const clampedTimeIso = new Date(parsedMs).toISOString();
+
+    // The pixel guard only belongs on a live purchase, where a client purchase
+    // pixel is firing on the confirmation page moments after this write. A
+    // historical backfill must send the true purchase instant unchanged, so it
+    // is clamped first and guarded second: the guard can only push a value that
+    // has already survived the skew clamp, never turn a rejected one into a
+    // silently invented one.
+    //
+    // A caller declaring live_purchase is not taken at its word: some callers
+    // re-send an order without knowing how old it is, and shifting a stale
+    // instant would mutate a reporting period that already closed. isWithinLiveWindow
+    // is the route's own backstop against that, and applyPixelGuardBounded caps
+    // the shift at now plus the guard itself, so a value already sitting near the
+    // clamp's own future ceiling cannot be pushed past it. See
+    // lib/northbeam/writeContext.js and lib/northbeam/orderTime.js for the contracts.
+    const writeContext = order.nb_write_context;
+    const declaredLive = shouldApplyPixelGuard(writeContext);
+    const withinLiveWindow = isWithinLiveWindow(clampedTimeIso, nowMs);
+    const guardApplies = declaredLive && withinLiveWindow;
+    const timeOfPurchaseIso = guardApplies
+      ? applyPixelGuardBounded(clampedTimeIso, nowMs) || clampedTimeIso
+      : clampedTimeIso;
+
+    logger.log("[Northbeam API] Pixel guard decision", {
+      order_id: order.order_id,
+      write_context: normalizeWriteContext(writeContext),
+      within_live_window: withinLiveWindow,
+      guard_applied: guardApplies,
+      clamped_time_of_purchase: clampedTimeIso,
+      time_of_purchase: timeOfPurchaseIso,
+    });
+
     // Normalize customer_id: prefer Woo user id, then email, then phone; prefix namespace
     let derivedCustomerId = "";
     if (order.customer_id && Number(order.customer_id) > 0) {
@@ -308,9 +354,20 @@ export async function POST(req) {
       const digits = String(order.customer_phone_number).replace(/\D+/g, "");
       if (digits) derivedCustomerId = `phone:${digits}`;
     }
-    // Allow explicit override from client if provided
-    if (order.customer_id_canonical) {
-      derivedCustomerId = String(order.customer_id_canonical);
+    // Allow explicit override from client if provided, but only within the
+    // three namespaces this integration has ever emitted. A refused override
+    // degrades to the derived value above rather than to an empty one. See
+    // lib/northbeam/customerId.js.
+    const customerIdOverride = acceptCustomerIdOverride(
+      order.customer_id_canonical
+    );
+    if (customerIdOverride) {
+      derivedCustomerId = customerIdOverride;
+    } else if (order.customer_id_canonical) {
+      logger.warn(
+        "[Northbeam API] Refused non-conforming customer_id_canonical override, keeping derived customer_id",
+        { order_id: order.order_id }
+      );
     }
 
     // Merge any client-provided tags to preserve item-category-* computed on client
@@ -387,7 +444,10 @@ export async function POST(req) {
 
     logger.log("[Northbeam API] Sending order data:", {
       order_id: payload[0].order_id,
-      customer_id: payload[0].customer_id,
+      // Never log the raw customer_id: for a guest order the canonical id IS
+      // the email address, and devLogger's redaction does not know this key.
+      customer_id_namespace:
+        String(payload[0].customer_id || "").split(":")[0] || "none",
       purchase_total: payload[0].purchase_total,
       product_count: payload[0].products.length,
       order_tags: payload[0].order_tags,

@@ -305,7 +305,7 @@ export const analyticsService = {
         if (logger && logger.log) {
           logger.log("[Analytics] purchase parity", {
             order_id: order?.id,
-            pixel_time_of_purchase: canonicalTimeIso,
+            ga4_tiktok_time_of_purchase: canonicalTimeIso,
             customer_id_canonical: canonicalCustomerId,
           });
         }
