@@ -16,7 +16,10 @@ export default defineConfig({
     // globals, and package-lock.json still carries orphan jest entries that are not in
     // package.json and not on disk. Rescuing it is not this change's job, so it stays out of
     // the include list rather than being left to fail the run.
-    include: ["lib/customerio/__tests__/**/*.test.js"],
+    include: [
+      "lib/customerio/__tests__/**/*.test.js",
+      "lib/northbeam/__tests__/**/*.test.js",
+    ],
     environment: "node",
   },
 });
