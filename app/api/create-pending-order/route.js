@@ -285,9 +285,33 @@ export async function POST(req) {
     // session, so this is the one place a server side writer can still see it.
     // capturedAt reuses ipCapturedAt so both provenance timestamps on the order
     // agree instead of drifting by however long order creation takes.
+    // This storefront persists attribution under its own `traffic_*` cookie
+    // names, so none of the vendor cookie names the seam looks for are ever set
+    // here and its fallback would find nothing. Translating them is what makes a
+    // request that arrives without source_attribution still record what the
+    // browser had, which is the whole point of having a fallback.
+    //
+    // These go in as cookieSource rather than source so provenance stays
+    // truthful: the values did not come from this request's client payload.
+    const nbJar = parseCookies(req);
+    const nbCookieSource = {
+      utm_source: nbJar.traffic_source || "",
+      utm_medium: nbJar.traffic_medium || "",
+      utm_campaign: nbJar.traffic_campaign || "",
+      utm_term: nbJar.traffic_term || "",
+      utm_content: nbJar.traffic_content || "",
+      referrer: nbJar.traffic_referrer || "",
+      landing_page: nbJar.traffic_landing_page || "",
+      click_id: nbJar.traffic_click_id || "",
+      click_id_type: nbJar.traffic_click_id_type || "",
+      gbraid: nbJar.traffic_gbraid || "",
+      wbraid: nbJar.traffic_wbraid || "",
+    };
+
     const sourceAttributionMeta = buildSourceAttributionMeta({
       source: source_attribution,
-      cookies: parseCookies(req),
+      cookieSource: nbCookieSource,
+      cookies: nbJar,
       requestHost,
       capturedAt: ipCapturedAt,
     });

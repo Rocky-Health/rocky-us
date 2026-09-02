@@ -1759,6 +1759,21 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
   //
   // Whole body is guarded because this runs inside the payment submit path. Losing
   // attribution on an order is recoverable; failing the checkout is not.
+  // This storefront stores the landing page as a full absolute URL while the
+  // Canadian one stores pathname plus query. Same _nb_landing_page key, two
+  // different value contracts, so one of them has to give. Reduced to path plus
+  // query to match, since the host is already implied by the region.
+  const normalizeLandingPage = (value) => {
+    const raw = typeof value === "string" ? value.trim() : "";
+    if (!raw) return "";
+    try {
+      const parsed = new URL(raw, "https://www.myrocky.com");
+      return `${parsed.pathname}${parsed.search}`;
+    } catch (_) {
+      return raw;
+    }
+  };
+
   const buildSourceAttributionPayload = () => {
     try {
       const attribution = getAttributionData();
@@ -1780,7 +1795,7 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
         utm_content: attribution.content || "",
         referrer: attribution.referrer || "",
         referrer_domain: referrerDomain,
-        landing_page: attribution.landingPage || "",
+        landing_page: normalizeLandingPage(attribution.landingPage),
         source_name: deriveSourceName(attribution) || "",
         session_id: getOrCreateSessionId() || "",
         gbraid: attribution.gbraid || "",
