@@ -45,6 +45,8 @@ const RockyInTheNews = ({ cards }) => {
                     MYROCKY IN THE NEWS
                 </div>
                 <div className="flex items-center gap-[40px] md:gap-[82px] whitespace-nowrap w-fit h-[39px] relative animate-scroll">
+                    {/* List is concatenated with itself for the CSS marquee loop,
+                        so entries repeat by design; index is the only safe key. */}
                     {dataToUse.concat(dataToUse).map((card, index) => (
                         <div
                             key={index}
