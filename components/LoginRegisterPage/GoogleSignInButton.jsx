@@ -10,6 +10,7 @@ const GoogleSignInButton = ({ onSuccess, onError, disabled, isLoading }) => {
   const onSuccessRef = useRef(onSuccess);
   const onErrorRef = useRef(onError);
   const codeClientRef = useRef(null);
+  const warmedRef = useRef(false);
   const [isPreparing, setIsPreparing] = useState(false);
 
   // Keep refs updated with latest callbacks
@@ -153,6 +154,24 @@ const GoogleSignInButton = ({ onSuccess, onError, disabled, isLoading }) => {
     }
   };
 
+  // Safari/iOS has no hover and only a tiny gap between touch and click, so a
+  // cold first tap can "do nothing" while the ~258 KB SDK downloads. Warm it up
+  // on hover / first touch / focus so the real click hits the synchronous path
+  // and the popup opens instantly. Fire-and-forget, runs at most once, and
+  // stays silent (no loading state).
+  const warmUp = () => {
+    if (warmedRef.current || disabled || isLoading) return;
+    if (window.google?.accounts?.oauth2) return;
+    warmedRef.current = true;
+    ensureGsiLoaded()
+      .then(() => getCodeClient())
+      .catch((error) => {
+        // Let the click retry from scratch if the warm-up fetch fails.
+        warmedRef.current = false;
+        logger.warn("Google Sign-In warm-up failed:", error);
+      });
+  };
+
   const handleClick = async () => {
     if (disabled || isLoading || isPreparing) return;
 
@@ -181,6 +200,9 @@ const GoogleSignInButton = ({ onSuccess, onError, disabled, isLoading }) => {
       ref={buttonRef}
       type="button"
       onClick={handleClick}
+      onPointerEnter={warmUp}
+      onTouchStart={warmUp}
+      onFocus={warmUp}
       disabled={disabled || isLoading || isPreparing}
       className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-300 text-gray-700 py-[12.5px] rounded-full hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
     >
