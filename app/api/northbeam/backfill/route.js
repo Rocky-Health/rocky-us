@@ -301,24 +301,32 @@ export async function POST(req) {
         const outcomeTimestamp = new Date().toISOString();
 
         if (classified.outcome === NB_SYNC_OUTCOME.ACCEPTED) {
-          // If internal route echoed sanitized payload, surface it under payload_preview for convenience
-          const payloadEcho = Array.isArray(json?.echo) && json.echo.length > 0 ? json.echo[0] : undefined;
-          const resultEntry = { id, status: "ok", northbeam: json };
-          if (payloadEcho) {
-            resultEntry.payload_preview = payloadEcho;
-          }
-          results.push(resultEntry);
-
           // A genuine delivery has to be marked, or checkIfAlreadySynced never
           // sees it and the same order is reselected and re-sent forever. This
           // route wrote no meta at all on success before TK-1030.
+          //
+          // The marker write can itself fail, and swallowing that failure while
+          // still reporting a clean "ok" recreates the same divergence from the
+          // other direction: Northbeam HAS the order, nothing on our side
+          // records it, and a later run writes over a canonical record. So the
+          // marker outcome is reported rather than logged and forgotten.
+          let markerWritten = true;
           try {
             await wooApi.put(`orders/${id}`, {
               meta_data: syncOutcomeMeta(classified, outcomeTimestamp),
             });
           } catch (metaErr) {
-            logger.error("[NB Backfill] Failed to mark order as backfilled", id, metaErr);
+            markerWritten = false;
+            logger.error("[NB Backfill] Delivered but failed to mark order as backfilled", id, metaErr);
           }
+
+          // If internal route echoed sanitized payload, surface it under payload_preview for convenience
+          const payloadEcho = Array.isArray(json?.echo) && json.echo.length > 0 ? json.echo[0] : undefined;
+          const resultEntry = { id, status: "ok", marker_written: markerWritten, northbeam: json };
+          if (payloadEcho) {
+            resultEntry.payload_preview = payloadEcho;
+          }
+          results.push(resultEntry);
 
           continue;
         }
@@ -366,7 +374,18 @@ export async function POST(req) {
     return NextResponse.json({
       success: true,
       dry_run: dryRun,
-      totals: { count: ids.length, ok: okCount, refused: refusedCount, failed: failCount },
+      // Delivered, but we failed to record that we delivered it. Counted on
+      // its own because it is the one outcome that looks clean and is not: the
+      // order is in Northbeam carrying no marker, so the auditor reports it as
+      // a gap on its next run. That gap is FALSE and must not be repaired
+      // blindly, since repairing it is a second write over a canonical record.
+      totals: {
+        count: ids.length,
+        ok: okCount,
+        refused: refusedCount,
+        failed: failCount,
+        unmarked: results.filter((r) => r.status === "ok" && r.marker_written === false).length,
+      },
       results,
     });
   } catch (error) {

@@ -252,6 +252,7 @@ export async function POST(req) {
     const results = [];
     let succeeded = 0;
     let failed = 0;
+    let unmarked = 0;
     let skipped = 0;
     let gaps = 0;
 
@@ -288,8 +289,17 @@ export async function POST(req) {
         // Deduplication checks (skip if force_resync is true). Shared with the
         // manual backfill route via checkIfAlreadySynced so a Relay sync or a
         // prior backfill reads the same way in both routes.
-        if (!forceResync) {
-          const syncStatus = checkIfAlreadySynced(order);
+        // force_resync is an operator override for THIS route's own marker. It
+        // deliberately does NOT extend to an order the Relay pushed:
+        // `handled_by_relay` means the canonical single writer owns that row,
+        // and re-sending it is the exact destructive second write TK-1027 made
+        // this route stop doing. An override that can undo the cutover is not
+        // an override, it is a hole.
+        const syncStatusForOverride = checkIfAlreadySynced(order);
+        const relayOwnsOrder = syncStatusForOverride.handled_by_relay === true;
+
+        if (!forceResync || relayOwnsOrder) {
+          const syncStatus = syncStatusForOverride;
           if (syncStatus.synced) {
             results.push({
               id,
@@ -370,10 +380,15 @@ export async function POST(req) {
         const outcomeTimestamp = new Date().toISOString();
 
         if (classified.outcome === NB_SYNC_OUTCOME.ACCEPTED) {
-          results.push({ id, status: "ok", northbeam: json });
-          succeeded++;
-
-          // Mark order as successfully backfilled
+          // Mark order as successfully backfilled.
+          //
+          // The marker write can fail on its own, and swallowing that while
+          // still reporting a clean "ok" recreates this ticket's defect from
+          // the other direction: Northbeam HAS the order, nothing on our side
+          // records it, and a later run writes over a canonical record. The
+          // delivery is still a success and is still reported as one; what
+          // changes is that a missing marker stops being invisible.
+          let markerWritten = true;
           try {
             await wooApi.put(`orders/${id}`, {
               meta_data: [
@@ -382,8 +397,13 @@ export async function POST(req) {
               ]
             });
           } catch (metaErr) {
-            logger.error(`[NB Backfill Auto] Failed to mark order ${id} as backfilled:`, metaErr);
+            markerWritten = false;
+            logger.error(`[NB Backfill Auto] Order ${id} delivered but the marker was not written:`, metaErr);
+            unmarked++;
           }
+
+          results.push({ id, status: "ok", marker_written: markerWritten, northbeam: json });
+          succeeded++;
 
           continue;
         }
@@ -447,6 +467,7 @@ export async function POST(req) {
       failed,
       skipped,
       gaps,
+      unmarked,
       mode,
       duration_ms: duration,
     });
@@ -457,12 +478,14 @@ export async function POST(req) {
       wp_cron_run: wpCronRun,
       mode,
       gaps,
+      unmarked,
       stats: {
         total: ids.length,
         succeeded,
         failed,
         skipped,
         gaps,
+        unmarked,
         mode,
         processed: succeeded + failed,
         duration_ms: duration,
