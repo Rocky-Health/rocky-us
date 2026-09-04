@@ -9,6 +9,8 @@ import {
   checkIfAlreadySynced,
   isSubscriptionDerivative,
 } from "@/lib/northbeam/orderGuards";
+import { buildCanonicalOrderTags } from "@/lib/northbeam/orderTags";
+import { buildSourceTagsFromOrder } from "@/lib/northbeam/attributionTags";
 
 /**
  * Convert 2-letter country code to 3-letter ISO 3166-1 alpha-3 code
@@ -147,28 +149,6 @@ export async function POST(req) {
           })
         : [];
 
-      // Build tag helpers to mirror server route logic minimally
-      const getStatusTag = (s) => {
-        const map = {
-          pending: "Pending",
-          processing: "Processing",
-          "on-hold": "On Hold",
-          completed: "Completed",
-          cancelled: "Cancelled",
-          refunded: "Refunded",
-          failed: "Failed",
-        };
-        return map[String(s || "").toLowerCase()] || "Pending";
-      };
-      const hasSubscription = products.some(
-        (p) => /subscription/i.test(p?.name || "")
-      );
-      const lifecycle = hasSubscription
-        ? order?.is_first_order
-          ? "Subscription First Order"
-          : "Subscription Recurring"
-        : "OTC";
-
       // Shipping address
       const shippingAddress = order?.shipping
         ? {
@@ -220,7 +200,14 @@ export async function POST(req) {
         customer_name: name,
         customer_ip_address: order?.customer_ip_address || "",
         is_recurring_order: Boolean(order?.is_recurring_order),
-        order_tags: [getStatusTag(status), lifecycle],
+        // The Woo REST order carries no product categories here either, so no
+        // categoryTags argument is passed; buildCanonicalOrderTags drops an
+        // empty axis rather than inventing one.
+        order_tags: buildCanonicalOrderTags({
+          status,
+          order,
+          sourceTags: buildSourceTagsFromOrder(order),
+        }),
         products,
         nb_write_context: writeContext,
         ...(shippingAddress ? { customer_shipping_address: shippingAddress } : {}),

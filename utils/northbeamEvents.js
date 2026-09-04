@@ -3,6 +3,8 @@ import { resolveOrderTimeIso } from "@/lib/northbeam/orderTime";
 import { NB_WRITE_CONTEXT } from "@/lib/northbeam/writeContext";
 import { toMoney } from "@/utils/priceFormatter";
 import { getNorthbeamSourceTags, getAttributionData } from "@/utils/sourceAttribution";
+import { statusTag } from "@/lib/northbeam/orderTags";
+import { buildCategoryTagsFromNames } from "@/lib/northbeam/categoryTags";
 
 /**
  * Northbeam Events Utility
@@ -73,49 +75,6 @@ const convertToISO3166Alpha3 = (countryCode) => {
 };
 
 /**
- * Get order status tag
- * @param {string} status - Order status
- * @returns {string} Status tag
- */
-const getStatusTag = (status) => {
-  const statusMap = {
-    pending: "Pending",
-    processing: "Processing",
-    "on-hold": "On Hold",
-    completed: "Completed",
-    cancelled: "Cancelled",
-    refunded: "Refunded",
-    failed: "Failed",
-  };
-  return statusMap[status?.toLowerCase()] || "Pending";
-};
-
-/**
- * Get lifecycle/purchase type tag
- * @param {Object} order - Order data
- * @returns {string} Lifecycle tag
- */
-const getLifecycleTag = (order) => {
-  // Check if order has subscription products
-  const hasSubscription = order.line_items?.some(
-    (item) =>
-      item.product_type === "subscription" ||
-      item.name?.toLowerCase().includes("subscription")
-  );
-
-  // Check if this is a recurring order
-  if (order.is_recurring_order || hasSubscription) {
-    // Check if this is the first order for this customer
-    if (order.is_first_order) {
-      return "Subscription First Order";
-    }
-    return "Subscription Recurring";
-  }
-
-  return "OTC";
-};
-
-/**
  * Fetch product details from our API endpoint
  * @param {number} productId - Product ID
  * @returns {Promise<Object|null>} Product details or null
@@ -173,12 +132,14 @@ const getProductTypeTags = async (lineItems) => {
       }
     });
 
-    // Add tags for each product type found with item-category format (use colon separator)
-    let categoryIndex = 1;
-    productTypes.forEach((type) => {
-      tags.push(`item-category-${categoryIndex}:${type}`);
-      categoryIndex++;
-    });
+    // buildCategoryTagsFromNames owns the ordering and the numbering
+    // (lib/northbeam/categoryTags.js). This used to number by Set insertion
+    // order, which made N depend on which line item resolved first, and the
+    // server routes now use the shared module. Two live writers numbering the
+    // same categories differently would put `item-category-1:ED` and
+    // `item-category-1:Sex` on one order, because the strings differ so
+    // deduplication cannot collapse them.
+    tags.push(...buildCategoryTagsFromNames([...productTypes]));
   } catch (error) {
     console.error("Error in getProductTypeTags:", error);
     // Return empty array if category fetching fails - don't break the order tracking
@@ -261,9 +222,12 @@ export const trackNorthbeamPurchase = async (
             customer_ip_address: order.customer_ip_address,
           }),
           is_recurring_order: order.is_recurring_order || false,
+          // No lifecycle axis from here: the browser has no way to know
+          // whether this customer is first-order or returning, and a guess
+          // would be worse than an absent tag. The canonical writer pins it
+          // server side; see lib/northbeam/orderTags.js.
           order_tags: [
-            getStatusTag(order.status),
-            getLifecycleTag(order),
+            statusTag(order.status),
             ...(await getProductTypeTags(order.line_items)),
             ...sourceAttributionTags, // Add source/channel attribution tags
           ],
@@ -406,9 +370,9 @@ export const formatNorthbeamOrderData = async (order) => {
       }`.trim() || "",
     customer_ip_address: order.customer_ip_address || "",
     is_recurring_order: order.is_recurring_order || false,
+    // No lifecycle axis from here, same reason as trackNorthbeamPurchase above.
     order_tags: [
-      getStatusTag(order.status),
-      getLifecycleTag(order),
+      statusTag(order.status),
       ...(await getProductTypeTags(order.line_items)),
       ...sourceAttributionTags, // Add source/channel attribution tags
     ],
