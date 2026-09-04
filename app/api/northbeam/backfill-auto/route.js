@@ -13,6 +13,12 @@ import {
   NB_SYNC_OUTCOME,
 } from "@/lib/northbeam/syncOutcome";
 import { checkIfAlreadySynced } from "@/lib/northbeam/orderGuards";
+import {
+  evaluateAuditWindow,
+  normalizeAuditMode,
+  NB_AUDIT_MODE,
+  NB_AUDIT_INELIGIBLE,
+} from "@/lib/northbeam/auditWindow";
 
 /**
  * POST /api/northbeam/backfill-auto
@@ -199,11 +205,18 @@ export async function POST(req) {
     const wpCronRun = body?.wp_cron_run || "manual";
     const forceResync = Boolean(body?.force_resync);
 
+    // TK-1030: this route is an auditor by default. AUDIT reports a gap and
+    // writes and sends nothing; REPAIR is the pre-existing send path and has
+    // to be asked for explicitly, because it is a write to the vendor.
+    const modeInput = body?.mode ?? req.nextUrl?.searchParams?.get("mode");
+    const mode = normalizeAuditMode(modeInput);
+
     logger.info(`[NB Backfill Auto] Started: ${batchId}`, {
       batch_id: batchId,
       wp_cron_run: wpCronRun,
       order_count: ids.length,
       force_resync: forceResync,
+      mode,
     });
 
     if (!ids.length) {
@@ -239,7 +252,9 @@ export async function POST(req) {
     const results = [];
     let succeeded = 0;
     let failed = 0;
+    let unmarked = 0;
     let skipped = 0;
+    let gaps = 0;
 
     for (const rawId of ids) {
       const id = String(rawId).trim();
@@ -274,8 +289,17 @@ export async function POST(req) {
         // Deduplication checks (skip if force_resync is true). Shared with the
         // manual backfill route via checkIfAlreadySynced so a Relay sync or a
         // prior backfill reads the same way in both routes.
-        if (!forceResync) {
-          const syncStatus = checkIfAlreadySynced(order);
+        // force_resync is an operator override for THIS route's own marker. It
+        // deliberately does NOT extend to an order the Relay pushed:
+        // `handled_by_relay` means the canonical single writer owns that row,
+        // and re-sending it is the exact destructive second write TK-1027 made
+        // this route stop doing. An override that can undo the cutover is not
+        // an override, it is a hole.
+        const syncStatusForOverride = checkIfAlreadySynced(order);
+        const relayOwnsOrder = syncStatusForOverride.handled_by_relay === true;
+
+        if (!forceResync || relayOwnsOrder) {
+          const syncStatus = syncStatusForOverride;
           if (syncStatus.synced) {
             results.push({
               id,
@@ -305,6 +329,35 @@ export async function POST(req) {
           }
         }
 
+        // TK-1030: demote this route to an auditor. An order outside the
+        // canonical era proves nothing about the canonical writer's silence,
+        // so it is reported as ineligible rather than as a gap, and nothing is
+        // sent or written for it either way. See lib/northbeam/auditWindow.js.
+        const audit = evaluateAuditWindow(order);
+        if (!audit.eligible) {
+          results.push({ id, status: "skipped", reason: audit.reason });
+          skipped++;
+          continue;
+        }
+
+        if (mode === NB_AUDIT_MODE.AUDIT) {
+          // A true gap: eligible for audit, unsynced, and mode has not opted
+          // into REPAIR. Report it and stop. Writing or sending anything here
+          // would be exactly the competing-writer behaviour TK-1030 exists to
+          // stop.
+          results.push({
+            id,
+            status: "gap",
+            reason: "unsynced_post_cutover",
+            paid_at: new Date(audit.paidMs).toISOString(),
+          });
+          gaps++;
+          continue;
+        }
+
+        // mode REPAIR: a true gap is pushed through the existing send path,
+        // completely unchanged below.
+
         // Map to Northbeam format
         const mapped = mapWooToNorthbeamOrder(order);
 
@@ -327,10 +380,15 @@ export async function POST(req) {
         const outcomeTimestamp = new Date().toISOString();
 
         if (classified.outcome === NB_SYNC_OUTCOME.ACCEPTED) {
-          results.push({ id, status: "ok", northbeam: json });
-          succeeded++;
-
-          // Mark order as successfully backfilled
+          // Mark order as successfully backfilled.
+          //
+          // The marker write can fail on its own, and swallowing that while
+          // still reporting a clean "ok" recreates this ticket's defect from
+          // the other direction: Northbeam HAS the order, nothing on our side
+          // records it, and a later run writes over a canonical record. The
+          // delivery is still a success and is still reported as one; what
+          // changes is that a missing marker stops being invisible.
+          let markerWritten = true;
           try {
             await wooApi.put(`orders/${id}`, {
               meta_data: [
@@ -339,8 +397,13 @@ export async function POST(req) {
               ]
             });
           } catch (metaErr) {
-            logger.error(`[NB Backfill Auto] Failed to mark order ${id} as backfilled:`, metaErr);
+            markerWritten = false;
+            logger.error(`[NB Backfill Auto] Order ${id} delivered but the marker was not written:`, metaErr);
+            unmarked++;
           }
+
+          results.push({ id, status: "ok", marker_written: markerWritten, northbeam: json });
+          succeeded++;
 
           continue;
         }
@@ -403,6 +466,9 @@ export async function POST(req) {
       succeeded,
       failed,
       skipped,
+      gaps,
+      unmarked,
+      mode,
       duration_ms: duration,
     });
 
@@ -410,11 +476,17 @@ export async function POST(req) {
       success: true,
       batch_id: batchId,
       wp_cron_run: wpCronRun,
+      mode,
+      gaps,
+      unmarked,
       stats: {
         total: ids.length,
         succeeded,
         failed,
         skipped,
+        gaps,
+        unmarked,
+        mode,
         processed: succeeded + failed,
         duration_ms: duration,
       },

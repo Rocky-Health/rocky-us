@@ -21,7 +21,7 @@ const RockyBlog = ({ blog }) => {
         <>
             {dataToUse.map((blog, index) => (
                 <section
-                    key={index}
+                    key={blog.title ?? index}
                     className="relative w-full px-1  h-[365px] md:h-screen bg-black overflow-hidden"
                 >
                     {blog.imageSrc ? (

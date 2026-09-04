@@ -103,7 +103,7 @@ const RockyInTheNews2 = () => {
                         <div className=" gap-6 justify-center hidden md:flex">
                             {ratings.map((item, index) => (
                                 <div
-                                    key={index}
+                                    key={item.text ?? index}
                                     className="text-center min-w-[120px] max-w-[130px]"
                                 >
                                     <div className="w-[24px] h-[24px] md:w-[32px] md:h-[32px] mx-auto mb-2 relative">
@@ -121,6 +121,8 @@ const RockyInTheNews2 = () => {
                                 </div>
                             ))}
                         </div>
+                        {/* List is duplicated for the CSS marquee loop, so entries
+                            repeat by design; index is the only safe key. */}
                         <div className="flex md:hidden gap-6 justify-center animate-scroll-faster md:animate-none">
                             {[...ratings, ...ratings].map((item, index) => (
                                 <div
@@ -152,6 +154,8 @@ const RockyInTheNews2 = () => {
                     MYROCKY IN THE NEWS
                 </div>
                 <div className="flex items-center gap-[40px] md:gap-[82px] whitespace-nowrap w-fit h-[39px] relative animate-scroll">
+                    {/* List is concatenated with itself for the CSS marquee loop,
+                        so entries repeat by design; index is the only safe key. */}
                     {news.concat(news).map((card, index) => (
                         <div key={index} className="flex-shrink-0 w-[150px]">
                             <div className="relative  overflow-hidden w-full min-h-[25px] flex justify-center items-center">

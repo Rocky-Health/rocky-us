@@ -75,7 +75,7 @@ const FaqsSection = ({
         >
           {groupedFaqs.map((section, sectionIndex) => (
             <div
-              key={sectionIndex}
+              key={section.title ?? sectionIndex}
               className={`mb-8 last:mb-0 ${
                 section.title
                   ? "grid md:grid-cols-2 lg:grid-cols-3 gap-[24px] lg:gap-[174px] items-start"
@@ -94,7 +94,7 @@ const FaqsSection = ({
               >
                 {section.faqs.map((faq, index) => (
                   <FaqItem
-                    key={`${sectionIndex}-${index}`}
+                    key={faq.question ?? `${sectionIndex}-${index}`}
                     question={faq.question}
                     answer={faq.answer}
                     isFirstCardOpen={

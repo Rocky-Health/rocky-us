@@ -37,7 +37,7 @@ const FeaturesNotAnimated = ({
       >
         {dataToUse.map((card, index) => (
           <div
-            key={index}
+            key={card.title ?? index}
             className={` ${index !== dataToUse.length - 1 ? "mb-[15px] border-b border-solid border-[#E2E2E1] pb-[15px]" : ""}`}
           >
             <div className="flex items-center gap-2">
@@ -56,7 +56,7 @@ const FeaturesNotAnimated = ({
       >
         <div className="flex items-center whitespace-nowrap w-fit overflow-hidden lg:pl-[50px]">
           {dataToUse.map((card, index) => (
-            <div key={index} className="w-[271px] flex-shrink-0">
+            <div key={card.title ?? index} className="w-[271px] flex-shrink-0">
               <div className="flex items-center gap-2 h-[24px] justify-center">
                 <div className="relative rounded-2xl overflow-hidden w-[24px] h-[24px]">
                   <CustomImage src={card.image} alt={card.title} fill />

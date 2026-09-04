@@ -11,6 +11,11 @@ import {
 } from "@/lib/northbeam/orderGuards";
 import { buildCanonicalOrderTags } from "@/lib/northbeam/orderTags";
 import { buildSourceTagsFromOrder } from "@/lib/northbeam/attributionTags";
+import {
+  classifySyncResponse,
+  syncOutcomeMeta,
+  NB_SYNC_OUTCOME,
+} from "@/lib/northbeam/syncOutcome";
 
 /**
  * Convert 2-letter country code to 3-letter ISO 3166-1 alpha-3 code
@@ -286,35 +291,103 @@ export async function POST(req) {
           cache: "no-store",
         });
 
-        if (!res.ok) {
-          const text = await res.text();
-          results.push({
-            id,
-            status: "failed",
-            error: `${res.status} ${res.statusText}`,
-            http_status: res.status,
-            details: text,
-          });
+        // The route answers HTTP 200 for both a genuine delivery and a
+        // deliberate refusal (internal coupon, zero value order, and so on),
+        // so res.ok alone cannot tell them apart. classifySyncResponse is the
+        // one place that makes the call; see lib/northbeam/syncOutcome.js for
+        // the defect that collapsing REFUSED into ACCEPTED caused.
+        const json = await res.json().catch(() => null);
+        const classified = classifySyncResponse({ ok: res.ok, status: res.status, body: json });
+        const outcomeTimestamp = new Date().toISOString();
+
+        if (classified.outcome === NB_SYNC_OUTCOME.ACCEPTED) {
+          // A genuine delivery has to be marked, or checkIfAlreadySynced never
+          // sees it and the same order is reselected and re-sent forever. This
+          // route wrote no meta at all on success before TK-1030.
+          //
+          // The marker write can itself fail, and swallowing that failure while
+          // still reporting a clean "ok" recreates the same divergence from the
+          // other direction: Northbeam HAS the order, nothing on our side
+          // records it, and a later run writes over a canonical record. So the
+          // marker outcome is reported rather than logged and forgotten.
+          let markerWritten = true;
+          try {
+            await wooApi.put(`orders/${id}`, {
+              meta_data: syncOutcomeMeta(classified, outcomeTimestamp),
+            });
+          } catch (metaErr) {
+            markerWritten = false;
+            logger.error("[NB Backfill] Delivered but failed to mark order as backfilled", id, metaErr);
+          }
+
+          // If internal route echoed sanitized payload, surface it under payload_preview for convenience
+          const payloadEcho = Array.isArray(json?.echo) && json.echo.length > 0 ? json.echo[0] : undefined;
+          const resultEntry = { id, status: "ok", marker_written: markerWritten, northbeam: json };
+          if (payloadEcho) {
+            resultEntry.payload_preview = payloadEcho;
+          }
+          results.push(resultEntry);
+
           continue;
         }
 
-        const json = await res.json().catch(() => ({}));
-        // If internal route echoed sanitized payload, surface it under payload_preview for convenience
-        const payloadEcho = Array.isArray(json?.echo) && json.echo.length > 0 ? json.echo[0] : undefined;
-        const resultEntry = { id, status: "ok", northbeam: json };
-        if (payloadEcho) {
-          resultEntry.payload_preview = payloadEcho;
+        if (classified.outcome === NB_SYNC_OUTCOME.REFUSED) {
+          // Never sent, so never the delivery marker. Recorded under its own
+          // refusal keys so this order stays distinguishable from one
+          // Northbeam actually has, and checkIfAlreadySynced can skip it
+          // without lying about what happened to it.
+          results.push({ id, status: "refused", reason: classified.reason });
+
+          try {
+            await wooApi.put(`orders/${id}`, {
+              meta_data: syncOutcomeMeta(classified, outcomeTimestamp),
+            });
+          } catch (metaErr) {
+            logger.error("[NB Backfill] Failed to record refusal meta", id, metaErr);
+          }
+
+          continue;
         }
-        results.push(resultEntry);
+
+        // FAILED: no outcome meta written, so the order stays retryable on
+        // the next run.
+        results.push({
+          id,
+          status: "failed",
+          error: `${res.status} ${res.statusText}`,
+          http_status: res.status,
+          reason: classified.reason,
+          details: json,
+        });
       } catch (err) {
         logger.error("[NB Backfill] Error processing order", id, err);
         results.push({ id, status: "error", error: err?.message || String(err) });
       }
     }
 
+    // "ok" is now written only for the ACCEPTED branch above, so counting it
+    // no longer counts a refusal as a delivery. refused gets its own bucket
+    // rather than being folded into either ok or failed.
     const okCount = results.filter((r) => r.status === "ok").length;
+    const refusedCount = results.filter((r) => r.status === "refused").length;
     const failCount = results.filter((r) => r.status === "failed" || r.status === "error").length;
-    return NextResponse.json({ success: true, dry_run: dryRun, totals: { count: ids.length, ok: okCount, failed: failCount }, results });
+    return NextResponse.json({
+      success: true,
+      dry_run: dryRun,
+      // Delivered, but we failed to record that we delivered it. Counted on
+      // its own because it is the one outcome that looks clean and is not: the
+      // order is in Northbeam carrying no marker, so the auditor reports it as
+      // a gap on its next run. That gap is FALSE and must not be repaired
+      // blindly, since repairing it is a second write over a canonical record.
+      totals: {
+        count: ids.length,
+        ok: okCount,
+        refused: refusedCount,
+        failed: failCount,
+        unmarked: results.filter((r) => r.status === "ok" && r.marker_written === false).length,
+      },
+      results,
+    });
   } catch (error) {
     logger.error("[NB Backfill] Unexpected error:", error);
     return NextResponse.json(

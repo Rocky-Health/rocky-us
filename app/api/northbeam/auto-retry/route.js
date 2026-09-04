@@ -146,6 +146,7 @@ export async function POST(req) {
     logger.log(
       `[NB Auto-Retry] ✅ Completed in ${duration}ms:`,
       `${backfillResult.totals?.ok || 0} succeeded,`,
+      `${backfillResult.totals?.refused || 0} refused,`,
       `${backfillResult.totals?.failed || 0} failed`
     );
 
@@ -157,11 +158,18 @@ export async function POST(req) {
       ordersAttempted: orderIds.length,
       results: {
         succeeded: backfillResult.totals?.ok || 0,
+        refused: backfillResult.totals?.refused || 0,
         failed: backfillResult.totals?.failed || 0,
       },
       // Include failed order IDs for monitoring
       failedOrderIds: backfillResult.results
         ?.filter((r) => r.status === "failed" || r.status === "error")
+        .map((r) => r.id) || [],
+      // A refused order was deliberately never sent, on a permanent business
+      // rule. Naming it here stops it from silently vanishing from this
+      // report now that totals.refused is no longer folded into succeeded.
+      refusedOrderIds: backfillResult.results
+        ?.filter((r) => r.status === "refused")
         .map((r) => r.id) || [],
     });
   } catch (error) {
