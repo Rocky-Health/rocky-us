@@ -183,6 +183,41 @@ export async function POST(req) {
       );
     }
 
+    // WL Edge Case: Skip Northbeam tracking for orders with follow-up consultation products.
+    // This prevents overcounting when subscription renewals fail and CS sends manual payment links.
+    // Follow-up Consultation Product ID: 180694
+    const FOLLOWUP_CONSULTATION_PRODUCT_ID = "180694";
+
+    const hasFollowUpConsultation = order.products?.some((product) => {
+      // Check by product ID (primary method - most reliable)
+      const productId = String(product?.product_id || "");
+      if (productId === FOLLOWUP_CONSULTATION_PRODUCT_ID) {
+        return true;
+      }
+
+      // Fallback: Check by product name (in case ID check fails)
+      const productName = (product?.name || "").toLowerCase();
+      return productName.includes("follow-up") && productName.includes("consultation");
+    });
+
+    if (hasFollowUpConsultation) {
+      logger.log(
+        "[Northbeam API] Skipping order with follow-up consultation:",
+        order.order_id
+      );
+      return NextResponse.json({
+        success: true,
+        skipped: true,
+        // This exact string is a PERMANENT_REFUSAL_REASONS member in
+        // lib/northbeam/orderGuards.js and in the WordPress backfill plugin's
+        // excluded-reason list. Any other spelling makes the refusal look
+        // temporary, so the order gets re-selected on every run forever.
+        reason: "follow-up consultation",
+        order_id: order.order_id,
+        message: "Order contains follow-up consultation - not tracked in Northbeam",
+      });
+    }
+
     // Check for required environment variables (support legacy names)
     const clientId =
       process.env.NB_CLIENT_ID || process.env.NORTHBEAM_CLIENT_ID;

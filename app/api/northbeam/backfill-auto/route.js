@@ -13,6 +13,12 @@ import {
   NB_SYNC_OUTCOME,
 } from "@/lib/northbeam/syncOutcome";
 import { checkIfAlreadySynced } from "@/lib/northbeam/orderGuards";
+import {
+  evaluateAuditWindow,
+  normalizeAuditMode,
+  NB_AUDIT_MODE,
+  NB_AUDIT_INELIGIBLE,
+} from "@/lib/northbeam/auditWindow";
 
 /**
  * POST /api/northbeam/backfill-auto
@@ -199,11 +205,18 @@ export async function POST(req) {
     const wpCronRun = body?.wp_cron_run || "manual";
     const forceResync = Boolean(body?.force_resync);
 
+    // TK-1030: this route is an auditor by default. AUDIT reports a gap and
+    // writes and sends nothing; REPAIR is the pre-existing send path and has
+    // to be asked for explicitly, because it is a write to the vendor.
+    const modeInput = body?.mode ?? req.nextUrl?.searchParams?.get("mode");
+    const mode = normalizeAuditMode(modeInput);
+
     logger.info(`[NB Backfill Auto] Started: ${batchId}`, {
       batch_id: batchId,
       wp_cron_run: wpCronRun,
       order_count: ids.length,
       force_resync: forceResync,
+      mode,
     });
 
     if (!ids.length) {
@@ -240,6 +253,7 @@ export async function POST(req) {
     let succeeded = 0;
     let failed = 0;
     let skipped = 0;
+    let gaps = 0;
 
     for (const rawId of ids) {
       const id = String(rawId).trim();
@@ -304,6 +318,35 @@ export async function POST(req) {
             continue;
           }
         }
+
+        // TK-1030: demote this route to an auditor. An order outside the
+        // canonical era proves nothing about the canonical writer's silence,
+        // so it is reported as ineligible rather than as a gap, and nothing is
+        // sent or written for it either way. See lib/northbeam/auditWindow.js.
+        const audit = evaluateAuditWindow(order);
+        if (!audit.eligible) {
+          results.push({ id, status: "skipped", reason: audit.reason });
+          skipped++;
+          continue;
+        }
+
+        if (mode === NB_AUDIT_MODE.AUDIT) {
+          // A true gap: eligible for audit, unsynced, and mode has not opted
+          // into REPAIR. Report it and stop. Writing or sending anything here
+          // would be exactly the competing-writer behaviour TK-1030 exists to
+          // stop.
+          results.push({
+            id,
+            status: "gap",
+            reason: "unsynced_post_cutover",
+            paid_at: new Date(audit.paidMs).toISOString(),
+          });
+          gaps++;
+          continue;
+        }
+
+        // mode REPAIR: a true gap is pushed through the existing send path,
+        // completely unchanged below.
 
         // Map to Northbeam format
         const mapped = mapWooToNorthbeamOrder(order);
@@ -403,6 +446,8 @@ export async function POST(req) {
       succeeded,
       failed,
       skipped,
+      gaps,
+      mode,
       duration_ms: duration,
     });
 
@@ -410,11 +455,15 @@ export async function POST(req) {
       success: true,
       batch_id: batchId,
       wp_cron_run: wpCronRun,
+      mode,
+      gaps,
       stats: {
         total: ids.length,
         succeeded,
         failed,
         skipped,
+        gaps,
+        mode,
         processed: succeeded + failed,
         duration_ms: duration,
       },
