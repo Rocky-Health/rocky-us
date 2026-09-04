@@ -12,6 +12,10 @@ import {
 } from "@/lib/northbeam/writeContext";
 import { acceptCustomerIdOverride } from "@/lib/northbeam/customerId";
 import { logger } from "@/utils/devLogger";
+import { api as wooApi } from "@/lib/woocommerce";
+import { buildCanonicalOrderTags } from "@/lib/northbeam/orderTags";
+import { buildSourceTagsFromOrder } from "@/lib/northbeam/attributionTags";
+import { buildCategoryTagsFromNames } from "@/lib/northbeam/categoryTags";
 
 /**
  * Convert 2-letter country code to 3-letter ISO 3166-1 alpha-3 code
@@ -76,59 +80,15 @@ const convertToISO3166Alpha3 = (countryCode) => {
 };
 
 /**
- * Get order status tag
- * @param {string} status - Order status
- * @returns {string} Status tag
- */
-const getStatusTag = (status) => {
-  const statusMap = {
-    pending: "Pending",
-    processing: "Processing",
-    "on-hold": "On Hold",
-    completed: "Completed",
-    cancelled: "Cancelled",
-    refunded: "Refunded",
-    failed: "Failed",
-  };
-  return statusMap[status?.toLowerCase()] || "Pending";
-};
-
-/**
- * Get lifecycle/purchase type tag
- * @param {Object} order - Order data
- * @returns {string} Lifecycle tag
- */
-const getLifecycleTag = (order) => {
-  // Check if order has subscription products
-  const hasSubscription = order.products?.some(
-    (product) =>
-      product.product_type === "subscription" ||
-      product.name?.toLowerCase().includes("subscription")
-  );
-
-  // Check if this is a recurring order
-  if (order.is_recurring_order || hasSubscription) {
-    // Check if this is the first order for this customer
-    if (order.is_first_order) {
-      return "Subscription First Order";
-    }
-    return "Subscription Recurring";
-  }
-
-  return "OTC";
-};
-
-/**
  * Get product type tags based on categories
  * @param {Array} products - Order products
  * @returns {Promise<Array>} Product type tags
  */
 const getProductTypeTags = async (products, baseUrlFromRequest) => {
-  const tags = [];
-  const productTypes = new Set();
+  const names = new Set();
 
   if (!products || products.length === 0) {
-    return tags;
+    return [];
   }
 
   try {
@@ -176,27 +136,24 @@ const getProductTypeTags = async (products, baseUrlFromRequest) => {
 
     const productDetails = await Promise.all(productPromises);
 
-    // Extract categories from product details
+    // Extract category names from product details. The N in item-category-N
+    // is assigned later by buildCategoryTagsFromNames, which sorts them
+    // deterministically; see lib/northbeam/categoryTags.js for why Set
+    // insertion order (line item order) is exactly the defect TK-1002 found.
     productDetails.forEach((product) => {
       if (product?.categories) {
         product.categories.forEach((category) => {
-          productTypes.add(category.name);
+          if (category?.name) names.add(category.name);
         });
       }
-    });
-
-    // Add tags for each product type found with item-category format (use colon separator)
-    let categoryIndex = 1;
-    productTypes.forEach((type) => {
-      tags.push(`item-category-${categoryIndex}:${type}`);
-      categoryIndex++;
     });
   } catch (error) {
     console.error("Error in getProductTypeTags:", error);
     // Return empty array if category fetching fails - don't break the order tracking
+    return [];
   }
 
-  return tags;
+  return buildCategoryTagsFromNames([...names]);
 };
 
 export async function POST(req) {
@@ -268,6 +225,25 @@ export async function POST(req) {
       order.products,
       requestBaseUrl
     );
+
+    // The three canonical axes (lifecycle, origin, mode) are pinned onto the
+    // Woo order by the canonical writer, not carried in the client payload, so
+    // this route has to read the order back to see them. Best effort only: two
+    // writers are live until TK-1029 retires the browser one, and Northbeam
+    // keeps the last write, so both must produce the same array or each
+    // overwrites the other with a different one. A failed read here still
+    // sends an order, just one with the axes omitted rather than invented.
+    let wooOrder = null;
+    if (shouldApplyPixelGuard(order.nb_write_context)) {
+      try {
+        const { data } = await wooApi.get(`orders/${order.order_id}`);
+        wooOrder = data;
+      } catch (e) {
+        logger.warn("[Northbeam API] Could not read order meta for canonical axes", {
+          order_id: order.order_id,
+        });
+      }
+    }
 
     // Derive canonical timestamp and customer_id
     // Explicit overrides first, then the order's true UTC instant.
@@ -370,25 +346,20 @@ export async function POST(req) {
       );
     }
 
-    // Merge any client-provided tags to preserve item-category-* computed on client
+    // Merge any client-provided tags to preserve item-category-* computed on
+    // client, dropping the retired lifecycle values explicitly. TK-446 forbids
+    // the two schemas coexisting, and a client build that has not picked up
+    // this cutover yet would otherwise still be sending one of these three.
+    const RETIRED_LIFECYCLE_TAGS = new Set([
+      "Subscription First Order",
+      "Subscription Recurring",
+      "OTC",
+    ]);
     const clientProvidedTags = Array.isArray(order.order_tags)
-      ? order.order_tags.filter(Boolean)
+      ? order.order_tags.filter(
+          (tag) => Boolean(tag) && !RETIRED_LIFECYCLE_TAGS.has(tag)
+        )
       : [];
-
-    // Helper to build a de-duplicated tag list while preserving primary tag order
-    const buildOrderTags = () => {
-      const primary = [getStatusTag(order.status), getLifecycleTag(order)];
-      const combined = [...primary, ...productTypeTags, ...clientProvidedTags];
-      const seen = new Set();
-      const deduped = [];
-      for (const tag of combined) {
-        const key = String(tag || "").trim();
-        if (!key || seen.has(key)) continue;
-        seen.add(key);
-        deduped.push(key);
-      }
-      return deduped;
-    };
 
     // Build the Northbeam API payload - send as array directly
     const payload = [
@@ -409,7 +380,19 @@ export async function POST(req) {
           customer_ip_address: order.customer_ip_address,
         }),
         is_recurring_order: order.is_recurring_order || false,
-        order_tags: buildOrderTags(),
+        order_tags: buildCanonicalOrderTags({
+          // The Woo order is authoritative on status and the client payload
+          // frequently omits it altogether: that omission is TK-1003, and it
+          // used to be papered over by a `Pending` default that produced
+          // orders carrying two contradictory status tags. With the default
+          // gone, reading the real status here is what stops a live purchase
+          // shipping with no status tag at all.
+          status: wooOrder?.status || order.status,
+          order: wooOrder,
+          categoryTags: productTypeTags,
+          sourceTags: wooOrder ? buildSourceTagsFromOrder(wooOrder) : [],
+          extraTags: clientProvidedTags,
+        }),
         products: (order.products || []).map((product) => ({
           id: product.id || "",
           name: product.name || "",

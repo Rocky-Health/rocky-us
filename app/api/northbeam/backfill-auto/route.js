@@ -5,6 +5,14 @@ import { NB_WRITE_CONTEXT } from "@/lib/northbeam/writeContext";
 import { logger } from "@/utils/devLogger";
 import { api as wooApi } from "@/lib/woocommerce";
 import { requireSyncApiKey } from "@/lib/northbeam/syncAuth";
+import { buildCanonicalOrderTags } from "@/lib/northbeam/orderTags";
+import { buildSourceTagsFromOrder } from "@/lib/northbeam/attributionTags";
+import {
+  classifySyncResponse,
+  syncOutcomeMeta,
+  NB_SYNC_OUTCOME,
+} from "@/lib/northbeam/syncOutcome";
+import { checkIfAlreadySynced } from "@/lib/northbeam/orderGuards";
 
 /**
  * POST /api/northbeam/backfill-auto
@@ -113,29 +121,6 @@ const mapWooToNorthbeamOrder = (order) => {
       })
     : [];
 
-  // Build status tag
-  const getStatusTag = (s) => {
-    const map = {
-      pending: "Pending",
-      processing: "Processing",
-      "on-hold": "On Hold",
-      completed: "Completed",
-      cancelled: "Cancelled",
-      refunded: "Refunded",
-      failed: "Failed",
-    };
-    return map[String(s || "").toLowerCase()] || "Pending";
-  };
-
-  const hasSubscription = products.some(
-    (p) => /subscription/i.test(p?.name || "")
-  );
-  const lifecycle = hasSubscription
-    ? order?.is_first_order
-      ? "Subscription First Order"
-      : "Subscription Recurring"
-    : "OTC";
-
   // Shipping address
   const shippingAddress = order?.shipping
     ? {
@@ -186,7 +171,15 @@ const mapWooToNorthbeamOrder = (order) => {
     customer_name: name,
     customer_ip_address: order?.customer_ip_address || "",
     is_recurring_order: Boolean(order?.is_recurring_order),
-    order_tags: [getStatusTag(status), lifecycle],
+    // The Woo REST order carries no product categories, only line item names
+    // and ids, so there is nothing here to build categoryTags from. Leaving it
+    // out is correct: buildCanonicalOrderTags drops an empty axis rather than
+    // inventing one.
+    order_tags: buildCanonicalOrderTags({
+      status,
+      order,
+      sourceTags: buildSourceTagsFromOrder(order),
+    }),
     products,
     nb_write_context: NB_WRITE_CONTEXT.HISTORICAL_BACKFILL,
     ...(shippingAddress ? { customer_shipping_address: shippingAddress } : {}),
@@ -278,28 +271,36 @@ export async function POST(req) {
           continue;
         }
 
-        // Deduplication checks (skip if force_resync is true)
+        // Deduplication checks (skip if force_resync is true). Shared with the
+        // manual backfill route via checkIfAlreadySynced so a Relay sync or a
+        // prior backfill reads the same way in both routes.
         if (!forceResync) {
-          // Check if already backfilled
-          const nbBackfilled = order?.meta_data?.find(m => m.key === '_northbeam_backfilled');
-          if (nbBackfilled?.value === 'yes') {
-            results.push({ id, status: "skipped", reason: "already_backfilled" });
+          const syncStatus = checkIfAlreadySynced(order);
+          if (syncStatus.synced) {
+            results.push({
+              id,
+              status: "skipped",
+              reason: syncStatus.handled_by_relay ? "handled_by_relay" : "already_backfilled",
+              handled_by_relay: syncStatus.handled_by_relay,
+            });
             skipped++;
-            logger.info(`[NB Backfill Auto] Skipped order ${id}: already backfilled`);
+            logger.info(
+              `[NB Backfill Auto] Skipped order ${id}: ${
+                syncStatus.handled_by_relay ? "handled by Relay plugin" : "already backfilled"
+              }`
+            );
             continue;
           }
 
-          // Check if Relay plugin already synced
-          const relayMeta = order?.meta_data?.find(m => m.key === '_nb_last_pushed_total');
-          if (relayMeta) {
-            results.push({ 
-              id, 
-              status: "skipped", 
-              reason: "handled_by_relay",
-              handled_by_relay: true 
-            });
+          // A prior run refused this order on a permanent business rule
+          // (see lib/northbeam/orderGuards.js). It was never sent, so it must
+          // not be counted or reported as a sync, only skipped again.
+          if (syncStatus.refused) {
+            results.push({ id, status: "skipped", reason: "previously_refused" });
             skipped++;
-            logger.info(`[NB Backfill Auto] Skipped order ${id}: handled by Relay plugin`);
+            logger.info(
+              `[NB Backfill Auto] Skipped order ${id}: previously refused (${syncStatus.refused_reason})`
+            );
             continue;
           }
         }
@@ -316,49 +317,76 @@ export async function POST(req) {
           cache: "no-store",
         });
 
-        if (!res.ok) {
-          const text = await res.text();
-          results.push({
-            id,
-            status: "failed",
-            error: `${res.status} ${res.statusText}`,
-            details: text.substring(0, 200),
-          });
-          failed++;
-          
-          // Update attempt count
+        // The route answers HTTP 200 for both a genuine delivery and a
+        // deliberate refusal (internal coupon, zero value order, and so on),
+        // so res.ok alone cannot tell them apart. classifySyncResponse is the
+        // one place that makes the call; see lib/northbeam/syncOutcome.js for
+        // the defect that collapsing REFUSED into ACCEPTED caused.
+        const json = await res.json().catch(() => null);
+        const classified = classifySyncResponse({ ok: res.ok, status: res.status, body: json });
+        const outcomeTimestamp = new Date().toISOString();
+
+        if (classified.outcome === NB_SYNC_OUTCOME.ACCEPTED) {
+          results.push({ id, status: "ok", northbeam: json });
+          succeeded++;
+
+          // Mark order as successfully backfilled
           try {
-            const currentAttempts = order?.meta_data?.find(m => m.key === '_northbeam_backfill_attempts')?.value || 0;
             await wooApi.put(`orders/${id}`, {
               meta_data: [
-                { key: '_northbeam_backfill_attempts', value: String(Number(currentAttempts) + 1) },
-                { key: '_northbeam_last_backfill_attempt', value: new Date().toISOString() },
+                ...syncOutcomeMeta(classified, outcomeTimestamp),
+                { key: '_northbeam_backfill_batch_id', value: batchId },
               ]
             });
           } catch (metaErr) {
-            logger.error(`[NB Backfill Auto] Failed to update meta for order ${id}:`, metaErr);
+            logger.error(`[NB Backfill Auto] Failed to mark order ${id} as backfilled:`, metaErr);
           }
-          
+
           continue;
         }
 
-        const json = await res.json().catch(() => ({}));
-        results.push({ id, status: "ok", northbeam: json });
-        succeeded++;
-        
-        // Mark order as successfully backfilled
+        if (classified.outcome === NB_SYNC_OUTCOME.REFUSED) {
+          // Never sent, so never the delivery marker. Recorded under its own
+          // refusal keys so this order stays distinguishable from one Northbeam
+          // actually has, and checkIfAlreadySynced can skip it without lying.
+          results.push({ id, status: "refused", reason: classified.reason });
+          skipped++;
+          logger.info(`[NB Backfill Auto] Order ${id} refused: ${classified.reason}`);
+
+          try {
+            await wooApi.put(`orders/${id}`, {
+              meta_data: syncOutcomeMeta(classified, outcomeTimestamp),
+            });
+          } catch (metaErr) {
+            logger.error(`[NB Backfill Auto] Failed to record refusal meta for order ${id}:`, metaErr);
+          }
+
+          continue;
+        }
+
+        // FAILED: no delivery marker, so the order stays retryable on the next run.
+        results.push({
+          id,
+          status: "failed",
+          error: `${res.status} ${res.statusText}`,
+          reason: classified.reason,
+          details: json,
+        });
+        failed++;
+
+        // Update attempt count
         try {
+          const currentAttempts = order?.meta_data?.find(m => m.key === '_northbeam_backfill_attempts')?.value || 0;
           await wooApi.put(`orders/${id}`, {
             meta_data: [
-              { key: '_northbeam_backfilled', value: 'yes' },
-              { key: '_northbeam_backfilled_at', value: new Date().toISOString() },
-              { key: '_northbeam_backfill_batch_id', value: batchId },
+              { key: '_northbeam_backfill_attempts', value: String(Number(currentAttempts) + 1) },
+              { key: '_northbeam_last_backfill_attempt', value: outcomeTimestamp },
             ]
           });
         } catch (metaErr) {
-          logger.error(`[NB Backfill Auto] Failed to mark order ${id} as backfilled:`, metaErr);
+          logger.error(`[NB Backfill Auto] Failed to update meta for order ${id}:`, metaErr);
         }
-        
+
       } catch (err) {
         logger.error(`[NB Backfill Auto] Error processing order ${id}:`, err);
         results.push({ id, status: "error", error: err?.message || String(err) });
