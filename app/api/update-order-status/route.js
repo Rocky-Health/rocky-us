@@ -3,6 +3,8 @@ import axios from "axios";
 import { logger } from "@/utils/devLogger";
 import { resolveOrderTimeIso } from "@/lib/northbeam/orderTime";
 import { NB_WRITE_CONTEXT } from "@/lib/northbeam/writeContext";
+import { buildCanonicalOrderTags } from "@/lib/northbeam/orderTags";
+import { buildSourceTagsFromOrder } from "@/lib/northbeam/attributionTags";
 
 const BASE_URL = process.env.BASE_URL;
 const CONSUMER_KEY = process.env.CONSUMER_KEY;
@@ -54,27 +56,6 @@ const mapWooToNorthbeamOrder = (order) => {
       })
     : [];
 
-  const getStatusTag = (s) => {
-    const map = {
-      pending: "Pending",
-      processing: "Processing",
-      "on-hold": "On Hold",
-      completed: "Completed",
-      cancelled: "Cancelled",
-      refunded: "Refunded",
-      failed: "Failed",
-    };
-    return map[String(s || "").toLowerCase()] || "Pending";
-  };
-  const hasSubscription = products.some((p) =>
-    /subscription/i.test(p?.name || "")
-  );
-  const lifecycle = hasSubscription
-    ? order?.is_first_order
-      ? "Subscription First Order"
-      : "Subscription Recurring"
-    : "OTC";
-
   const shippingAddress = order?.shipping
     ? {
         address1: order.shipping.address_1 || "",
@@ -123,7 +104,14 @@ const mapWooToNorthbeamOrder = (order) => {
     customer_name: name,
     customer_ip_address: order?.customer_ip_address || "",
     is_recurring_order: Boolean(order?.is_recurring_order),
-    order_tags: [getStatusTag(status), lifecycle],
+    // `order` here is the WC order the preceding PUT just returned, so it
+    // carries meta_data and the pinned axes are readable the same as any other
+    // writer's. No categoryTags: this route has no product category lookup.
+    order_tags: buildCanonicalOrderTags({
+      status,
+      order,
+      sourceTags: buildSourceTagsFromOrder(order),
+    }),
     products,
     // A pixel already fired on the confirmation page for this order, so a
     // re-send here must carry the guard. Northbeam keeps the last write, and
