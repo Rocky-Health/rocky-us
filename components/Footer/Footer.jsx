@@ -159,14 +159,11 @@ const Footer = ({ className }) => {
                             { href: "/about-us", text: "About Us" },
                             { href: "/blog", text: "Blog" },
                             // { href: "/podcast/", text: "Podcast" },
-                            // Blog category links held: /blog and /blog/category/*
-                            // currently error out in production (WordPress API 502).
-                            // Re-enable once the blog backend is restored.
-                            // { href: "/blog/category/hair-loss", text: "Hair Loss" },
-                            // { href: "/blog/category/lifestyle", text: "Lifestyle" },
-                            // { href: "/blog/category/sexual-health", text: "Sexual Health" },
-                            // { href: "/blog/category/weight-loss", text: "Weight Loss" },
-                            // mental-health also held for US compliance (vertical blocked)
+                            { href: "/blog/category/hair-loss", text: "Hair Loss" },
+                            { href: "/blog/category/lifestyle", text: "Lifestyle" },
+                            { href: "/blog/category/sexual-health", text: "Sexual Health" },
+                            { href: "/blog/category/weight-loss", text: "Weight Loss" },
+                            // mental-health held for US compliance (vertical blocked)
                             // { href: "/blog/category/mental-health", text: "Mental Health" },
                         ].map((link) => (
                             <Link
