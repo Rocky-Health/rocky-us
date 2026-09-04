@@ -6,6 +6,7 @@ import CheckoutSkeleton from "@/components/ui/skeletons/CheckoutSkeleton";
 import { useEffect, useRef, useState } from "react";
 import BillingAndShipping from "./BillingAndShipping";
 import CartAndPayment from "./CartAndPayment";
+import ExpressCheckoutWallet from "./ExpressCheckoutWallet";
 import Glp2TreatmentCheckoutSummary from "./Glp2TreatmentCheckoutSummary";
 import { toast } from "react-toastify";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -1817,51 +1818,53 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
 
   // Same payload the new-card path builds in handleSubmit, but always a new
   // payment (no saved card). Keep this in sync with the dataToSend object below.
-  const buildWalletCheckoutData = () => {
+  // TK-839: `overrides` lets the express-wallet path source the order from the
+  // wallet sheet (billing_address / shipping_address) instead of the manual
+  // form. When a wallet shipping address is supplied it's always used as the
+  // ship-to address. Falls back to formData for the standard card path.
+  const buildWalletCheckoutData = (overrides = {}) => {
+    const billing = overrides.billing_address || formData.billing_address;
+    const shipping = overrides.shipping_address || formData.shipping_address;
     const useShippingAddress =
-      formData.shipping_address.ship_to_different_address;
+      overrides.shipping_address != null
+        ? true
+        : formData.shipping_address.ship_to_different_address;
     const { awc: awinAwc, channel: awinChannel } = getAwinFromUrlOrStorage();
 
     return {
-      firstName: formData.billing_address.first_name,
-      lastName: formData.billing_address.last_name,
-      addressOne: formData.billing_address.address_1,
-      addressTwo: formData.billing_address.address_2,
-      city: formData.billing_address.city,
-      state: formData.billing_address.state,
-      postcode: formData.billing_address.postcode,
-      country: formData.billing_address.country,
-      phone: formData.billing_address.phone,
-      email: formData.billing_address.email,
+      firstName: billing.first_name,
+      lastName: billing.last_name,
+      addressOne: billing.address_1,
+      addressTwo: billing.address_2,
+      city: billing.city,
+      state: billing.state,
+      postcode: billing.postcode,
+      country: billing.country,
+      phone: billing.phone,
+      email: billing.email,
 
       shipToAnotherAddress: useShippingAddress || false,
       shippingFirstName: useShippingAddress
-        ? formData.shipping_address.first_name
-        : formData.billing_address.first_name,
+        ? shipping.first_name
+        : billing.first_name,
       shippingLastName: useShippingAddress
-        ? formData.shipping_address.last_name
-        : formData.billing_address.last_name,
+        ? shipping.last_name
+        : billing.last_name,
       shippingAddressOne: useShippingAddress
-        ? formData.shipping_address.address_1
-        : formData.billing_address.address_1,
+        ? shipping.address_1
+        : billing.address_1,
       shippingAddressTwo: useShippingAddress
-        ? formData.shipping_address.address_2
-        : formData.billing_address.address_2,
-      shippingCity: useShippingAddress
-        ? formData.shipping_address.city
-        : formData.billing_address.city,
-      shippingState: useShippingAddress
-        ? formData.shipping_address.state
-        : formData.billing_address.state,
+        ? shipping.address_2
+        : billing.address_2,
+      shippingCity: useShippingAddress ? shipping.city : billing.city,
+      shippingState: useShippingAddress ? shipping.state : billing.state,
       shippingPostCode: useShippingAddress
-        ? formData.shipping_address.postcode
-        : formData.billing_address.postcode,
+        ? shipping.postcode
+        : billing.postcode,
       shippingCountry: useShippingAddress
-        ? formData.shipping_address.country
-        : formData.billing_address.country || "CA",
-      shippingPhone: useShippingAddress
-        ? formData.shipping_address.phone
-        : formData.billing_address.phone,
+        ? shipping.country
+        : billing.country || "CA",
+      shippingPhone: useShippingAddress ? shipping.phone : billing.phone,
 
       discreet:
         formData.extensions["checkout-fields-for-blocks"]._meta_discreet,
@@ -1899,7 +1902,8 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
 
   // Runs on the wallet tap. Has to be synchronous — Apple Pay only opens its
   // sheet straight off the user's gesture, so no awaits before we resolve.
-  // Mirrors the synchronous guards in handleSubmit (form + age + ED/WL state).
+  // TK-839: only runs the gates that don't need an address here (age/Zonnic);
+  // the form pre-fill guard is gone and ED/WL state gating moved to confirm.
   // Returns true to open the wallet sheet, false to cancel it.
   const handleExpressWalletClick = () => {
     if (!stripe || !stripeElements) {
@@ -1907,62 +1911,31 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
       return false;
     }
 
-    const validationResult = validateForm({
-      billing_address: formData.billing_address,
-      shipping_address: formData.shipping_address,
-      cardNumber: "dummy", // card fields don't apply to the wallet path
-      cardExpMonth: "12",
-      cardExpYear: "30",
-      cardCVD: "123",
-      useSavedCard: false,
-    });
-
-    if (!validationResult.isValid) {
-      toast.error(
-        validationResult.formattedMessage ||
-          "Please complete your details above before using express checkout.",
-      );
-      return false;
-    }
+    // TK-839: the wallet sheet now collects name/email/billing/shipping, so we
+    // no longer require the manual form to be filled before opening it — that's
+    // the whole point of the express form-skip flow. Address/state-dependent
+    // gating moved to handleExpressWalletConfirm where the wallet's shipping
+    // address is available.
 
     if (ageValidationFailed) {
       setShowAgePopup(true);
       return false;
     }
 
-    if (cartItems?.items) {
-      if (hasZonnicProducts(cartItems.items)) {
-        const dob = formData.billing_address.date_of_birth;
-        if (!dob) {
-          // We can't verify age without a fetch (not allowed off the gesture),
-          // so send them to the card form which runs the full async check.
-          toast.error("Please use the card form below to complete this order.");
-          return false;
-        }
-        if (checkAgeRestriction(dob, 19).blocked) {
-          setAgeValidationFailed(true);
-          setShowAgePopup(true);
-          return false;
-        }
-      }
-
-      const useShip = formData.shipping_address.ship_to_different_address;
-      const stateToCheck =
-        (useShip
-          ? formData.shipping_address.state
-          : formData.billing_address.state) || formData.billing_address.state;
-
-      const restrictedEdItem = cartItems.items.find(isRestrictedEdCartItem);
-      if (restrictedEdItem && stateToCheck && isEdStateRestricted(stateToCheck)) {
-        setRestrictedProductName(restrictedEdItem.name || "this");
-        setShowEdRestrictionPopup(true);
+    // Age gating that doesn't depend on the address stays here. The wallet
+    // doesn't collect a date of birth, so age-restricted (Zonnic) products
+    // can't be verified off the gesture — send those users to the card form.
+    if (cartItems?.items && hasZonnicProducts(cartItems.items)) {
+      const dob = formData.billing_address.date_of_birth;
+      if (!dob) {
+        // We can't verify age without a fetch (not allowed off the gesture),
+        // so send them to the card form which runs the full async check.
+        toast.error("Please use the card form below to complete this order.");
         return false;
       }
-
-      const restrictedWlItem = cartItems.items.find(isRestrictedWlCartItem);
-      if (restrictedWlItem && stateToCheck && isWlStateRestricted(stateToCheck)) {
-        setRestrictedProductName(restrictedWlItem.name || "this");
-        setShowEdRestrictionPopup(true);
+      if (checkAgeRestriction(dob, 19).blocked) {
+        setAgeValidationFailed(true);
+        setShowAgePopup(true);
         return false;
       }
     }
@@ -1974,12 +1947,60 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
   // already satisfied (the sheet opened off the tap), so we can do async work
   // here. submit() collects the wallet's data (not the empty card field), then
   // we hand off to the same order + payment pipeline the card flow uses.
-  const handleExpressWalletConfirm = async () => {
+  // TK-839: shape a wallet party (Stripe billingDetails / shippingAddress) into
+  // the formData address shape the order builder consumes.
+  const mapWalletParty = (party) => {
+    const nameParts = (party?.name || "").trim().split(/\s+/).filter(Boolean);
+    const address = party?.address || {};
+    return {
+      first_name: nameParts[0] || "",
+      last_name: nameParts.slice(1).join(" ") || "",
+      email: party?.email || "",
+      phone: party?.phone || "",
+      address_1: address.line1 || "",
+      address_2: address.line2 || "",
+      city: address.city || "",
+      state: address.state || "",
+      postcode: address.postal_code || "",
+      country: address.country || "US",
+    };
+  };
+
+  const handleExpressWalletConfirm = async (event) => {
     // Tracks whether we've handed off to the processing modal yet — once we
     // have, processStripePayment owns error display, so we don't also toast.
     let modalShown = false;
     try {
       setSubmitting(true);
+
+      // TK-839: build the order from the wallet sheet data instead of the form.
+      const walletBilling = mapWalletParty(event?.billingDetails);
+      const walletShipping = mapWalletParty(event?.shippingAddress);
+      // The wallet shipping address carries no email/phone; reuse the billing
+      // contact so the order still has one.
+      walletShipping.email = walletShipping.email || walletBilling.email;
+      walletShipping.phone = walletShipping.phone || walletBilling.phone;
+
+      // State-restricted ED/WL gating runs here now that the shipping state
+      // arrives from the wallet rather than the form.
+      const stateToCheck = walletShipping.state || walletBilling.state;
+      if (cartItems?.items && stateToCheck) {
+        const restrictedEdItem = cartItems.items.find(isRestrictedEdCartItem);
+        if (restrictedEdItem && isEdStateRestricted(stateToCheck)) {
+          setRestrictedProductName(restrictedEdItem.name || "this");
+          setShowEdRestrictionPopup(true);
+          setSubmitting(false);
+          return;
+        }
+
+        const restrictedWlItem = cartItems.items.find(isRestrictedWlCartItem);
+        if (restrictedWlItem && isWlStateRestricted(stateToCheck)) {
+          setRestrictedProductName(restrictedWlItem.name || "this");
+          setShowEdRestrictionPopup(true);
+          setSubmitting(false);
+          return;
+        }
+      }
 
       const { error: submitError } = await stripeElements.submit();
       if (submitError) {
@@ -1991,7 +2012,21 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
         return;
       }
 
-      const dataToSend = buildWalletCheckoutData();
+      // Keep formData in sync with the wallet data for any downstream reads.
+      setFormData((prev) => ({
+        ...prev,
+        billing_address: { ...prev.billing_address, ...walletBilling },
+        shipping_address: {
+          ...prev.shipping_address,
+          ...walletShipping,
+          ship_to_different_address: true,
+        },
+      }));
+
+      const dataToSend = buildWalletCheckoutData({
+        billing_address: { ...formData.billing_address, ...walletBilling },
+        shipping_address: { ...formData.shipping_address, ...walletShipping },
+      });
 
       logger.log("Creating pending order (express checkout)...");
       const orderResponse = await fetch("/api/create-pending-order", {
@@ -3276,9 +3311,20 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
     isPaymentValid,
     paymentValidationMessage,
     onStripeReady: setStripeElements,
-    onWalletClick: handleExpressWalletClick,
-    onWalletConfirm: handleExpressWalletConfirm,
   };
+
+  // TK-839: express wallet (Apple/Google Pay) surfaced at the top of the page so
+  // the wallet sheet can collect name/email/billing/shipping and the user can
+  // skip the manual form. Rendered inside the shared <Elements> provider above.
+  // The wallet sheet is fed the real WC-computed shipping rates for the current
+  // cart + address (same source the checkout summary renders).
+  const expressWallet = (
+    <ExpressCheckoutWallet
+      onWalletClick={handleExpressWalletClick}
+      onWalletConfirm={handleExpressWalletConfirm}
+      wcShippingRates={cartItems?.shipping_rates}
+    />
+  );
 
   return (
     <>
@@ -3325,16 +3371,24 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
               cartItems={cartItems}
               setCartItems={setCartItems}
             />
+            {/* TK-839: express wallet above the address form so the sheet fills it */}
+            {expressWallet}
             <BillingAndShipping {...billingShippingProps} variant="glp2" />
             <CartAndPayment {...cartPaymentProps} layoutVariant="glp2" />
           </div>
         </div>
       ) : (
-        <div className="grid lg:grid-cols-2 min-h-[calc(100vh-100px)] border-t overflow-hidden max-w-full">
-          {submitting && <Loader />}
-          <BillingAndShipping {...billingShippingProps} />
-          <CartAndPayment {...cartPaymentProps} />
-        </div>
+        <>
+          {/* TK-839: express wallet at the top of the page, above the address form */}
+          <div className="border-t px-4 pt-6">
+            <div className="mx-auto lg:max-w-[512px]">{expressWallet}</div>
+          </div>
+          <div className="grid lg:grid-cols-2 min-h-[calc(100vh-100px)] overflow-hidden max-w-full">
+            {submitting && <Loader />}
+            <BillingAndShipping {...billingShippingProps} />
+            <CartAndPayment {...cartPaymentProps} />
+          </div>
+        </>
       )}
 
       {/* Quebec Restriction Popup */}
