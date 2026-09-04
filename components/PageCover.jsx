@@ -5,7 +5,11 @@ import { FaArrowRightLong } from "react-icons/fa6";
 import ProudPartner from "./ProudPartner";
 import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
-const PageCover = ({ data, items }) => {
+const PageCover = ({ data, items, subtitleAs = "div" }) => {
+  // Pages whose cover title is the page's main heading pass subtitleAs="h1"
+  // (e.g. hair). Defaults to a div so verticals that carry their h1 elsewhere
+  // (ed, sex, body-optimization) are unaffected.
+  const SubtitleTag = subtitleAs;
   return (
     <div className="grid md:grid-cols-2 gap-6 md:gap-20 items-center">
       <div>
@@ -16,10 +20,10 @@ const PageCover = ({ data, items }) => {
         )}
 
         {data.subtitle && (
-          <div
+          <SubtitleTag
             dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.subtitle) }}
             className="text-[32px] lg:text-[48px] headers-font leading-[36.8px] md:leading-[53.52px] font-[550] tracking-[-0.01em] md:tracking-[-0.02em] mb-4 md:mb-8 capitalize"
-          ></div>
+          ></SubtitleTag>
         )}
         {data.upperNote && (
           <div

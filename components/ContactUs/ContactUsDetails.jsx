@@ -21,9 +21,9 @@ export default function ContactUsDetails() {
       {/* Overlay Content */}
       <div className="z-10 p-6 md:px-20 md:py-[94.5px] flex flex-col  ">
         {/* Contact Us Heading */}
-        <h2 className="text-[32px] md:text-[48px] leading-[115%] tracking-[-0.01em] md:tracking-[-0.02em] mb-[4px] headers-font">
+        <h1 className="text-[32px] md:text-[48px] leading-[115%] tracking-[-0.01em] md:tracking-[-0.02em] mb-[4px] headers-font">
           Contact Us
-        </h2>
+        </h1>
         <p className="text-[#814B00] text-[16px] md:text-[20px] font-[400] leading-[140%] mb-[21px] md:mb-14">
           We're here for you.
         </p>

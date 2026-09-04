@@ -13,10 +13,10 @@ const Mission = ({ title, description, videoRef, videoSrc, imageSrc }) => {
                     <div className="text-[#AE7E56] text-[12px] md:text-[14px] font-[500] uppercase mb-1 md:mb-2">
                         Mission
                     </div>
-                    <div className="text-[32px] md:text-[48px] tracking-[-0.01em] md:tracking-[-0.02em] leading-[115%] md:leading-[100%] max-w-[684px] capitalize headers-font mb-3 md:mb-4">
+                    <h1 className="text-[32px] md:text-[48px] tracking-[-0.01em] md:tracking-[-0.02em] leading-[115%] md:leading-[100%] max-w-[684px] capitalize headers-font mb-3 md:mb-4">
                         {title ||
                             "Breaking the stigma and redefining health for everyone."}
-                    </div>
+                    </h1>
                     <div className="text-[16px] md:text-[18px] font-[400] leading-[140%] md:max-w-[591px] ">
                         {description ||
                             "At myRocky, we're on a mission to normalize everyday health concerns and remove the stigma that keeps too many from seeking care. By creating a safe, accessible, and frictionless platform, we empower you to take control of your health and start conversations that matter."}

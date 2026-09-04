@@ -45,7 +45,7 @@ const HairCoverData = {
 const HairCover = () => {
   return (
     <>
-      <PageCover data={HairCoverData} items={items} />
+      <PageCover data={HairCoverData} items={items} subtitleAs="h1" />
     </>
   );
 };

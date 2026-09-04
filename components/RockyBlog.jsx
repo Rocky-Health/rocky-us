@@ -10,7 +10,7 @@ const homeBlog = [
         title: "All things health blog",
         subtitle: "A lifestyle blog connecting you with issues that matter",
         buttonText: "Read our Blog",
-        buttonLink: "/blog/",
+        buttonLink: "/blog",
     },
 ];
 
@@ -46,9 +46,9 @@ const RockyBlog = ({ blog }) => {
                     )}
 
                     <div className="relative z-10 flex flex-col justify-center items-center text-center text-[#FFFFFF] h-full px-4 py-12">
-                        <h1 className=" text-[36px] md:text-[45px] leading-[114.9%] tracking-[1px]  font-[600] subheaders-font">
+                        <h2 className=" text-[36px] md:text-[45px] leading-[114.9%] tracking-[1px]  font-[600] subheaders-font">
                             {blog.title}
-                        </h1>
+                        </h2>
                         <p className="text-[18px] md:text-[18px] leading-[100%] tracking-[0%] font-[400]  mt-0 md:mt-4 ">
                             {blog.subtitle}
                         </p>
