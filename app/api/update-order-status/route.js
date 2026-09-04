@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
 import { logger } from "@/utils/devLogger";
+import { resolveOrderTimeIso } from "@/lib/northbeam/orderTime";
+import { NB_WRITE_CONTEXT } from "@/lib/northbeam/writeContext";
 
 const BASE_URL = process.env.BASE_URL;
 const CONSUMER_KEY = process.env.CONSUMER_KEY;
@@ -102,9 +104,12 @@ const mapWooToNorthbeamOrder = (order) => {
       canonicalCustomerId || String(order?.customer_id || email || ""),
     customer_id_canonical:
       canonicalCustomerId || String(order?.customer_id || email || ""),
-    time_of_purchase: new Date(
-      timeCandidate || order?.date_created || Date.now()
-    ).toISOString(),
+    // resolveOrderTimeIso pins the _gmt fields to UTC. The bare date_created
+    // tail carries no offset and resolves against the runtime's own timezone,
+    // so it stays only as the fallback when no GMT field is usable.
+    time_of_purchase:
+      resolveOrderTimeIso(order) ||
+      new Date(timeCandidate || Date.now()).toISOString(),
     currency: order?.currency || "USD",
     purchase_total: purchaseTotal,
     tax,
@@ -120,6 +125,10 @@ const mapWooToNorthbeamOrder = (order) => {
     is_recurring_order: Boolean(order?.is_recurring_order),
     order_tags: [getStatusTag(status), lifecycle],
     products,
+    // A pixel already fired on the confirmation page for this order, so a
+    // re-send here must carry the guard. Northbeam keeps the last write, and
+    // an unguarded re-send would replace a guarded value with an earlier one.
+    nb_write_context: NB_WRITE_CONTEXT.LIVE_PURCHASE,
     ...(shippingAddress ? { customer_shipping_address: shippingAddress } : {}),
   };
 };

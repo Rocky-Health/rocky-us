@@ -59,7 +59,7 @@ export default function LongevityNadLpClient() {
                 headingBefore=""
                 headingAccent="NAD+ Injection"
                 headingAfter="for Healthy Aging"
-                priceLine="Only $99 a month"
+                priceLine="Only $199 a month"
                 description="Boost your NAD+ levels without costly infusions, all from the comfort of home. With unlimited support from longevity experts."
                 showSecondaryBtn={false}
                 primaryBtnText="Add to Cart"
@@ -97,7 +97,7 @@ export default function LongevityNadLpClient() {
                 bg="bg-[#FAFAFA]"
                 name="NAD+ Injections"
                 pricePrefix="Only"
-                price="$99"
+                price="$199"
                 priceAfter="a month"
                 description="A simple way to support cellular health, energy production, and overall wellness, all from the comfort of home."
                 checkPointsPosition="after"

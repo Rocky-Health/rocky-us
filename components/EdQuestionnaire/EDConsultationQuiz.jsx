@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import { logger } from "@/utils/devLogger";
-import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { useRouter, useSearchParams } from "next/navigation";
 import { WarningPopup } from "./WarningPopup";
 import { QuestionLayout } from "./QuestionLayout";
 import { QuestionOption } from "./QuestionOption";
@@ -17,12 +18,19 @@ import {
   FaCheckCircle,
 } from "react-icons/fa";
 import Loader from "../Loader";
+import {
+  getPrefillStorageKey,
+  mapCrmResponseToFormData,
+} from "@/lib/questionnairePrefillConfig";
 import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
 import { useQuizSequence } from "@/lib/questionnaire/useQuizSequence";
 import QuestionnaireIntermission from "@/components/OrderReceived/QuestionnaireIntermission";
+import { getQuizUserInfoError } from "@/utils/quizUserValidation";
 const { uploadFileToS3WithProgress } = await import(
   "@/utils/s3/frontend-upload"
 );
+
+const ED_PREFILL_KEY = getPrefillStorageKey("/ed-consultation-quiz");
 
 const QuestionWrapper = ({ children }) => (
   <div className="w-[335px] md:w-[520px] mx-auto">{children}</div>
@@ -51,7 +59,7 @@ export default function EDConsultationQuiz({
         logger.error("Error loading form data from localStorage:", e);
       }
     }
-    const nameParts = userName.split(" ");
+    const nameParts = userName ? userName.split(" ") : [];
     const fname = nameParts[0];
     const lname = nameParts[1];
     // Check for lidocaine addon selection
@@ -124,11 +132,12 @@ export default function EDConsultationQuiz({
     };
   };
 
-  const nameParts = userName.split(" ");
+  const nameParts = userName ? userName.split(" ") : [];
   const fname = nameParts[0];
   const lname = nameParts[1];
 
   const router = useRouter();
+  const searchParams = useSearchParams();
   const formRef = useRef(null);
   const isValidating = useRef(false);
   const isIntentionalNavigation = useRef(false);
@@ -228,6 +237,11 @@ export default function EDConsultationQuiz({
     "49_6": "", // None of these apply to me
   });
   const [formData, setFormData] = useState(getInitialFormData());
+
+  const [isLoadingQuestionnairePrefill, setIsLoadingQuestionnairePrefill] =
+    useState(false);
+  const [questionnairePrefillLoaded, setQuestionnairePrefillLoaded] =
+    useState(false);
 
   const [showThankYou, setShowThankYou] = useState(false);
   const [isCheckingCompletion, setIsCheckingCompletion] = useState(true);
@@ -332,6 +346,151 @@ export default function EDConsultationQuiz({
 
     processQueue();
   }, [pendingSubmissions, isSyncing]);
+
+  const getTargetPageFromPrefill = (data) => {
+    const has = (keys) => {
+      if (Array.isArray(keys)) {
+        return keys.some(
+          (k) => data[k] != null && String(data[k]).trim() !== ""
+        );
+      }
+      return data[keys] != null && String(data[keys]).trim() !== "";
+    };
+    if (!has("1")) return 1;
+    if (!has("30")) return 2;
+    if (!has("138")) return 3;
+    if (!has(["23_1", "23_2", "23_3", "23_4", "23_5", "23_6"])) return 4;
+    if (
+      !has([
+        "5_1",
+        "5_2",
+        "5_3",
+        "5_4",
+        "5_5",
+        "5_6",
+        "5_7",
+        "5_8",
+        "5_9",
+        "5_11",
+        "5_12",
+        "5_13",
+      ])
+    )
+      return 5;
+    if (!has("25")) return 6;
+    if (data["25"] === "Yes") {
+      if (!has(["27_1", "27_2", "27_3", "27_4", "27_5", "27_6", "27_7", "28"]))
+        return 7;
+    }
+    if (!has(["33_1", "33_2", "33_3", "33_5"])) return 8;
+    if (!has("42")) return 9;
+    if (!has("35")) return 10;
+    if (!has("37")) return 11;
+    if (!has("40")) return 12;
+    if (!has("45")) return 13;
+    if (!has("51")) return 14;
+    if (!has(["49_1", "49_2", "49_3", "49_4", "49_5", "49_6"])) return 15;
+    if (!has("2")) return 16;
+    if (data["2"] === "Yes" && !has("148")) return 16;
+    if (!has("203")) return 17;
+    if (!has("179")) return 18;
+    if (data["179"] === "Yes" && !has("181")) return 18;
+    if (!has("178")) return 19;
+    if (!has("196")) return 20;
+    return 21;
+  };
+
+  useEffect(() => {
+    if (!searchParams || questionnairePrefillLoaded) return;
+    const id = searchParams.get("id");
+    const token = searchParams.get("token");
+    const patientToken = searchParams.get("patient-token");
+    // Portal recovery link arrived with patient-token but is missing
+    // id/token. Without this guard we'd silently start a fresh quiz, which
+    // creates a new CRM entry and orphans the original record.
+    if (patientToken && (!id || !token)) {
+      toast.error(
+        "This recovery link is incomplete. Please request a new link from your account."
+      );
+      return;
+    }
+    if (!id || !token || !patientToken) return;
+
+    const loadPrefill = async () => {
+      setIsLoadingQuestionnairePrefill(true);
+      try {
+        let answersData = null;
+        const cached =
+          typeof window !== "undefined" && localStorage.getItem(ED_PREFILL_KEY);
+        if (cached) {
+          try {
+            const { id: cachedId, data } = JSON.parse(cached);
+            if (cachedId === id && data?.data) {
+              answersData = data.data;
+              logger.log(
+                "[EDConsultationQuiz] Using cached questionnaire-filled-answers"
+              );
+            }
+          } catch {}
+        }
+        if (!answersData) {
+          const res = await fetch("/api/questionnaire-filled-answers", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              wp_entry_id: id,
+              token,
+              patient_token: patientToken,
+            }),
+          });
+          const data = await res.json();
+          logger.log("[EDConsultationQuiz] questionnaire-filled-answers:", {
+            status: res.status,
+            data,
+          });
+          if (data?.data) {
+            answersData = data.data;
+            if (typeof window !== "undefined") {
+              localStorage.setItem(
+                ED_PREFILL_KEY,
+                JSON.stringify({ id, token, data })
+              );
+            }
+          }
+        }
+        if (answersData) {
+          const mapped = mapCrmResponseToFormData(answersData);
+          const merged = { ...formData, id, token, ...mapped };
+          const targetPage = getTargetPageFromPrefill(merged);
+          setFormData({ ...merged, page_step: targetPage });
+          setCurrentPage(targetPage);
+          setProgress(Math.min(100, Math.floor(((targetPage - 1) / 21) * 100)));
+          if (typeof window !== "undefined") {
+            const ttl = Date.now() + 60 * 60 * 1000;
+            const dataToStore = {
+              ...merged,
+              page_step: targetPage,
+              completion_percentage: Math.min(
+                100,
+                Math.floor(((targetPage - 1) / 21) * 100)
+              ),
+            };
+            localStorage.setItem("quiz-form-data", JSON.stringify(dataToStore));
+            localStorage.setItem("quiz-form-data-expiry", ttl.toString());
+          }
+        }
+      } catch (err) {
+        logger.error(
+          "[EDConsultationQuiz] questionnaire-filled-answers error:",
+          err
+        );
+      } finally {
+        setIsLoadingQuestionnairePrefill(false);
+        setQuestionnairePrefillLoaded(true);
+      }
+    };
+    loadPrefill();
+  }, [searchParams, questionnairePrefillLoaded]);
 
   useEffect(() => {
     if (
@@ -1245,11 +1404,11 @@ export default function EDConsultationQuiz({
       };
 
       const userInfo = {
-        "130_3": formData["130_3"] || "Omkar",
-        "130_6": formData["130_6"] || "Test",
-        131: formData["131"] || "omkar@w3mg.in",
-        132: formData["132"] || "(000) 000-0000",
-        158: formData["158"] || "2000-01-01",
+        "130_3": formData["130_3"] || "",
+        "130_6": formData["130_6"] || "",
+        131: formData["131"] || "",
+        132: formData["132"] || "",
+        158: formData["158"] || "",
         "161_4": formData["161_4"] || "Ontario",
         "selected-dosage": formData["selected-dosage"] || "",
       };
@@ -1408,14 +1567,21 @@ export default function EDConsultationQuiz({
   const initializeUserDetails = () => {
     if (!localStorage.getItem("userDetails")) {
       const defaultUserDetails = {
-        firstName: "Omkar",
-        lastName: "Test",
-        email: "omkar@w3mg.in",
+        firstName: "",
+        lastName: "",
+        email: "",
       };
       localStorage.setItem("userDetails", JSON.stringify(defaultUserDetails));
     }
   };
   const verifyCustomerAndProceed = async () => {
+    const userInfoError = getQuizUserInfoError(formData);
+    if (userInfoError) {
+      setIsSubmitting(false);
+      alert(userInfoError);
+      return;
+    }
+
     if (!photoIdFile && !formData["196"]) {
       setIsSubmitting(false);
       alert("Please upload a photo ID");
@@ -3955,6 +4121,10 @@ export default function EDConsultationQuiz({
     }
   }, [isSubmitting]);
 
+  if (isLoadingQuestionnairePrefill) {
+    return <Loader />;
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-white subheaders-font font-medium">
       <QuestionnaireNavbar
@@ -4000,33 +4170,33 @@ export default function EDConsultationQuiz({
             <input
               type="hidden"
               name="source_site"
-              value="https://stg-1.rocky.health"
+              value={process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com"}
             />
 
             <input
               type="hidden"
               name="130_3"
-              value={formData["130_3"] || "Omkar"}
+              value={formData["130_3"] || ""}
             />
             <input
               type="hidden"
               name="130_6"
-              value={formData["130_6"] || "Test"}
+              value={formData["130_6"] || ""}
             />
             <input
               type="hidden"
               name="131"
-              value={formData["131"] || "omkar@w3mg.in"}
+              value={formData["131"] || ""}
             />
             <input
               type="hidden"
               name="132"
-              value={formData["132"] || "(000) 000-0000"}
+              value={formData["132"] || ""}
             />
             <input
               type="hidden"
               name="158"
-              value={formData["158"] || "2000-01-01"}
+              value={formData["158"] || ""}
             />
             <input
               type="hidden"

@@ -14,6 +14,10 @@ import {
 } from "@/utils/tiktokEvents";
 import { trackNorthbeamPurchase } from "@/utils/northbeamEvents";
 import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
+import {
+  sendCustomerioCheckoutStarted,
+  sendCustomerioProductAdded,
+} from "@/utils/customerioEvents";
 import { hashEmail, hashPhone } from "./hash";
 import { mapOrderToEcommerce } from "./mappers";
 
@@ -130,6 +134,10 @@ export const analyticsService = {
 
       // Track TikTok event
       trackTikTokAddToCart(product, quantity, additionalData, true);
+
+      // Customer.io Product Added. Nothing in this method returns early, so the last position
+      // in the try block reaches every add_to_cart. The relay decides whether it is live.
+      sendCustomerioProductAdded(ecommerce);
     } catch (error) {
       logger.error("[Analytics] Error tracking add_to_cart:", error);
     }
@@ -187,6 +195,10 @@ export const analyticsService = {
 
       // Track TikTok event
       trackTikTokInitiateCheckout(cartItems, additionalData, true);
+
+      // Customer.io Checkout Started. Above the diagnostic block so it cannot end up behind
+      // anything added there later; nothing in this method returns early today.
+      sendCustomerioCheckoutStarted(ecommerce);
 
       // Diagnostic: fire before checkout redirect for GTM Tag Assistant validation
       try {
@@ -293,7 +305,7 @@ export const analyticsService = {
         if (logger && logger.log) {
           logger.log("[Analytics] purchase parity", {
             order_id: order?.id,
-            pixel_time_of_purchase: canonicalTimeIso,
+            ga4_tiktok_time_of_purchase: canonicalTimeIso,
             customer_id_canonical: canonicalCustomerId,
           });
         }
@@ -328,14 +340,22 @@ export const analyticsService = {
       }
 
       // Track Northbeam event (await to reduce pixel-only cases)
-      // Optionally guard NB separately; allow if not sent this session
+      // Guard NB separately. The guard key is order scoped
+      // (analytics:purchase:nb:<order.id>), so a second distinct order in the
+      // same session still sends.
+      //
+      // This previously called trackNorthbeamPurchase in the else branch too,
+      // which made the guard a no-op: every purchase fired twice, roughly 100ms
+      // apart. Northbeam upserts on order_id so revenue was not double counted,
+      // but the second write silently overwrote the first, making any per-write
+      // difference resolve non-deterministically. Retry on failure is already
+      // handled inside trackNorthbeamPurchase.
       if (setOnce(guardKeyNB)) {
         await trackNorthbeamPurchase(order, additionalData, true);
       } else {
-        // If already sent this session, still attempt once more if previous attempts failed silently
-        try {
-          await trackNorthbeamPurchase(order, additionalData, true);
-        } catch (_) {}
+        logger.log("[Analytics] Northbeam purchase already sent this session", {
+          order_id: order?.id,
+        });
       }
     } catch (error) {
       logger.error("[Analytics] Error tracking purchase:", error);

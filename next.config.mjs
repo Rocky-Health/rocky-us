@@ -36,12 +36,15 @@ const nextConfig = {
   env: {
     BASE_URL: process.env.BASE_URL,
   },
-  // Disable streaming metadata for all user agents. With async generateMetadata
-  // (e.g. blog [slug] fetching from WordPress), Next.js otherwise injects
-  // <link rel="canonical"> into <body> after the page streams. Google ignores
-  // body-level canonicals, which caused GSC to report "User-declared canonical: None"
-  // on blog URLs despite the tag being present in the HTML.
-  htmlLimitedBots: /.*/,
+  // Force buffered (non-streamed) metadata for real crawlers only. With async
+  // generateMetadata (e.g. blog [slug] fetching from WordPress), Next.js streams
+  // metadata and injects <link rel="canonical"> into <body> after the page
+  // streams. Google ignores body-level canonicals, which caused GSC to report
+  // "User-declared canonical: None" on blog URLs despite the tag being present.
+  // Scoping this to crawlers (incl. Googlebot) keeps canonical in <head> for bots
+  // while humans regain streamed metadata (Next's default set omits Googlebot).
+  htmlLimitedBots:
+    /Googlebot|Google-InspectionTool|Storebot-Google|Bingbot|BingPreview|Slurp|DuckDuckBot|Baiduspider|YandexBot|Sogou|Exabot|facebookexternalhit|facebot|Twitterbot|LinkedInBot|Applebot|ia_archiver|AhrefsBot|SemrushBot|PetalBot/i,
   experimental: {
     // Tree-shake icon imports (295 import sites across 232 files).
     optimizePackageImports: ["react-icons"],

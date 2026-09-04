@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { logger } from "@/utils/devLogger";
 import Link from "next/link";
 import Image from "next/image";
+import { toBackupHost } from "@/utils/blogImageFallback";
 
 export default function BlogCard({
   blog,
@@ -15,6 +16,8 @@ export default function BlogCard({
 }) {
   const [imageLoading, setImageLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
+  const [imgSrc, setImgSrc] = useState(null);
+  const triedBackup = useRef(false);
 
   // Safety check for blog data
   if (!blog || typeof blog !== "object") {
@@ -97,6 +100,19 @@ export default function BlogCard({
       media.media_details?.sizes?.medium?.source_url ||
       media.media_details?.sizes?.large?.source_url;
   }
+  // Load from the original host first; swap to the backup host only on error.
+  const displaySrc = imgSrc || featuredImage;
+
+  const handleImageError = () => {
+    setImageLoading(false);
+    const backup = toBackupHost(displaySrc);
+    if (!triedBackup.current && backup && backup !== displaySrc) {
+      triedBackup.current = true;
+      setImgSrc(backup);
+      return;
+    }
+    setImageError(true);
+  };
 
   // Remove HTML tags from excerpt for clean display
   const cleanExcerpt = excerpt.replace(/<[^>]*>/g, "").trim();
@@ -119,17 +135,15 @@ export default function BlogCard({
           )}
 
           <Image
-            src={featuredImage}
+            src={displaySrc}
             alt={title}
             fill
+            unoptimized
             className={`object-cover rounded-2xl transition-opacity duration-300 ${
               imageLoading ? "opacity-0" : "opacity-100"
             }`}
             onLoad={() => setImageLoading(false)}
-            onError={() => {
-              setImageLoading(false);
-              setImageError(true);
-            }}
+            onError={handleImageError}
             priority={variant === "featured"}
           />
         </div>

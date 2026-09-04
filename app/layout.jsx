@@ -21,7 +21,7 @@ import GeoRedirectPopup from "@/components/Popups/GeoRedirectPopup";
 // import ZendeskWidget from "@/components/Layout/ZendeskWidget";
 import MetaCookieInitializer from "@/components/Layout/MetaCookieInitializer";
 import FBPixelLoader from "@/components/FBPixelLoader";
-import InactivityTimeoutHandler from "@/components/InactivityTimeoutHandler";
+import InactivityTimeoutGate from "@/components/InactivityTimeoutGate";
 import { Suspense } from "react";
 import { SITE, ogImageUrl } from "@/lib/seo/metadata";
 import JsonLd from "@/components/seo/JsonLd";
@@ -215,31 +215,47 @@ export default function RootLayout({ children }) {
           content="uvvbdeqdbj046v74x0oqaxhl9tyq26"
         />
         {/* End Facebooc Domain Verification */}
-        {/* Start Convert Experiences — async load.
-            Inline anti-flicker hides body for up to 500ms while Convert downloads,
-            so the page reveals fast even when Convert is slow. */}
-        <Script id="convert-anti-flicker" strategy="beforeInteractive">
+        {/* Start Convert Experiences — session-aware bootstrap.
+            Anti-flicker runs only on the first full-page load per tab session so
+            funnel pages after a hard reload do not flash hidden content. Convert's
+            visitor cookie (_conv_v) carries stable assignment across reloads;
+            client-side navigation (router.push) keeps the script loaded once.
+            Verify in Convert dashboard that bucketing uses the visitor cookie. */}
+        <Script id="convert-bootstrap" strategy="beforeInteractive">
           {`
-            (function(){
-              var s=document.createElement('style');
-              s.id='__convert-anti-flicker';
-              s.appendChild(document.createTextNode('body{opacity:0!important}'));
-              (document.head||document.documentElement).appendChild(s);
-              function clear(){
-                var n=document.getElementById('__convert-anti-flicker');
-                if(n&&n.parentNode)n.parentNode.removeChild(n);
+            (function(w,d){
+              var KEY='rocky_convert_bootstrapped';
+              var SRC='https://cdn-4.convertexperiments.com/v1/js/10045956-10046753.js?environment=production';
+              w._conv_q=w._conv_q||[];
+              var bootstrapped=false;
+              try{bootstrapped=!!w.sessionStorage.getItem(KEY);}catch(e){}
+              if(bootstrapped){
+                w._conv_prevent_bodyhide=true;
+              }else{
+                var s=d.createElement('style');
+                s.id='__convert-anti-flicker';
+                s.appendChild(d.createTextNode('body{opacity:0!important}'));
+                (d.head||d.documentElement).appendChild(s);
+                function clear(){
+                  var n=d.getElementById('__convert-anti-flicker');
+                  if(n&&n.parentNode)n.parentNode.removeChild(n);
+                }
+                setTimeout(clear,500);
+                w.__convertClearAntiFlicker=clear;
               }
-              setTimeout(clear,500);
-              window.__convertClearAntiFlicker=clear;
-            })();
+              if(d.getElementById('convert-experiences'))return;
+              var sc=d.createElement('script');
+              sc.id='convert-experiences';
+              sc.async=true;
+              sc.src=SRC;
+              sc.onload=function(){
+                try{w.sessionStorage.setItem(KEY,'1');}catch(e){}
+                if(w.__convertClearAntiFlicker)w.__convertClearAntiFlicker();
+              };
+              (d.head||d.documentElement).appendChild(sc);
+            })(window,document);
           `}
         </Script>
-        <Script
-          id="convert-experiences"
-          strategy="beforeInteractive"
-          async
-          src="https://cdn-4.convertexperiments.com/v1/js/10045956-10046753.js?environment=production"
-        />
         {/* End Convert Experiences */}
         {/* TikTok Pixel — code owns ttq.load() + PageView (same pattern as
             FBPixelLoader for Meta). SDK loads after first interaction; idle
@@ -312,7 +328,9 @@ export default function RootLayout({ children }) {
             injected the 258 KB Google Identity Services script on every page.
             The GSI script is now lazy-loaded by GoogleSignInButton when an
             auth surface mounts. Nothing here consumed the OAuth context. */}
-        <InactivityTimeoutHandler />
+        {/* TK-429: gated — mounts only for authenticated users so guests skip
+            the activity listeners, polling interval, and modal chunk */}
+        <InactivityTimeoutGate />
         <Navbar className="navbar-main" />
         <ClientLayoutProvider>{children}</ClientLayoutProvider>
         <Footer className="footer-main" />

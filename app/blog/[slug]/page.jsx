@@ -18,6 +18,12 @@ import RelatedArticles from "@/components/Article/RelatedArticles";
 // Body is now rendered on the server so crawlers get the full article.
 export const revalidate = 300;
 
+// Opt the route into ISR without prebuilding any post at build time.
+// Every post renders on first request, then caches per `revalidate`.
+export function generateStaticParams() {
+  return [];
+}
+
 const DEFAULT_FEATURED_IMAGE =
   "https://www.shutterstock.com/image-vector/default-ui-image-placeholder-wireframes-600nw-1037719192.jpg";
 

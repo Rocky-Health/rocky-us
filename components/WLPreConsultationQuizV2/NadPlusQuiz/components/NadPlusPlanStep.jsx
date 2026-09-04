@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/Loader";
@@ -26,7 +26,13 @@ const NadPlusPlanStep = ({ onContinue }) => {
   const [showLoader, setShowLoader] = useState(true);
   const router = useRouter();
 
+  // TK-525: prefetch /checkout once. `router` identity can change after mount
+  // (route/searchParam updates), which re-ran this effect and fired a second
+  // RSC prefetch with a new _rsc id. The ref guards a single invocation.
+  const checkoutPrefetchedRef = useRef(false);
   useEffect(() => {
+    if (checkoutPrefetchedRef.current) return;
+    checkoutPrefetchedRef.current = true;
     router.prefetch("/checkout");
   }, [router]);
 
@@ -98,6 +104,7 @@ const NadPlusPlanStep = ({ onContinue }) => {
                 src={NAD_PLUS_PRODUCT.image}
                 alt="NAD+ injection vial"
                 fill
+                sizes="120px"
                 className="object-contain"
               />
             </div>

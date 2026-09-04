@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { logger } from "@/utils/devLogger";
 import { api as wooApi } from "@/lib/woocommerce";
+import { NB_WRITE_CONTEXT } from "@/lib/northbeam/writeContext";
 
 /**
  * Automatic Northbeam Order Retry Cron Job
@@ -61,12 +62,16 @@ export async function POST(req) {
     const maxOrdersToRetry = parseInt(process.env.NB_RETRY_MAX_ORDERS) || 50; // Safety limit
     const afterDate = new Date(Date.now() - lookbackMinutes * 60 * 1000);
 
-    logger.log(`[NB Auto-Retry] Looking for orders after ${afterDate.toISOString()}`);
+    logger.log(`[NB Auto-Retry] Looking for orders modified after ${afterDate.toISOString()}`);
 
-    // Query WooCommerce for recent orders
-    // Filter for orders that should be tracked in Northbeam
+    // Query WooCommerce for recently modified orders. Filtering on creation
+    // date missed a failed-payment order that customer service recovers
+    // manually, since that recovery usually lands outside the lookback window
+    // measured from when the order was first created. Filtering on
+    // modification date catches the recovery regardless of when the order
+    // was created.
     const { data: orders } = await wooApi.get("orders", {
-      after: afterDate.toISOString(),
+      modified_after: afterDate.toISOString(),
       status: ["processing", "completed"], // Only retry orders we care about
       per_page: maxOrdersToRetry,
       orderby: "date",
@@ -104,14 +109,26 @@ export async function POST(req) {
     
     logger.log(`[NB Auto-Retry] Calling backfill endpoint with ${orderIds.length} orders`);
     
+    // The backfill endpoint now requires the shared sync secret. Without this
+    // header the cron would start receiving 401s the moment TK-1024 deploys.
+    const backfillHeaders = { "Content-Type": "application/json" };
+    if (process.env.NORTHBEAM_SYNC_API_KEY) {
+      backfillHeaders["X-API-Key"] = process.env.NORTHBEAM_SYNC_API_KEY;
+    } else {
+      logger.error(
+        "[NB Auto-Retry] NORTHBEAM_SYNC_API_KEY not configured, the backfill call will be rejected"
+      );
+    }
+
     const backfillResponse = await fetch(backfillUrl, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: backfillHeaders,
       body: JSON.stringify({
         order_ids: orderIds,
         dry_run: false,
+        // These orders had a pixel fire and failed their live send, so the
+        // recovered write still needs the guard, not the historical default.
+        write_context: NB_WRITE_CONTEXT.LIVE_PURCHASE,
       }),
     });
 

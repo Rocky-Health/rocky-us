@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server";
+import { normalizeOrderId } from "@/lib/northbeam/orderId";
+import { resolveOrderTimeIso } from "@/lib/northbeam/orderTime";
+import { normalizeWriteContext } from "@/lib/northbeam/writeContext";
 import { logger } from "@/utils/devLogger";
 import { api as wooApi } from "@/lib/woocommerce";
+import { requireSyncApiKey } from "@/lib/northbeam/syncAuth";
+import {
+  checkIfAlreadySynced,
+  isSubscriptionDerivative,
+} from "@/lib/northbeam/orderGuards";
 
 /**
  * Convert 2-letter country code to 3-letter ISO 3166-1 alpha-3 code
@@ -71,9 +79,18 @@ const convertToISO3166Alpha3 = (countryCode) => {
  */
 export async function POST(req) {
   try {
+    const unauthorized = requireSyncApiKey(req, "NB Backfill", logger);
+    if (unauthorized) return unauthorized;
+
     const body = await req.json().catch(() => ({}));
     const ids = Array.isArray(body?.order_ids) ? body.order_ids : [];
     const dryRun = Boolean(body?.dry_run);
+    // Threaded through explicitly rather than guessed. auto-retry recovers
+    // orders whose live send already failed after a pixel had fired, so it
+    // declares live_purchase; anything else defaults to historical, which
+    // normalizeWriteContext already guarantees for an absent or unrecognised
+    // value.
+    const writeContext = normalizeWriteContext(body?.write_context);
     // Pass-through debug echo controls to internal NB orders route (URL param only)
     const debugParam = req.nextUrl?.searchParams?.get("debug") === "1";
 
@@ -178,11 +195,18 @@ export async function POST(req) {
       }
 
       return {
-        order_id: String(order?.id),
+        // Northbeam dedupes on order_id, so a non primary key here becomes a
+    // separate record for the same purchase. String(order?.id) on a
+    // missing id yields the string "undefined", which survives a
+    // truthiness check downstream, so normalize explicitly.
+    order_id: normalizeOrderId(order?.id),
         // Provide canonical id for parity with pixel and to override on server
         customer_id: canonicalCustomerId || String(order?.customer_id || email || ""),
         customer_id_canonical: canonicalCustomerId || String(order?.customer_id || email || ""),
-        time_of_purchase: new Date(timeCandidate || order?.date_created || Date.now()).toISOString(),
+        // timeCandidate already prefers the _gmt fields; resolveOrderTimeIso pins
+    // them to UTC and drops the bare date_created tail, which carried no
+    // offset and so resolved against the runtime's own timezone.
+    time_of_purchase: resolveOrderTimeIso(order) || new Date(timeCandidate || Date.now()).toISOString(),
         currency: order?.currency || "USD",
         purchase_total: purchaseTotal,
         tax,
@@ -198,6 +222,7 @@ export async function POST(req) {
         is_recurring_order: Boolean(order?.is_recurring_order),
         order_tags: [getStatusTag(status), lifecycle],
         products,
+        nb_write_context: writeContext,
         ...(shippingAddress ? { customer_shipping_address: shippingAddress } : {}),
       };
     };
@@ -227,6 +252,31 @@ export async function POST(req) {
         const { data: order } = await wooApi.get(`orders/${id}`);
         if (!order?.id) {
           results.push({ id, status: "not_found" });
+          continue;
+        }
+
+        // 1a) Never backfill subscription renewals, resubscribes or switches.
+        // The integration only sends parent purchases, so pushing these would
+        // invent orders Northbeam has never seen from the live path.
+        if (isSubscriptionDerivative(order)) {
+          logger.log("[NB Backfill] Skipping subscription-derived order", id);
+          results.push({ id, status: "skipped", reason: "subscription_renewal" });
+          continue;
+        }
+
+        // 1b) Never re-push an order that is already in Northbeam. A re-push
+        // overwrites the stored record and wipes its marketing source tags.
+        const syncStatus = checkIfAlreadySynced(order);
+        if (syncStatus.synced) {
+          logger.log("[NB Backfill] Skipping already-synced order", id, syncStatus.handled_by_relay ? "(relay)" : "(backfill)");
+          results.push({
+            id,
+            status: "skipped",
+            reason: syncStatus.handled_by_relay
+              ? "already_sent_by_relay"
+              : "already_backfilled",
+            synced_at: syncStatus.synced_at,
+          });
           continue;
         }
 

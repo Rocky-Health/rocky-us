@@ -65,6 +65,7 @@ const BeforeAfterStrip = () => (
                   className="object-cover"
                   sizes="90px"
                   unoptimized
+                  priority
                 />
               </div>
               <p className="text-center text-[11px] text-[#888] font-medium">
@@ -80,6 +81,7 @@ const BeforeAfterStrip = () => (
                   className="object-cover"
                   sizes="90px"
                   unoptimized
+                  priority
                 />
               </div>
               <p className="text-center text-[11px] text-[#888] font-medium">
@@ -188,6 +190,7 @@ const GLP1HeroSection = ({ ctaHref = "#", hideProudPartner = false }) => {
               section={true}
               bg="bg-[#F4F3EF] mx-auto"
               hideMapleLeaf={true}
+              priority
             />
           </div>
         </div>

@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
+import { normalizeOrderId } from "@/lib/northbeam/orderId";
+import { resolveOrderTimeIso } from "@/lib/northbeam/orderTime";
+import { NB_WRITE_CONTEXT } from "@/lib/northbeam/writeContext";
 import { logger } from "@/utils/devLogger";
 import { api as wooApi } from "@/lib/woocommerce";
+import { requireSyncApiKey } from "@/lib/northbeam/syncAuth";
 
 /**
  * POST /api/northbeam/backfill-auto
@@ -158,10 +162,17 @@ const mapWooToNorthbeamOrder = (order) => {
   }
 
   return {
-    order_id: String(order?.id),
+    // Northbeam dedupes on order_id, so a non primary key here becomes a
+    // separate record for the same purchase. String(order?.id) on a
+    // missing id yields the string "undefined", which survives a
+    // truthiness check downstream, so normalize explicitly.
+    order_id: normalizeOrderId(order?.id),
     customer_id: canonicalCustomerId || String(order?.customer_id || email || ""),
     customer_id_canonical: canonicalCustomerId || String(order?.customer_id || email || ""),
-    time_of_purchase: new Date(timeCandidate || order?.date_created || Date.now()).toISOString(),
+    // timeCandidate already prefers the _gmt fields; resolveOrderTimeIso pins
+    // them to UTC and drops the bare date_created tail, which carried no
+    // offset and so resolved against the runtime's own timezone.
+    time_of_purchase: resolveOrderTimeIso(order) || new Date(timeCandidate || Date.now()).toISOString(),
     currency: order?.currency || "USD",
     purchase_total: purchaseTotal,
     tax,
@@ -177,6 +188,7 @@ const mapWooToNorthbeamOrder = (order) => {
     is_recurring_order: Boolean(order?.is_recurring_order),
     order_tags: [getStatusTag(status), lifecycle],
     products,
+    nb_write_context: NB_WRITE_CONTEXT.HISTORICAL_BACKFILL,
     ...(shippingAddress ? { customer_shipping_address: shippingAddress } : {}),
   };
 };
@@ -185,6 +197,9 @@ export async function POST(req) {
   const startTime = Date.now();
   
   try {
+    const unauthorized = requireSyncApiKey(req, "NB Backfill Auto", logger);
+    if (unauthorized) return unauthorized;
+
     const body = await req.json().catch(() => ({}));
     const ids = Array.isArray(body?.order_ids) ? body.order_ids : [];
     const batchId = body?.batch_id || `batch_${Date.now()}`;

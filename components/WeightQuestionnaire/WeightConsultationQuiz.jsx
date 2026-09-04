@@ -16,7 +16,15 @@ import BMICalculatorStep from "../WLPreConsultationQuiz/steps/BMICalculatorStep"
 import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
 import { useQuizSequence } from "@/lib/questionnaire/useQuizSequence";
 import QuestionnaireIntermission from "@/components/OrderReceived/QuestionnaireIntermission";
+import { toast } from "react-toastify";
+import {
+  getPrefillStorageKey,
+  mapCrmResponseToFormData,
+} from "@/lib/questionnairePrefillConfig";
+import Loader from "../Loader";
+import { getQuizUserInfoError } from "@/utils/quizUserValidation";
 
+const WL_PREFILL_KEY = getPrefillStorageKey("/wl-consultation");
 const SINGLE_CHOICE_PAGES = [1, 2, 3, 7, 10, 11, 12, 14];
 
 export default function WeightLossConsultationQuiz({
@@ -57,7 +65,7 @@ export default function WeightLossConsultationQuiz({
       source_site: process.env.NEXT_PUBLIC_SITE_URL || "https://www.myrocky.com",
       "130_3": fname || "",
       "130_6": lname || "",
-      131: userEmail || "@w3mg.in",
+      131: userEmail || "",
       132: pn || "",
       158: dob || "",
       "161_4": province || "",
@@ -269,10 +277,191 @@ export default function WeightLossConsultationQuiz({
     useState(false);
   const [formData, setFormData] = useState(getInitialFormData());
   const [isClient, setIsClient] = useState(false);
+  const [isLoadingQuestionnairePrefill, setIsLoadingQuestionnairePrefill] =
+    useState(false);
+  const [questionnairePrefillLoaded, setQuestionnairePrefillLoaded] =
+    useState(false);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  // First unanswered question, following this quiz's branching:
+  // 601 Yes skips 602/603, 602 Yes skips 603 (both land on 604),
+  // and answering 603 skips page 4.
+  const getTargetPageFromPrefill = (data) => {
+    if (!data["601"]) return 1;
+    if (data["601"] !== "Yes") {
+      if (!data["602"]) return 2;
+      if (data["602"] !== "Yes" && !data["603"]) return 3;
+    }
+    if (data["601"] === "Yes" || data["602"] === "Yes") {
+      const has604 = [
+        "604_1",
+        "604_2",
+        "604_3",
+        "604_4",
+        "604_5",
+        "604_6",
+      ].some((k) => data[k]);
+      if (!has604) return 4;
+    }
+    if (!data["617"] && !data["l-617_1-textarea"]) return 5;
+    const has605 = [
+      "605_1",
+      "605_2",
+      "605_3",
+      "605_4",
+      "605_5",
+      "605_6",
+      "605_7",
+    ].some((k) => data[k]);
+    if (!has605) return 6;
+    if (!data["606"]) return 7;
+    const has607 = [
+      "607_1",
+      "607_2",
+      "607_3",
+      "607_4",
+      "607_5",
+      "607_6",
+    ].some((k) => data[k]);
+    if (!has607) return 8;
+    const has608 = [
+      "608_1",
+      "608_2",
+      "608_3",
+      "608_4",
+      "608_5",
+      "608_6",
+      "608_7",
+      "608_8",
+      "608_9",
+      "608_11",
+    ].some((k) => data[k]);
+    if (!has608) return 9;
+    if (!data["609"]) return 10;
+    if (!data["610"]) return 11;
+    if (!data["611"]) return 12;
+    const has612 = ["612_1", "612_2", "612_3", "612_4"].some((k) => data[k]);
+    if (!has612) return 13;
+    if (!data["620"]) return 14;
+    const has613 = Array.from({ length: 12 }, (_, i) => `613_${i + 1}`).some(
+      (k) => data[k],
+    );
+    if (!has613) return 15;
+    const has621 = ["621_1", "621_2", "621_3", "621_4"].some((k) => data[k]);
+    if (!has621) return 16;
+    const has622 = ["622_1", "622_2", "622_3", "622_4"].some((k) => data[k]);
+    if (!has622) return 17;
+    const has624 = [
+      "624_1",
+      "624_2",
+      "624_3",
+      "624_4",
+      "624_5",
+      "624_6",
+    ].some((k) => data[k]);
+    if (!has624) return 18;
+    const has623 = ["623_1", "623_2", "623_3", "623_4"].some((k) => data[k]);
+    if (!has623) return 19;
+    if (!data["614"]) return 20;
+    const has615 = ["615_1", "615_2", "615_3", "615_4", "615_5"].some(
+      (k) => data[k],
+    );
+    if (!has615) return 21;
+    if (!data["616"]) return 22;
+    return 23;
+  };
+
+  useEffect(() => {
+    if (!isClient || questionnairePrefillLoaded) return;
+    const searchParams = new URLSearchParams(window.location.search);
+    const id = searchParams.get("id");
+    const token = searchParams.get("token");
+    const patientToken = searchParams.get("patient-token");
+    // Portal recovery link arrived with patient-token but is missing id/token.
+    // Without this guard we'd silently start a fresh quiz, which creates a new
+    // CRM entry and orphans the original record.
+    if (patientToken && (!id || !token)) {
+      toast.error(
+        "This recovery link is incomplete. Please request a new link from your account.",
+      );
+      return;
+    }
+    if (!id || !token || !patientToken) return;
+
+    const loadPrefill = async () => {
+      setIsLoadingQuestionnairePrefill(true);
+      try {
+        let answersData = null;
+        const cached = localStorage.getItem(WL_PREFILL_KEY);
+        if (cached) {
+          try {
+            const { id: cachedId, data } = JSON.parse(cached);
+            if (cachedId === id && data?.data) {
+              answersData = data.data;
+              logger.log(
+                "[WeightConsultationQuiz] Using cached questionnaire-filled-answers",
+              );
+            }
+          } catch {}
+        }
+        if (!answersData) {
+          const res = await fetch("/api/questionnaire-filled-answers", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              wp_entry_id: id,
+              token,
+              patient_token: patientToken,
+            }),
+          });
+          const data = await res.json();
+          logger.log("[WeightConsultationQuiz] questionnaire-filled-answers:", {
+            status: res.status,
+            data,
+          });
+          if (data?.data) {
+            answersData = data.data;
+            localStorage.setItem(
+              WL_PREFILL_KEY,
+              JSON.stringify({ id, token, data }),
+            );
+          }
+        }
+        if (answersData) {
+          const mapped = mapCrmResponseToFormData(answersData);
+          const merged = { ...formData, id, token, ...mapped };
+          const targetPage = getTargetPageFromPrefill(merged);
+          setFormData({
+            ...merged,
+            page_step: targetPage,
+            _ui: { currentPage: targetPage },
+          });
+          setCurrentPage(targetPage);
+          setProgress(Math.max(0, Math.ceil((targetPage / 26) * 100)));
+          const ttl = Date.now() + 60 * 60 * 1000;
+          const dataToSave = {
+            ...merged,
+            page_step: targetPage,
+            _ui: { currentPage: targetPage },
+          };
+          localStorage.setItem("wl-quiz-form", JSON.stringify(dataToSave));
+          localStorage.setItem("wl-quiz-form-expiry", ttl.toString());
+        }
+      } catch (err) {
+        logger.error(
+          "[WeightConsultationQuiz] questionnaire-filled-answers error:",
+          err,
+        );
+      } finally {
+        setIsLoadingQuestionnairePrefill(false);
+        setQuestionnairePrefillLoaded(true);
+      }
+    };
+    loadPrefill();
+  }, [isClient, questionnairePrefillLoaded]);
 
   const slideVariants = {
     hiddenRight: { x: "100%", opacity: 0 },
@@ -571,6 +760,17 @@ export default function WeightLossConsultationQuiz({
 
   useEffect(() => {
     const initializeForm = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlId = urlParams.get("id");
+      const urlToken = urlParams.get("token");
+      const patientToken = urlParams.get("patient-token");
+      // Portal prefill owns initialization while a complete recovery link is
+      // present. Re-runs once the prefill effect finishes. Incomplete links
+      // (missing id/token) fall through so the quiz still boots normally.
+      if (urlId && urlToken && patientToken && !questionnairePrefillLoaded) {
+        return;
+      }
+
       try {
         const storedData = readLocalStorage();
         let storedQuizData = null;
@@ -835,7 +1035,7 @@ export default function WeightLossConsultationQuiz({
     } catch (error) {
       logger.error("Error loading weight data:", error);
     }
-  }, []);
+  }, [questionnairePrefillLoaded]);
 
   useEffect(() => {
     const handleBeforeUnload = (e) => {
@@ -2586,6 +2786,16 @@ export default function WeightLossConsultationQuiz({
   };
 
   const verifyCustomerAndProceed = async () => {
+    const userInfoError = getQuizUserInfoError(formData);
+    if (userInfoError) {
+      const errorBox = formRef.current?.querySelector(".error-box");
+      if (errorBox) {
+        errorBox.classList.remove("hidden");
+        errorBox.textContent = userInfoError;
+      }
+      return;
+    }
+
     if (formData["196"] && !photoIdFile) {
       const updatedData = updateFormDataAndStorage({
         page_step: currentPage + 1,
@@ -3118,6 +3328,13 @@ export default function WeightLossConsultationQuiz({
       filteredData.eatingDisorderDiagnosis =
         storedAttributes.eatingDisorderDiagnosis;
     }
+
+    // User info lives in formData from cookies but the page maps skip it; send it explicitly
+    ["130_3", "130_6", "131", "132", "158", "161_4"].forEach((key) => {
+      if (formData[key]) {
+        filteredData[key] = formData[key];
+      }
+    });
 
     return filteredData;
   };
@@ -4005,6 +4222,11 @@ export default function WeightLossConsultationQuiz({
       }
     });
   }, []);
+
+  if (isLoadingQuestionnairePrefill) {
+    return <Loader />;
+  }
+
   return (
     <div
       className="flex flex-col min-h-screen bg-white subheaders-font font-medium"
@@ -4094,27 +4316,27 @@ export default function WeightLossConsultationQuiz({
                     <input
                       type="hidden"
                       name="130_3"
-                      value={formData["130_3"] || "Omkar"}
+                      value={formData["130_3"] || ""}
                     />
                     <input
                       type="hidden"
                       name="130_6"
-                      value={formData["130_6"] || "Test"}
+                      value={formData["130_6"] || ""}
                     />
                     <input
                       type="hidden"
                       name="131"
-                      value={formData["131"] || "omkar@w3mg.in"}
+                      value={formData["131"] || ""}
                     />
                     <input
                       type="hidden"
                       name="132"
-                      value={formData["132"] || "(000) 000-0000"}
+                      value={formData["132"] || ""}
                     />
                     <input
                       type="hidden"
                       name="158"
-                      value={formData["158"] || "2000-01-01"}
+                      value={formData["158"] || ""}
                     />
                     <input
                       type="hidden"

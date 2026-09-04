@@ -48,7 +48,7 @@ const Categories = () => {
   return (
     <div className="mx-auto text-center poppins-font">
       <h2 className="text-[40px] lg:text-[60px] leading-[46px] lg:leading-[69px]  tracking-[-0.01em] lg:tracking-[-0.02em] text-[#000000] headers-font">
-        Men's Healthcare,
+        Virtual Healthcare,
       </h2>
       <h2 className="font-[500] text-[30px] lg:text-[40px] leading-[42px] lg:leading-[56px]">
         made easy, quick & discreet

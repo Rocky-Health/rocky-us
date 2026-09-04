@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { logger } from "@/utils/devLogger";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/Loader";
@@ -145,7 +145,13 @@ const Glp2TreatmentAndPlanStep = ({
     setSelectedPlan(defaultPlan);
   }, [planValues, selectedProduct]);
 
+  // TK-525: prefetch /checkout once. `router` identity can change after mount
+  // (route/searchParam updates), which re-ran this effect and fired a second
+  // RSC prefetch with a new _rsc id. The ref guards a single invocation.
+  const checkoutPrefetchedRef = useRef(false);
   useEffect(() => {
+    if (checkoutPrefetchedRef.current) return;
+    checkoutPrefetchedRef.current = true;
     router.prefetch("/checkout");
   }, [router]);
 

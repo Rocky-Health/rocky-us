@@ -19,7 +19,7 @@ const PodcastsContent = () => {
             <StatisticCard
               value="10K+"
               title="Monthly Listeners"
-              description="Join a community of over 10,000 men tuning in every month."
+              description="Join a community of over 10,000 tuning in every month."
               className="mb-[200px] flex flex-col gap-2"
               valueClassName="text-[70px] headers-font font-[550px] text-[#AE7E56] mb-2"
               titleClassName="text-2xl font-medium"
@@ -46,7 +46,7 @@ const PodcastsContent = () => {
               <StatisticCard
                 value="10K+"
                 title="Monthly Listeners"
-                description="Join a community of over 10,000 men tuning in every month for valuable health insights and discussions"
+                description="Join a community of over 10,000 tuning in every month for valuable health insights and discussions"
                 className="flex flex-col flex-1 gap-1 md:hidden"
                 valueClassName="text-[40px] headers-font text-[#AE7E56]"
                 titleClassName="text-base font-medium"

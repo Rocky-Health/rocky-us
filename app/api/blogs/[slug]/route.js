@@ -83,7 +83,10 @@ export async function GET(req, { params }) {
     // Return the first (and should be only) blog post
     return new Response(JSON.stringify(blog.data[0]), {
       status: 200,
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+      },
     });
   } catch (error) {
     logger.error("API: Error fetching blog by slug:", error);

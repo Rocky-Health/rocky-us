@@ -10,9 +10,9 @@ import { buildMetadata } from "@/lib/seo/metadata";
 export const revalidate = 300;
 
 export const metadata = buildMetadata({
-  title: "MyRocky Blog — Men's Health Articles",
+  title: "MyRocky Blog — Personalized Health Articles",
   description:
-    "Evidence-based articles from MyRocky on ED, hair loss, weight management, mental health, skincare, and longevity — written for men.",
+    "Evidence-based articles from MyRocky on ED, hair loss, weight management, mental health, skincare, and longevity — written for Americans.",
   path: "/blog",
   caPath: "/blog",
   vertical: "blog",

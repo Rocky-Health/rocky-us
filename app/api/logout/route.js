@@ -76,8 +76,10 @@ export async function POST(req) {
       });
     }
 
-    // For regular form submissions, redirect
-    return NextResponse.redirect(new URL("/", req.nextUrl.origin));
+    // For regular form submissions, redirect. Use 303 so the browser replays
+    // the redirect as GET instead of POST (NextResponse.redirect defaults to
+    // 307, which preserves POST and caused a 405 on the homepage).
+    return NextResponse.redirect(new URL("/", req.nextUrl.origin), 303);
   } catch (error) {
     logger.error("Error logging out:", error.response?.data || error.message);
 

@@ -1,4 +1,6 @@
 import { logger } from "@/utils/devLogger";
+import { resolveOrderTimeIso } from "@/lib/northbeam/orderTime";
+import { NB_WRITE_CONTEXT } from "@/lib/northbeam/writeContext";
 import { toMoney } from "@/utils/priceFormatter";
 import { getNorthbeamSourceTags, getAttributionData } from "@/utils/sourceAttribution";
 
@@ -203,10 +205,14 @@ export const trackNorthbeamPurchase = async (
       logger.log("[Northbeam] Tracking purchase event for order:", order.id);
     }
 
-    // Prefer canonical overrides when provided
+    // Send the order's true UTC instant, not a candidate chain that can still
+    // carry a bare site-local Woo field. additionalData.time_of_purchase_iso
+    // used to take precedence here and shadowed resolveOrderTimeIso with
+    // exactly that kind of value. The route is the one place that posts to
+    // Northbeam, so it owns the pixel guard; this call deliberately does not
+    // pre-shift the timestamp itself.
     const canonicalTimeIso =
-      additionalData.time_of_purchase_iso ||
-      new Date(order.date_created || Date.now()).toISOString();
+      resolveOrderTimeIso(order) || new Date().toISOString();
     const customerIdOverride = additionalData.customer_id || null;
 
     // Get source attribution tags for Northbeam
@@ -238,6 +244,7 @@ export const trackNorthbeamPurchase = async (
           ),
           customer_id_canonical: String(customerIdOverride || ""),
           time_of_purchase: canonicalTimeIso, // Ensure proper ISO format
+          nb_write_context: NB_WRITE_CONTEXT.LIVE_PURCHASE,
           currency: order.currency || "USD",
           purchase_total: parseFloat(order.total) || 0, // Keep in dollars, not cents
           tax: parseFloat(order.total_tax) || 0, // Keep in dollars, not cents
@@ -382,7 +389,9 @@ export const formatNorthbeamOrderData = async (order) => {
   return {
     order_id: order.id.toString(),
     customer_id: String(order.customer_id || order.billing?.email || ""), // Ensure customer_id is a string
-    time_of_purchase: new Date(order.date_created || new Date()).toISOString(), // Ensure proper ISO format
+    // True UTC instant. See resolveOrderTimeIso for why date_created is not
+    // used directly here.
+    time_of_purchase: resolveOrderTimeIso(order) || new Date().toISOString(),
     currency: order.currency || "USD",
     purchase_total: parseFloat(order.total) || 0, // Keep in dollars, not cents
     tax: parseFloat(order.total_tax) || 0, // Keep in dollars, not cents
