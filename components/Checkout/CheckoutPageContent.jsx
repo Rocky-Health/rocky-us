@@ -57,7 +57,7 @@ import {
 } from "@/utils/metaQuestionnaireTracking";
 import StripeElementsPayment from "./StripeElementsPayment";
 import { Elements, useStripe } from "@stripe/react-stripe-js";
-import { getStripe } from "@/lib/stripe/stripeClient";
+import { useDeferredStripe } from "@/lib/stripe/stripeClient";
 import { useAddressManager } from "@/lib/hooks/useAddressManager";
 import { debugAddressData } from "@/utils/addressDebugger";
 import {
@@ -66,11 +66,15 @@ import {
   clearPendingCouponCode,
 } from "@/lib/hooks/useAutoApplyCoupon";
 
-// Shared singleton so Stripe.js (and shared-ffa.js) loads once app-wide.
-const stripePromise = getStripe();
-
 // Wrapper component to provide Stripe context
 const CheckoutPageWrapper = () => {
+  // TK-506: Stripe.js (which pulls in Google Pay and hCaptcha) stays unloaded
+  // until the user REACHES the payment section (scrolls it into view, or
+  // engages it directly when it is visible at load). Elements accepts
+  // stripe={null} and upgrades once the shared promise arrives, so nothing
+  // below needs to change. paymentRegionRef is attached in CartAndPayment.
+  const { stripePromise, paymentRegionRef } = useDeferredStripe();
+
   // Amount (in cents) advertised to Stripe Elements. This drives the total
   // shown in the Apple Pay / Google Pay wallet sheets, so it must reflect the
   // real cart total. It starts as a placeholder and is updated by
@@ -92,12 +96,15 @@ const CheckoutPageWrapper = () => {
         paymentMethodTypes: ["card"],
       }}
     >
-      <CheckoutPageContent onStripeAmountChange={setStripeAmount} />
+      <CheckoutPageContent
+        onStripeAmountChange={setStripeAmount}
+        paymentRegionRef={paymentRegionRef}
+      />
     </Elements>
   );
 };
 
-const CheckoutPageContent = ({ onStripeAmountChange }) => {
+const CheckoutPageContent = ({ onStripeAmountChange, paymentRegionRef }) => {
   const stripe = useStripe(); // Get the Stripe instance from context
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -3278,6 +3285,7 @@ const CheckoutPageContent = ({ onStripeAmountChange }) => {
     onStripeReady: setStripeElements,
     onWalletClick: handleExpressWalletClick,
     onWalletConfirm: handleExpressWalletConfirm,
+    paymentRegionRef,
   };
 
   return (
