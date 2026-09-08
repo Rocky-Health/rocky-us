@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 import RadioQuestion from "../../components/RadioQuestion";
 import CheckboxQuestion from "../../components/CheckboxQuestion";
 import RadioTextQuestion from "../../components/RadioTextQuestion";
@@ -702,7 +703,7 @@ const Glp2GenericQuestionStep = ({
               } ${stepConfig.titleCenter ? "text-center mb-6" : ""} font-medium leading-[120%] `}
             >
               {typeof stepTitle === "string" && /<[^>]+>/.test(stepTitle) ? (
-                <span dangerouslySetInnerHTML={{ __html: stepTitle }} />
+                <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(stepTitle) }} />
               ) : (
                 stepTitle
               )}
@@ -717,7 +718,7 @@ const Glp2GenericQuestionStep = ({
             /<[^>]+>/.test(stepConfig.subtitle) ? (
               <p
                 className="text-[14px] text-[#AE7E56] mb-[24px] md:w-full font-medium"
-                dangerouslySetInnerHTML={{ __html: stepConfig.subtitle }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(stepConfig.subtitle) }}
               />
             ) : (
               <p className="text-[14px] text-[#AE7E56] mb-[24px] md:w-full font-medium">

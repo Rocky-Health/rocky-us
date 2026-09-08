@@ -3,6 +3,7 @@
 import CustomImage from "@/components/utils/CustomImage";
 import { useState } from "react";
 import { DM_OFFERS_FAQ_ITEMS } from "./dmOffersFaqData";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 const AVATAR_BACKGROUNDS = [
     "from-rose-100 to-amber-100",
@@ -91,7 +92,7 @@ function FaqRow({ item, index }) {
                             <div
                                 className="faq-answer max-w-none text-start font-poppins text-sm leading-relaxed text-neutral-600 md:text-[15px] [&_strong]:font-semibold [&_strong]:text-neutral-800 [&_ol]:mb-3 [&_ol]:ml-6 [&_ol]:list-decimal [&_ol]:space-y-2 [&_ul]:mb-3 [&_ul]:ml-6 [&_ul]:list-disc [&_ul]:space-y-2 [&_li]:leading-relaxed [&_p]:mb-3 [&_p:last-child]:mb-0 [&_a]:font-medium [&_a]:text-sky-800 [&_a]:underline [&_a]:hover:text-sky-900 [&_u]:underline [&_h4]:mt-4 [&_h4]:font-semibold [&_h4]:text-neutral-900"
                                 dangerouslySetInnerHTML={{
-                                    __html: item.answer,
+                                    __html: sanitizeHtml(item.answer),
                                 }}
                             />
                         </div>

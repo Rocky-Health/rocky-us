@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import QuestionnaireNavbar from "../../components/QuestionnaireNavbar";
 import { isAuthenticated } from "@/lib/cart/cartService";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 // Separate GenericPopup component for BO2/BO3 simplified flow
 // This is completely independent from the default WL flow GenericPopup
@@ -239,9 +240,10 @@ const GenericPopup = ({
                                     <div
                                         className="w-full text-left headers-font text-base leading-[155%] text-[#251F20]"
                                         dangerouslySetInnerHTML={{
-                                            __html:
+                                            __html: sanitizeHtml(
                                                 popupConfig.disqualificationFooterHtml ||
-                                                "",
+                                                    "",
+                                            ),
                                         }}
                                     />
                                     {popupConfig.buttons && (
@@ -317,7 +319,9 @@ const GenericPopup = ({
                                                 {popupConfig.titleIsHtml ? (
                                                     <span
                                                         dangerouslySetInnerHTML={{
-                                                            __html: popupConfig.title,
+                                                            __html: sanitizeHtml(
+                                                                popupConfig.title,
+                                                            ),
                                                         }}
                                                     />
                                                 ) : (
@@ -378,7 +382,9 @@ const GenericPopup = ({
                                                                     : ""
                                                             }
                                                             dangerouslySetInnerHTML={{
-                                                                __html: line,
+                                                                __html: sanitizeHtml(
+                                                                    line,
+                                                                ),
                                                             }}
                                                         />
                                                     ))}
@@ -391,7 +397,9 @@ const GenericPopup = ({
                                             "string" ? (
                                                 <div
                                                     dangerouslySetInnerHTML={{
-                                                        __html: popupConfig.content,
+                                                        __html: sanitizeHtml(
+                                                            popupConfig.content,
+                                                        ),
                                                     }}
                                                 />
                                             ) : (
