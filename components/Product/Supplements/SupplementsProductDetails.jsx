@@ -8,6 +8,7 @@ import CollapsibleDiv from "@/components/Supplements/CollapsibleDiv";
 import { useAddItemToCart } from "@/lib/cart/cartHooks";
 import CartPopup from "@/components/Cart/CartPopup";
 import { formatPriceUI } from "@/utils/priceFormatter";
+import { toCartCents } from "@/utils/cartItemFormat";
 
 const SupplementsProductDetails = ({ product, variations, isLoading }) => {
     const addItemToCart = useAddItemToCart();
@@ -168,7 +169,8 @@ const SupplementsProductDetails = ({ product, variations, isLoading }) => {
                 productId: itemId,
                 quantity: 1,
                 name: product.name,
-                price: variationPrice,
+                // Cart stores prices in cents; variationPrice is in dollars — convert.
+                price: toCartCents(variationPrice),
                 image:
                     product.images?.[0]?.src ||
                     product.image ||

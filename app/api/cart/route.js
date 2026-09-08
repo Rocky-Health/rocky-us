@@ -16,8 +16,24 @@ export async function GET() {
 
       if (localCart) {
         try {
+          // The cookie value is URL-encoded on write (saveLocalCart) so that
+          // names with ";" or non-ASCII (e.g. "®") survive the round-trip.
+          // Fall back to the raw value for cookies written before that change.
+          let cookieValue = localCart.value;
+          try {
+            cookieValue = decodeURIComponent(localCart.value);
+          } catch (decodeError) {
+            cookieValue = localCart.value;
+          }
+
           // Try to parse the local cart data from the cookie
-          const parsedCart = JSON.parse(localCart.value);
+          let parsedCart;
+          try {
+            parsedCart = JSON.parse(cookieValue);
+          } catch (parseError) {
+            // Legacy cookies may not have been encoded; try the raw value.
+            parsedCart = JSON.parse(localCart.value);
+          }
           logger.log(
             "Retrieved local cart from cookie with items:",
             parsedCart.items?.length || 0
