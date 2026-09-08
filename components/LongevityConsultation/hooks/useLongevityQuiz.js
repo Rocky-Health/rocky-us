@@ -10,6 +10,7 @@ import {
     getNadPlusPreHandoff,
     clearNadPlusPreHandoff,
 } from "@/utils/nadPlusPreConsultationHandoff";
+import { toast } from "react-toastify";
 import { logger } from "@/utils/devLogger";
 import { isUserAuthenticated } from "@/utils/crossSellCheckout";
 import {
@@ -65,6 +66,36 @@ function isStepAnswered(step, answers) {
 }
 
 /**
+ * Does a restored answer represent a disqualifying selection that the live UI
+ * would gate with the eligibility popup? Mirrors LongevityQuestionStep's
+ * handleOptionSelect / handleCheckboxToggle logic (blockContinueOnValues, and a
+ * non-exclusive pick on a showPopupOnNonExclusiveSelect screening step). The
+ * popup only fires from those handlers, never on resume, so the resume walker
+ * must stop here instead of following navigation past the gate.
+ */
+function isBlockingAnswer(step, answers) {
+    if (!step?.field) return false;
+    const val = answers?.[step.field];
+    if (val === undefined || val === null || val === "") return false;
+
+    if (
+        step.type === "radio" &&
+        Array.isArray(step.blockContinueOnValues) &&
+        step.blockContinueOnValues.includes(val)
+    ) {
+        return true;
+    }
+
+    if (step.showPopupOnNonExclusiveSelect && step.exclusiveOptions?.length) {
+        const exclusive = step.exclusiveOptions;
+        const picks = Array.isArray(val) ? val : [val];
+        if (picks.some((v) => v && !exclusive.includes(v))) return true;
+    }
+
+    return false;
+}
+
+/**
  * First step the user still needs to answer, walking the navigation graph from
  * step 1. Used to drop a resumed portal visitor onto their next question rather
  * than restarting the quiz. Returns the ID-upload / completion step when every
@@ -78,6 +109,9 @@ function computeResumeStep(answers, quizConfig) {
         const cfg = quizConfig.steps?.[step];
         if (!cfg) break;
         if (!isStepAnswered(cfg, answers)) return step;
+        // A restored disqualifying answer must re-arrest the user on its gate
+        // rather than let the walker follow navigation past the eligibility stop.
+        if (isBlockingAnswer(cfg, answers)) return step;
         const next = resolveNavigationTarget(
             quizConfig.navigation?.[step],
             answers,
@@ -221,6 +255,15 @@ export function useLongevityQuiz(quizConfig) {
         const id = searchParams?.get("id") || "";
         const token = searchParams?.get("token") || "";
         const patientToken = searchParams?.get("patient-token") || "";
+        // Truncated recovery link (patient-token but no id/token): warn instead
+        // of silently starting a fresh quiz that would orphan the CRM entry.
+        if (patientToken && (!id || !token)) {
+            toast.error(
+                "This recovery link is incomplete. Please request a new link from your account.",
+            );
+            setPrefillLoaded(true);
+            return;
+        }
         if (!id || !token || !patientToken) return;
 
         let cancelled = false;
@@ -313,7 +356,13 @@ export function useLongevityQuiz(quizConfig) {
 
     const submitToServer = useCallback(
         async (isGoingToComplete, answersOverride = null) => {
-            if (!isUserAuthenticated()) {
+            // A patient-portal resume carries no authToken cookie but does carry
+            // the entry id/token; authorize the save on those too, matching the
+            // ED/WL/hair quizzes which never gate the submit on the cookie.
+            const hasPortalEntry = !!(
+                metaRef.current.id && metaRef.current.token
+            );
+            if (!isUserAuthenticated() && !hasPortalEntry) {
                 throw new Error("Please log in to continue.");
             }
 
@@ -422,7 +471,11 @@ export function useLongevityQuiz(quizConfig) {
     /** Screening risk hides Continue — persist choice so CRM still gets e.g. 1202_1: "Yes". */
     const persistScreeningRiskSelection = useCallback(
         async (answersSnapshot) => {
-            if (!isUserAuthenticated()) return;
+            if (
+                !isUserAuthenticated() &&
+                !(metaRef.current.id && metaRef.current.token)
+            )
+                return;
             setSubmitError(null);
             try {
                 await submitToServer(false, answersSnapshot);
