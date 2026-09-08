@@ -12,13 +12,13 @@ const QuizStepRenderer = ({
   setSelectedProduct,
   handleContinue,
   handleAction,
-  handlePlanStepCheckout,
 }) => {
   const stepConfig = boSimplifiedConfig.steps[currentStep];
 
-  // Steps 7 and 8 — combined "Select Treatment" + plan selection
-  // (replaces the original step 7 "Choose your treatment" recommendation +
-  // step 8 plan selection with the glp2 unified screen)
+  // Steps 7 and 8 — combined "Select Treatment" + plan selection.
+  // Uses Glp2TreatmentAndPlanStep with NO onContinue, so the component falls
+  // through to its built-in glp2 checkout (sends ?glp2-checkout=1 query param,
+  // base product ID — matches /glp2-pre-consultation behavior exactly).
   if (currentStep === 7 || currentStep === 8) {
     const recommendation = getProductRecommendation(
       userData,
@@ -31,7 +31,6 @@ const QuizStepRenderer = ({
         selectedProduct={selectedProduct}
         setSelectedProduct={setSelectedProduct}
         planOptionsByProduct={boSimplifiedConfig.planOptions}
-        onContinue={handlePlanStepCheckout}
       />
     );
   }
