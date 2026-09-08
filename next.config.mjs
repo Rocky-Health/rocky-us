@@ -20,7 +20,7 @@ const CSP_REPORT_ONLY = [
   "frame-ancestors 'self'",
   "upgrade-insecure-requests",
   // TK-792: without reporting directives a Report-Only CSP is a no-op. Both
-  // send violations to our collector: report-uri for current browsers,
+  // send violations to our collector: report-uri for current browsers,.
   // report-to (with the Reporting-Endpoints header below) for the newer API.
   "report-uri /api/csp-report",
   "report-to csp-endpoint",
