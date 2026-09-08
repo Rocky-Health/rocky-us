@@ -19,6 +19,11 @@ const CSP_REPORT_ONLY = [
   "form-action 'self'",
   "frame-ancestors 'self'",
   "upgrade-insecure-requests",
+  // TK-792: without reporting directives a Report-Only CSP is a no-op. Both
+  // send violations to our collector: report-uri for current browsers,
+  // report-to (with the Reporting-Endpoints header below) for the newer API.
+  "report-uri /api/csp-report",
+  "report-to csp-endpoint",
 ].join("; ");
 
 const SECURITY_HEADERS = [
@@ -26,6 +31,8 @@ const SECURITY_HEADERS = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "Content-Security-Policy-Report-Only", value: CSP_REPORT_ONLY },
+  // TK-792: names the endpoint used by the report-to CSP directive.
+  { key: "Reporting-Endpoints", value: 'csp-endpoint="/api/csp-report"' },
 ];
 
 /** @type {import('next').NextConfig} */
