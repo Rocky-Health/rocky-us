@@ -32,6 +32,7 @@ const CartAndPayment = ({
   onStripeReady, // NEW: Callback for Stripe Elements
   onWalletClick, // Express Checkout (Apple/Google Pay) gesture guard
   onWalletConfirm, // Express Checkout confirm handler
+  paymentRegionRef, // TK-506: arms the deferred Stripe load when reached
   layoutVariant = "default",
 }) => {
   const isGlp2 = layoutVariant === "glp2";
@@ -62,6 +63,10 @@ const CartAndPayment = ({
         </div>
       )}
 
+      {/* TK-506: the payment region. Reaching it (scroll into view, hover,
+          focus or tap, including going for the Place order button) arms the
+          deferred Stripe load. Cart/shipping above stay SDK-free. */}
+      <div ref={paymentRegionRef}>
       {onWalletConfirm && (
         <div className={isGlp2 ? "" : "lg:max-w-[512px]"}>
           <ExpressCheckoutWallet
@@ -128,6 +133,7 @@ const CartAndPayment = ({
           "Place order"
         )}
       </button>
+      </div>
 
       <p
         className={`text-[10px] text-gray-700 mt-4 text-center w-full ${isGlp2 ? "" : "lg:max-w-[512px]"}`}
