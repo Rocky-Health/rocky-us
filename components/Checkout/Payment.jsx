@@ -69,6 +69,16 @@ const Payment = ({
           disabled={!elements}
         />
 
+        {/* TK-506: skeleton while the deferred Stripe load is arming, so the
+            payment box is never blank when the user reaches it. */}
+        {!elements && (
+          <div className="mt-4 space-y-3 animate-pulse" aria-hidden="true">
+            <div className="h-11 rounded-lg bg-gray-200" />
+            <div className="h-11 rounded-lg bg-gray-200" />
+            <div className="h-11 w-2/3 rounded-lg bg-gray-200" />
+          </div>
+        )}
+
         {/* New card form stays mounted (CSS-hidden) so Stripe stays initialized */}
         <div className={`mt-4 ${showNewCardForm ? "" : "hidden"}`}>
           <StripeCardInput

@@ -12,8 +12,10 @@ import { toast } from "react-toastify";
 import { logger } from "@/utils/devLogger";
 import { formatPriceUI } from "@/utils/priceFormatter";
 
-// Shared singleton so Stripe.js (and shared-ffa.js) loads once app-wide.
-const stripePromise = getStripe();
+// TK-506: no module-level getStripe() call. Importing this file must not
+// download Stripe.js. This component IS an explicit payment form, so mounting
+// it is payment intent: the lazy useState initializer below loads Stripe at
+// mount time and never at import time.
 
 // Card Element styling
 const CARD_ELEMENT_OPTIONS = {
@@ -211,6 +213,7 @@ export default function StripeElementsPayment({
   onSuccess,
   onError,
 }) {
+  const [stripePromise] = useState(() => getStripe());
   return (
     <Elements stripe={stripePromise}>
       <PaymentForm
