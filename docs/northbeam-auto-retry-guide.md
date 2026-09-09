@@ -99,9 +99,13 @@ After deploying, Vercel will automatically start running the cron job.
 
 ### 3. Verify Setup
 
-#### Check Configuration
+Vercel Cron always calls this path with GET, so GET performs the real retry
+work, the same as POST. Both share one internal function; the only
+difference is the `?config=1` query param described below.
+
+#### Check Configuration (no retry run)
 ```bash
-curl -X GET https://your-domain.com/api/northbeam/auto-retry \
+curl -X GET "https://your-domain.com/api/northbeam/auto-retry?config=1" \
   -H "Authorization: Bearer YOUR_CRON_SECRET"
 ```
 
@@ -115,12 +119,16 @@ Response:
     "maxOrdersToRetry": 50,
     "afterDate": "2025-11-05T12:00:00.000Z"
   },
-  "message": "Use POST to trigger manual retry, or let Vercel Cron handle it automatically"
+  "message": "Use GET (or POST) without ?config=1 to trigger the retry, or let Vercel Cron handle it automatically"
 }
 ```
 
 #### Trigger Manual Retry
 ```bash
+curl -X GET https://your-domain.com/api/northbeam/auto-retry \
+  -H "Authorization: Bearer YOUR_CRON_SECRET"
+
+# POST does the same thing
 curl -X POST https://your-domain.com/api/northbeam/auto-retry \
   -H "Authorization: Bearer YOUR_CRON_SECRET"
 ```

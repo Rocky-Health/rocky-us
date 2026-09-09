@@ -5,27 +5,33 @@ import { NB_WRITE_CONTEXT } from "@/lib/northbeam/writeContext";
 
 /**
  * Automatic Northbeam Order Retry Cron Job
- * 
+ *
  * This endpoint is designed to be called by Vercel Cron to automatically
  * retry sending orders to Northbeam that may have failed.
- * 
+ *
  * Strategy:
  * - Queries recent WooCommerce orders (last 2 hours)
  * - Filters for completed/processing orders (orders we care about tracking)
  * - Attempts to send them to Northbeam via backfill endpoint
  * - Northbeam will deduplicate if order was already received
- * 
+ *
  * POST /api/northbeam/auto-retry
+ * GET  /api/northbeam/auto-retry
  * Headers: Authorization: Bearer <CRON_SECRET>
+ *
+ * Vercel Cron invokes this path with GET, so GET performs the same retry
+ * work as POST. Pass ?config=1 on a GET request to get the old config echo
+ * (no orders are queried or sent in that mode), which is still useful for
+ * checking configuration without running a batch.
  */
-export async function POST(req) {
+async function runAutoRetry(req) {
   const startTime = Date.now();
-  
+
   try {
     // Verify this is a legitimate cron request
     const authHeader = req.headers.get("authorization");
     const cronSecret = process.env.CRON_SECRET || process.env.VERCEL_CRON_SECRET;
-    
+
     if (!cronSecret) {
       logger.error("[NB Auto-Retry] CRON_SECRET not configured, rejecting request for security");
       return NextResponse.json(
@@ -33,7 +39,7 @@ export async function POST(req) {
         { status: 401 }
       );
     }
-    
+
     if (authHeader !== `Bearer ${cronSecret}`) {
       logger.error("[NB Auto-Retry] Unauthorized cron request");
       return NextResponse.json(
@@ -47,7 +53,7 @@ export async function POST(req) {
     // Check if Northbeam is configured
     const clientId = process.env.NB_CLIENT_ID || process.env.NORTHBEAM_CLIENT_ID;
     const apiKey = process.env.NB_API_KEY || process.env.NORTHBEAM_AUTH_TOKEN;
-    
+
     if (!clientId || !apiKey) {
       logger.warn("[NB Auto-Retry] Northbeam not configured, skipping");
       return NextResponse.json({
@@ -106,9 +112,9 @@ export async function POST(req) {
 
     // Call the backfill endpoint (which handles deduplication and formatting)
     const backfillUrl = `${origin}/api/northbeam/backfill`;
-    
+
     logger.log(`[NB Auto-Retry] Calling backfill endpoint with ${orderIds.length} orders`);
-    
+
     // The backfill endpoint now requires the shared sync secret. Without this
     // header the cron would start receiving 401s the moment TK-1024 deploys.
     const backfillHeaders = { "Content-Type": "application/json" };
@@ -140,9 +146,9 @@ export async function POST(req) {
     }
 
     const backfillResult = await backfillResponse.json();
-    
+
     const duration = Date.now() - startTime;
-    
+
     logger.log(
       `[NB Auto-Retry] ✅ Completed in ${duration}ms:`,
       `${backfillResult.totals?.ok || 0} succeeded,`,
@@ -175,7 +181,7 @@ export async function POST(req) {
   } catch (error) {
     const duration = Date.now() - startTime;
     logger.error("[NB Auto-Retry] Error during auto-retry:", error);
-    
+
     return NextResponse.json(
       {
         success: false,
@@ -189,21 +195,22 @@ export async function POST(req) {
 }
 
 /**
- * GET endpoint for manual testing/debugging
- * Returns configuration and status info
+ * Returns configuration and status info without touching any orders. Kept
+ * behind the ?config=1 query param on GET, since checking configuration is
+ * still useful without running a batch.
  */
-export async function GET(req) {
+function configEcho(req) {
   const authHeader = req.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET || process.env.VERCEL_CRON_SECRET;
-  
-  // Require authentication for GET as well
+
+  // Require authentication for the config echo as well
   if (!cronSecret) {
     return NextResponse.json(
       { error: "Unauthorized - CRON_SECRET must be configured" },
       { status: 401 }
     );
   }
-  
+
   if (authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -223,6 +230,24 @@ export async function GET(req) {
       maxOrdersToRetry,
       afterDate: new Date(Date.now() - lookbackMinutes * 60 * 1000).toISOString(),
     },
-    message: "Use POST to trigger manual retry, or let Vercel Cron handle it automatically",
+    message: "Use GET (or POST) without ?config=1 to trigger the retry, or let Vercel Cron handle it automatically",
   });
+}
+
+export async function POST(req) {
+  return runAutoRetry(req);
+}
+
+/**
+ * Vercel Cron calls this path with GET every 10 minutes, so GET now performs
+ * the real retry work rather than only echoing configuration. Pass
+ * ?config=1 to get the old config echo instead, for checking configuration
+ * without running a batch.
+ */
+export async function GET(req) {
+  const { searchParams } = new URL(req.url);
+  if (searchParams.get("config") === "1") {
+    return configEcho(req);
+  }
+  return runAutoRetry(req);
 }
