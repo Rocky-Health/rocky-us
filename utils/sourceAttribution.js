@@ -25,6 +25,10 @@ const STORAGE_KEYS = {
   LANDING_PAGE: "traffic_landing_page",
   FIRST_TOUCH_TIME: "traffic_first_touch",
   LAST_TOUCH_TIME: "traffic_last_touch",
+  // Marker co-located with the UTM fields, same name as CA's client module,
+  // so a later reader can tell "an own-property navigation suppressed
+  // capture" from "nothing was ever captured".
+  UTM_SUPPRESSED: "utm_suppressed_own_domain",
 };
 
 /**
@@ -143,7 +147,68 @@ const detectClickIdType = (paramName) => {
 };
 
 /**
- * Get the current referrer, excluding same-domain traffic
+ * Lowercase, trim, drop a leading www. and any port, so host comparisons are
+ * stable. Mirrors normalizeHost in lib/northbeam/sourceAttribution.js.
+ */
+const normalizeHost = (host) => {
+  if (typeof host !== "string") return "";
+  return host.trim().toLowerCase().replace(/^www\./, "").replace(/:\d+$/, "");
+};
+
+/**
+ * Last two labels of a host, standing in for a registrable base. Mirrors
+ * registrableBase in lib/northbeam/sourceAttribution.js; both storefronts sit
+ * on a two label apex so this is exact here.
+ */
+const registrableBase = (host) => {
+  const normalized = normalizeHost(host);
+  if (!normalized) return "";
+  const labels = normalized.split(".");
+  return labels.length <= 2 ? normalized : labels.slice(-2).join(".");
+};
+
+/**
+ * Whether a referrer host is our own property: the apex, any subdomain of it,
+ * a Vercel preview, or localhost. Mirrors isOwnDomainReferrer in
+ * lib/northbeam/sourceAttribution.js so client and server agree on what counts
+ * as internal traffic. Replaces the old exact-hostname comparison, which let
+ * www. and sibling subdomains slip through as if they were external. Not
+ * imported from that module: it is a server side order-meta builder that has
+ * no reason to run in the browser bundle, so these few pure lines are
+ * duplicated here instead.
+ * @param {string} referrerHost - hostname parsed from a referrer URL
+ * @param {string} currentHost - hostname serving this page
+ * @returns {boolean}
+ */
+export const isOwnPropertyReferrer = (referrerHost, currentHost) => {
+  const referrer = normalizeHost(referrerHost);
+  if (!referrer) return false;
+
+  if (referrer.endsWith(".vercel.app") || referrer === "vercel.app") return true;
+  if (referrer === "localhost" || referrer === "127.0.0.1") return true;
+
+  const base = registrableBase(currentHost);
+  if (!base) return false;
+
+  return referrer === base || referrer.endsWith(`.${base}`);
+};
+
+/**
+ * Hostname of document.referrer, or empty string when absent or unparseable.
+ */
+const getReferrerHostname = () => {
+  if (typeof document === "undefined") return "";
+  try {
+    const referrer = document.referrer || "";
+    if (!referrer) return "";
+    return new URL(referrer).hostname;
+  } catch (e) {
+    return "";
+  }
+};
+
+/**
+ * Get the current referrer, excluding own-property traffic
  * @returns {string} Referrer URL or empty string
  */
 const getReferrer = () => {
@@ -153,17 +218,33 @@ const getReferrer = () => {
     const referrer = document.referrer || "";
     if (!referrer) return "";
 
-    // Exclude same-domain referrers
-    const currentDomain = window.location.hostname;
     const referrerUrl = new URL(referrer);
-    if (referrerUrl.hostname === currentDomain) {
-      return ""; // Same domain, not an external referrer
+    if (isOwnPropertyReferrer(referrerUrl.hostname, window.location.hostname)) {
+      return ""; // Own property, not an external referrer
     }
 
     return referrer;
   } catch (e) {
     return "";
   }
+};
+
+/**
+ * Whether any UTM field is already stored (cookie or localStorage), used to
+ * decide whether an own-property navigation's incoming UTMs should be
+ * suppressed rather than overwrite what is on file.
+ * @returns {boolean}
+ */
+const hasStoredUtmData = () => {
+  const keys = [
+    STORAGE_KEYS.SOURCE,
+    STORAGE_KEYS.MEDIUM,
+    STORAGE_KEYS.CAMPAIGN,
+    STORAGE_KEYS.CONTENT,
+    STORAGE_KEYS.TERM,
+    STORAGE_KEYS.UTM_ID,
+  ];
+  return keys.some((key) => Boolean(readCookie(key) || getFromStorage(key)));
 };
 
 /**
@@ -200,33 +281,57 @@ export const captureAttribution = () => {
     const utmCampaign = params.get("utm_campaign");
     const utmContent = params.get("utm_content");
     const utmTerm = params.get("utm_term");
-
-    if (utmSource) {
-      setInStorage(STORAGE_KEYS.SOURCE, utmSource);
-      setCookie(STORAGE_KEYS.SOURCE, utmSource);
-    }
-    if (utmMedium) {
-      setInStorage(STORAGE_KEYS.MEDIUM, utmMedium);
-      setCookie(STORAGE_KEYS.MEDIUM, utmMedium);
-    }
-    if (utmCampaign) {
-      setInStorage(STORAGE_KEYS.CAMPAIGN, utmCampaign);
-      setCookie(STORAGE_KEYS.CAMPAIGN, utmCampaign);
-    }
-    if (utmContent) {
-      setInStorage(STORAGE_KEYS.CONTENT, utmContent);
-      setCookie(STORAGE_KEYS.CONTENT, utmContent);
-    }
-    if (utmTerm) {
-      setInStorage(STORAGE_KEYS.TERM, utmTerm);
-      setCookie(STORAGE_KEYS.TERM, utmTerm);
-    }
-
-    // Capture utm_id (Google Ads campaign-level identifier)
     const utmId = params.get("utm_id");
-    if (utmId) {
-      setInStorage(STORAGE_KEYS.UTM_ID, utmId);
-      setCookie(STORAGE_KEYS.UTM_ID, utmId);
+    const incomingHasUtm = Boolean(
+      utmSource || utmMedium || utmCampaign || utmContent || utmTerm || utmId
+    );
+
+    // An own-property navigation (an account portal link, an internal promo)
+    // must not overwrite acquisition UTMs already on file. Only gate when
+    // there is stored data to protect; a first touch we cannot attribute
+    // elsewhere is still stored, same as before.
+    const referrerHostname = getReferrerHostname();
+    const ownPropertyNav = isOwnPropertyReferrer(
+      referrerHostname,
+      window.location.hostname
+    );
+    const suppressUtmOverwrite =
+      incomingHasUtm && ownPropertyNav && hasStoredUtmData();
+
+    if (suppressUtmOverwrite) {
+      // Record that suppression happened so a later reader can tell it apart
+      // from a session with no attribution at all.
+      setInStorage(STORAGE_KEYS.UTM_SUPPRESSED, "true");
+      setCookie(STORAGE_KEYS.UTM_SUPPRESSED, "true");
+    } else if (incomingHasUtm) {
+      if (utmSource) {
+        setInStorage(STORAGE_KEYS.SOURCE, utmSource);
+        setCookie(STORAGE_KEYS.SOURCE, utmSource);
+      }
+      if (utmMedium) {
+        setInStorage(STORAGE_KEYS.MEDIUM, utmMedium);
+        setCookie(STORAGE_KEYS.MEDIUM, utmMedium);
+      }
+      if (utmCampaign) {
+        setInStorage(STORAGE_KEYS.CAMPAIGN, utmCampaign);
+        setCookie(STORAGE_KEYS.CAMPAIGN, utmCampaign);
+      }
+      if (utmContent) {
+        setInStorage(STORAGE_KEYS.CONTENT, utmContent);
+        setCookie(STORAGE_KEYS.CONTENT, utmContent);
+      }
+      if (utmTerm) {
+        setInStorage(STORAGE_KEYS.TERM, utmTerm);
+        setCookie(STORAGE_KEYS.TERM, utmTerm);
+      }
+      if (utmId) {
+        setInStorage(STORAGE_KEYS.UTM_ID, utmId);
+        setCookie(STORAGE_KEYS.UTM_ID, utmId);
+      }
+      // This capture went through, so any earlier suppression no longer
+      // applies.
+      setInStorage(STORAGE_KEYS.UTM_SUPPRESSED, "");
+      setCookie(STORAGE_KEYS.UTM_SUPPRESSED, "");
     }
 
     // Capture click IDs (platform-specific tracking IDs)

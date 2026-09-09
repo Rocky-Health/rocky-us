@@ -11,6 +11,7 @@ import {
   shouldApplyPixelGuard,
 } from "@/lib/northbeam/writeContext";
 import { acceptCustomerIdOverride } from "@/lib/northbeam/customerId";
+import { requireSyncApiKey } from "@/lib/northbeam/syncAuth";
 import { logger } from "@/utils/devLogger";
 import { api as wooApi } from "@/lib/woocommerce";
 import { buildCanonicalOrderTags } from "@/lib/northbeam/orderTags";
@@ -158,6 +159,9 @@ const getProductTypeTags = async (products, baseUrlFromRequest) => {
 
 export async function POST(req) {
   try {
+    const unauthorized = requireSyncApiKey(req, "NB Orders", logger);
+    if (unauthorized) return unauthorized;
+
     const orderData = await req.json();
 
     // Validate required fields
@@ -263,11 +267,10 @@ export async function POST(req) {
 
     // The three canonical axes (lifecycle, origin, mode) are pinned onto the
     // Woo order by the canonical writer, not carried in the client payload, so
-    // this route has to read the order back to see them. Best effort only: two
-    // writers are live until TK-1029 retires the browser one, and Northbeam
-    // keeps the last write, so both must produce the same array or each
-    // overwrites the other with a different one. A failed read here still
-    // sends an order, just one with the axes omitted rather than invented.
+    // this route has to read the order back to see them. Best effort only:
+    // the browser purchase fire was retired under TK-1029, and Northbeam
+    // keeps the last write, so a failed read here still sends an order, just
+    // one with the axes omitted rather than invented.
     let wooOrder = null;
     if (shouldApplyPixelGuard(order.nb_write_context)) {
       try {
