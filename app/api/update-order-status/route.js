@@ -147,9 +147,17 @@ const maybeSendNorthbeam = async (req, order, status) => {
   }
 
   try {
+    const orderHeaders = { "Content-Type": "application/json" };
+    if (process.env.NORTHBEAM_SYNC_API_KEY) {
+      orderHeaders["X-API-Key"] = process.env.NORTHBEAM_SYNC_API_KEY;
+    } else {
+      logger.error(
+        "[Northbeam] NORTHBEAM_SYNC_API_KEY not configured, the orders call will be rejected"
+      );
+    }
     const response = await fetch(`${origin}/api/northbeam/orders`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: orderHeaders,
       body: JSON.stringify({ orders: [mapped] }),
     });
     if (!response.ok) {

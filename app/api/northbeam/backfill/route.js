@@ -283,6 +283,13 @@ export async function POST(req) {
         // 3) Send to our own NB endpoint (same-origin) to centralize logic/tags
         const internalUrl = `${origin}/api/northbeam/orders${debugParam ? "?debug=1" : ""}`;
         const headers = { "Content-Type": "application/json" };
+        if (process.env.NORTHBEAM_SYNC_API_KEY) {
+          headers["X-API-Key"] = process.env.NORTHBEAM_SYNC_API_KEY;
+        } else {
+          logger.error(
+            "[NB Backfill] NORTHBEAM_SYNC_API_KEY not configured, the orders call will be rejected"
+          );
+        }
         const res = await fetch(internalUrl, {
           method: "POST",
           headers,
