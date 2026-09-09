@@ -304,7 +304,7 @@ const CartITem2 = ({ item, hasCoupon = false }) => {
           height={56}
           src={
             item.name == "Body Optimization Program"
-              ? "/products/wlProg.webp"
+              ? "https://mycdn.myrocky.com/wp-content/uploads/20260909172822/Weight-Management-Program-Icon.jpg"
               : item.images[0]?.thumbnail
           }
           alt={item.name}

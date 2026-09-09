@@ -310,7 +310,7 @@ async function handleUnauthenticatedFlow(
         name: "Body Optimization Program",
         price: 99 * 100, // Convert to cents
         image:
-          "https://mycdn.myrocky.com/wp-content/uploads/20240403133727/wl-consultation-sq-small-icon-wt.png",
+          "https://mycdn.myrocky.com/wp-content/uploads/20260909172822/Weight-Management-Program-Icon.jpg",
         product_type: "simple",
         variation: [],
       };
@@ -442,7 +442,7 @@ async function handleUnauthenticatedEarlyAddition(
         name: "Body Optimization Program",
         price: 99,
         image:
-          "https://mycdn.myrocky.com/wp-content/uploads/20240403133727/wl-consultation-sq-small-icon-wt.png",
+          "https://mycdn.myrocky.com/wp-content/uploads/20260909172822/Weight-Management-Program-Icon.jpg",
         product_type: "simple",
         variation: [],
       };
