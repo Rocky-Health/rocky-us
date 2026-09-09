@@ -270,19 +270,25 @@ export async function POST(req) {
         if (!order?.id) {
           results.push({ id, status: "not_found" });
           failed++;
-          
-          // Mark as backfilled attempt even if not found to prevent retry loops
-          try {
-            await wooApi.put(`orders/${id}`, {
-              meta_data: [
-                { key: '_northbeam_backfill_attempts', value: String(((order?.meta_data?.find(m => m.key === '_northbeam_backfill_attempts')?.value || 0) + 1)) },
-                { key: '_northbeam_last_backfill_attempt', value: new Date().toISOString() },
-              ]
-            });
-          } catch (metaErr) {
-            logger.error(`[NB Backfill Auto] Failed to update meta for order ${id}:`, metaErr);
+
+          // TK-1030: audit mode must never mutate WooCommerce, and the order
+          // fetch itself failed on this branch (order is guaranteed to carry
+          // no usable data here), so there is no real prior attempts value to
+          // read. Writing a computed attempts count without one produced the
+          // literal string "NaN", so this branch never writes that field: it
+          // only marks the timestamp, and only outside audit mode.
+          if (mode !== NB_AUDIT_MODE.AUDIT) {
+            try {
+              await wooApi.put(`orders/${id}`, {
+                meta_data: [
+                  { key: '_northbeam_last_backfill_attempt', value: new Date().toISOString() },
+                ]
+              });
+            } catch (metaErr) {
+              logger.error(`[NB Backfill Auto] Failed to update meta for order ${id}:`, metaErr);
+            }
           }
-          
+
           continue;
         }
 
@@ -363,9 +369,17 @@ export async function POST(req) {
 
         // Send to Northbeam via internal API
         const internalUrl = `${origin}/api/northbeam/orders`;
+        const internalHeaders = { "Content-Type": "application/json" };
+        if (process.env.NORTHBEAM_SYNC_API_KEY) {
+          internalHeaders["X-API-Key"] = process.env.NORTHBEAM_SYNC_API_KEY;
+        } else {
+          logger.error(
+            "[NB Backfill Auto] NORTHBEAM_SYNC_API_KEY not configured, the orders call will be rejected"
+          );
+        }
         const res = await fetch(internalUrl, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: internalHeaders,
           body: JSON.stringify({ orders: [mapped] }),
           cache: "no-store",
         });
