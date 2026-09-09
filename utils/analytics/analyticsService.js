@@ -12,7 +12,6 @@ import {
   trackTikTokViewContent,
   trackTikTokSearch,
 } from "@/utils/tiktokEvents";
-import { trackNorthbeamPurchase } from "@/utils/northbeamEvents";
 import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
 import {
   sendCustomerioCheckoutStarted,
@@ -238,7 +237,6 @@ export const analyticsService = {
 
       // Separate idempotency guards per integration to avoid blocking S2S
       const guardKeyGA4 = `analytics:purchase:ga4:${order.id}`;
-      const guardKeyNB = `analytics:purchase:nb:${order.id}`;
       const guardKeyMetaCAPI = `analytics:purchase:meta-capi:${order.id}`;
       const guardKeyTikTokCAPI = `analytics:purchase:tiktok-capi:${order.id}`;
 
@@ -337,25 +335,6 @@ export const analyticsService = {
         } catch (tiktokError) {
           logger.error("[Analytics] TikTok CAPI tracking failed:", tiktokError);
         }
-      }
-
-      // Track Northbeam event (await to reduce pixel-only cases)
-      // Guard NB separately. The guard key is order scoped
-      // (analytics:purchase:nb:<order.id>), so a second distinct order in the
-      // same session still sends.
-      //
-      // This previously called trackNorthbeamPurchase in the else branch too,
-      // which made the guard a no-op: every purchase fired twice, roughly 100ms
-      // apart. Northbeam upserts on order_id so revenue was not double counted,
-      // but the second write silently overwrote the first, making any per-write
-      // difference resolve non-deterministically. Retry on failure is already
-      // handled inside trackNorthbeamPurchase.
-      if (setOnce(guardKeyNB)) {
-        await trackNorthbeamPurchase(order, additionalData, true);
-      } else {
-        logger.log("[Analytics] Northbeam purchase already sent this session", {
-          order_id: order?.id,
-        });
       }
     } catch (error) {
       logger.error("[Analytics] Error tracking purchase:", error);
