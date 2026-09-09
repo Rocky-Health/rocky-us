@@ -27,6 +27,13 @@ const shouldLog = () => (isServer ? serverLogsEnabled() : isDevelopment);
  * ln, db, zp, ct, st, country) — those are already hashed/pseudonymous and are
  * the tracking payload fields; masking them adds no compliance value and would
  * make CAPI debug logs useless.
+ * NOTE: also deliberately does NOT include customer_id. The canonical
+ * Northbeam customer id is wc:{wooUserId} when WooCommerce has a user (an
+ * internal identifier, not PII), falling back to email:{address} or
+ * phone:{digits} when it does not. A blunt redact would destroy the
+ * debuggable wc: form, so customer_id is masked prefix-preserving by
+ * maskCustomerId below instead of being listed here: everything up to and
+ * including the first colon is kept, and only the remainder is replaced.
  */
 const SENSITIVE_KEYS = new Set([
   // credentials
@@ -45,6 +52,9 @@ const SENSITIVE_KEYS = new Set([
   // raw PII
   "email",
   "phone",
+  "customer_email",
+  "customer_phone_number",
+  "customer_phone",
   "first_name",
   "last_name",
   "full_name",
@@ -63,19 +73,50 @@ function isSensitiveKey(key) {
 }
 
 /**
+ * Masks a canonical Northbeam customer id (wc:{id}, email:{address} or
+ * phone:{digits}). The wc: namespace is an internal WooCommerce user id, not
+ * PII, so it passes through unchanged; every other namespace keeps its
+ * prefix up to and including the first ":" and has the remainder replaced
+ * with the same redaction marker used elsewhere in this file.
+ * A number is left as is (not PII in this field); anything else that is not
+ * a string falls back to the blanket redaction marker.
+ */
+function maskCustomerId(value) {
+  if (typeof value === "number") return value;
+  if (typeof value !== "string") return "***";
+  const colonIndex = value.indexOf(":");
+  if (colonIndex === -1) return "***";
+  const namespace = value.slice(0, colonIndex).toLowerCase();
+  if (namespace === "wc") return value;
+  return `${value.slice(0, colonIndex + 1)}***`;
+}
+
+/**
  * Returns a deep copy of obj with sensitive field values replaced by "***".
  * Non-mutating. Safe to call on anything before logging.
  */
-export function redactSensitive(obj) {
+export function redactSensitive(obj, _seen) {
   if (obj === null || typeof obj !== "object") {
     return obj;
   }
+  // Guard against circular references (e.g. axios error objects) so logging
+  // one can never overflow the stack.
+  const seen = _seen || new WeakSet();
+  if (seen.has(obj)) return "[Circular]";
+  seen.add(obj);
   if (Array.isArray(obj)) {
-    return obj.map((item) => redactSensitive(item));
+    return obj.map((item) => redactSensitive(item, seen));
   }
   const out = {};
   for (const [key, value] of Object.entries(obj)) {
-    out[key] = isSensitiveKey(key) ? "***" : redactSensitive(value);
+    const k = String(key).toLowerCase();
+    if (k === "customer_id") {
+      out[key] = maskCustomerId(value);
+    } else if (isSensitiveKey(key)) {
+      out[key] = "***";
+    } else {
+      out[key] = redactSensitive(value, seen);
+    }
   }
   return out;
 }
