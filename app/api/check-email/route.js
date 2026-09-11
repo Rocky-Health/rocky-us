@@ -25,6 +25,7 @@ export async function POST(req) {
             "Content-Type": "application/json",
             Authorization: process.env.ADMIN_TOKEN,
           },
+          timeout: 5000,
         }
       );
 
@@ -34,12 +35,16 @@ export async function POST(req) {
       });
     } catch (err) {
       logger.log("Error checking email:", err);
-      
-      // If the API call fails, return false for safety
-      return NextResponse.json({
-        success: true,
-        registered: false,
-      });
+
+      // Fail closed. Reporting an unverified address as "not registered" is
+      // what let existing customers through the quiz into the signup flow.
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Could not verify email availability. Please try again.",
+        },
+        { status: 503 }
+      );
     }
   } catch (error) {
     logger.log("Error in check-email API:", error);
