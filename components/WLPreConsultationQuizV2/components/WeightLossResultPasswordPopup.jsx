@@ -20,13 +20,24 @@ const WeightLossResultPasswordPopup = ({
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
-  const [showPasswordSection, setShowPasswordSection] = useState(false);
   const [checkingEmail, setCheckingEmail] = useState(false);
   const [emailTouched, setEmailTouched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [emailExists, setEmailExists] = useState(false);
-  const lastCheckedEmailRef = useRef("");
+  // The address the current emailExists answer belongs to. Tying the result to
+  // its email is what stops a stale answer being reused after an edit, and it
+  // takes over from the lastCheckedEmail ref: the password section is derived
+  // below, so iOS Safari re-filling the same address no longer hides it.
+  const [checkedEmail, setCheckedEmail] = useState("");
+  // The address whose check failed, so the error clears itself on an edit and
+  // the debounce does not keep retrying an address that just failed.
+  const [failedEmail, setFailedEmail] = useState("");
   const [passwordError, setPasswordError] = useState("");
+
+  // Newest request wins, so a slow response cannot overwrite a fresher answer.
+  const checkSeqRef = useRef(0);
+  const inFlightRef = useRef({ email: "", promise: null });
+  const debounceRef = useRef(null);
 
   const MIN_NEW_PASSWORD_LENGTH = 8;
 
@@ -66,6 +77,13 @@ const WeightLossResultPasswordPopup = ({
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
   };
 
+  const trimmedEmail = String(email || "").trim();
+  // Derived, never set by hand: the password section can only be visible when
+  // the check has resolved for the address currently in the field.
+  const emailCheckResolved = checkedEmail !== "" && checkedEmail === trimmedEmail;
+  const emailCheckFailed = failedEmail !== "" && failedEmail === trimmedEmail;
+  const showPasswordSection = emailCheckResolved;
+
   // Run auth check on mount and call onSubmit if authenticated.
   // This must run in a useEffect to avoid updating state during render.
   React.useEffect(() => {
@@ -82,33 +100,78 @@ const WeightLossResultPasswordPopup = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const checkEmailExists = async (emailToCheck) => {
-    if (!isValidEmail(emailToCheck)) return;
+  const runEmailCheck = async (target) => {
+    const seq = ++checkSeqRef.current;
     setCheckingEmail(true);
-    setShowPasswordSection(false);
+    setFailedEmail("");
 
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
+
+    let result = null;
     try {
       const res = await fetch("/api/check-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: emailToCheck }),
+        body: JSON.stringify({ email: target }),
+        signal: controller.signal,
       });
-
-      if (res.ok) {
-        const data = await res.json();
-        setEmailExists(data.registered === true);
-      } else {
-        setEmailExists(false);
+      const data = res.ok ? await res.json() : null;
+      if (!data || data.success === false) {
+        throw new Error("check-email failed with status " + res.status);
       }
+      result = { email: target, registered: data.registered === true };
     } catch (error) {
-      console.error("Error checking email:", error);
-      // Default to false if check fails
-      setEmailExists(false);
+      logger.error("Error checking email:", error);
+      result = null;
     } finally {
-      setCheckingEmail(false);
-      setShowPasswordSection(true);
+      clearTimeout(timer);
     }
+
+    // A superseded request must not write state.
+    if (seq !== checkSeqRef.current) return result;
+
+    inFlightRef.current = { email: "", promise: null };
+    setCheckingEmail(false);
+    if (result) {
+      setEmailExists(result.registered);
+      setCheckedEmail(result.email);
+      setFailedEmail("");
+    } else {
+      // Fail closed. An address we could not verify must never fall through as
+      // a new signup, that is how existing customers ended up registering.
+      setEmailExists(false);
+      setCheckedEmail("");
+      setFailedEmail(target);
+    }
+    return result;
   };
+
+  // Resolves whether the address already has an account. Callers can await it;
+  // a second call for an address already in flight reuses the same request.
+  const checkEmailExists = (emailToCheck) => {
+    const target = String(emailToCheck || "").trim();
+    if (!isValidEmail(target)) return Promise.resolve(null);
+    if (inFlightRef.current.email === target && inFlightRef.current.promise) {
+      return inFlightRef.current.promise;
+    }
+    const promise = runEmailCheck(target);
+    inFlightRef.current = { email: target, promise };
+    return promise;
+  };
+
+  // Resolve the address shortly after the user stops typing. Continue cannot
+  // depend on a blur that may never happen, since tapping a disabled button
+  // does not move focus and so never fires one.
+  React.useEffect(() => {
+    if (!isValidEmail(trimmedEmail)) return;
+    if (trimmedEmail === checkedEmail) return;
+    if (trimmedEmail === failedEmail) return;
+    if (trimmedEmail === inFlightRef.current.email) return;
+    debounceRef.current = setTimeout(() => checkEmailExists(trimmedEmail), 800);
+    return () => clearTimeout(debounceRef.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trimmedEmail, checkedEmail, failedEmail]);
 
   const TryLogin = async ({ email, password }) => {
     // attempt login
@@ -180,13 +243,21 @@ const WeightLossResultPasswordPopup = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (
-      showPasswordSection &&
-      !emailExists &&
-      !isValidNewAccountPassword(password)
-    ) {
+    if (!isValidEmail(trimmedEmail) || !agreePrivacy || disabled) return;
+
+    // The real guard. The disabled button is only a hint, Enter and a fast
+    // click can still land here while the check is in flight, and continuing
+    // then would send an existing customer down the signup path.
+    if (!emailCheckResolved) {
+      clearTimeout(debounceRef.current);
+      await checkEmailExists(trimmedEmail);
+      // The password field appears once the check lands, so stop here rather
+      // than continuing with a password the user has not entered yet.
       return;
     }
+
+    if (!passwordMeetsRequirements(password, emailExists)) return;
+
     if (onSubmit) {
       setUserData((prev) => ({
         ...prev,
@@ -221,7 +292,9 @@ const WeightLossResultPasswordPopup = ({
     !isValidEmail(email) ||
     !agreePrivacy ||
     disabled ||
-    (showPasswordSection && !passwordMeetsRequirements(password, emailExists));
+    checkingEmail ||
+    !emailCheckResolved ||
+    !passwordMeetsRequirements(password, emailExists);
 
   return (
     <div
@@ -255,31 +328,24 @@ const WeightLossResultPasswordPopup = ({
                 onChange={(e) => {
                   const newEmail = e.target.value;
                   setEmail(newEmail);
-                  // Compare against the last server-checked email (ref) rather
-                  // than the current email state — this avoids a stale-closure
-                  // bug on iOS Safari where autofill re-fires after a failed
-                  // login, making the comparison incorrectly evaluate to true
-                  // and hiding the password section.
-                  if (newEmail.trim() !== lastCheckedEmailRef.current) {
-                    setShowPasswordSection(false);
-                  }
+                  // Password section and error follow the resolved address, so
+                  // nothing to reset here. Also settles the iOS autofill case.
                   // mark touched as user types so errors can show after interaction
                   if (!emailTouched) setEmailTouched(true);
                 }}
                 onBlur={() => {
                   if (!emailTouched) setEmailTouched(true);
-                  const trimmed = String(email || "").trim();
-                  if (trimmed.length > 0 && isValidEmail(trimmed)) {
-                    // Only call the API if the email actually changed —
-                    // prevents Safari/iOS autofill blur from re-triggering
-                    // the check when focus moves to the password field.
-                    // Using a ref so the comparison is always against the
-                    // latest value with no stale-closure risk.
-                    if (trimmed !== lastCheckedEmailRef.current) {
-                      lastCheckedEmailRef.current = trimmed;
-                      checkEmailExists(trimmed);
-                    }
-                  }
+                  // Leaving the field resolves the address straight away
+                  // instead of waiting out the debounce. Skipped when the same
+                  // address is already resolved, already failed, or in flight,
+                  // which is what keeps Safari/iOS autofill from re-triggering
+                  // the check on its way to the password field.
+                  if (!isValidEmail(trimmedEmail)) return;
+                  if (trimmedEmail === checkedEmail) return;
+                  if (trimmedEmail === failedEmail) return;
+                  if (trimmedEmail === inFlightRef.current.email) return;
+                  clearTimeout(debounceRef.current);
+                  checkEmailExists(trimmedEmail);
                 }}
                 aria-invalid={emailTouched && !isValidEmail(email)}
                 aria-describedby={
@@ -301,6 +367,21 @@ const WeightLossResultPasswordPopup = ({
               {checkingEmail && (
                 <p className="mt-2 text-[12px] text-[#666]">
                   Checking email ...
+                </p>
+              )}
+              {emailCheckFailed && !checkingEmail && (
+                <p className="mt-2 text-[12px] text-red-600" role="alert">
+                  We could not verify your email.{" "}
+                  <button
+                    type="button"
+                    className="underline font-medium"
+                    onClick={() => {
+                      clearTimeout(debounceRef.current);
+                      checkEmailExists(trimmedEmail);
+                    }}
+                  >
+                    Try again
+                  </button>
                 </p>
               )}
             </div>
