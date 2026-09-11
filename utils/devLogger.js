@@ -27,13 +27,15 @@ const shouldLog = () => (isServer ? serverLogsEnabled() : isDevelopment);
  * ln, db, zp, ct, st, country) — those are already hashed/pseudonymous and are
  * the tracking payload fields; masking them adds no compliance value and would
  * make CAPI debug logs useless.
- * NOTE: also deliberately does NOT include customer_id. The canonical
- * Northbeam customer id is wc:{wooUserId} when WooCommerce has a user (an
- * internal identifier, not PII), falling back to email:{address} or
- * phone:{digits} when it does not. A blunt redact would destroy the
- * debuggable wc: form, so customer_id is masked prefix-preserving by
- * maskCustomerId below instead of being listed here: everything up to and
- * including the first colon is kept, and only the remainder is replaced.
+ * NOTE: also deliberately does NOT include customer_id or any of the
+ * customer_id* family. The canonical Northbeam customer id is wc:{wooUserId}
+ * when WooCommerce has a user (an internal identifier, not PII), falling back
+ * to email:{address} or phone:{digits} when it does not. A blunt redact would
+ * destroy the debuggable wc: form, so that whole family is masked
+ * prefix-preserving by maskCustomerId below instead of being listed here:
+ * everything up to and including the first colon is kept, and only the
+ * remainder is replaced. See isCanonicalCustomerIdKey for which keys qualify
+ * and for the one namespace-only key that is excluded.
  */
 const SENSITIVE_KEYS = new Set([
   // credentials
@@ -92,6 +94,35 @@ function maskCustomerId(value) {
 }
 
 /**
+ * Keys that hold ONLY a namespace and never the value behind it, so they carry
+ * no PII and must NOT go through maskCustomerId: that function answers "***"
+ * for a value with no colon, which would erase the diagnostic these keys exist
+ * to provide. `customer_id_namespace` is logged deliberately by both orders
+ * routes precisely so the namespace survives when the raw id does not.
+ */
+const CUSTOMER_ID_NAMESPACE_ONLY_KEYS = new Set(["customer_id_namespace"]);
+
+/**
+ * True for any key carrying a canonical Northbeam customer id, not just the
+ * exact `customer_id`.
+ *
+ * The original TK-1071 pass matched `customer_id` exactly, which left
+ * `customer_id_canonical` printing in plain text even though it holds the same
+ * value: `analyticsService` logs both keys in the SAME object on the purchase
+ * path, so the identical address was masked under one name and printed under
+ * the other. Matching the whole `customer_id*` family closes that and also
+ * catches the next variant somebody adds, which an exact-match list cannot.
+ *
+ * The namespace-only keys above are excluded by name rather than by pattern,
+ * because "holds a namespace" is not something the key string can express.
+ */
+function isCanonicalCustomerIdKey(key) {
+  const k = String(key).toLowerCase();
+  if (CUSTOMER_ID_NAMESPACE_ONLY_KEYS.has(k)) return false;
+  return k.startsWith("customer_id");
+}
+
+/**
  * Returns a deep copy of obj with sensitive field values replaced by "***".
  * Non-mutating. Safe to call on anything before logging.
  */
@@ -109,8 +140,7 @@ export function redactSensitive(obj, _seen) {
   }
   const out = {};
   for (const [key, value] of Object.entries(obj)) {
-    const k = String(key).toLowerCase();
-    if (k === "customer_id") {
+    if (isCanonicalCustomerIdKey(key)) {
       out[key] = maskCustomerId(value);
     } else if (isSensitiveKey(key)) {
       out[key] = "***";
