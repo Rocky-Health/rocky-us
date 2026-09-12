@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import axios from "axios";
 import { logger } from "@/utils/devLogger";
 import { resolveOrderTimeIso } from "@/lib/northbeam/orderTime";
+import { shouldSendOnStatus } from "@/lib/northbeam/statusSendGate";
 import { NB_WRITE_CONTEXT } from "@/lib/northbeam/writeContext";
 import { buildCanonicalOrderTags } from "@/lib/northbeam/orderTags";
 import { buildSourceTagsFromOrder } from "@/lib/northbeam/attributionTags";
@@ -122,9 +123,9 @@ const mapWooToNorthbeamOrder = (order) => {
 };
 
 const maybeSendNorthbeam = async (req, order, status) => {
-  const shouldSend =
-    status === "processing" || status === "completed" || status === "on-hold";
-  if (!shouldSend) return;
+  // on-hold is only a purchase when the order carries a payment. See
+  // lib/northbeam/statusSendGate.js for why, and for the Relay rule it mirrors.
+  if (!shouldSendOnStatus(status, order)) return;
 
   const clientId = process.env.NB_CLIENT_ID || process.env.NORTHBEAM_CLIENT_ID;
   const apiKey = process.env.NB_API_KEY || process.env.NORTHBEAM_AUTH_TOKEN;
