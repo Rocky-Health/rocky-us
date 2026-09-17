@@ -304,7 +304,11 @@ export const captureAttribution = () => {
       setCookie(STORAGE_KEYS.LANDING_PAGE, window.location.href);
     }
 
-    // Capture UTM parameters (overwrite on new campaign)
+    // Capture UTM parameters. A new utm_source is a new acquisition and
+    // replaces the whole set, so no field of the previous campaign is left
+    // stitched onto it. A partial set with no utm_source merges over what is
+    // on file instead, so an untouched field is not wiped. Same rule as the
+    // Canadian storefront's captureUtmData.
     const utmSource = params.get("utm_source");
     const utmMedium = params.get("utm_medium");
     const utmCampaign = params.get("utm_campaign");
@@ -341,30 +345,27 @@ export const captureAttribution = () => {
       setInStorage(STORAGE_KEYS.UTM_SUPPRESSED, "true");
       setCookie(STORAGE_KEYS.UTM_SUPPRESSED, "true");
     } else if (incomingHasUtm) {
-      if (utmSource) {
-        setInStorage(STORAGE_KEYS.SOURCE, utmSource);
-        setCookie(STORAGE_KEYS.SOURCE, utmSource);
-      }
-      if (utmMedium) {
-        setInStorage(STORAGE_KEYS.MEDIUM, utmMedium);
-        setCookie(STORAGE_KEYS.MEDIUM, utmMedium);
-      }
-      if (utmCampaign) {
-        setInStorage(STORAGE_KEYS.CAMPAIGN, utmCampaign);
-        setCookie(STORAGE_KEYS.CAMPAIGN, utmCampaign);
-      }
-      if (utmContent) {
-        setInStorage(STORAGE_KEYS.CONTENT, utmContent);
-        setCookie(STORAGE_KEYS.CONTENT, utmContent);
-      }
-      if (utmTerm) {
-        setInStorage(STORAGE_KEYS.TERM, utmTerm);
-        setCookie(STORAGE_KEYS.TERM, utmTerm);
-      }
-      if (utmId) {
-        setInStorage(STORAGE_KEYS.UTM_ID, utmId);
-        setCookie(STORAGE_KEYS.UTM_ID, utmId);
-      }
+      const incoming = [
+        [STORAGE_KEYS.SOURCE, utmSource],
+        [STORAGE_KEYS.MEDIUM, utmMedium],
+        [STORAGE_KEYS.CAMPAIGN, utmCampaign],
+        [STORAGE_KEYS.CONTENT, utmContent],
+        [STORAGE_KEYS.TERM, utmTerm],
+        [STORAGE_KEYS.UTM_ID, utmId],
+      ];
+
+      incoming.forEach(([key, value]) => {
+        if (value) {
+          setInStorage(key, value);
+          setCookie(key, value);
+        } else if (utmSource) {
+          // Wholesale replace: a field the new campaign did not supply is
+          // cleared rather than inherited, so bing never reports the campaign
+          // and term that google brought.
+          setInStorage(key, "");
+          setCookie(key, "");
+        }
+      });
       // This capture went through, so any earlier suppression no longer
       // applies.
       setInStorage(STORAGE_KEYS.UTM_SUPPRESSED, "");
