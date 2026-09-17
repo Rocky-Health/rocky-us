@@ -69,9 +69,25 @@ const SENSITIVE_KEYS = new Set([
   "birthdate",
 ]);
 
+/**
+ * Substring families that carry raw PII under whatever prefix or suffix a call
+ * site invents. TK-1071 was fixed twice by adding the one exact key QA had just
+ * found, `customer_id_canonical` and then `phone_number`, and failed QA twice
+ * for the same reason: an exact-name list only ever covers the names somebody
+ * has already been bitten by. Matching the family covers the variant nobody has
+ * written yet, which is the argument isCanonicalCustomerIdKey already makes for
+ * the customer_id family.
+ *
+ * The hashed CAPI short keys (em, ph, fn, ln, db, zp, ct, st) contain none of
+ * these substrings and stay readable as intended, and so does
+ * `customer_id_namespace`.
+ */
+const SENSITIVE_KEY_SUBSTRINGS = ["password", "secret", "phone", "email"];
+
 function isSensitiveKey(key) {
   const k = String(key).toLowerCase();
-  return SENSITIVE_KEYS.has(k) || k.includes("password") || k.includes("secret");
+  if (SENSITIVE_KEYS.has(k)) return true;
+  return SENSITIVE_KEY_SUBSTRINGS.some((fragment) => k.includes(fragment));
 }
 
 /**
@@ -143,7 +159,8 @@ export function redactSensitive(obj, _seen) {
     if (isCanonicalCustomerIdKey(key)) {
       out[key] = maskCustomerId(value);
     } else if (isSensitiveKey(key)) {
-      out[key] = "***";
+      // A boolean is never PII, so a family key match must not eat a flag.
+      out[key] = typeof value === "boolean" ? value : "***";
     } else {
       out[key] = redactSensitive(value, seen);
     }
