@@ -139,6 +139,42 @@ function isCanonicalCustomerIdKey(key) {
 }
 
 /**
+ * WooCommerce meta_data is an array of { key, value } pairs, so the field name
+ * lives in the VALUE of `key` and the secret lives in `value`. The generic walk
+ * reads that backwards: the literal property `key` is itself a credential name
+ * in SENSITIVE_KEYS, so it masked the harmless field name and printed the phone
+ * beside it, giving { key: "***", value: "+1555..." }. Decide from the field
+ * name instead, and keep that name readable, since it is schema and not PII.
+ *
+ * Both properties must be present. An ordinary object that merely carries a
+ * `key` is still a credential and keeps its blanket redaction.
+ */
+function isMetaDataEntry(obj) {
+  return typeof obj.key === "string" && "value" in obj;
+}
+
+function redactMetaDataEntry(entry, seen) {
+  const name = entry.key;
+  let redactedValue;
+  if (isCanonicalCustomerIdKey(name)) {
+    redactedValue = maskCustomerId(entry.value);
+  } else if (isSensitiveKey(name)) {
+    redactedValue = typeof entry.value === "boolean" ? entry.value : "***";
+  } else {
+    redactedValue = redactSensitive(entry.value, seen);
+  }
+
+  // Woo echoes entries back with an id, so anything else walks normally.
+  const out = {};
+  for (const [k, v] of Object.entries(entry)) {
+    if (k === "key") out[k] = name;
+    else if (k === "value") out[k] = redactedValue;
+    else out[k] = redactSensitive(v, seen);
+  }
+  return out;
+}
+
+/**
  * Returns a deep copy of obj with sensitive field values replaced by "***".
  * Non-mutating. Safe to call on anything before logging.
  */
@@ -153,6 +189,9 @@ export function redactSensitive(obj, _seen) {
   seen.add(obj);
   if (Array.isArray(obj)) {
     return obj.map((item) => redactSensitive(item, seen));
+  }
+  if (isMetaDataEntry(obj)) {
+    return redactMetaDataEntry(obj, seen);
   }
   const out = {};
   for (const [key, value] of Object.entries(obj)) {
