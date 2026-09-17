@@ -230,6 +230,35 @@ const getReferrer = () => {
 };
 
 /**
+ * utm_source and utm_medium values that are our own traffic rather than a new
+ * acquisition. A portal or email link can arrive with no referrer at all, so
+ * isOwnPropertyReferrer cannot see it and the value itself is the only thing
+ * left to recognise it by.
+ *
+ * Marketing owns this list, not engineering: a wrong entry silently discards
+ * real acquisition and a missing entry silently keeps overwriting it. Confirmed
+ * 2026-09-17 that patient_portal is the only value today, medium none. Add more
+ * here, lowercase. Kept in step with INTERNAL_UTM_SOURCES in the CA
+ * storefront's utils/sourceTracking.js, which holds its own copy because this
+ * storefront stores attribution under traffic_* keys rather than a single
+ * utm_data blob.
+ */
+const INTERNAL_UTM_SOURCES = new Set(["patient_portal"]);
+const INTERNAL_UTM_MEDIUMS = new Set();
+
+/** Whether an incoming UTM set is one of our own stamps rather than traffic. */
+const isInternalUtmStamp = (source, medium) => {
+  const normalize = (value) =>
+    typeof value === "string" ? value.trim().toLowerCase() : "";
+  const normalizedSource = normalize(source);
+  const normalizedMedium = normalize(medium);
+  return (
+    (!!normalizedSource && INTERNAL_UTM_SOURCES.has(normalizedSource)) ||
+    (!!normalizedMedium && INTERNAL_UTM_MEDIUMS.has(normalizedMedium))
+  );
+};
+
+/**
  * Whether any UTM field is already stored (cookie or localStorage), used to
  * decide whether an own-property navigation's incoming UTMs should be
  * suppressed rather than overwrite what is on file.
@@ -295,8 +324,16 @@ export const captureAttribution = () => {
       referrerHostname,
       window.location.hostname
     );
+    // An own-property stamp is never acquisition, so it is dropped whether or
+    // not anything is stored: recording patient_portal as the source is the
+    // defect this guard exists for, and there is nothing to lose by not
+    // recording a value we already know is ours. The referrer rule still only
+    // fires when there is stored data to protect, since an unrecognised
+    // internal promo is a guess rather than a known-ours value.
+    const internalStamp = isInternalUtmStamp(utmSource, utmMedium);
     const suppressUtmOverwrite =
-      incomingHasUtm && ownPropertyNav && hasStoredUtmData();
+      incomingHasUtm &&
+      (internalStamp || (ownPropertyNav && hasStoredUtmData()));
 
     if (suppressUtmOverwrite) {
       // Record that suppression happened so a later reader can tell it apart
