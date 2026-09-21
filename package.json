@@ -47,7 +47,8 @@
     "request": {
       "form-data": "2.5.5"
     },
-    "shell-quote": "1.7.3",
+    "shell-quote": "1.10.0",
+    "websocket-driver": "0.7.5",
     "loader-utils": "1.4.2"
   },
   "devDependencies": {
