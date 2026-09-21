@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { logger } from "@/utils/devLogger";
-import https from "https";
 import axios from "axios";
 
 // Get base URL from environment variables
@@ -74,9 +73,6 @@ export async function POST(req) {
         postData,
         {
           headers,
-          httpsAgent: new https.Agent({
-            rejectUnauthorized: false,
-          }),
           validateStatus: (status) => status >= 200 && status < 300,
         }
       );

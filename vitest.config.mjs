@@ -19,6 +19,8 @@ export default defineConfig({
     include: [
       "lib/customerio/__tests__/**/*.test.js",
       "lib/northbeam/__tests__/**/*.test.js",
+      // TK-1044 TLS verification bypass guard.
+      "tools/__tests__/**/*.test.js",
     ],
     environment: "node",
   },
