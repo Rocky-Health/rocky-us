@@ -69,9 +69,25 @@ const SENSITIVE_KEYS = new Set([
   "birthdate",
 ]);
 
+/**
+ * Substring families that carry raw PII under whatever prefix or suffix a call
+ * site invents. TK-1071 was fixed twice by adding the one exact key QA had just
+ * found, `customer_id_canonical` and then `phone_number`, and failed QA twice
+ * for the same reason: an exact-name list only ever covers the names somebody
+ * has already been bitten by. Matching the family covers the variant nobody has
+ * written yet, which is the argument isCanonicalCustomerIdKey already makes for
+ * the customer_id family.
+ *
+ * The hashed CAPI short keys (em, ph, fn, ln, db, zp, ct, st) contain none of
+ * these substrings and stay readable as intended, and so does
+ * `customer_id_namespace`.
+ */
+const SENSITIVE_KEY_SUBSTRINGS = ["password", "secret", "phone", "email"];
+
 function isSensitiveKey(key) {
   const k = String(key).toLowerCase();
-  return SENSITIVE_KEYS.has(k) || k.includes("password") || k.includes("secret");
+  if (SENSITIVE_KEYS.has(k)) return true;
+  return SENSITIVE_KEY_SUBSTRINGS.some((fragment) => k.includes(fragment));
 }
 
 /**
@@ -123,6 +139,42 @@ function isCanonicalCustomerIdKey(key) {
 }
 
 /**
+ * WooCommerce meta_data is an array of { key, value } pairs, so the field name
+ * lives in the VALUE of `key` and the secret lives in `value`. The generic walk
+ * reads that backwards: the literal property `key` is itself a credential name
+ * in SENSITIVE_KEYS, so it masked the harmless field name and printed the phone
+ * beside it, giving { key: "***", value: "+1555..." }. Decide from the field
+ * name instead, and keep that name readable, since it is schema and not PII.
+ *
+ * Both properties must be present. An ordinary object that merely carries a
+ * `key` is still a credential and keeps its blanket redaction.
+ */
+function isMetaDataEntry(obj) {
+  return typeof obj.key === "string" && "value" in obj;
+}
+
+function redactMetaDataEntry(entry, seen) {
+  const name = entry.key;
+  let redactedValue;
+  if (isCanonicalCustomerIdKey(name)) {
+    redactedValue = maskCustomerId(entry.value);
+  } else if (isSensitiveKey(name)) {
+    redactedValue = typeof entry.value === "boolean" ? entry.value : "***";
+  } else {
+    redactedValue = redactSensitive(entry.value, seen);
+  }
+
+  // Woo echoes entries back with an id, so anything else walks normally.
+  const out = {};
+  for (const [k, v] of Object.entries(entry)) {
+    if (k === "key") out[k] = name;
+    else if (k === "value") out[k] = redactedValue;
+    else out[k] = redactSensitive(v, seen);
+  }
+  return out;
+}
+
+/**
  * Returns a deep copy of obj with sensitive field values replaced by "***".
  * Non-mutating. Safe to call on anything before logging.
  */
@@ -138,12 +190,16 @@ export function redactSensitive(obj, _seen) {
   if (Array.isArray(obj)) {
     return obj.map((item) => redactSensitive(item, seen));
   }
+  if (isMetaDataEntry(obj)) {
+    return redactMetaDataEntry(obj, seen);
+  }
   const out = {};
   for (const [key, value] of Object.entries(obj)) {
     if (isCanonicalCustomerIdKey(key)) {
       out[key] = maskCustomerId(value);
     } else if (isSensitiveKey(key)) {
-      out[key] = "***";
+      // A boolean is never PII, so a family key match must not eat a flag.
+      out[key] = typeof value === "boolean" ? value : "***";
     } else {
       out[key] = redactSensitive(value, seen);
     }

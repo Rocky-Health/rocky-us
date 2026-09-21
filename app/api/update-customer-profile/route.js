@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
-import { logger } from "@/utils/devLogger";
+import { logger, redactSensitive } from "@/utils/devLogger";
 import { cookies } from "next/headers";
 
 const BASE_URL = process.env.BASE_URL;
@@ -26,7 +26,7 @@ export async function POST(req) {
     // Log the request data for debugging
     logger.log(
       "Update customer profile request data:",
-      JSON.stringify(requestData, null, 2)
+      JSON.stringify(redactSensitive(requestData), null, 2)
     );
 
     // Prepare meta data updates
@@ -79,7 +79,7 @@ export async function POST(req) {
 
     logger.log(
       "Full WooCommerce update payload:",
-      JSON.stringify(updatePayload, null, 2)
+      JSON.stringify(redactSensitive(updatePayload), null, 2)
     );
 
     const response = await axios.put(
