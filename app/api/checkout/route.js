@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
 import { cookies } from "next/headers";
-import fs from "fs";
-import path from "path";
 import Stripe from "stripe";
-import { logger } from "@/utils/devLogger";
+import { logger, redactSensitive } from "@/utils/devLogger";
 import {
   transformPaymentError,
   logPaymentError,
@@ -475,39 +473,10 @@ export async function POST(req) {
     }
 
     // Debug the final checkout data with enhanced logging
-    logger.log("FINAL checkoutData", JSON.stringify(checkoutData, null, 2));
-
-    // Write to server log file for debugging
-    const fs = require("fs");
-    const path = require("path");
-    const logDir =
-      process.env.NODE_ENV === "development"
-        ? path.join(process.cwd(), "tmp")
-        : "/tmp";
-
-    try {
-      // Create tmp directory if it doesn't exist
-      if (!fs.existsSync(logDir)) {
-        fs.mkdirSync(logDir, { recursive: true });
-      }
-
-      // Write checkout data to log file
-      fs.writeFileSync(
-        path.join(logDir, `checkout-log-${Date.now()}.json`),
-        JSON.stringify(
-          {
-            timestamp: new Date().toISOString(),
-            checkoutData,
-            savedCardUsed: useSavedCard,
-            totalAmount,
-          },
-          null,
-          2
-        )
-      );
-    } catch (logError) {
-      logger.error("Error writing debug log:", logError);
-    }
+    logger.log(
+      "FINAL checkoutData",
+      JSON.stringify(redactSensitive(checkoutData), null, 2)
+    );
 
     // Call the WooCommerce Store API checkout endpoint
     const response = await axios.post(
