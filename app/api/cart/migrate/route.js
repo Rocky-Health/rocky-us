@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
 import { cookies } from "next/headers";
-import { logger } from "@/utils/devLogger";
+import { logger, redactSensitive } from "@/utils/devLogger";
 
 const BASE_URL = process.env.BASE_URL;
 
@@ -14,7 +14,10 @@ export async function POST(req) {
     logger.log("Starting cart migration API endpoint");
 
     const { items } = await req.json();
-    logger.log(`Received cart items for migration:`, JSON.stringify(items));
+    logger.log(
+      `Received cart items for migration:`,
+      JSON.stringify(redactSensitive(items))
+    );
 
     const cookieStore = await cookies();
     const encodedCredentials = cookieStore.get("authToken");
@@ -318,7 +321,6 @@ export async function POST(req) {
     return NextResponse.json(
       {
         error: "Failed to migrate cart",
-        details: error.message,
       },
       { status: 500 }
     );

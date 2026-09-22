@@ -132,7 +132,6 @@ export async function POST(req) {
         success: false,
         error:
           error.response?.data?.message || "Failed to update customer profile",
-        details: error.response?.data || null,
       },
       { status: error.response?.status || 500 }
     );

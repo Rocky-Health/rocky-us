@@ -125,7 +125,7 @@ const getProductTypeTags = async (products, baseUrlFromRequest) => {
         }
         return null;
       } catch (error) {
-        console.error(
+        logger.error(
           `Error fetching product details for ${
             product.id || product.product_id
           }:`,
@@ -149,7 +149,7 @@ const getProductTypeTags = async (products, baseUrlFromRequest) => {
       }
     });
   } catch (error) {
-    console.error("Error in getProductTypeTags:", error);
+    logger.error("Error in getProductTypeTags:", error);
     // Return empty array if category fetching fails - don't break the order tracking
     return [];
   }
@@ -550,7 +550,6 @@ export async function POST(req) {
     return NextResponse.json(
       {
         error: "Internal server error",
-        details: error.message,
       },
       { status: 500 }
     );

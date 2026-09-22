@@ -85,8 +85,6 @@ export async function GET(req) {
     return new Response(
       JSON.stringify({
         error: "Failed to fetch blogs",
-        message: error.message,
-        details: error.response?.data || error.stack,
       }),
       {
         status: 500,

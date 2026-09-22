@@ -172,12 +172,6 @@ export async function POST(req) {
       {
         success: false,
         error: userFriendlyMessage,
-        details: {
-          message: error.message,
-          type: error.type,
-          code: error.code,
-          decline_code: error.decline_code,
-        },
       },
       { status: error.statusCode || 500 }
     );

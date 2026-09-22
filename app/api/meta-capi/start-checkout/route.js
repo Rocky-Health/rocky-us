@@ -4,6 +4,7 @@ import { MILESTONES } from "@/utils/metaBrowserEventConfig";
 import { hashEmail, hashSHA256 } from "@/utils/analytics/hashServerSide";
 import { processMetaParameters } from "@/lib/meta/paramBuilderHelper";
 import { toMoney } from "@/utils/priceFormatter";
+import { logger } from "@/utils/devLogger";
 
 /**
  * Server-side Meta CAPI mirror for the "Start Checkout" funnel milestone (TK-633).
@@ -81,7 +82,7 @@ export async function POST(req) {
       return NextResponse.json({ error: `Unknown gateway: ${gateway}` }, { status: 400 });
     }
     if (!gatewayConfig?.accessToken) {
-      console.error(
+      logger.error(
         `[Meta CAPI SC] gateway "${gateway}" has no access token (FB_ACCESS_TOKEN_${gateway} empty/missing).`
       );
       return NextResponse.json(
@@ -181,7 +182,7 @@ export async function POST(req) {
         const data = await response.json();
         if (data.error) throw new Error(data.error.message || "Meta API error");
 
-        console.log(`[Meta CAPI SC] ✅ ${target.label}:`, {
+        logger.log(`[Meta CAPI SC] ✅ ${target.label}:`, {
           event_name: target.eventName,
           event_id: target.eventId,
           events_received: data.events_received || 0,
@@ -200,13 +201,13 @@ export async function POST(req) {
           await new Promise((r) => setTimeout(r, 1000));
           return sendOneTarget(target, 2);
         }
-        console.error(`[Meta CAPI SC] ❌ ${target.label}:`, error?.message);
+        logger.error(`[Meta CAPI SC] ❌ ${target.label}:`, error?.message);
         return {
           success: false,
           pixel_id: target.pixelId,
           event_name: target.eventName,
           event_id: target.eventId,
-          error: error?.message || "unknown error",
+          error: "gateway request failed",
         };
       }
     };
@@ -238,7 +239,7 @@ export async function POST(req) {
       secondaries: secondaryResults,
     });
   } catch (error) {
-    console.error("[Meta CAPI SC] System Error:", error);
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    logger.error("[Meta CAPI SC] System Error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

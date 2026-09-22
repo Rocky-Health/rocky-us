@@ -4,6 +4,7 @@ import { hashEmail, hashPhone, hashSHA256 } from '@/utils/analytics/hashServerSi
 import { processMetaParameters } from '@/lib/meta/paramBuilderHelper';
 import { toMoney } from '@/utils/priceFormatter';
 import axios from 'axios';
+import { logger } from '@/utils/devLogger';
 
 const BASE_URL = process.env.BASE_URL;
 const CONSUMER_KEY = process.env.CONSUMER_KEY;
@@ -15,7 +16,7 @@ const _missingMetaTokens = Object.entries(META_CAPI_GATEWAYS)
   .filter(([, cfg]) => !cfg.accessToken)
   .map(([key]) => key);
 if (_missingMetaTokens.length > 0) {
-  console.warn(
+  logger.warn(
     `[Meta CAPI] Cold start: missing FB_ACCESS_TOKEN for gateways: ${_missingMetaTokens.join(', ')}`
   );
 }
@@ -65,7 +66,7 @@ const fetchOrderFromWooCommerce = async (orderId) => {
 
     return response.data;
   } catch (error) {
-    console.error(`[Meta CAPI] Error fetching order ${orderId}:`, error.message);
+    logger.error(`[Meta CAPI] Error fetching order ${orderId}:`, error.message);
     return null;
   }
 };
@@ -87,7 +88,7 @@ const fetchProductDetails = async (productId) => {
     );
     return response.data;
   } catch (error) {
-    console.warn(`[Meta CAPI] Error fetching product ${productId}:`, error.message);
+    logger.warn(`[Meta CAPI] Error fetching product ${productId}:`, error.message);
     return null;
   }
 };
@@ -143,7 +144,7 @@ const fetchCustomerProfile = async (customerId) => {
     );
     return response.data;
   } catch (error) {
-    console.warn(`[Meta CAPI] Could not fetch customer profile:`, error.message);
+    logger.warn(`[Meta CAPI] Could not fetch customer profile:`, error.message);
     return null;
   }
 };
@@ -217,7 +218,7 @@ export async function POST(req) {
     // Validate gateway
     const gatewayConfig = getGatewayConfig(gateway);
     if (!gatewayConfig || !gatewayConfig.accessToken) {
-      console.error(
+      logger.error(
         `[Meta CAPI] Refusing event for order ${order_id}: gateway "${gateway}" has no access token (env var FB_ACCESS_TOKEN_${gateway} is empty or missing).`
       );
       return NextResponse.json(
@@ -228,7 +229,7 @@ export async function POST(req) {
 
     // Skip $0 orders (100% discount)
     if (parseFloat(value) <= 0) {
-      console.log(`[Meta CAPI] Skipping $0 order ${order_id} for gateway ${gateway}`);
+      logger.log(`[Meta CAPI] Skipping $0 order ${order_id} for gateway ${gateway}`);
       return NextResponse.json({
         success: true,
         skipped: true,
@@ -240,7 +241,7 @@ export async function POST(req) {
 
     // Fetch complete order if order_data is incomplete
     if (!order_data?.billing || !order_data?.line_items) {
-      console.log(`[Meta CAPI] Fetching order ${order_id} from WooCommerce...`);
+      logger.log(`[Meta CAPI] Fetching order ${order_id} from WooCommerce...`);
       order_data = await fetchOrderFromWooCommerce(order_id);
       
       if (!order_data) {
@@ -441,7 +442,7 @@ export async function POST(req) {
       const eventPayload = buildEventPayload(target.eventName, target.eventId);
 
       if (attempt === 1) {
-        console.log(`[Meta CAPI] Sending event for order ${order_id} to ${target.label}:`, {
+        logger.log(`[Meta CAPI] Sending event for order ${order_id} to ${target.label}:`, {
           pixel_id: target.pixelId,
           event_name: eventPayload.event_name,
           event_id: eventPayload.event_id,
@@ -466,7 +467,7 @@ export async function POST(req) {
         if (!response.ok) {
           const text = await response.text();
           const retryable = isRetryableStatus(response.status);
-          console.error(`[Meta CAPI] HTTP Error ${target.label} (attempt ${attempt}):`, {
+          logger.error(`[Meta CAPI] HTTP Error ${target.label} (attempt ${attempt}):`, {
             event_id: target.eventId,
             status: response.status,
             statusText: response.statusText,
@@ -475,7 +476,7 @@ export async function POST(req) {
           });
 
           if (attempt === 1 && retryable) {
-            console.log(`[Meta CAPI] Retrying ${target.label}...`);
+            logger.log(`[Meta CAPI] Retrying ${target.label}...`);
             await new Promise((resolve) => setTimeout(resolve, 1000));
             return sendOneTarget(target, 2);
           }
@@ -486,11 +487,11 @@ export async function POST(req) {
         const data = await response.json();
 
         if (data.error) {
-          console.error(`[Meta CAPI] Error ${target.label}:`, data.error);
+          logger.error(`[Meta CAPI] Error ${target.label}:`, data.error);
           throw new Error(data.error.message || 'Meta API error');
         }
 
-        console.log(`[Meta CAPI] ✅ Success ${target.label}:`, {
+        logger.log(`[Meta CAPI] ✅ Success ${target.label}:`, {
           event_id: target.eventId,
           events_received: data.events_received || 0,
           fbtrace_id: data.fbtrace_id,
@@ -506,7 +507,7 @@ export async function POST(req) {
         };
       } catch (error) {
         if (attempt === 1 && isRetryableError(error)) {
-          console.log(`[Meta CAPI] Retrying ${target.label} after error...`);
+          logger.log(`[Meta CAPI] Retrying ${target.label} after error...`);
           await new Promise((resolve) => setTimeout(resolve, 1000));
           return sendOneTarget(target, 2);
         }
@@ -515,7 +516,7 @@ export async function POST(req) {
           pixel_id: target.pixelId,
           event_name: target.eventName,
           event_id: target.eventId,
-          error: error?.message || 'unknown error',
+          error: 'gateway request failed',
         };
       }
     };
@@ -555,9 +556,9 @@ export async function POST(req) {
     });
 
   } catch (error) {
-    console.error('[Meta CAPI] System Error:', error);
+    logger.error('[Meta CAPI] System Error:', error);
     return NextResponse.json({ 
-      error: error.message || 'Internal server error' 
+      error: 'Internal server error' 
     }, { status: 500 });
   }
 }

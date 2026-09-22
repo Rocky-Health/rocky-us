@@ -123,7 +123,6 @@ export async function GET(req) {
           {
             success: false,
             error: `Failed to authenticate with CRM: ${loginResponse.status} ${loginResponse.statusText}`,
-            details: errorText,
           },
           { status: 500 }
         );
@@ -166,7 +165,6 @@ export async function GET(req) {
         {
           success: false,
           error: "CRM authentication token not found",
-          details: loginData,
         },
         { status: 500 }
       );
@@ -218,7 +216,6 @@ export async function GET(req) {
           {
             success: false,
             error: `Failed to get portal auto-login link: ${portalResponse.status} ${portalResponse.statusText}`,
-            details: errorText,
           },
           { status: 500 }
         );
@@ -261,7 +258,6 @@ export async function GET(req) {
         {
           success: false,
           error: "Portal auto-login link not found",
-          details: portalData,
         },
         { status: 500 }
       );
@@ -317,8 +313,6 @@ export async function GET(req) {
       {
         success: false,
         error: "Internal server error",
-        details: error.message,
-        stack: error.stack,
       },
       { status: 500 }
     );

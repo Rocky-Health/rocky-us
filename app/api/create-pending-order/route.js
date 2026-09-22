@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
 import { cookies } from "next/headers";
-import { logger } from "@/utils/devLogger";
+import { logger, redactSensitive } from "@/utils/devLogger";
 import {
   transformPaymentError,
   logPaymentError,
@@ -379,7 +379,10 @@ export async function POST(req) {
       );
     }
 
-    logger.log("Creating order with data:", JSON.stringify(orderData, null, 2));
+    logger.log(
+      "Creating order with data:",
+      JSON.stringify(redactSensitive(orderData), null, 2)
+    );
     logger.log(
       "Order will be associated with customer_id:",
       orderData.customer_id
@@ -619,7 +622,6 @@ export async function POST(req) {
     return NextResponse.json(
       {
         error: userFriendlyMessage,
-        details: error.response?.data || null,
       },
       { status: error.response?.status || 500 }
     );

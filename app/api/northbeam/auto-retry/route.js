@@ -186,7 +186,6 @@ async function runAutoRetry(req) {
       {
         success: false,
         error: "Auto-retry failed",
-        details: error.message,
         duration: `${duration}ms`,
       },
       { status: 500 }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
 import { cookies } from "next/headers";
+import { logger } from "@/utils/devLogger";
 
 const BASE_URL = process.env.BASE_URL;
 const AWIN_MERCHANT_ID = process.env.AWIN_MERCHANT_ID || "101159";
@@ -50,7 +51,7 @@ export async function POST(req) {
     const awinEnabled = process.env.AWIN_ENABLED;
     const isEnabled = awinEnabled === undefined || awinEnabled === "" || awinEnabled === "true" || awinEnabled === "1";
     if (!isEnabled) {
-      console.log("[AWIN] Tracking is disabled, skipping tracking request");
+      logger.log("[AWIN] Tracking is disabled, skipping tracking request");
       return NextResponse.json({
         success: false,
         skipped: true,
@@ -66,7 +67,7 @@ export async function POST(req) {
       );
     }
 
-    console.log("[AWIN] Starting tracking for order:", order_id);
+    logger.log("[AWIN] Starting tracking for order:", order_id);
 
     // Use provided order data or fetch if not provided (fallback)
     let order;
@@ -114,7 +115,7 @@ export async function POST(req) {
         commissionGroup = isExisting ? "EXISTING" : "NEWCUST";
       }
     } catch (e) {
-      console.warn("[AWIN] Unable to determine commission group, using DEFAULT:", e?.message || e);
+      logger.warn("[AWIN] Unable to determine commission group, using DEFAULT:", e?.message || e);
       commissionGroup = "DEFAULT";
     }
 
@@ -162,7 +163,7 @@ export async function POST(req) {
       ? order.meta_data.find((m) => m?.key === "_awin_s2s_code" && String(m?.value) === "200")
       : null;
     if (alreadyFired) {
-      console.log("[AWIN] Skipping S2S; already fired for order", orderReference);
+      logger.log("[AWIN] Skipping S2S; already fired for order", orderReference);
       return NextResponse.json({
         success: true,
         skipped: true,
@@ -177,7 +178,7 @@ export async function POST(req) {
       headers: { Referer: process.env.NEXT_PUBLIC_SITE_URL || "" },
     });
 
-    console.log("[AWIN] Awin response:", {
+    logger.log("[AWIN] Awin response:", {
       status: trackingResponse.status,
       status_text: trackingResponse.statusText,
       data: trackingResponse.data,
@@ -205,7 +206,7 @@ export async function POST(req) {
         }
       );
     } catch (e) {
-      console.warn("[AWIN] Failed to persist S2S meta to Woo:", e?.message || e);
+      logger.warn("[AWIN] Failed to persist S2S meta to Woo:", e?.message || e);
     }
 
     return NextResponse.json({
