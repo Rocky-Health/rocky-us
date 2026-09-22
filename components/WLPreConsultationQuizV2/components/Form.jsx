@@ -598,6 +598,9 @@ const Form = ({
   };
 
   const handleContinue = async () => {
+    // Prevent duplicate submissions from rapid double-clicks while a
+    // registration request is already in flight (TK-529).
+    if (loading) return;
     // If the form includes a password input and the user has entered a password,
     // ensure it meets the required length before proceeding. This prevents the
     // user from continuing when password validation fails.
@@ -1317,7 +1320,7 @@ const Form = ({
 
         <StickyButton
           text="Continue"
-          disabled={false}
+          disabled={loading}
           onClick={handleContinue}
         />
 

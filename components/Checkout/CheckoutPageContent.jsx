@@ -4,6 +4,7 @@ import Loader from "@/components/Loader";
 import { logger } from "@/utils/devLogger";
 import CheckoutSkeleton from "@/components/ui/skeletons/CheckoutSkeleton";
 import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import BillingAndShipping from "./BillingAndShipping";
 import CartAndPayment from "./CartAndPayment";
 import Glp2TreatmentCheckoutSummary from "./Glp2TreatmentCheckoutSummary";
@@ -35,10 +36,26 @@ import {
   trackFunnelEvent,
   trackFunnelEventOnce,
 } from "@/utils/clarityFunnelEvents";
-import QuebecRestrictionPopup from "../Popups/QuebecRestrictionPopup";
-import AgeRestrictionPopup from "../Popups/AgeRestrictionPopup";
-import ProductNotAvailablePopup from "../Popups/ProductNotAvailablePopup";
-import PaymentProcessingModal from "../Popups/PaymentProcessingPopup";
+// Below-the-fold restriction / status popups: rendered only after a
+// client-side user interaction (each returns null while isOpen is false), so
+// they never appear on initial paint. Lazy-load them (ssr: false, no loading
+// placeholder) to keep them out of the critical checkout hydration bundle.
+const QuebecRestrictionPopup = dynamic(
+  () => import("../Popups/QuebecRestrictionPopup"),
+  { ssr: false, loading: () => null }
+);
+const AgeRestrictionPopup = dynamic(
+  () => import("../Popups/AgeRestrictionPopup"),
+  { ssr: false, loading: () => null }
+);
+const ProductNotAvailablePopup = dynamic(
+  () => import("../Popups/ProductNotAvailablePopup"),
+  { ssr: false, loading: () => null }
+);
+const PaymentProcessingModal = dynamic(
+  () => import("../Popups/PaymentProcessingPopup"),
+  { ssr: false, loading: () => null }
+);
 import {
   isRestrictedCartItem,
   isEdStateRestricted,

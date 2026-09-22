@@ -6044,6 +6044,9 @@ export default function WeightLossConsultationQuiz({
                       <img
                         src={`${process.env.BASE_URL || "https://wpbe.myrocky.com"}/wp-content/themes/salient-child/img/please_wait_animation.gif`}
                         alt=""
+                        width={100}
+                        height={100}
+                        className="object-contain"
                         style={{ margin: "0 auto" }}
                       />
                     </div>

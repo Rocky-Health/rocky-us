@@ -4,6 +4,9 @@ import Link from "next/link";
 import { useState, useRef } from "react";
 import { toBackupHost } from "@/utils/blogImageFallback";
 
+// SSR-safe plain-text extraction. Runs during server render/prerender too, so
+// it must not touch `document`. Strip HTML tags with a regex and decode the
+// handful of entities WordPress emits in titles/excerpts.
 function getText(html) {
   if (!html) return "";
   // Browser: use the DOM for accurate entity/tag handling.
@@ -19,6 +22,7 @@ function getText(html) {
     .replace(/&amp;/g, "&")
     .replace(/&quot;/g, '"')
     .replace(/&#0?39;|&apos;/g, "'")
+    .replace(/&#x27;/g, "'")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/\s+/g, " ")

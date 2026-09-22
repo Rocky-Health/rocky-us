@@ -295,6 +295,10 @@ const HeroSection = ({ onOpenMenu }) => {
                                         aria-hidden
                                     />
                                     {/* Background Image — mobile LCP candidate: preload it */}
+                                    {/* Fit the portrait to the short mobile card height so the
+                                        model's head isn't clipped by the card's overflow-hidden.
+                                        147x163 preserves the source aspect ratio (1570x1740) so
+                                        the full figure shows, mirroring the desktop card. */}
                                     <CustomImage
                                         src={services[0].image}
                                         alt={services[0].title}
@@ -302,7 +306,7 @@ const HeroSection = ({ onOpenMenu }) => {
                                         height={services[0].height}
                                         priority
                                         sizes="(max-width: 768px) 90vw, 420px"
-                                        className={`object-cover absolute bottom-0 right-0 w-[${services[0].mobile_width}px]`}
+                                        className={`object-cover absolute bottom-0 right-0 h-[163px] w-[147px]`}
                                     />
 
                                     <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-transparent "></div>

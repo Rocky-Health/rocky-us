@@ -6,6 +6,7 @@ import React, { useState, useRef } from "react";
 import { toast } from "react-toastify";
 import { usePassword } from "@/components/WLPreConsultationQuizV2/contexts/PasswordContext";
 import { encryptPasswordWithServerKey } from "@/utils/encryptPasswordWithServerKey";
+import GoogleSignInButton from "@/components/LoginRegisterPage/GoogleSignInButton";
 
 const WeightLossResultPasswordPopup = ({
   onSubmit,
@@ -287,6 +288,43 @@ const WeightLossResultPasswordPopup = ({
     }
   };
 
+  // Google Sign-In: exchange the id_token for a session, then continue the
+  // funnel via the same step the password login uses.
+  const handleGoogleSuccess = async ({ credential }) => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/google-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id_token: credential }),
+      });
+      if (res.ok) {
+        toast.success("Logged in successfully");
+        if (typeof onSubmit === "function") {
+          onSubmit("openPopup", "YourWeightPopup");
+        }
+      } else {
+        let data = null;
+        try {
+          data = await res.json();
+        } catch (e) {}
+        toast.error(
+          (data && (data.message || data.error)) ||
+            "Google sign-in was unsuccessful. Please try again.",
+        );
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error("Google sign-in was unsuccessful. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleError = () => {
+    toast.error("Google sign-in was unsuccessful. Please try again.");
+  };
+
   const isButtonDisabled =
     !email ||
     !isValidEmail(email) ||
@@ -512,6 +550,26 @@ const WeightLossResultPasswordPopup = ({
                     </li>
                   </ul>
                 )}
+              </div>
+            )}
+
+            {showPasswordSection && emailExists && (
+              <div>
+                {/* Divider */}
+                <div className="w-full flex items-center justify-center gap-4 my-4">
+                  <div className="h-[1px] bg-gray-300 flex-1"></div>
+                  <span className="text-gray-500 text-sm">OR</span>
+                  <div className="h-[1px] bg-gray-300 flex-1"></div>
+                </div>
+                {/* Google Sign-In Button */}
+                <div className="w-full flex justify-center items-center">
+                  <GoogleSignInButton
+                    onSuccess={handleGoogleSuccess}
+                    onError={handleGoogleError}
+                    disabled={disabled || loading}
+                    isLoading={loading}
+                  />
+                </div>
               </div>
             )}
 

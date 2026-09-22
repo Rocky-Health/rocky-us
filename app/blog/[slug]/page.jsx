@@ -27,6 +27,38 @@ export function generateStaticParams() {
 const DEFAULT_FEATURED_IMAGE =
   "https://www.shutterstock.com/image-vector/default-ui-image-placeholder-wireframes-600nw-1037719192.jpg";
 
+// Pre-generate article routes at build time from the published posts.
+export async function generateStaticParams() {
+  try {
+    const res = await fetch(
+      `${process.env.BASE_URL}/wp-json/wp/v2/posts?per_page=100&_fields=slug`,
+      {
+        headers: {
+          Authorization: process.env.ADMIN_TOKEN,
+        },
+      }
+    );
+
+    if (!res.ok) {
+      logger.error("Failed to fetch posts for static generation");
+      return [];
+    }
+
+    const posts = await res.json();
+
+    if (!Array.isArray(posts)) {
+      return [];
+    }
+
+    return posts.map((post) => ({
+      slug: post.slug,
+    }));
+  } catch (error) {
+    logger.error("Error in generateStaticParams:", error);
+    return [];
+  }
+}
+
 function deriveCategory(blog) {
   if (blog?.class_list?.[7]) {
     return blog.class_list[7].replace("category-", "").replace(/-/g, " ");

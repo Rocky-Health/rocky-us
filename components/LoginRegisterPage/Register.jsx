@@ -26,6 +26,7 @@ import {
 } from "@/utils/zonnicQuebecValidation";
 import CartMigrationOverlay from "@/components/CartMigrationOverlay";
 import { encryptPasswordWithServerKey } from "@/utils/encryptPasswordWithServerKey";
+import FieldError, { fieldInputClass, fieldLabelClass } from "./FieldError";
 
 import {
   ALL_US_STATES,
@@ -52,12 +53,11 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
     gender: "",
   });
   const [datePickerValue, setDatePickerValue] = useState(null);
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
-  const [phoneError, setPhoneError] = useState("");
-  const [phoneTouched, setPhoneTouched] = useState(false);
   const redirectTo = searchParams.get("redirect_to");
 
   // Password strength checks (live feedback)
@@ -74,10 +74,15 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
   const isEdFlow = searchParams.get("ed-flow") === "1";
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: value,
     }));
+
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -153,62 +158,80 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
   };
 
   const validateStep1 = () => {
-    if (!formData.first_name || !formData.last_name) {
-      toast.error("Please enter your full name");
-      return false;
+    const newErrors = {};
+    let valid = true;
+
+    if (!formData.first_name) {
+      newErrors.first_name = "Please enter your first name";
+      valid = false;
+    }
+    if (!formData.last_name) {
+      newErrors.last_name = "Please enter your last name";
+      valid = false;
     }
     if (!formData.email) {
-      toast.error("Email address is required");
-      return false;
-    }
-    if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      toast.error("Please enter a valid email address");
-      return false;
+      newErrors.email = "Email address is required";
+      valid = false;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+      valid = false;
     }
     if (!formData.password) {
-      toast.error("Password is required");
-      return false;
-    }
-    if (formData.password.length < 8) {
-      toast.error("Password must be at least 8 characters");
-      return false;
-    }
-    if (!/[A-Z]/.test(formData.password)) {
-      toast.error("Password must contain at least one uppercase letter");
-      return false;
-    }
-    if (!/[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(formData.password)) {
-      toast.error("Password must contain at least one number or symbol");
-      return false;
+      newErrors.password = "Password is required";
+      valid = false;
+    } else if (formData.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
+      valid = false;
+    } else if (!/[A-Z]/.test(formData.password)) {
+      newErrors.password =
+        "Password must contain at least one uppercase letter";
+      valid = false;
+    } else if (
+      !/[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(formData.password)
+    ) {
+      newErrors.password =
+        "Password must contain at least one number or symbol";
+      valid = false;
     }
     if (formData.password !== formData.confirm_password) {
-      toast.error("Passwords do not match");
-      return false;
+      newErrors.confirm_password = "Passwords do not match";
+      valid = false;
     }
-    return true;
+
+    setErrors(newErrors);
+    return valid;
   };
 
   const validateStep2 = () => {
-    const digitsOnly = (formData.phone || "").replace(/\D/g, "");
-    if (!formData.phone || digitsOnly.length < 10 || /^0+$/.test(digitsOnly)) {
-      const msg = formData.phone
-        ? "Please enter a valid phone number"
-        : "Phone number is required";
-      toast.error(msg);
-      setPhoneError(msg);
-      setPhoneTouched(true);
-      return false;
+    const newErrors = {};
+    let valid = true;
+
+    if (!formData.phone) {
+      newErrors.phone = "Phone number is required";
+      valid = false;
+    } else {
+      const digitsOnly = formData.phone.replace(/\D/g, "");
+      if (digitsOnly.length < 10 || /^0+$/.test(digitsOnly)) {
+        newErrors.phone = "Please enter a valid phone number";
+        valid = false;
+      }
     }
-    setPhoneError("");
+
     if (!formData.date_of_birth) {
-      toast.error("Date of birth is required");
-      return false;
+      newErrors.date_of_birth = "Date of birth is required";
+      valid = false;
     }
     if (!formData.province) {
-      toast.error("Province is required");
-      return false;
+      newErrors.province = "State is required";
+      valid = false;
     }
-    return true;
+    if (!formData.gender) {
+      newErrors.gender = "Please select a gender";
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
   };
 
   const handleNextStep = async (e) => {
@@ -282,9 +305,10 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
 
   const handlePhoneChange = (formatted) => {
     setFormData((prev) => ({ ...prev, phone: formatted }));
-    setPhoneTouched(true);
     // Clear external error while user is typing
-    if (phoneError) setPhoneError("");
+    if (errors.phone) {
+      setErrors((prev) => ({ ...prev, phone: "" }));
+    }
   };
 
   const handleDateChange = (value) => {
@@ -292,6 +316,9 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
       ...prev,
       date_of_birth: value,
     }));
+    if (errors.date_of_birth) {
+      setErrors((prev) => ({ ...prev, date_of_birth: "" }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -544,18 +571,23 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
         </h3>
       </div>
 
-      <form onSubmit={currentStep === 1 ? handleNextStep : handleSubmit}>
+      <form noValidate onSubmit={currentStep === 1 ? handleNextStep : handleSubmit}>
         <div className="flex flex-col flex-wrap items-center justify-center mx-auto py-3 px-8 pt-5 w-[100%] max-w-[400px] space-y-4">
           {currentStep === 1 ? (
             <>
               <div className="flex flex-col md:flex-row md:gap-2 w-full space-y-4 md:space-y-0">
                 <div className="w-full flex flex-col items-start justify-center gap-2">
-                  <label htmlFor="first_name">First Name</label>
+                  <label
+                    htmlFor="first_name"
+                    className={fieldLabelClass(errors.first_name)}
+                  >
+                    First Name
+                  </label>
                   <input
                     type="text"
                     id="first_name"
                     name="first_name"
-                    className="block w-[100%] rounded-[8px] h-[40px] text-md m-auto border-gray-500 border px-4 focus:outline focus:outline-2 focus:outline-black focus:ring-0 focus:border-transparent"
+                    className={fieldInputClass(errors.first_name)}
                     tabIndex="1"
                     placeholder="Your first name"
                     value={formData.first_name}
@@ -563,14 +595,20 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
                     style={{ outlineColor: "black" }}
                     required
                   />
+                  <FieldError message={errors.first_name} className="-mt-1.5" />
                 </div>
                 <div className="w-full flex flex-col items-start justify-center gap-2">
-                  <label htmlFor="last_name">Last Name</label>
+                  <label
+                    htmlFor="last_name"
+                    className={fieldLabelClass(errors.last_name)}
+                  >
+                    Last Name
+                  </label>
                   <input
                     type="text"
                     id="last_name"
                     name="last_name"
-                    className="block w-[100%] rounded-[8px] h-[40px] text-md m-auto border-gray-500 border px-4 focus:outline focus:outline-2 focus:outline-black focus:ring-0 focus:border-transparent"
+                    className={fieldInputClass(errors.last_name)}
                     tabIndex="1"
                     placeholder="Your last name"
                     value={formData.last_name}
@@ -578,15 +616,18 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
                     style={{ outlineColor: "black" }}
                     required
                   />
+                  <FieldError message={errors.last_name} className="-mt-1.5" />
                 </div>
               </div>
               <div className="w-full flex flex-col items-start justify-center gap-2">
-                <label htmlFor="email">Email Address</label>
+                <label htmlFor="email" className={fieldLabelClass(errors.email)}>
+                  Email Address
+                </label>
                 <input
                   type="email"
                   id="email"
                   name="email"
-                  className="block w-[100%] rounded-[8px] h-[40px] text-md m-auto border-gray-500 border px-4 focus:outline focus:outline-2 focus:outline-black focus:ring-0 focus:border-transparent"
+                  className={fieldInputClass(errors.email)}
                   tabIndex="1"
                   autoComplete="email"
                   placeholder="Enter your email address"
@@ -595,16 +636,22 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
                   style={{ outlineColor: "black" }}
                   required
                 />
+                <FieldError message={errors.email} className="-mt-1.5" />
               </div>
               <div className="w-full flex flex-col items-start justify-center gap-2 password-field">
-                <label htmlFor="password">Password</label>
+                <label
+                  htmlFor="password"
+                  className={fieldLabelClass(errors.password)}
+                >
+                  Password
+                </label>
                 <div className="w-full relative items-center">
                   <input
                     type={showPassword ? "text" : "password"}
                     id="password"
                     placeholder="Enter your password"
                     name="password"
-                    className="block w-[100%] rounded-[8px] h-[40px] text-md m-auto border-gray-500 border px-4 focus:outline focus:outline-2 focus:outline-black focus:ring-0 focus:border-transparent"
+                    className={fieldInputClass(errors.password)}
                     tabIndex="4"
                     autoComplete="new-password"
                     value={formData.password}
@@ -613,20 +660,20 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
                     required
                     minLength={8}
                   />
-                  {showPassword ? (
-                    <MdOutlineVisibilityOff
-                      size={16}
-                      className="absolute right-3 top-3 cursor-pointer"
-                      onClick={togglePasswordVisibility}
-                    />
-                  ) : (
-                    <MdOutlineRemoveRedEye
-                      size={16}
-                      className="absolute right-3 top-3 cursor-pointer"
-                      onClick={togglePasswordVisibility}
-                    />
-                  )}
+                  <button
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    className="absolute right-0 top-0 h-full px-3 flex items-center justify-center text-gray-600 cursor-pointer"
+                  >
+                    {showPassword ? (
+                      <MdOutlineVisibilityOff size={16} />
+                    ) : (
+                      <MdOutlineRemoveRedEye size={16} />
+                    )}
+                  </button>
                 </div>
+                <FieldError message={errors.password} className="-mt-1.5" />
                 {/* Password requirements checklist */}
                 <ul className="mt-1 text-[12px] list-none space-y-1 pl-0 w-full">
                   <li
@@ -666,14 +713,19 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
                 </ul>
               </div>
               <div className="w-full flex flex-col items-start justify-center gap-2 password-field">
-                <label htmlFor="confirm_password">Confirm Password</label>
+                <label
+                  htmlFor="confirm_password"
+                  className={fieldLabelClass(errors.confirm_password)}
+                >
+                  Confirm Password
+                </label>
                 <div className="w-full relative items-center">
                   <input
                     type={showConfirmPassword ? "text" : "password"}
                     id="confirm_password"
                     placeholder="Confirm your password"
                     name="confirm_password"
-                    className="block w-[100%] rounded-[8px] h-[40px] text-md m-auto border-gray-500 border px-4 focus:outline focus:outline-2 focus:outline-black focus:ring-0 focus:border-transparent"
+                    className={fieldInputClass(errors.confirm_password)}
                     tabIndex="4"
                     autoComplete="new-password"
                     value={formData.confirm_password}
@@ -681,20 +733,25 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
                     style={{ outlineColor: "black" }}
                     required
                   />
-                  {showConfirmPassword ? (
-                    <MdOutlineVisibilityOff
-                      size={16}
-                      className="absolute right-3 top-3 cursor-pointer"
-                      onClick={toggleConfirmPasswordVisibility}
-                    />
-                  ) : (
-                    <MdOutlineRemoveRedEye
-                      size={16}
-                      className="absolute right-3 top-3 cursor-pointer"
-                      onClick={toggleConfirmPasswordVisibility}
-                    />
-                  )}
+                  <button
+                    type="button"
+                    onClick={toggleConfirmPasswordVisibility}
+                    aria-label={
+                      showConfirmPassword ? "Hide password" : "Show password"
+                    }
+                    className="absolute right-0 top-0 h-full px-3 flex items-center justify-center text-gray-600 cursor-pointer"
+                  >
+                    {showConfirmPassword ? (
+                      <MdOutlineVisibilityOff size={16} />
+                    ) : (
+                      <MdOutlineRemoveRedEye size={16} />
+                    )}
+                  </button>
                 </div>
+                <FieldError
+                  message={errors.confirm_password}
+                  className="-mt-1.5"
+                />
               </div>
             </>
           ) : (
@@ -710,34 +767,50 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
                 </button>
               </div>
               <div className="w-full flex flex-col items-start justify-center gap-2">
-                <label htmlFor="phone">Phone Number</label>
+                <label htmlFor="phone" className={fieldLabelClass(errors.phone)}>
+                  Phone Number
+                </label>
                 <PhoneInput
                   id="phone"
                   name="phone"
                   value={formData.phone}
                   onChange={handlePhoneChange}
-                  error={phoneError || undefined}
+                  error={errors.phone || undefined}
                   required
                   className="w-full"
                 />
               </div>
               <div className="w-full flex flex-col items-start justify-center gap-2">
-                <label htmlFor="date_of_birth">Date of Birth</label>
+                <label
+                  htmlFor="date_of_birth"
+                  className={fieldLabelClass(errors.date_of_birth)}
+                >
+                  Date of Birth
+                </label>
                 <DOBInput
                   value={formData.date_of_birth}
                   onChange={handleDateChange}
-                  className="block w-full rounded-[8px] h-[40px] text-md m-auto border-gray-500 border px-4 focus:outline focus:outline-2 focus:outline-black focus:ring-0 focus:border-transparent pr-10"
+                  className={`${fieldInputClass(errors.date_of_birth)} pr-10`}
                   placeholder="mm/dd/yyyy"
                   minAge={18}
                   required
                 />
+                <FieldError
+                  message={errors.date_of_birth}
+                  className="-mt-1.5"
+                />
               </div>
               <div className="w-full flex flex-col items-start justify-center gap-2">
-                <label htmlFor="province">State</label>
+                <label
+                  htmlFor="province"
+                  className={fieldLabelClass(errors.province)}
+                >
+                  State
+                </label>
                 <select
                   id="province"
                   name="province"
-                  className="block w-[100%] rounded-[8px] h-[40px] text-md m-auto border-gray-500 border px-4 focus:outline focus:outline-2 focus:outline-black focus:ring-0 focus:border-transparent"
+                  className={fieldInputClass(errors.province)}
                   value={formData.province}
                   onChange={handleChange}
                   style={{ outlineColor: "black" }}
@@ -753,13 +826,16 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
                     </option>
                   ))}
                 </select>
+                <FieldError message={errors.province} className="-mt-1.5" />
               </div>
               <div className="w-full flex flex-col items-start justify-center gap-2">
-                <label htmlFor="gender">Gender</label>
+                <label htmlFor="gender" className={fieldLabelClass(errors.gender)}>
+                  Gender
+                </label>
                 <select
                   id="gender"
                   name="gender"
-                  className="block w-[100%] rounded-[8px] h-[40px] text-md m-auto border-gray-500 border px-4 focus:outline focus:outline-2 focus:outline-black focus:ring-0 focus:border-transparent"
+                  className={fieldInputClass(errors.gender)}
                   value={formData.gender}
                   onChange={handleChange}
                   style={{ outlineColor: "black" }}
@@ -771,6 +847,7 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
                     </option>
                   ))}
                 </select>
+                <FieldError message={errors.gender} className="-mt-1.5" />
               </div>
             </>
           )}
