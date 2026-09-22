@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { isUserAuthenticated } from "@/utils/crossSellCheckout";
+import { logger } from "@/utils/devLogger";
 
 const STORAGE_KEY = "wl_flow2_quiz_data";
 
@@ -71,7 +72,7 @@ export const useStepNavigation = (quizConfig) => {
         }
       }
     } catch (e) {
-      console.error("Failed to load navigation state from localStorage:", e);
+      logger.error("Failed to load navigation state from localStorage:", e);
     }
     hasHydrated.current = true;
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -95,7 +96,7 @@ export const useStepNavigation = (quizConfig) => {
         })
       );
     } catch (e) {
-      console.error("Failed to save navigation state to localStorage:", e);
+      logger.error("Failed to save navigation state to localStorage:", e);
     }
   }, [currentStep, progressPercent, history]);
 
@@ -254,7 +255,7 @@ export const useStepNavigation = (quizConfig) => {
           );
         }
       } catch (e) {
-        console.error("Failed to reset navigation state in localStorage:", e);
+        logger.error("Failed to reset navigation state in localStorage:", e);
       }
     }
   };

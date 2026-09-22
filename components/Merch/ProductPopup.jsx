@@ -213,11 +213,11 @@ const ProductPopup = ({ isOpen, onClose, product }) => {
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
 
-    console.log('Swipe detected:', { distance, isLeftSwipe, isRightSwipe, touchStart, touchEnd });
+    logger.log('Swipe detected:', { distance, isLeftSwipe, isRightSwipe, touchStart, touchEnd });
 
     if (isLeftSwipe && currentProduct.images.length > 1) {
       // Swipe left - go to next image
-      console.log('Going to next image');
+      logger.log('Going to next image');
       setSelectedImageIndex((prev) => 
         prev === currentProduct.images.length - 1 ? 0 : prev + 1
       );
@@ -225,7 +225,7 @@ const ProductPopup = ({ isOpen, onClose, product }) => {
     
     if (isRightSwipe && currentProduct.images.length > 1) {
       // Swipe right - go to previous image
-      console.log('Going to previous image');
+      logger.log('Going to previous image');
       setSelectedImageIndex((prev) => 
         prev === 0 ? currentProduct.images.length - 1 : prev - 1
       );

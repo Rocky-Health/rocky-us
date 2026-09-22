@@ -9,6 +9,7 @@
  * SSR-safe, never throws, gracefully degrades if fbq is missing.
  */
 
+import { logger } from "@/utils/devLogger";
 import { safePush, getOrCreateSessionId } from "@/utils/dataLayerHelper";
 import {
   resolveMetaEventName,
@@ -37,7 +38,7 @@ const DEBUG =
 export function logMetaTrackingError(err, context = {}) {
   if (DEBUG) {
     try {
-      console.warn("[META_TRACKING_ERROR]", { error: err, ...context });
+      logger.warn("[META_TRACKING_ERROR]", { error: err, ...context });
     } catch (_) {
       // absolute last resort — never break the app
     }
@@ -146,7 +147,7 @@ function emitMetaFunnelEvent(milestone, flowId, questionnaireId, params = {}) {
 
     if (DEBUG) {
       try {
-        console.log("[META_QUIZ]", milestone, obfuscatedName, basePayload);
+        logger.log("[META_QUIZ]", milestone, obfuscatedName, basePayload);
       } catch (err) {
         logMetaTrackingError(err, { flow_id: flowId, questionnaire_id: questionnaireId, milestone, scope: "debug_log" });
       }

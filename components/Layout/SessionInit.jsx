@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
+import { logger } from "@/utils/devLogger";
 import {
   getOrCreateSessionId,
   getRequestId,
@@ -107,7 +108,7 @@ function runAnalyticsBridge(sessionId) {
 
     if (process.env.NEXT_PUBLIC_QS_TRACK_DEBUG === "1") {
       try {
-        console.debug("[SessionTrace] session initialized:", sessionId);
+        logger.debug("[SessionTrace] session initialized:", Boolean(sessionId));
       } catch (_) {}
     }
   });

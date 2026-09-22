@@ -418,9 +418,10 @@ export default function WeightLossConsultationQuiz({
             }),
           });
           const data = await res.json();
+          // Prefill answers are PHI, so log the outcome only.
           logger.log("[WeightConsultationQuiz] questionnaire-filled-answers:", {
             status: res.status,
-            data,
+            answerCount: Object.keys(data?.data || {}).length,
           });
           if (data?.data) {
             answersData = data.data;
@@ -1166,7 +1167,10 @@ export default function WeightLossConsultationQuiz({
     const purchasedProduct = searchParams.get("purchased_product");
 
     if (orderId || purchasedProduct) {
-      logger.log("Extracted URL parameters:", { orderId, purchasedProduct });
+      logger.log("Extracted URL parameters:", {
+        orderId,
+        hasPurchasedProduct: Boolean(purchasedProduct),
+      });
 
       const urlParamUpdates = {};
 
@@ -1177,9 +1181,9 @@ export default function WeightLossConsultationQuiz({
       if (purchasedProduct) {
         const decodedProduct = decodeURIComponent(purchasedProduct);
         urlParamUpdates.product_name = sanitizeProductName(decodedProduct);
+        // The product name is treatment data, so log the outcome only.
         logger.log("Sanitized product name:", {
-          original: decodedProduct,
-          sanitized: urlParamUpdates.product_name,
+          changed: decodedProduct !== urlParamUpdates.product_name,
         });
       }
 
@@ -1193,7 +1197,10 @@ export default function WeightLossConsultationQuiz({
         ...urlParamUpdates,
       });
 
-      logger.log("Updated form data with URL parameters:", urlParamUpdates);
+      logger.log(
+        "Updated form data with URL parameters:",
+        Object.keys(urlParamUpdates),
+      );
     }
   }, []);
 
@@ -2032,7 +2039,8 @@ export default function WeightLossConsultationQuiz({
           }, {});
 
         if (Object.keys(textareaFields).length > 0) {
-          logger.log("Submitting textarea fields:", textareaFields);
+          // Free text answers, so log the field names only.
+          logger.log("Submitting textarea fields:", Object.keys(textareaFields));
         }
       };
       const completionPct =
@@ -3546,7 +3554,9 @@ export default function WeightLossConsultationQuiz({
   };
 
   const HandleChangeBpWarningAcknowledged = (option) => {
-    logger.log(option);
+    logger.log("BP warning acknowledgement changed", {
+      acknowledged: Boolean(option),
+    });
     // Only toggle the acknowledged state to enable/disable the Continue button.
     // All form data saving and navigation happen in the onClose handler when
     // the user explicitly clicks Continue.

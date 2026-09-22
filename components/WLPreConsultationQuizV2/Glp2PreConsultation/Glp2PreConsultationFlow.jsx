@@ -118,7 +118,8 @@ const Glp2PreConsultationFlow = () => {
     if (activePopup) {
       logger.log("[Glp2PreConsultationFlow] Active popup:", activePopup);
       logger.log("[Glp2PreConsultationFlow] Popup config:", activePopupConfig);
-      logger.log("[Glp2PreConsultationFlow] User data:", userData);
+      // Quiz answers are PHI, so log the field names only.
+      logger.log("[Glp2PreConsultationFlow] User data fields:", Object.keys(userData || {}));
     }
   }, [activePopup, activePopupConfig, userData]);
 

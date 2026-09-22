@@ -86,11 +86,6 @@ export function useAcneQuiz() {
 
       const phone = phoneRaw ? decodeURIComponent(phoneRaw) : "";
 
-      // Debug logging
-      logger.log("Cookie data read:", { dob, phone });
-      logger.log("DOB raw:", dobRaw);
-      logger.log("Phone raw:", phoneRaw);
-
       return { dob, phone };
     } catch (e) {
       logger.warn("Error reading cookies:", e);
@@ -117,11 +112,6 @@ export function useAcneQuiz() {
       158: cookieData.dob || storedData[158],
       132: cookieData.phone || storedData[132],
     };
-
-    // Debug logging
-    logger.log("Initial data with DOB and phone:", initialData);
-    logger.log("DOB value:", initialData[158]);
-    logger.log("Phone value:", initialData[132]);
 
     return initialData;
   });
@@ -715,11 +705,6 @@ export function useAcneQuiz() {
     // Include DOB and phone number from cookies/user data
     if (ans[132]) out["132"] = ans[132]; // Phone number
     if (ans[158]) out["158"] = ans[158]; // DOB
-
-    // Debug logging
-    logger.log("TransformAnswersForApi - ans[132] (phone):", ans[132]);
-    logger.log("TransformAnswersForApi - ans[158] (DOB):", ans[158]);
-    logger.log("TransformAnswersForApi - out object:", out);
 
     return out;
   };

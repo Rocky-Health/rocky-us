@@ -84,7 +84,10 @@ export const trackTikTokEvent = (eventName, eventData = {}, debug = true, mirror
     const payload = { ...eventData, event_id };
 
     if (debug) {
-      logger.log(`[TikTok] Tracking event: ${eventName}`, payload);
+      logger.log(`[TikTok] Tracking event: ${eventName}`, {
+        ...payload,
+        contents: payload.contents?.length,
+      });
     }
 
     // Track the event with TikTok pixel (existing behavior — unchanged)

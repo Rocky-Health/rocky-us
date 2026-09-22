@@ -363,9 +363,10 @@ export default function HairConsultationQuiz({
             }),
           });
           const data = await res.json();
+          // Prefill answers are PHI, so log the outcome only.
           logger.log("[HairConsultationQuiz] questionnaire-filled-answers:", {
             status: res.status,
-            data,
+            answerCount: Object.keys(data?.data || {}).length,
           });
           if (data?.data) {
             answersData = data.data;

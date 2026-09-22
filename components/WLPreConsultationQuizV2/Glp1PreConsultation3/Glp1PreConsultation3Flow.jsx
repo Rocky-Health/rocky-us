@@ -123,7 +123,8 @@ const Glp1PreConsultation3Flow = () => {
                 "[Glp1PreConsultation3Flow] Popup config:",
                 activePopupConfig,
             );
-            logger.log("[Glp1PreConsultation3Flow] User data:", userData);
+            // Quiz answers are PHI, so log the field names only.
+      logger.log("[Glp1PreConsultation3Flow] User data fields:", Object.keys(userData || {}));
         }
     }, [activePopup, activePopupConfig, userData]);
 

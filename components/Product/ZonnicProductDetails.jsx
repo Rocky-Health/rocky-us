@@ -172,7 +172,8 @@ const ZonnicProductDetails = ({ product, variations, isLoading }) => {
 
       // Check age restriction for logged-in users (must be 19+ for Zonnic)
       if (userDateOfBirth) {
-        logger.log("User date of birth:", userDateOfBirth);
+        // Never log the DOB value itself.
+        logger.log("Checking age restriction against stored date of birth");
         const ageCheck = checkAgeRestriction(userDateOfBirth, 19);
         logger.log("Age validation result:", ageCheck);
 
@@ -240,7 +241,13 @@ const ZonnicProductDetails = ({ product, variations, isLoading }) => {
         }
       }
 
-      logger.log("Adding to cart with data:", cartData);
+      // Attribute values carry dose/strength, so log the ids only.
+      logger.log("Adding to cart with data:", {
+        productId: cartData.productId,
+        variationId: cartData.variationId,
+        quantity: cartData.quantity,
+        attributeKeys: Object.keys(cartData.attributes || {}),
+      });
 
       await addItemToCart(cartData);
 

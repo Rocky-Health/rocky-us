@@ -91,7 +91,10 @@ export const trackGA4Event = (eventName, eventData = {}, debug = true) => {
     }
 
     if (debug) {
-      logger.log(`[GA4] Tracking event: ${eventName}`, eventPayload);
+      logger.log(`[GA4] Tracking event: ${eventName}`, {
+        ...eventPayload,
+        items: eventPayload.items?.length,
+      });
     }
 
     window.dataLayer.push(eventPayload);

@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { uploadFileToS3WithProgress } from "@/utils/s3/frontend-upload";
+import { logger } from "@/utils/devLogger";
 
 const PhotoUploadStep = ({
   onContinue,
@@ -81,7 +82,7 @@ const PhotoUploadStep = ({
       // Continue to next step
       onContinue();
     } catch (error) {
-      console.error("Photo upload error:", error);
+      logger.error("Photo upload error:", error);
       setUploadError(
         error.message || "Failed to upload photos. Please try again."
       );

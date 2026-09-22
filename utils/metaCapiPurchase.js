@@ -20,17 +20,10 @@ export const categorizeProduct = (product) => {
   const productName = (product.name || '').toLowerCase();
   const productId = product.product_id || product.id;
   
-  // Debug logging to help troubleshoot categorization issues
-  console.log(`[Meta CAPI] 🔍 Categorizing product ${productId}:`, {
-    name: product.name,
-    categories: productCategories,
-    has_categories: productCategories.length > 0
-  });
-  
+  // Product name and category slugs name the treatment, so log the id and a count.
   if (logger?.log) {
     logger.log(`[Meta CAPI] Categorizing product ${productId}:`, {
-      name: product.name,
-      categories: productCategories,
+      category_count: productCategories.length,
       has_categories: productCategories.length > 0
     });
   }
@@ -44,16 +37,15 @@ export const categorizeProduct = (product) => {
     );
     
     if (matches) {
-      console.log(`[Meta CAPI] ✅ Product ${productId} matched to ${gatewayKey} gateway (by category)`);
       if (logger?.log) {
-        logger.log(`[Meta CAPI] Product matched to ${gatewayKey} gateway`);
+        logger.log(`[Meta CAPI] Product ${productId} matched to ${gatewayKey} gateway (by category)`);
       }
       return gatewayKey;
     }
   }
   
   // Fallback: Try to match by product name keywords
-  console.log(`[Meta CAPI] ⚠️ No category match for product ${productId}, trying name-based matching...`);
+  logger.log(`[Meta CAPI] ⚠️ No category match for product ${productId}, trying name-based matching...`);
   
   const nameKeywords = {
     ED: ['erectile', 'ed ', 'sildenafil', 'tadalafil', 'viagra', 'cialis'],
@@ -66,19 +58,17 @@ export const categorizeProduct = (product) => {
   for (const [gatewayKey, keywords] of Object.entries(nameKeywords)) {
     const nameMatches = keywords.some(keyword => productName.includes(keyword));
     if (nameMatches) {
-      console.log(`[Meta CAPI] ✅ Product ${productId} matched to ${gatewayKey} gateway (by name: "${product.name}")`);
       if (logger?.log) {
-        logger.log(`[Meta CAPI] Product matched to ${gatewayKey} gateway by name`);
+        logger.log(`[Meta CAPI] Product ${productId} matched to ${gatewayKey} gateway by name`);
       }
       return gatewayKey;
     }
   }
   
-  console.warn(`[Meta CAPI] ❌ Product ${productId} ("${product.name}") defaulting to OTHERS - no category or name match found`);
-  console.warn(`[Meta CAPI] Categories found:`, productCategories);
-  
   if (logger?.warn) {
-    logger.warn(`[Meta CAPI] Product ${productId} defaulting to OTHERS - no category match found`);
+    logger.warn(`[Meta CAPI] Product ${productId} defaulting to OTHERS - no category match found`, {
+      category_count: productCategories.length
+    });
   }
   
   return 'OTHERS'; // Default fallback
@@ -227,46 +217,43 @@ export const trackMetaCapiPurchase = async (order, additionalData = {}, debug = 
     if (logger?.error) {
       logger.error('[Meta CAPI] Invalid order data - missing order or order.id');
     }
-    console.error('[Meta CAPI] Invalid order data - missing order or order.id');
     return;
   }
 
   try {
-    console.log(`[Meta CAPI] ▶️ Starting tracking for order ${order.id}`);
-    console.log(`[Meta CAPI] Order has ${order.line_items?.length || 0} line items`);
+    logger.log(`[Meta CAPI] ▶️ Starting tracking for order ${order.id}`);
+    logger.log(`[Meta CAPI] Order has ${order.line_items?.length || 0} line items`);
     
     // **CRITICAL**: Enrich order with product categories BEFORE categorization
     // Without this, all products will be categorized as OTHERS
     if (logger?.log) {
       logger.log(`[Meta CAPI] Enriching order ${order.id} with product categories...`);
     }
-    console.log(`[Meta CAPI] 🔍 Enriching order ${order.id} with product categories...`);
     
     const enrichedOrder = await enrichOrderWithProductData(order, { 
       debug: debug 
     });
     
     if (!enrichedOrder) {
-      console.error('[Meta CAPI] ❌ Enrichment returned null/undefined');
+      logger.error('[Meta CAPI] ❌ Enrichment returned null/undefined');
       return;
     }
     
     if (logger?.log) {
       logger.log(`[Meta CAPI] Order ${order.id} enrichment complete`);
     }
-    console.log(`[Meta CAPI] ✅ Order ${order.id} enrichment complete`);
     
     // Log enrichment results for debugging
     const itemsWithCategories = enrichedOrder.line_items?.filter(
       item => item.categories && Array.isArray(item.categories) && item.categories.length > 0
     ).length || 0;
-    console.log(`[Meta CAPI] ${itemsWithCategories}/${enrichedOrder.line_items?.length || 0} items have categories`);
+    logger.log(`[Meta CAPI] ${itemsWithCategories}/${enrichedOrder.line_items?.length || 0} items have categories`);
     
     // Log first item's categories for debugging
     if (enrichedOrder.line_items && enrichedOrder.line_items.length > 0) {
       const firstItem = enrichedOrder.line_items[0];
-      console.log(`[Meta CAPI] First item (${firstItem.name}) categories:`, 
-        firstItem.categories?.map(c => c.slug || c.name).join(', ') || 'NONE');
+      // Item name and category slugs name the treatment, so log the id and a count.
+      logger.log(`[Meta CAPI] First item ${firstItem.id} has ${firstItem.categories?.length || 0} categories`);
     }
     
     // Split order by gateway (now with categories!)

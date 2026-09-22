@@ -159,6 +159,7 @@ const sendAwinTracking = async (orderData) => {
 
     if (response.ok) {
       const responseData = await response.json();
+      // The response echoes the order, so log the shape only.
       logger.log("[AWIN] ✅ Order tracking successful", {
         order_id: orderData.id,
         order_total: orderData.total,
@@ -167,7 +168,7 @@ const sendAwinTracking = async (orderData) => {
         awc_sent: !!trackingData.order_data?.meta_data?.find(
           (m) => m.key === "_awin_awc"
         )?.value,
-        awin_response: responseData,
+        awin_has_order_data: Boolean(responseData?.order_data),
       });
       return responseData?.order_data || null;
     } else {
@@ -516,13 +517,15 @@ const OrderReceivedContent = ({ userId }) => {
     queryParams.append("seskey", seskey);
 
     const finalUrl = `${basePath}?${queryParams.toString()}`;
-    logger.log("[Debug] Final redirect URL:", finalUrl);
+    // The query carries the product name and the seskey, so log the path only.
+    logger.log("[Debug] Final redirect URL:", finalUrl.split("?")[0]);
     return finalUrl;
   };
 
   // Start countdown after order loads and questionnaire check is complete
   useEffect(() => {
-    logger.log("order", order);
+    // The order carries customer and address fields, so log the id only.
+    logger.log("order", { id: order?.id ?? null });
     logger.log("shouldRedirect", shouldRedirect);
     logger.log("countdown", countdown);
     logger.log("isQuestionnaireCompleted", isQuestionnaireCompleted);
@@ -542,7 +545,10 @@ const OrderReceivedContent = ({ userId }) => {
       (edFlow === "1" || hairFlow === "1" ? questionnaireCheckComplete : true);
 
     if (shouldStartCountdown) {
-      logger.log("Starting countdown for redirect to", getRedirectPath());
+      logger.log(
+        "Starting countdown for redirect to",
+        getRedirectPath().split("?")[0]
+      );
       setCountdown(10);
     }
   }, [
@@ -574,7 +580,7 @@ const OrderReceivedContent = ({ userId }) => {
       logger.log("Countdown complete, redirecting now");
 
       const redirectPath = getRedirectPath();
-      logger.log("[Debug] Final Redirect URL:", redirectPath);
+      logger.log("[Debug] Final Redirect URL:", redirectPath.split("?")[0]);
 
       // Use Next.js router for internal navigation
       router.push(redirectPath);

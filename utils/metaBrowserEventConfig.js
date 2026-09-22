@@ -6,6 +6,8 @@
  * Readable names stay in dataLayer only; fbq receives cryptic names.
  */
 
+import { logger } from "@/utils/devLogger";
+
 const META_DEBUG =
   typeof process !== "undefined" &&
   process.env.NEXT_PUBLIC_META_QUIZ_DEBUG === "1";
@@ -199,12 +201,12 @@ export function resolveCategory(flowId, questionnaireId) {
 
   if (META_DEBUG) {
     try {
-      console.warn("[META_TRACKING] Fallback to OTHERS:", {
+      logger.warn("[META_TRACKING] Fallback to OTHERS:", {
         flowId,
         questionnaireId,
       });
     } catch (err) {
-      // Guarded: only reachable if console.warn itself throws (e.g. test env)
+      // Guarded: only reachable if logger.warn itself throws (e.g. test env)
     }
   }
 

@@ -67,7 +67,7 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
             if (flowProductsResult.success) {
                 logger.log(
                     "Processed saved flow products after login:",
-                    flowProductsResult,
+                    { success: flowProductsResult.success },
                 );
                 return flowProductsResult.redirectUrl;
             }
@@ -76,9 +76,13 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
             const savedProducts = getSavedProducts();
 
             if (savedProducts) {
+                // Product name/dose is treatment data, so log the shape only.
                 logger.log(
                     "Converting legacy saved products to direct cart approach:",
-                    savedProducts,
+                    {
+                        flowType: savedProducts.flowType,
+                        addonCount: savedProducts.addons?.length ?? 0,
+                    },
                 );
 
                 // Determine the flow type from URL parameters or saved products
@@ -120,7 +124,7 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
                 if (result.success) {
                     logger.log(
                         "Legacy products converted and added to cart:",
-                        result,
+                        { success: result.success },
                     );
                     return result.redirectUrl;
                 } else {
@@ -178,9 +182,11 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
 
             const data = await res.json();
 
+            // The response echoes the consultation answers, so log the shape only.
             logger.log("Google login response:", {
                 status: res.status,
-                data: data || "No data",
+                hasData: Boolean(data),
+                fieldCount: Object.keys(data || {}).length,
             });
 
             if (res.ok) {
@@ -252,7 +258,12 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
                 let errorMessage =
                     data.error || "Google sign-in failed. Please try again.";
                 toast.error(errorMessage);
-                logger.error("Google login error:", data);
+                // The response echoes the consultation answers, so log the shape only.
+                logger.error("Google login error:", {
+                    status: res.status,
+                    hasError: Boolean(data?.error),
+                    fieldCount: Object.keys(data || {}).length,
+                });
             }
         } catch (err) {
             logger.error("Google login exception:", err);
@@ -323,9 +334,11 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
             }
 
             // Log the response for debugging (without causing errors if data is null)
+            // The response echoes the consultation answers, so log the shape only.
             logger.log("Login response:", {
                 status: res.status,
-                data: data || "No data",
+                hasData: Boolean(data),
+                fieldCount: Object.keys(data || {}).length,
             });
 
             if (res.ok) {
@@ -437,9 +450,10 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
                             });
 
                             redirectPath = `/checkout?${checkoutParams.toString()}`;
+                            // The query carries dose_* parameters.
                             logger.log(
                                 "Created checkout URL with flow parameters:",
-                                redirectPath,
+                                redirectPath.split("?")[0],
                             );
                         } else {
                             // Default redirect to home
@@ -448,7 +462,7 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
                     }
                 }
 
-                logger.log("Final redirect path:", redirectPath);
+                logger.log("Final redirect path:", redirectPath.split("?")[0]);
 
                 // Add a small delay to ensure the success toast is visible before navigation
                 setTimeout(() => {

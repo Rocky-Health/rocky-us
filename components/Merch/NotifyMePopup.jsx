@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { IoClose } from "react-icons/io5";
+import { logger } from "@/utils/devLogger";
 
 const NotifyMePopup = ({ isOpen, onClose, size, productName }) => {
   const [email, setEmail] = useState("");
@@ -16,7 +17,6 @@ const NotifyMePopup = ({ isOpen, onClose, size, productName }) => {
     
     try {
       // TODO: Implement actual notification API call
-      console.log(`Notify request for ${productName} - Size ${size} - Email: ${email}`);
       
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -29,7 +29,7 @@ const NotifyMePopup = ({ isOpen, onClose, size, productName }) => {
       }, 2000);
       
     } catch (error) {
-      console.error("Error submitting notification request:", error);
+      logger.error("Error submitting notification request:", error);
     } finally {
       setIsSubmitting(false);
     }

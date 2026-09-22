@@ -109,7 +109,7 @@ export const useQuizData = () => {
         onContinue();
         break;
       default:
-        logger.log("Unknown action:", action, payload);
+        logger.log("Unknown action:", action);
     }
   };
 

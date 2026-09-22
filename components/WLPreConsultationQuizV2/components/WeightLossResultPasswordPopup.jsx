@@ -233,7 +233,7 @@ const WeightLossResultPasswordPopup = ({
         return 0;
       }
     } catch (e) {
-      console.error(e);
+      logger.error(e);
       toast.error("Login failed. Please try again.");
       return 0;
     } finally {

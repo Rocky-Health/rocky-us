@@ -8,7 +8,7 @@ const DateQuestion = ({ config, userData, setUserData, onContinue }) => {
   // Get initial value from userData if available
   const initialDate =
     userData && userData[config.field] ? String(userData[config.field]) : "";
-  logger.log(userData);
+  logger.log(Object.keys(userData || {}));
   const [dateOfBirth, setDateOfBirth] = useState(initialDate);
   const [error, setError] = useState("");
 

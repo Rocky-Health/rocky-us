@@ -186,7 +186,13 @@ const EdProductCard = ({ product }) => {
         ],
       };
 
-      logger.log("🛒 ED Flow - Adding product to cart early:", mainProduct);
+      // Attribute values carry dose/strength, so log the ids only.
+      logger.log("🛒 ED Flow - Adding product to cart early:", {
+        id: mainProduct.id,
+        variationId: mainProduct.variationId,
+        quantity: mainProduct.quantity,
+        attributeKeys: Object.keys(mainProduct.attributes || {}),
+      });
 
       // Add product to cart early (before cross-sell popup)
       const result = await addToCartEarly(mainProduct, "ed", {
@@ -246,7 +252,7 @@ const EdProductCard = ({ product }) => {
       // Just generate checkout URL and redirect
       const checkoutUrl = finalizeFlowCheckout("ed", true);
 
-      logger.log("Redirecting to:", checkoutUrl);
+      logger.log("Redirecting to:", checkoutUrl.split("?")[0]);
 
       // Close modal and navigate
       setCrossSellModalOpen(false);

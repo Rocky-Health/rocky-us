@@ -13,18 +13,13 @@ export const calculateAge = (dateOfBirth) => {
   if (!dateOfBirth) return null;
 
   try {
-    logger.log(
-      "Calculating age for date:",
-      dateOfBirth,
-      "Type:",
-      typeof dateOfBirth
-    );
+    // Never log the DOB value itself, only its shape.
+    logger.log("Calculating age from date of birth, type:", typeof dateOfBirth);
 
     const birthDate = new Date(dateOfBirth);
-    logger.log("Parsed birth date:", birthDate);
+    logger.log("Parsed birth date, valid:", !isNaN(birthDate.getTime()));
 
     const today = new Date();
-    logger.log("Today's date:", today);
 
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();

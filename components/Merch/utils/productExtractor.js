@@ -1,4 +1,5 @@
 import { fetchProductVariations } from '@/lib/api/productVariations';
+import { logger } from '@/utils/devLogger';
 
 /**
  * Product Data Extractor with Variation Support
@@ -74,7 +75,7 @@ export const fetchProductVariationData = async (productId, productType = null) =
     try {
         // If product type is provided and it's not a variable product, skip fetching
         if (productType && !productType.includes('variable')) {
-            console.log(`Skipping variation fetch for product ${productId} (type: ${productType}) - not a variable product`);
+            logger.log(`Skipping variation fetch for product ${productId} (type: ${productType}) - not a variable product`);
             return {
                 hasVariations: false,
                 variations: [],
@@ -166,7 +167,7 @@ export const fetchProductVariationData = async (productId, productType = null) =
             formattedVariations: variationData.formattedVariations || []
         };
     } catch (error) {
-        console.error(`Error fetching variation data for product ${productId}:`, error);
+        logger.error(`Error fetching variation data for product ${productId}:`, error);
         return {
             hasVariations: false,
             variations: [],
@@ -394,7 +395,7 @@ export const transformProductsArray = async (products, includeVariations = false
                 // Extract product data with variation information (if available)
                 return extractProductData(product, variationData);
             } catch (error) {
-                console.error(`Error processing product ${product.id}:`, error);
+                logger.error(`Error processing product ${product.id}:`, error);
                 // Fallback to basic product data without variations
                 return extractProductData(product);
             }
@@ -430,7 +431,7 @@ export const transformSingleProduct = async (product, includeVariations = false)
 
         return extractProductData(product, variationData);
     } catch (error) {
-        console.error(`Error processing product ${product.id}:`, error);
+        logger.error(`Error processing product ${product.id}:`, error);
         return extractProductData(product);
     }
 };

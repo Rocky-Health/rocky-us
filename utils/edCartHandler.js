@@ -97,7 +97,14 @@ export const addEdProductToCart = async (
         productOptions.preference === "brand" ? "Brand" : "Generic";
     }
 
-    logger.log("Adding ED product to cart:", requestBody);
+    // Attribute and meta values carry dose/strength, so log the ids only.
+    logger.log("Adding ED product to cart:", {
+      productId: requestBody.productId,
+      variationId: requestBody.variationId,
+      quantity: requestBody.quantity,
+      attributeKeys: Object.keys(requestBody.attributes || {}),
+      metaKeys: (requestBody.meta_data || []).map((entry) => entry?.key),
+    });
 
     // Make the API call to add the item to cart
     const response = await fetch("/api/cart/add-item", {
@@ -115,7 +122,7 @@ export const addEdProductToCart = async (
     }
 
     const result = await response.json();
-    logger.log("Product added to cart:", result);
+    logger.log("Product added to cart, item count:", result?.items?.length ?? 0);
 
     // Fire add_to_cart analytics event
     try {

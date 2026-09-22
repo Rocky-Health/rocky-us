@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { logger } from "@/utils/devLogger";
 
 const NETWORK_DOMAINS = {
   rcr73qtl: "www.rcr73qtl.com",
@@ -80,7 +81,7 @@ export function fireEverFlowConversion({ network, offerId, eventId }) {
       window.EF.conversion({ offer_id: offerId });
     }
   } catch (err) {
-    console.warn("[EverFlow] imperative fire failed:", err);
+    logger.warn("[EverFlow] imperative fire failed:", err);
   }
 }
 
@@ -177,13 +178,13 @@ export default function EverFlowScript({
           if (adv1) conversion.adv1 = adv1;
           if (orderId) conversion.order_id = orderId;
           if (amount) conversion.amount = amount;
-          console.info("[EverFlow] sale conversion", conversion);
+          logger.info("[EverFlow] sale conversion", conversion);
           EF.conversion(conversion);
         } else if (mode === "event") {
           EF.conversion({ offer_id: offerId, event_id: eventId });
         }
       } catch (err) {
-        console.warn("[EverFlow] event failed:", err);
+        logger.warn("[EverFlow] event failed:", err);
       }
     });
   }, [mode, offerId, eventId, network, adv1, orderId, amount]);

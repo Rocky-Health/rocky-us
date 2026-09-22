@@ -59,7 +59,7 @@ const EdTreatment = () => {
   // Handle checkout
   const handleCheckout = async (addons = []) => {
     try {
-      logger.log("Chewalis checkout with addons:", addons);
+      logger.log("Chewalis checkout addon count:", addons.length);
       setIsCheckoutLoading(true);
 
       // Create main product data
@@ -72,8 +72,12 @@ const EdTreatment = () => {
         variationId: selectedPillOption.variationId,
       };
 
-      logger.log("Chewalis main product:", mainProduct);
-      logger.log("Chewalis addons:", addons);
+      // Product name/dose is treatment data, so log identifiers only.
+      logger.log("Chewalis main product:", {
+        id: mainProduct.id,
+        variationId: mainProduct.variationId,
+        isSubscription: mainProduct.isSubscription,
+      });
 
       // Use the new direct cart handler
       const result = await edFlowAddToCart(mainProduct, addons, {
@@ -81,7 +85,7 @@ const EdTreatment = () => {
       });
 
       if (result.success) {
-        logger.log("🎉 Chewalis - SUCCESS! Result:", result);
+        logger.log("🎉 Chewalis - SUCCESS!");
         setCrossSellModalOpen(false);
         setIsCheckoutLoading(false);
 

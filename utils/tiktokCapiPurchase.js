@@ -10,14 +10,13 @@ import { enrichOrderWithProductData } from './enrichOrderData';
  */
 export const trackTikTokCapiPurchase = async (order, additionalData = {}, debug = true) => {
   if (!order || !order.id) {
-    console.error('[TikTok CAPI] Invalid order data - missing order or order.id');
     if (logger?.error) logger.error('[TikTok CAPI] Invalid order data');
     return;
   }
 
   try {
-    console.log(`[TikTok CAPI] ▶️ Starting tracking for order ${order.id}`);
-    console.log(`[TikTok CAPI] Order has ${order.line_items?.length || 0} line items`);
+    logger.log(`[TikTok CAPI] ▶️ Starting tracking for order ${order.id}`);
+    logger.log(`[TikTok CAPI] Order has ${order.line_items?.length || 0} line items`);
     
     if (debug && logger?.log) {
       logger.log('[TikTok CAPI] Processing purchase for order:', order.id);
@@ -28,27 +27,25 @@ export const trackTikTokCapiPurchase = async (order, additionalData = {}, debug 
     if (logger?.log) {
       logger.log(`[TikTok CAPI] Enriching order ${order.id} with product categories...`);
     }
-    console.log(`[TikTok CAPI] 🔍 Enriching order ${order.id} with product categories...`);
     
     const enrichedOrder = await enrichOrderWithProductData(order, { 
       debug: debug 
     });
     
     if (!enrichedOrder) {
-      console.error('[TikTok CAPI] ❌ Enrichment returned null/undefined');
+      logger.error('[TikTok CAPI] ❌ Enrichment returned null/undefined');
       return;
     }
     
     if (logger?.log) {
       logger.log(`[TikTok CAPI] Order ${order.id} enrichment complete`);
     }
-    console.log(`[TikTok CAPI] ✅ Order ${order.id} enrichment complete`);
     
     // Log enrichment results for debugging
     const itemsWithCategories = enrichedOrder.line_items?.filter(
       item => item.categories && Array.isArray(item.categories) && item.categories.length > 0
     ).length || 0;
-    console.log(`[TikTok CAPI] ${itemsWithCategories}/${enrichedOrder.line_items?.length || 0} items have categories`);
+    logger.log(`[TikTok CAPI] ${itemsWithCategories}/${enrichedOrder.line_items?.length || 0} items have categories`);
 
     // Reuse the exact same split logic as Meta (now with categories!)
     const gatewaySplits = splitOrderByGateway(enrichedOrder);

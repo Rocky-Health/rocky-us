@@ -95,7 +95,7 @@ export const createQuestionHandlers = (
   };
 
   const handleConsentOption = (questionId, option) => {
-    logger.log("Handling consent option:", option);
+    logger.log("Handling consent option for question:", questionId);
 
     setFormData((prev) => ({
       ...prev,
@@ -166,7 +166,7 @@ export const createQuestionHandlers = (
     const currentValue = formData[fieldName];
     const newValue = currentValue === option.value ? "" : option.value;
 
-    logger.log(`Checkbox selection: ${fieldName} = ${newValue}`);
+    logger.log("Checkbox selection", { fieldName, hasValue: Boolean(newValue) });
 
     setFormData((prev) => ({
       ...prev,

@@ -1021,7 +1021,7 @@ const Form = ({
                         toast.error(userFriendlyMessage);
                       }
                     } catch (e) {
-                      console.error(e);
+                      logger.error(e);
                       toast.error("Login failed. Please try again.");
                     } finally {
                       setLoading(false);

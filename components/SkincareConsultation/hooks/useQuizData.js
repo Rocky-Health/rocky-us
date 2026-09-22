@@ -19,7 +19,7 @@ export const useQuizData = (initialUserData = {}) => {
         onContinue();
         break;
       default:
-        logger.log("Unknown action:", action, payload);
+        logger.log("Unknown action:", action);
     }
   };
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import SkincareQuizLoader from "./SkincareQuizLoader";
+import { logger } from "@/utils/devLogger";
 
 const ThankYouStep = ({
     submitFormData,
@@ -18,7 +19,7 @@ const ThankYouStep = ({
                 });
                 setIsApiComplete(true);
             } catch (error) {
-                console.error("Error submitting final completion:", error);
+                logger.error("Error submitting final completion:", error);
                 // Still proceed even if API fails
                 setIsApiComplete(true);
             }
