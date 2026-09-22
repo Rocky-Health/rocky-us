@@ -35,7 +35,6 @@ const BillingAndShipping = ({
     if (e.target.name === "address_1") {
       logger.log("=== BILLING ADDRESS_1 CHANGE ===");
       logger.log("Field name:", e.target.name);
-      logger.log("New value:", `"${e.target.value}"`);
       logger.log("Value length:", e.target.value?.length || 0);
       logger.log("From autocomplete:", fromAutocomplete);
 
@@ -47,18 +46,8 @@ const BillingAndShipping = ({
         !fromAutocomplete
       ) {
         logger.warn("⚠️ WARNING: Short address value detected!");
-        logger.warn(
-          "⚠️ Current address:",
-          `"${currentAddress}"`,
-          "Length:",
-          currentAddress.length,
-        );
-        logger.warn(
-          "⚠️ New value:",
-          `"${e.target.value}"`,
-          "Length:",
-          e.target.value.length,
-        );
+        logger.warn("⚠️ Current address length:", currentAddress.length);
+        logger.warn("⚠️ New value length:", e.target.value.length);
         logger.warn("⚠️ This might be user typing or a bug!");
       }
 
@@ -77,8 +66,8 @@ const BillingAndShipping = ({
       // Debug log the updated form data for address_1 changes
       if (e.target.name === "address_1") {
         logger.log(
-          "Updated billing_address in formData:",
-          updatedFormData.billing_address.address_1,
+          "Updated billing_address_1 length in formData:",
+          updatedFormData.billing_address.address_1?.length || 0,
         );
       }
 

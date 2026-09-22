@@ -60,7 +60,11 @@ const PostCanadaAddressAutocomplete = ({
         setError(null);
 
         try {
-            logger.log("Fetching suggestions for:", searchTerm);
+            // Never log the typed address, only how much was typed.
+            logger.log(
+                "Fetching address suggestions, query length:",
+                searchTerm.length
+            );
             const response = await fetch("/api/google-places/autocomplete", {
                 method: "POST",
                 headers: {
@@ -74,24 +78,26 @@ const PostCanadaAddressAutocomplete = ({
 
             logger.log("Response status:", response.status);
             const responseText = await response.text();
-            logger.log("Response text:", responseText);
 
             if (!response.ok) {
                 throw new Error(`Error: ${response.status} - ${responseText}`);
             }
 
             const data = JSON.parse(responseText);
-            logger.log("Parsed response data:", data);
+            logger.log(
+                "Suggestion count:",
+                Array.isArray(data.addresses) ? data.addresses.length : 0
+            );
 
             if (data.error) {
                 // Handle API errors (like URL restrictions)
-                logger.error("API Error:", data);
+                logger.error("API Error:", data.error);
                 setError(`${data.error}: ${data.details || "Unknown error"}`);
                 setSuggestions([]);
             } else if (data.addresses && Array.isArray(data.addresses)) {
                 setSuggestions(data.addresses);
             } else {
-                logger.log("No addresses in response:", data);
+                logger.log("No addresses in response");
                 setSuggestions([]);
             }
         } catch (err) {
@@ -123,18 +129,17 @@ const PostCanadaAddressAutocomplete = ({
 
             logger.log("Response status:", response.status);
             const responseText = await response.text();
-            logger.log("Response text:", responseText);
 
             if (!response.ok) {
                 throw new Error(`Error: ${response.status} - ${responseText}`);
             }
 
             const data = JSON.parse(responseText);
-            logger.log("Parsed response data:", data);
+            logger.log("Address details received:", Boolean(data.address));
 
             if (data.error) {
                 // Handle API errors (unsupported states, URL restrictions, etc.)
-                logger.error("API Error:", data);
+                logger.error("API Error:", data.error);
                 logger.log("Service Coverage URL:", data.serviceCoverageUrl);
 
                 const errorMessage =
@@ -193,7 +198,7 @@ const PostCanadaAddressAutocomplete = ({
                     onAddressSelected(formattedAddress);
                 }
             } else {
-                logger.log("❌ No address in response:", data);
+                logger.log("❌ No address in response");
             }
         } catch (err) {
             logger.error("Error retrieving address details:", err);
@@ -307,11 +312,6 @@ const PostCanadaAddressAutocomplete = ({
 
     // Handle suggestion selection
     const handleSelectSuggestion = (suggestion) => {
-        logger.log("🏠 Selected suggestion:", suggestion);
-        logger.log(
-            "🏠 Suggestion formattedAddress:",
-            suggestion.formattedAddress
-        );
         logger.log("🏠 Suggestion ID:", suggestion.id);
 
         getAddressDetails(suggestion.id);

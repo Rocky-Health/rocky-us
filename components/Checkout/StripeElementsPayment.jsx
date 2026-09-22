@@ -90,7 +90,10 @@ function PaymentForm({ orderId, amount, onSuccess, onError }) {
         throw new Error(result.error || "Payment failed");
       }
 
-      logger.log("Payment successful:", result);
+      logger.log("Payment successful:", {
+        paymentIntentId: result.paymentIntentId,
+        chargeId: result.chargeId,
+      });
 
       // Update order status
       const updateResponse = await fetch("/api/update-order-status", {
