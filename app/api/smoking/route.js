@@ -192,7 +192,6 @@ export async function POST(req) {
       {
         error: true,
         msg: "Internal server error",
-        details: error.message,
       },
       { status: 500 }
     );
@@ -216,7 +215,6 @@ async function handleFileUpload(req, entrykey) {
       {
         error: true,
         msg: "File upload failed",
-        details: error.message,
       },
       { status: 500 }
     );
@@ -275,7 +273,16 @@ async function postSmokingQuestionnaireDataToCRM(data) {
   }
 
   try {
-    logger.log("CRM Submission Payload:", JSON.stringify(postData, null, 2));
+    // Metadata only. The payload is the patient's questionnaire answers.
+    logger.log("CRM Submission Payload:", {
+      endpoint: apiEndpoint,
+      sync: postData.sync,
+      form_id: postData.form_id,
+      stage: postData.stage,
+      completion_state: postData.completion_state,
+      field_count: Object.keys(postData).length,
+      has_entry_id: !!postData.id,
+    });
 
     const response = await crmApi.post(apiEndpoint, postData, {
       validateStatus: function (status) {
@@ -283,7 +290,11 @@ async function postSmokingQuestionnaireDataToCRM(data) {
       },
     });
 
-    logger.log("CRM Response:", JSON.stringify(response.data, null, 2));
+    logger.log("CRM Response:", {
+      status: response.status,
+      success: !!response.data?.success,
+      has_entry_id: !!response.data?.data?.wp_entry_id,
+    });
 
     if (response.data && response.data.success) {
       return {
@@ -302,9 +313,8 @@ async function postSmokingQuestionnaireDataToCRM(data) {
     logger.error("CRM API fetch error:", {
       message: error.message,
       name: error.name,
-      response: error.response?.data,
       status: error.response?.status,
-      headers: error.response?.headers,
+      crm_message: error.response?.data?.message,
     });
 
     throw new Error(`CRM Submission Failed: ${error.message}`);

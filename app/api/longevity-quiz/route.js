@@ -182,7 +182,7 @@ export async function GET(request) {
   } catch (error) {
     logger.error("Longevity quiz GET error:", error);
     return NextResponse.json(
-      { error: true, msg: "Internal server error", details: error.message },
+      { error: true, msg: "Internal server error" },
       { status: 500 },
     );
   }
@@ -320,7 +320,7 @@ export async function POST(req) {
   } catch (error) {
     logger.error("Longevity quiz POST error:", error);
     return NextResponse.json(
-      { error: true, msg: "Internal server error", details: error.message },
+      { error: true, msg: "Internal server error" },
       { status: 500 },
     );
   }
@@ -372,19 +372,26 @@ async function postLongevityToCRM(data) {
   }
 
   try {
-    logger.log(
-      "Longevity quiz CRM payload:",
-      JSON.stringify(postData, null, 2),
-    );
+    // Metadata only. The payload is the patient's questionnaire answers.
+    logger.log("Longevity quiz CRM payload:", {
+      endpoint: apiEndpoint,
+      sync: postData.sync,
+      form_id: postData.form_id,
+      stage: postData.stage,
+      completion_state: postData.completion_state,
+      field_count: Object.keys(postData).length,
+      has_entry_id: !!postData.id,
+    });
     const response = await crmApi.post(apiEndpoint, postData, {
       validateStatus: function (status) {
         return status >= 200 && status < 300;
       },
     });
-    logger.log(
-      "Longevity quiz CRM response:",
-      JSON.stringify(response.data, null, 2),
-    );
+    logger.log("Longevity quiz CRM response:", {
+      status: response.status,
+      success: !!response.data?.success,
+      has_entry_id: !!response.data?.data?.wp_entry_id,
+    });
 
     if (response.data && response.data.success) {
       return {
@@ -401,8 +408,8 @@ async function postLongevityToCRM(data) {
   } catch (error) {
     logger.error("Longevity quiz CRM API error:", {
       message: error.message,
-      response: error.response?.data,
       status: error.response?.status,
+      crm_message: error.response?.data?.message,
     });
     throw new Error(`CRM Submission Failed: ${error.message}`);
   }
