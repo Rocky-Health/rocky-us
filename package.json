@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
+    "logs:check": "node tools/log-redaction-check.mjs",
     "optimize:images": "node tools/optimize-public-images.mjs"
   },
   "dependencies": {

@@ -82,11 +82,56 @@ const SENSITIVE_KEYS = new Set([
  * these substrings and stay readable as intended, and so does
  * `customer_id_namespace`.
  */
-const SENSITIVE_KEY_SUBSTRINGS = ["password", "secret", "phone", "email"];
+const SENSITIVE_KEY_SUBSTRINGS = [
+  "password",
+  "secret",
+  "phone",
+  "email",
+  // TK-1046. Each family below was observed leaking under a name the exact
+  // list did not carry: access_token / refresh_token / id_token / wl_token /
+  // jobToken, sessionId / session_id, billing_address_1 and ipAddress beside a
+  // masked address_1, billing_postcode beside a masked postcode, dateOfBirth
+  // beside a masked date_of_birth, and the *_entrykey family.
+  "token",
+  "session",
+  "address",
+  "postal",
+  "postcode",
+  "birth",
+  "entrykey",
+  "nonce",
+];
+
+/**
+ * Name fragments rather than a bare "name" family on purpose:
+ * "customer_id_namespace" contains "name", and that key is logged deliberately
+ * so the namespace survives when the raw id does not. None of the fragments
+ * below occurs inside it.
+ *
+ * These are substrings, not exact names, because an exact list left
+ * billing_first_name and shipping_last_name printing in clear beside a masked
+ * first_name in the same log object. The hashed CAPI short keys (fn, ln)
+ * contain none of these and stay readable.
+ */
+const NAME_KEY_SUBSTRINGS = [
+  "first_name",
+  "firstname",
+  "last_name",
+  "lastname",
+  "full_name",
+  "fullname",
+  "fname",
+  "lname",
+  "username",
+  "displayname",
+  "patientname",
+  "customername",
+];
 
 function isSensitiveKey(key) {
   const k = String(key).toLowerCase();
   if (SENSITIVE_KEYS.has(k)) return true;
+  if (NAME_KEY_SUBSTRINGS.some((fragment) => k.includes(fragment))) return true;
   return SENSITIVE_KEY_SUBSTRINGS.some((fragment) => k.includes(fragment));
 }
 
