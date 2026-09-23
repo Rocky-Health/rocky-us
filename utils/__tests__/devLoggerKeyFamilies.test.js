@@ -111,7 +111,7 @@ describe("name keys", () => {
   });
 
   it("does not mask customer_id_namespace, which merely contains 'name'", () => {
-    // This is why the name keys are listed exactly instead of as a family.
+    // This is why the fragments are specific instead of a bare "name" family.
     expect(redactSensitive({ customer_id_namespace: "email" }).customer_id_namespace).toBe(
       "email",
     );
