@@ -509,7 +509,7 @@ export async function POST(req) {
   } catch (error) {
     logger.error("[NB Backfill Auto] Unexpected error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Internal server error", details: error.message },
       { status: 500 }
     );
   }
