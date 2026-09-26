@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getTikTokGatewayConfig, getTikTokEndpoint, TIKTOK_CAPI_GATEWAYS } from '@/utils/tiktokCapiConfig';
 import { hashEmail, hashPhone, hashSHA256 } from '@/utils/analytics/hashServerSide';
+import { buildTikTokPurchaseEventId } from '@/utils/tiktokEventId';
 import { toMoney } from '@/utils/priceFormatter';
 import axios from 'axios';
 
@@ -66,10 +67,29 @@ const fetchCustomerProfile = async (customerId) => {
   }
 };
 
+const normalizeExternalIdSource = (value) => {
+  const source = String(value || '').trim();
+  if (!source) return '';
+
+  const wcMatch = source.match(/^wc:(.+)$/i);
+  if (wcMatch?.[1]) return wcMatch[1].trim();
+
+  return source;
+};
+
 export async function POST(req) {
   try {
     const payload = await req.json();
-    let { order_id, gateway, value, currency, contents, order_data } = payload;
+    let {
+      order_id,
+      gateway,
+      value,
+      currency,
+      contents,
+      order_data,
+      event_id,
+      time_of_purchase_iso,
+    } = payload;
 
     const gatewayConfig = getTikTokGatewayConfig(gateway);
 
@@ -118,8 +138,11 @@ export async function POST(req) {
     
     // Hash user data
     const email = hashEmail(userEmail);
-    const phone = hashPhone(userPhone, 'CA');
-    const external_id = order_data.customer_id ? hashSHA256(order_data.customer_id.toString()) : '';
+    const phone = hashPhone(userPhone, billing.country || 'US');
+    const externalIdSource = order_data.customer_id
+      ? order_data.customer_id.toString()
+      : normalizeExternalIdSource(payload.customer_id || payload.customer_id_canonical);
+    const external_id = externalIdSource ? hashSHA256(externalIdSource) : '';
     
     // Client Info
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || '';
@@ -162,11 +185,18 @@ export async function POST(req) {
       };
     }
 
+    const purchaseEventId =
+      event_id ||
+      buildTikTokPurchaseEventId(
+        order_id,
+        time_of_purchase_iso || order_data?.date_created
+      );
+
     // TikTok Events API v1.3 Payload
     const eventPayload = {
       pixel_code: gatewayConfig.pixelId,
       event: gatewayConfig.eventName, // 'CompletePayment'
-      event_id: `purchase_${order_id}_${gateway}`,
+      event_id: purchaseEventId,
       timestamp: new Date().toISOString(),
       context: contextObj,
       properties: {
@@ -226,4 +256,3 @@ export async function POST(req) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
-

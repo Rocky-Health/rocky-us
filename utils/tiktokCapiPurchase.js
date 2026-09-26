@@ -86,6 +86,8 @@ export const trackTikTokCapiPurchase = async (order, additionalData = {}, debug 
             price: toMoney(item.subtotal)
           })),
           order_data: enrichedOrder,
+          event_id: additionalData.event_id,
+          time_of_purchase_iso: additionalData.time_of_purchase_iso,
           ...additionalData
         };
 
@@ -120,4 +122,3 @@ export const trackTikTokCapiPurchase = async (order, additionalData = {}, debug 
     throw error;
   }
 };
-
