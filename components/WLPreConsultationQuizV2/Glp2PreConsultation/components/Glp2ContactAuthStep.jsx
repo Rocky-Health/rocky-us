@@ -9,6 +9,7 @@ import { usePassword } from "@/components/WLPreConsultationQuizV2/contexts/Passw
 import PhoneInput, { isValidPhone } from "@/components/PhoneInput";
 import { encryptPasswordWithServerKey } from "@/utils/encryptPasswordWithServerKey";
 import { migrateLocalCartToServer, getLocalCart } from "@/lib/cart/cartService";
+import { identifyCustomerioProfile } from "@/utils/customerioEvents";
 
 const isValidEmail = (e) => {
     if (!e || typeof e !== "string") return false;
@@ -277,6 +278,20 @@ const Glp2ContactAuthStep = ({ userData, setUserData, onContinue }) => {
             } else {
                 await registerAndLogin();
                 toast.success("Account created successfully");
+            }
+
+            // Carry this visitor's anonymous session id onto the profile the
+            // just-set auth cookies resolve to, so Customer.io's anonymous
+            // event merge attaches whatever the guest did earlier in the
+            // funnel. Fire-and-forget, never awaited: it must not be able to
+            // delay or fail the login, registration or cart migration below.
+            try {
+                identifyCustomerioProfile();
+            } catch (identifyError) {
+                logger.error(
+                    "Customer.io identify after auth skipped:",
+                    identifyError,
+                );
             }
 
             // Migrate any pre-existing guest cart items (e.g. ED) to the server

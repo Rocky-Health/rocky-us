@@ -19,6 +19,7 @@ import {
 } from "../../utils/crossSellCheckout";
 import { processSavedFlowProducts } from "../../utils/flowCartHandler";
 import { migrateLocalCartToServer, getLocalCart } from "@/lib/cart/cartService";
+import { identifyCustomerioProfile } from "@/utils/customerioEvents";
 import {
   checkQuebecZonnicRestriction,
   getQuebecRestrictionMessage,
@@ -351,6 +352,18 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
         logger.log(data.data.response);
         document.getElementById("cart-refresher")?.click();
         toast.success(data.message || "You registered successfully!");
+
+        // Carry this visitor's anonymous session id onto the profile the
+        // just-set auth cookies resolve to, so Customer.io's anonymous event
+        // merge attaches whatever the guest did before this registration.
+        // Fire-and-forget, never awaited, and unconditional on whether there
+        // is a local cart to migrate below: it must not be able to delay or
+        // fail registration either way.
+        try {
+          identifyCustomerioProfile();
+        } catch (identifyError) {
+          logger.error("Customer.io identify after registration skipped:", identifyError);
+        }
 
         // Check if we came from a flow (for redirect logic)
         const isFromFlow =
