@@ -80,6 +80,9 @@ export async function POST(req) {
       // The session_token is validated by WordPress via the authenticate filter
       const encodedCredentials = btoa(`${userEmail}:${sessionToken}`);
       cookieStore.set("authToken", `Basic ${encodedCredentials}`);
+      // Per-login id so the inactivity hook can discard stale
+      // lastActivityTime values left over from a previous session
+      cookieStore.set("loginSession", crypto.randomUUID());
 
       cookieStore.set("userId", userId);
       cookieStore.set("userName", fullName);
@@ -178,6 +181,7 @@ export async function POST(req) {
       // For Google login, create Basic auth credentials using email:session_token
       const encodedCredentials = btoa(`${userEmail}:${sessionToken}`);
       cookieStore.set("authToken", `Basic ${encodedCredentials}`);
+      cookieStore.set("loginSession", crypto.randomUUID());
 
       cookieStore.set("userId", userId);
       cookieStore.set("userEmail", userEmail);
