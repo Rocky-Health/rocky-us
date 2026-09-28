@@ -14,6 +14,7 @@ import {
 import { processSavedFlowProducts } from "../../utils/flowCartHandler";
 import Link from "next/link";
 import { migrateLocalCartToServer } from "@/lib/cart/cartService";
+import { identifyCustomerioProfile } from "@/utils/customerioEvents";
 import GoogleSignInButton from "./GoogleSignInButton";
 import CartMigrationOverlay from "@/components/CartMigrationOverlay";
 import Image from "next/image";
@@ -202,6 +203,20 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
                     await migrateLocalCartToServer();
                     logger.log("Cart migration completed successfully");
 
+                    // Carry this visitor's anonymous session id onto the profile the
+                    // signed-in cookies now resolve to, so Customer.io's anonymous
+                    // event merge attaches whatever the guest did before this login.
+                    // Fire-and-forget, never awaited: it must not be able to delay
+                    // or fail the login it rides along with.
+                    try {
+                        identifyCustomerioProfile();
+                    } catch (identifyError) {
+                        logger.warn(
+                            "Customer.io identify after Google login skipped:",
+                            identifyError,
+                        );
+                    }
+
                     // Refresh the cart display
                     document.getElementById("cart-refresher")?.click();
                     logger.log("Cart display refreshed after migration");
@@ -349,6 +364,20 @@ const LoginContent = ({ setActiveTab, loginRef }) => {
                     await migrateLocalCartToServer();
                     migrateSuccess = true;
                     logger.log("Cart migration completed successfully");
+
+                    // Carry this visitor's anonymous session id onto the profile the
+                    // signed-in cookies now resolve to, so Customer.io's anonymous
+                    // event merge attaches whatever the guest did before this login.
+                    // Fire-and-forget, never awaited: it must not be able to delay
+                    // or fail the login it rides along with.
+                    try {
+                        identifyCustomerioProfile();
+                    } catch (identifyError) {
+                        logger.warn(
+                            "Customer.io identify after login skipped:",
+                            identifyError,
+                        );
+                    }
 
                     // Now that migration is complete, refresh the cart display
                     document.getElementById("cart-refresher")?.click();
