@@ -6,6 +6,7 @@ import React, { useState, useRef } from "react";
 import { toast } from "react-toastify";
 import { usePassword } from "@/components/WLPreConsultationQuizV2/contexts/PasswordContext";
 import { encryptPasswordWithServerKey } from "@/utils/encryptPasswordWithServerKey";
+import { identifyCustomerioProfile } from "@/utils/customerioEvents";
 
 const WeightLossResultPasswordPopup = ({
   onSubmit,
@@ -271,6 +272,17 @@ const WeightLossResultPasswordPopup = ({
       if (emailExists) {
         const goNext = await TryLogin({ email, password });
         if (goNext == 0) return;
+
+        // Carry this visitor's anonymous session id onto the profile the
+        // just-set auth cookies resolve to, so Customer.io's anonymous event
+        // merge attaches whatever the guest did earlier in the funnel.
+        // Fire-and-forget, never awaited: it must not be able to delay or
+        // fail this login or the cart migration below.
+        try {
+          identifyCustomerioProfile();
+        } catch (identifyError) {
+          logger.error("Customer.io identify after login skipped:", identifyError);
+        }
 
         // Migrate any pre-existing guest cart items (e.g. ED) to the server
         // cart before the WL plan is added in the next step. Non-blocking.
