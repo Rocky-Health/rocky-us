@@ -258,11 +258,12 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
         setCurrentStep(2);
       } else {
         // Debug logging to help identify the issue
+        // The response echoes the consultation answers, so log the shape only.
         logger.log("Register API Error Response:", {
           status: res.status,
           ok: res.ok,
-          data: data,
-          error: data.error,
+          hasError: Boolean(data?.error),
+          fieldCount: Object.keys(data || {}).length,
         });
 
         toast.error(
@@ -349,7 +350,10 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
       const data = await res.json();
 
       if (res.ok && data.success) {
-        logger.log(data.data.response);
+        // The response echoes the consultation answers, so log the shape only.
+        logger.log("Register API Step 2 response:", {
+          hasResponse: Boolean(data.data.response),
+        });
         document.getElementById("cart-refresher")?.click();
         toast.success(data.message || "You registered successfully!");
 
@@ -503,11 +507,12 @@ const RegisterContent = ({ setActiveTab, registerRef }) => {
         // });
       } else {
         // Debug logging to help identify the issue
+        // The response echoes the consultation answers, so log the shape only.
         logger.log("Register API Step 2 Error Response:", {
           status: res.status,
           ok: res.ok,
-          data: data,
-          error: data.error,
+          hasError: Boolean(data?.error),
+          fieldCount: Object.keys(data || {}).length,
         });
 
         toast.error(

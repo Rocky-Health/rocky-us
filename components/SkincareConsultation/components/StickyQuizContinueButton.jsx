@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { logger } from "@/utils/devLogger";
 
 const StickyQuizContinueButton = ({ quizState, quizConfig, onContinue }) => {
   const [showButton, setShowButton] = useState(false);
@@ -35,11 +36,10 @@ const StickyQuizContinueButton = ({ quizState, quizConfig, onContinue }) => {
       // If the selected option requires text input, check if text is provided
       if (selectedOption.showTextInput) {
         const textValue = quizState.answers[stepConfig.textField];
-        console.log("Radio-text validation:", {
-          fieldValue,
+        // Log the shape of the answer, never the answer itself
+        logger.log("Radio-text validation:", {
           textField: stepConfig.textField,
-          textValue,
-          isValid: textValue && textValue.trim().length > 0,
+          hasText: Boolean(textValue && textValue.trim().length > 0),
         });
         return textValue && textValue.trim().length > 0;
       }
@@ -54,9 +54,9 @@ const StickyQuizContinueButton = ({ quizState, quizConfig, onContinue }) => {
   // Update button visibility when quiz state changes
   useEffect(() => {
     const shouldShow = shouldShowContinueButton();
-    console.log("Button visibility check:", {
+    logger.log("Button visibility check:", {
       stepIndex: quizState.stepIndex,
-      answers: quizState.answers,
+      answerCount: Object.keys(quizState.answers || {}).length,
       shouldShow,
     });
     setShowButton(shouldShow);

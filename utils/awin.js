@@ -1,3 +1,5 @@
+import { logger } from "@/utils/devLogger";
+
 /**
  * Check if Awin tracking is enabled
  * @returns {boolean} True if Awin tracking is enabled, false otherwise
@@ -48,7 +50,7 @@ export function getAwinFromUrlOrStorage() {
           document.cookie = `_awin_awc=${awcFromUrl};path=/;max-age=${60 * 60 * 24 * 365};SameSite=None;Secure`;
         }
       } catch (error) {
-        console.warn("Failed to set Awin cookie:", error);
+        logger.warn("Failed to set Awin cookie:", error);
       }
     }
 

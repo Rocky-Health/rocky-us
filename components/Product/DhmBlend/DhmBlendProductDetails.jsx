@@ -255,7 +255,13 @@ const DhmBlendProductDetails = ({ product, variations, isLoading }) => {
         }
       }
 
-      logger.log("Adding to cart with data:", cartData);
+      // Attribute values carry dose/strength, so log the ids only.
+      logger.log("Adding to cart with data:", {
+        productId: cartData.productId,
+        variationId: cartData.variationId,
+        quantity: cartData.quantity,
+        attributeKeys: Object.keys(cartData.attributes || {}),
+      });
       await addItemToCart(cartData);
 
       // Refresh the cart in the navbar

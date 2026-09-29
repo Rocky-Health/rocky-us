@@ -11,6 +11,7 @@ import { useAddItemToCart } from "@/lib/cart/cartHooks";
 import SkincareQuizLoader from "../components/SkincareQuizLoader";
 import StickyQuizContinueButton from "../components/StickyQuizContinueButton";
 import { useQuestionnaireStepTracking } from "@/lib/hooks/useQuestionnaireStepTracking";
+import { logger } from "@/utils/devLogger";
 
 const HyperpigmentationQuiz = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -71,7 +72,7 @@ const HyperpigmentationQuiz = () => {
 
         quizState.handleRecommendationNext();
       } catch (error) {
-        console.error("Error adding product to cart:", error);
+        logger.error("Error adding product to cart:", error);
         // Still proceed to avoid blocking the user
         quizState.handleRecommendationNext();
       } finally {

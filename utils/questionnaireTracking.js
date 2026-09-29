@@ -3,6 +3,7 @@
  * Pure functions -- no React, SSR-safe.
  */
 
+import { logger } from "@/utils/devLogger";
 import { trackFunnelEvent } from "./clarityFunnelEvents";
 
 const QS_DEBUG =
@@ -102,7 +103,7 @@ export function trackQuestionnaireStepView(payload) {
 
   if (QS_DEBUG) {
     try {
-      console.info("[QS_TRACK]", payload);
+      logger.info("[QS_TRACK]", payload);
     } catch (_) {}
   }
 
@@ -171,7 +172,7 @@ export function trackQuestionnaireStepComplete(payload) {
   if (typeof window === "undefined") return;
   if (QS_DEBUG) {
     try {
-      console.info("[QS_TRACK] complete", payload);
+      logger.info("[QS_TRACK] complete", payload);
     } catch (_) {}
   }
   trackFunnelEvent("questionnaire_step_complete", {
@@ -194,7 +195,7 @@ export function trackQuestionnaireSubmit(payload) {
   if (typeof window === "undefined") return;
   if (QS_DEBUG) {
     try {
-      console.info("[QS_TRACK] submit", payload);
+      logger.info("[QS_TRACK] submit", payload);
     } catch (_) {}
   }
   trackFunnelEvent("questionnaire_submit", {

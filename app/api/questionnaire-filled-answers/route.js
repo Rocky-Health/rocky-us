@@ -33,18 +33,18 @@ export async function POST(req) {
       }
     );
 
+    // The CRM body is the patient's filled answers, so log shape only.
     logger.log("[questionnaire-filled-answers] Backend - CRM response:", {
       status: response.status,
-      ok: response.ok,
-      data: response.data,
+      has_data: !!response.data,
     });
 
     return NextResponse.json(response.data);
   } catch (error) {
-    logger.error(
-      "[questionnaire-filled-answers] Error:",
-      error?.response?.data || error?.message || error
-    );
+    logger.error("[questionnaire-filled-answers] Error:", {
+      message: error?.message,
+      status: error?.response?.status,
+    });
     return NextResponse.json(
       { error: true, msg: error?.response?.data?.message || error?.message },
       { status: error?.response?.status || 500 }

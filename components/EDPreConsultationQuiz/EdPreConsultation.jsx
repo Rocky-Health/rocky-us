@@ -137,7 +137,7 @@ const EDPreConsultationQuiz = () => {
             // Just generate checkout URL and redirect
             const checkoutUrl = finalizeFlowCheckout("ed", true);
 
-            logger.log("Redirecting to:", checkoutUrl);
+            logger.log("Redirecting to:", checkoutUrl.split("?")[0]);
 
             // Close modal and navigate on success (client-side so Convert stays
             // initialized once per session — matches EdProductCard checkout)

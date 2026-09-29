@@ -19,6 +19,24 @@ let productCache = {
 const productTypeCache = {};
 
 /**
+ * Log-safe view of a cart request body. Attribute values carry dose/strength,
+ * which is treatment data, so only the catalogue ids and the attribute names
+ * are kept.
+ */
+function summarizeCartRequest(requestBody) {
+  if (!requestBody || typeof requestBody !== "object") return {};
+  return {
+    productId: requestBody.productId,
+    variationId: requestBody.variationId,
+    quantity: requestBody.quantity,
+    isSubscription: requestBody.isSubscription,
+    subscriptionPeriod: requestBody.subscriptionPeriod,
+    isVarietyPack: requestBody.isVarietyPack,
+    attributeKeys: Object.keys(requestBody.attributes || {}),
+  };
+}
+
+/**
  * Get product information dynamically from the API
  * @param {string} productId - The ID of the product
  * @returns {Promise<Object>} Product type and variation information
@@ -439,7 +457,7 @@ export const processUrlCartParameters = async (searchParams) => {
           batchItems.push(requestBody);
           logger.log(
             `Prepared product ${productId} for batch:`,
-            JSON.stringify(requestBody, null, 2)
+            summarizeCartRequest(requestBody)
           );
         } catch (productError) {
           logger.error(`Error preparing product ${productId}:`, productError);
@@ -802,7 +820,7 @@ async function buildSmartProductRequestBody(productId, searchParams) {
     // Return early for this special case
     logger.log(
       `Final request for Lidocaine Cream:`,
-      JSON.stringify(requestBody, null, 2)
+      summarizeCartRequest(requestBody)
     );
     return requestBody;
   }
@@ -825,7 +843,7 @@ async function buildSmartProductRequestBody(productId, searchParams) {
     // Return early for this special case
     logger.log(
       `Final request for Lidocaine Spray:`,
-      JSON.stringify(requestBody, null, 2)
+      summarizeCartRequest(requestBody)
     );
     return requestBody;
   }
@@ -908,7 +926,7 @@ async function buildSmartProductRequestBody(productId, searchParams) {
   // Handle logging for debug purposes
   logger.log(
     `Final request for product ${productId}:`,
-    JSON.stringify(requestBody, null, 2)
+    summarizeCartRequest(requestBody)
   );
 
   return requestBody;
@@ -1176,7 +1194,12 @@ export const createCartUrl = async (
   try {
     // Detailed logging of the product being processed
     logger.log("===== PRODUCT INFO FOR CART URL =====");
-    logger.log("Main Product:", JSON.stringify(mainProduct, null, 2));
+    // Product name/dose is treatment data, so log identifiers only.
+    logger.log("Main Product:", {
+      id: mainProduct?.id ?? mainProduct?.productId ?? null,
+      variationId: mainProduct?.variationId ?? null,
+      type: typeof mainProduct,
+    });
     logger.log("Flow Type:", flowType);
     logger.log("Is Authenticated:", isAuthenticated);
 

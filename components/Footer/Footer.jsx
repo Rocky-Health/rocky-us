@@ -31,7 +31,6 @@ const Footer = ({ className }) => {
     const handleSubscribe = async (e) => {
         e.preventDefault();
         const email = e.target.email.value;
-        logger.log("Email:", email);
         if (!email) {
             setOverlayMessage({
                 type: "error",

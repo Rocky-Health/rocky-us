@@ -144,7 +144,12 @@ export const processItemsIndividuallyWithFallback = async (
         : `All ${successfulItems} items added successfully via individual processing`,
   };
 
-  logger.log(`Individual processing summary:`, summary);
+  logger.log(`Individual processing summary:`, {
+    success: summary.success,
+    total_items: summary.total_items,
+    successful_items: summary.successful_items,
+    failed_items: summary.failed_items,
+  });
   return summary;
 };
 

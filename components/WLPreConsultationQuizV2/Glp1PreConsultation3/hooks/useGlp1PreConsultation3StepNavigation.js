@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { isUserAuthenticated } from "@/utils/crossSellCheckout";
+import { logger } from "@/utils/devLogger";
 
 // Isolated from WL shared useStepNavigation — this flow uses its own localStorage key.
 const STORAGE_KEY = "glp1_pc3_wl_flow_quiz_data";
@@ -60,7 +61,7 @@ export const useGlp1PreConsultation3StepNavigation = (quizConfig) => {
           );
         }
       } catch (e) {
-        console.error("Failed to load currentStep from localStorage:", e);
+        logger.error("Failed to load currentStep from localStorage:", e);
       }
     }
     return 1;
@@ -80,7 +81,7 @@ export const useGlp1PreConsultation3StepNavigation = (quizConfig) => {
           return quizConfig.progressMap[resolvedStep] || 0;
         }
       } catch (e) {
-        console.error("Failed to load progressPercent from localStorage:", e);
+        logger.error("Failed to load progressPercent from localStorage:", e);
       }
     }
     return quizConfig.progressMap[1] || 0;
@@ -96,7 +97,7 @@ export const useGlp1PreConsultation3StepNavigation = (quizConfig) => {
           return parsed.history || [];
         }
       } catch (e) {
-        console.error("Failed to load history from localStorage:", e);
+        logger.error("Failed to load history from localStorage:", e);
       }
     }
     return [];
@@ -121,7 +122,7 @@ export const useGlp1PreConsultation3StepNavigation = (quizConfig) => {
           })
         );
       } catch (e) {
-        console.error("Failed to save navigation state to localStorage:", e);
+        logger.error("Failed to save navigation state to localStorage:", e);
       }
     }
   }, [currentStep, progressPercent, history]);
@@ -293,7 +294,7 @@ export const useGlp1PreConsultation3StepNavigation = (quizConfig) => {
           );
         }
       } catch (e) {
-        console.error("Failed to reset navigation state in localStorage:", e);
+        logger.error("Failed to reset navigation state in localStorage:", e);
       }
     }
   };

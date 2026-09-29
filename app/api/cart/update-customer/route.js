@@ -21,11 +21,12 @@ export async function POST(req) {
       );
     }
 
-    // Log the request data for debugging
-    logger.log(
-      "Update customer request data:",
-      JSON.stringify(requestData, null, 2)
-    );
+    // Billing/shipping address payload, so log only which sections arrived.
+    logger.log("Update customer request:", {
+      sections: Object.keys(requestData || {}),
+      hasBillingAddress: !!requestData?.billing_address,
+      hasShippingAddress: !!requestData?.shipping_address,
+    });
     
     // Specifically log address fields to debug truncation
     logger.log("=== UPDATE-CUSTOMER API ADDRESS DEBUG ===");
@@ -69,7 +70,6 @@ export async function POST(req) {
     return NextResponse.json(
       {
         error: error.response?.data?.message || "Failed to update customer",
-        details: error.response?.data || null,
       },
       { status: error.response?.status || 500 }
     );

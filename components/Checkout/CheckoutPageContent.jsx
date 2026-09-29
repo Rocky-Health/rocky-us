@@ -715,37 +715,30 @@ const CheckoutPageContent = ({ onStripeAmountChange, paymentRegionRef }) => {
         });
       }
 
-      // Log the customer data being sent
-      logger.log(
-        "Sending customer data to update-customer API:",
-        JSON.stringify(customerData, null, 2),
-      );
+      // Only the province sync matters here, so keep the address out of the log.
+      logger.log("Sending customer data to update-customer API:", {
+        addressType,
+        billingState: customerData?.billing_address?.state,
+        shippingState: customerData?.shipping_address?.state,
+      });
 
-      // Specifically log the address_1 field to debug truncation
+      // Lengths only, so address truncation is still debuggable.
       logger.log("=== ADDRESS DEBUG ===");
-      logger.log(
-        "Billing address_1 being sent:",
-        `"${customerData.billing_address.address_1}"`,
-      );
       logger.log(
         "Billing address_1 length:",
         customerData.billing_address.address_1?.length || 0,
-      );
-      logger.log(
-        "Shipping address_1 being sent:",
-        `"${customerData.shipping_address.address_1}"`,
       );
       logger.log(
         "Shipping address_1 length:",
         customerData.shipping_address.address_1?.length || 0,
       );
       logger.log(
-        "FormData billing address_1:",
-        `"${formData.billing_address.address_1}"`,
+        "FormData billing address_1 length:",
+        formData.billing_address.address_1?.length || 0,
       );
       logger.log(
-        "FormData shipping address_1:",
-        `"${formData.shipping_address.address_1}"`,
+        "FormData shipping address_1 length:",
+        formData.shipping_address.address_1?.length || 0,
       );
       logger.log("=== END ADDRESS DEBUG ===");
 
@@ -822,7 +815,10 @@ const CheckoutPageContent = ({ onStripeAmountChange, paymentRegionRef }) => {
       const data = await res.json();
 
       // Log cart items to debug what products are actually being added
-      logger.log("Cart items received from API:", data.items);
+      logger.log(
+        "Cart item ids received from API:",
+        (data.items || []).map((item) => item.product_id),
+      );
 
       // If we're coming from ED flow with specific products, verify the products are correct
       if (onboardingAddToCart) {
@@ -945,14 +941,18 @@ const CheckoutPageContent = ({ onStripeAmountChange, paymentRegionRef }) => {
             };
 
             logger.log("=== PERSONAL INFO MERGED INTO CART DATA ===", {
-              billing_first_name: data.billing_address.first_name,
-              billing_last_name: data.billing_address.last_name,
-              billing_phone: data.billing_address.phone,
-              billing_date_of_birth: data.billing_address.date_of_birth,
-              shipping_first_name: data.shipping_address.first_name,
-              shipping_last_name: data.shipping_address.last_name,
-              shipping_phone: data.shipping_address.phone,
-              shipping_date_of_birth: data.shipping_address.date_of_birth,
+              billing_first_name: Boolean(data.billing_address.first_name),
+              billing_last_name: Boolean(data.billing_address.last_name),
+              billing_phone: Boolean(data.billing_address.phone),
+              billing_date_of_birth: Boolean(
+                data.billing_address.date_of_birth,
+              ),
+              shipping_first_name: Boolean(data.shipping_address.first_name),
+              shipping_last_name: Boolean(data.shipping_address.last_name),
+              shipping_phone: Boolean(data.shipping_address.phone),
+              shipping_date_of_birth: Boolean(
+                data.shipping_address.date_of_birth,
+              ),
             });
 
             // Immediately save the merged data to localStorage to prevent it from being overwritten
@@ -971,7 +971,7 @@ const CheckoutPageContent = ({ onStripeAmountChange, paymentRegionRef }) => {
       if (updateFormData) {
         logger.log("=== SETTING FORM DATA FROM CART ===", {
           billing_address_1: data.billing_address?.address_1,
-          billing_city: data.billing_address?.city,
+          billing_has_city: Boolean(data.billing_address?.city),
           billing_state: data.billing_address?.state,
         });
         setFormData((prev) => {
@@ -1070,7 +1070,10 @@ const CheckoutPageContent = ({ onStripeAmountChange, paymentRegionRef }) => {
       // Parse the response
       const data = await res.json();
 
-      logger.log("Saved cards API full response:", data);
+      logger.log("Saved cards API response:", {
+        success: data.success,
+        cardCount: Array.isArray(data.cards) ? data.cards.length : 0,
+      });
 
       if (
         data.success &&
@@ -1078,13 +1081,13 @@ const CheckoutPageContent = ({ onStripeAmountChange, paymentRegionRef }) => {
         Array.isArray(data.cards) &&
         data.cards.length > 0
       ) {
-        logger.log("Setting saved cards in state:", data.cards);
+        logger.log("Setting saved cards in state, count:", data.cards.length);
         setSavedCards(data.cards);
 
         // Set the default card as selected if available
         const defaultCard = data.cards.find((card) => card.is_default);
         if (defaultCard) {
-          logger.log("Setting default card as selected:", defaultCard);
+          logger.log("Setting default card as selected:", defaultCard.id);
           // Store the card object to have access to both id and token
           setSelectedCard(defaultCard);
         }
@@ -1131,7 +1134,7 @@ const CheckoutPageContent = ({ onStripeAmountChange, paymentRegionRef }) => {
       logger.log("=== PROFILE DATA FETCHED ===", {
         timestamp: new Date().toISOString(),
         billing_address_1: data.billing_address_1,
-        billing_city: data.billing_city,
+        billing_has_city: Boolean(data.billing_city),
         billing_state: data.billing_state,
         billing_postcode: data.billing_postcode,
       });
@@ -1246,17 +1249,19 @@ const CheckoutPageContent = ({ onStripeAmountChange, paymentRegionRef }) => {
               "",
           };
 
-          logger.log(
-            "Updated billing address (prioritizing cart data):",
-            updatedBillingAddress,
-          );
-          logger.log(
-            "Previous billing address (from cart):",
-            prev.billing_address,
-          );
+          logger.log("Updated billing address (prioritizing cart data):", {
+            has_address_1: Boolean(updatedBillingAddress.address_1),
+            has_city: Boolean(updatedBillingAddress.city),
+            state: updatedBillingAddress.state,
+          });
+          logger.log("Previous billing address (from cart):", {
+            has_address_1: Boolean(prev.billing_address?.address_1),
+            has_city: Boolean(prev.billing_address?.city),
+            state: prev.billing_address?.state,
+          });
           logger.log("Profile billing address:", {
-            address_1: profileData.billing_address_1,
-            city: profileData.billing_city,
+            has_address_1: Boolean(profileData.billing_address_1),
+            has_city: Boolean(profileData.billing_city),
             state: profileData.billing_state,
           });
 
@@ -1649,10 +1654,10 @@ const CheckoutPageContent = ({ onStripeAmountChange, paymentRegionRef }) => {
           };
 
           logger.log("Profile update data:", {
-            billing_city: profileData.billing_address?.city,
+            billing_has_city: Boolean(profileData.billing_address?.city),
             billing_state: profileData.billing_address?.state,
             billing_postcode: profileData.billing_address?.postcode,
-            shipping_city: profileData.shipping_address?.city,
+            shipping_has_city: Boolean(profileData.shipping_address?.city),
             date_of_birth: profileData.date_of_birth,
             phone: profileData.billing_address?.phone,
           });
@@ -2164,7 +2169,8 @@ const CheckoutPageContent = ({ onStripeAmountChange, paymentRegionRef }) => {
 
           // Now validate the date of birth
           if (dateOfBirthToCheck) {
-            logger.log("Checking age validation for date:", dateOfBirthToCheck);
+            // Never log the DOB value itself.
+            logger.log("Checking age validation for stored date of birth");
             const ageCheck = checkAgeRestriction(dateOfBirthToCheck, 19);
             logger.log("Age validation result:", ageCheck);
             if (ageCheck.blocked) {
@@ -2203,7 +2209,7 @@ const CheckoutPageContent = ({ onStripeAmountChange, paymentRegionRef }) => {
         ) {
           logger.log(
             `ED product shipping restricted for state: ${stateToCheck}`,
-            restrictedEdItem,
+            restrictedEdItem.product_id,
           );
           setRestrictedProductName(restrictedEdItem.name || "this");
           setShowEdRestrictionPopup(true);
@@ -2223,7 +2229,7 @@ const CheckoutPageContent = ({ onStripeAmountChange, paymentRegionRef }) => {
         ) {
           logger.log(
             `WL product shipping restricted for state: ${stateToCheck}`,
-            restrictedWlItem,
+            restrictedWlItem.product_id,
           );
           setRestrictedProductName(restrictedWlItem.name || "this");
           setShowEdRestrictionPopup(true);

@@ -77,10 +77,10 @@ export default function EDConsultationQuiz({
             parsedData.source === "lidocaine_addon_selection"
           ) {
             lidocaineAnswer = parsedData["98"] || "";
-            logger.log(
-              "Loaded lidocaine answer from localStorage:",
-              lidocaineAnswer
-            );
+            // The answer itself is clinical data, so log the outcome only.
+            logger.log("Loaded lidocaine answer from localStorage", {
+              hasValue: Boolean(lidocaineAnswer),
+            });
           } else {
             logger.warn(
               "Invalid lidocaine data structure, clearing localStorage"
@@ -444,9 +444,10 @@ export default function EDConsultationQuiz({
             }),
           });
           const data = await res.json();
+          // Prefill answers are PHI, so log the outcome only.
           logger.log("[EDConsultationQuiz] questionnaire-filled-answers:", {
             status: res.status,
-            data,
+            answerCount: Object.keys(data?.data || {}).length,
           });
           if (data?.data) {
             answersData = data.data;
@@ -532,8 +533,7 @@ export default function EDConsultationQuiz({
       const photoStatus = getPhotoUploadStatus();
       if (photoStatus.uploaded && quizFormData["196"] && !photoIdFile) {
         logger.log(
-          "Detected photo was uploaded but file object lost after refresh. Photo URL:",
-          photoStatus.url
+          "Detected photo was uploaded but file object lost after refresh"
         );
         if (quizFormData.completion_state !== "Full") {
           const updatedData = {
@@ -1424,7 +1424,10 @@ export default function EDConsultationQuiz({
         ...currentPageData,
       };
 
-      logger.log("API submission payload:", payload);
+      // The payload is the whole answer set, so log the shape only.
+      logger.log("API submission payload:", {
+        fieldCount: Object.keys(payload).length,
+      });
 
       const response = await fetch("/api/ed", {
         method: "POST",
@@ -1870,7 +1873,7 @@ export default function EDConsultationQuiz({
       )
     );
 
-    logger.log("Collected page data:", result);
+    logger.log("Collected page data:", Object.keys(result));
 
     return result;
   };
@@ -2771,7 +2774,9 @@ export default function EDConsultationQuiz({
   };
 
   const handleVeryHighBpWarningClose = (proceed = true) => {
-    logger.log("Closing very high BP warning, selection was:", formData["45"]);
+    logger.log("Closing very high BP warning", {
+      hasSelection: Boolean(formData["45"]),
+    });
     setShowVeryHighBpWarning(false);
     setIsSubmitting(false);
 
@@ -2788,7 +2793,9 @@ export default function EDConsultationQuiz({
       queueFormSubmission(updates);
     } else {
       const currentSelection = formData["45"];
-      logger.log("User proceeding with selection:", currentSelection);
+      logger.log("User proceeding", {
+        hasSelection: Boolean(currentSelection),
+      });
       queueFormSubmission({ 45: currentSelection });
     }
   };
@@ -2874,7 +2881,7 @@ export default function EDConsultationQuiz({
     clearError();
 
     const newValue = formData[fieldName] === value ? "" : value;
-    logger.log(`Setting ${fieldName} to ${newValue}`);
+    logger.log("Setting field", { fieldName, hasValue: Boolean(newValue) });
 
     const currentValue = formData[fieldName];
 

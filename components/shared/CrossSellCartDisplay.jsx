@@ -34,7 +34,7 @@ const CrossSellCartDisplay = ({
    */
   const handleRemove = (item) => {
     if (!canRemoveItem(item.id)) {
-      logger.log(`⚠️ Cannot remove required item: ${item.name}`);
+      logger.log(`⚠️ Cannot remove required item: ${item.id}`);
       return;
     }
 

@@ -108,7 +108,8 @@ const WLOfferPreConsultationFlow = () => {
     if (activePopup) {
       logger.log("[WLOfferPreConsultationFlow] Active popup:", activePopup);
       logger.log("[WLOfferPreConsultationFlow] Popup config:", activePopupConfig);
-      logger.log("[WLOfferPreConsultationFlow] User data:", userData);
+      // Quiz answers are PHI, so log the field names only.
+      logger.log("[WLOfferPreConsultationFlow] User data fields:", Object.keys(userData || {}));
     }
   }, [activePopup, activePopupConfig, userData]);
 

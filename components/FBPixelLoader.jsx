@@ -3,6 +3,7 @@
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getIdentityKey, buildAdvancedMatching } from "@/utils/metaAdvancedMatching";
+import { logger } from "@/utils/devLogger";
 
 // US bundle: ED / WL / HL + LONGEVITY (the NAD+ funnel rides the LONGEVITY
 // pixel). Smoking, Skincare, and Mental-Health categories are blocked at
@@ -277,7 +278,7 @@ export default function FBPixelLoader() {
       const t = document.createElement("script");
       t.async = true;
       t.src = "https://connect.facebook.net/en_US/fbevents.js";
-      t.onerror = (e) => console.warn("[FBPixelLoader] fbevents.js FAILED to load", e);
+      t.onerror = (e) => logger.warn("[FBPixelLoader] fbevents.js FAILED to load", e);
       const s = document.getElementsByTagName("script")[0];
       if (s && s.parentNode) {
         s.parentNode.insertBefore(t, s);

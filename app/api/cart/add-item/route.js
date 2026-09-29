@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
 import { cookies } from "next/headers";
-import { logger } from "@/utils/devLogger";
+import { logger, redactSensitive } from "@/utils/devLogger";
 import {
   ensureValidCartNonce,
   updateCartNonceFromResponse,
@@ -118,7 +118,7 @@ export async function POST(req) {
 
     logger.log(
       "Sending API request to add item to cart:",
-      JSON.stringify(cartData, null, 2)
+      JSON.stringify(redactSensitive(cartData), null, 2)
     );
 
     // Ensure we have a valid nonce and proper headers

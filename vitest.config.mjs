@@ -19,6 +19,9 @@ export default defineConfig({
     include: [
       "lib/customerio/__tests__/**/*.test.js",
       "lib/northbeam/__tests__/**/*.test.js",
+      // TK-1046 sensitive-logging guard.
+      "tools/__tests__/**/*.test.js",
+      "utils/__tests__/devLoggerKeyFamilies.test.js",
     ],
     environment: "node",
   },

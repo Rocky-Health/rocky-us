@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
 import { cookies } from "next/headers";
-import { logger } from "@/utils/devLogger";
+import { logger, redactSensitive } from "@/utils/devLogger";
 import {
   getCurrentCartNonce,
   updateCartNonceFromResponse,
@@ -20,7 +20,7 @@ export async function POST(req) {
     const { items } = await req.json();
     logger.log(
       `Received ${items?.length || 0} items for batch cart addition:`,
-      JSON.stringify(items, null, 2)
+      JSON.stringify(redactSensitive(items), null, 2)
     );
 
     const cookieStore = await cookies();
@@ -138,11 +138,14 @@ export async function POST(req) {
       return batchRequest;
     });
 
+    // Bodies only, the headers carry the live cart nonce.
     logger.log(
       "Sending batch request to WooCommerce:",
       JSON.stringify(
         {
-          requests: batchRequests,
+          requests: redactSensitive(
+            batchRequests.map(({ headers, ...request }) => request)
+          ),
         },
         null,
         2
@@ -167,7 +170,7 @@ export async function POST(req) {
 
     logger.log(
       "Batch response received:",
-      JSON.stringify(batchResponse.data, null, 2)
+      JSON.stringify(redactSensitive(batchResponse.data), null, 2)
     );
 
     // Update nonce using unified manager
@@ -250,11 +253,6 @@ export async function POST(req) {
     // Enhanced error response with fallback recommendation
     const errorResponse = {
       error: "Failed to add items to cart via batch operation",
-      details: {
-        message: error.message,
-        response: error.response?.data || null,
-        status: error.response?.status || null,
-      },
       fallback_recommended: true, // Signal to client to use individual calls
       batch_size: items?.length || 0,
     };

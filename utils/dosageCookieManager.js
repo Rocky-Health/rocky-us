@@ -39,9 +39,10 @@ export const saveDosageSelection = (productId, dosage) => {
   }
 
   try {
-    logger.log("Saving dosage selection:", { productId, dosage });
+    // Dosage is treatment data, so log the product and counts only.
+    logger.log("Saving dosage selection for product:", productId);
     const selections = getDosageSelections();
-    logger.log("Current selections:", selections);
+    logger.log("Current selection count:", Object.keys(selections).length);
 
     // Store in format: { "259": "50mg", "260": "100mg" }
     selections[productId] = dosage;
@@ -50,12 +51,10 @@ export const saveDosageSelection = (productId, dosage) => {
     expiryDate.setDate(expiryDate.getDate() + COOKIE_EXPIRY_DAYS);
 
     const cookieValue = JSON.stringify(selections);
-    logger.log("Setting cookie value:", cookieValue);
 
     const cookieString = `${COOKIE_NAME}=${encodeURIComponent(
       cookieValue
     )}; expires=${expiryDate.toUTCString()}; path=/; SameSite=Lax`;
-    logger.log("Setting cookie string:", cookieString);
 
     document.cookie = cookieString;
 
@@ -63,7 +62,7 @@ export const saveDosageSelection = (productId, dosage) => {
     const savedCookie = document.cookie
       .split("; ")
       .find((row) => row.startsWith(`${COOKIE_NAME}=`));
-    logger.log("Saved cookie:", savedCookie);
+    logger.log("Dosage cookie written:", Boolean(savedCookie));
   } catch (error) {
     logger.error("Error saving dosage selection:", error);
   }
@@ -79,8 +78,8 @@ export const getDosageSelection = (productId) => {
   logger.log(
     "Getting dosage selection for product",
     productId,
-    ":",
-    selections[productId]
+    "found:",
+    Boolean(selections[productId])
   );
   return selections[productId] || null;
 };

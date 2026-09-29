@@ -172,7 +172,6 @@ export async function GET(request, { params }) {
       return NextResponse.json(
         {
           error: "Failed to fetch order details",
-          details: error.response.data,
         },
         { status: error.response.status || 500 }
       );

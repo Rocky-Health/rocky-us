@@ -17,17 +17,12 @@ const DosageSelectionModal = ({
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
-      // Log product info when modal opens
-      logger.log("DosageSelectionModal opened with product:", product);
+      // Dosage is treatment data, so log the product id only.
+      logger.log("DosageSelectionModal opened for product:", product?.id ?? null);
 
       // Save the default dosage selection when modal opens
       if (product?.id && selectedDose) {
-        logger.log(
-          "Saving default dosage for product:",
-          product.id,
-          "with dose:",
-          selectedDose
-        );
+        logger.log("Saving default dosage for product:", product.id);
         saveDosageSelection(product.id.toString(), selectedDose);
       }
     } else {
@@ -43,18 +38,11 @@ const DosageSelectionModal = ({
 
   const handleRadioChange = (e) => {
     const newDose = e.target.value;
-    logger.log("Radio changed to:", newDose);
-    logger.log("Current product in modal:", product);
     setSelectedDose(newDose);
 
     // Save the dosage selection to cookie if we have a product ID
     if (product?.id) {
-      logger.log(
-        "Saving dosage for product:",
-        product.id,
-        "with dose:",
-        newDose
-      );
+      logger.log("Saving dosage for product:", product.id);
       saveDosageSelection(product.id.toString(), newDose);
     } else {
       logger.log("No product ID available for saving dosage");

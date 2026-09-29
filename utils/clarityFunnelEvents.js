@@ -11,6 +11,8 @@
  * (quiz -> plan selection -> checkout) per TK-584 / TK-585 / TK-586.
  */
 
+import { logger } from "@/utils/devLogger";
+
 const FUNNEL_DEBUG =
   typeof process !== "undefined" &&
   process.env.NEXT_PUBLIC_QS_TRACK_DEBUG === "1";
@@ -31,7 +33,7 @@ export function trackFunnelEvent(eventName, { clarity = {}, data = {} } = {}) {
 
   if (FUNNEL_DEBUG) {
     try {
-      console.info("[FUNNEL_TRACK]", eventName, { clarity, data });
+      logger.info("[FUNNEL_TRACK]", eventName, { clarity, data });
     } catch (_) {}
   }
 

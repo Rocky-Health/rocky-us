@@ -113,7 +113,6 @@ export async function POST(req) {
       {
         error: true,
         message: "Internal server error",
-        details: error.message,
       },
       { status: 500 }
     );

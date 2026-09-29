@@ -83,7 +83,7 @@ export const useGlp1PreConsultation3QuizData = () => {
         onContinue();
         break;
       default:
-        logger.log("Unknown action:", action, payload);
+        logger.log("Unknown action:", action);
     }
   };
 

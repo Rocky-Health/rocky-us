@@ -20,6 +20,24 @@ import { analyticsService } from "@/utils/analytics/analyticsService";
 import { getOrCreateSessionId } from "@/utils/dataLayerHelper";
 
 /**
+ * Log-safe view of a cart item. Attribute and meta values carry dose/strength,
+ * which is treatment data, so only the catalogue ids, quantities and the field
+ * names are kept.
+ */
+function summarizeCartItem(item) {
+  if (!item || typeof item !== "object") return {};
+  return {
+    productId: item.productId ?? item.id ?? null,
+    variationId: item.variationId ?? item.variation_id ?? null,
+    quantity: item.quantity,
+    isSubscription: item.isSubscription,
+    subscriptionPeriod: item.subscriptionPeriod,
+    attributeKeys: Object.keys(item.attributes || {}),
+    metaKeys: (item.meta_data || []).map((entry) => entry?.key),
+  };
+}
+
+/**
  * Helper function to clean and parse price strings
  * Handles prices with currency symbols like "$399" or "399.00"
  */
@@ -47,8 +65,12 @@ export const addToCartDirectly = async (
 ) => {
   try {
     logger.log(`🛒 Starting direct cart addition for ${flowType} flow`);
-    logger.log("Main Product:", mainProduct);
-    logger.log("Addons:", addons);
+    // Product name/dose is treatment data, so log identifiers only.
+    logger.log("Main Product:", {
+      id: mainProduct?.id ?? mainProduct?.productId ?? null,
+      variationId: mainProduct?.variationId ?? null,
+    });
+    logger.log("Addon count:", Array.isArray(addons) ? addons.length : 0);
 
     const {
       preserveExistingCart = true,
@@ -116,12 +138,12 @@ async function handleAuthenticatedFlow(mainProduct, addons, flowType, options) {
 
     logger.log(
       `🛒 Flow Handler - Prepared ${cartItems.length} items for ${flowType} flow:`,
-      cartItems,
+      cartItems.map(summarizeCartItem),
     );
 
     // Log each item details for debugging
     cartItems.forEach((item, index) => {
-      logger.log(`🛒 Flow Handler - Item ${index + 1}:`, item);
+      logger.log(`🛒 Flow Handler - Item ${index + 1}:`, summarizeCartItem(item));
     });
 
     // Use batch endpoint for multiple items, individual for single item
@@ -236,7 +258,12 @@ async function handleUnauthenticatedFlow(
         variation: mainProduct.variation || [],
       };
 
-      logger.log("🛒 Adding main product via cartService:", mainProductData);
+      logger.log("🛒 Adding main product via cartService:", {
+        productId: mainProductData.productId,
+        variationId: mainProductData.variationId,
+        quantity: mainProductData.quantity,
+        price: mainProductData.price,
+      });
       await addItemToCart(mainProductData);
     }
 
@@ -294,7 +321,12 @@ async function handleUnauthenticatedFlow(
           variation: addonVariation,
         };
 
-        logger.log("🛒 Adding addon via cartService:", addonData);
+        logger.log("🛒 Adding addon via cartService:", {
+          productId: addonData.productId,
+          variationId: addonData.variationId,
+          quantity: addonData.quantity,
+          price: addonData.price,
+        });
         await addItemToCart(addonData);
       }
     }
@@ -340,10 +372,10 @@ async function handleUnauthenticatedFlow(
 
     // Get the updated cart from cartService
     const cartData = getLocalCart();
-    logger.log(
-      "✅ Products added to localStorage cart via cartService:",
-      cartData,
-    );
+    logger.log("✅ Products added to localStorage cart via cartService:", {
+      total_items: cartData.total_items,
+      itemCount: cartData.items?.length ?? 0,
+    });
 
     // Generate login URL with proper redirect
     const loginUrl = generateLoginUrl(
@@ -423,7 +455,12 @@ async function handleUnauthenticatedEarlyAddition(
       variation: mainProduct.variation || [],
     };
 
-    logger.log("🛒 Adding main product via cartService:", mainProductData);
+    logger.log("🛒 Adding main product via cartService:", {
+      productId: mainProductData.productId,
+      variationId: mainProductData.variationId,
+      quantity: mainProductData.quantity,
+      price: mainProductData.price,
+    });
     logger.log(
       `💰 Price conversion: $${priceInDollars} → ${priceInCents} cents`,
     );
@@ -455,10 +492,10 @@ async function handleUnauthenticatedEarlyAddition(
 
     // Get the updated cart from cartService
     const cartData = getLocalCart();
-    logger.log(
-      "✅ Products added to localStorage cart via cartService:",
-      cartData,
-    );
+    logger.log("✅ Products added to localStorage cart via cartService:", {
+      total_items: cartData.total_items,
+      itemCount: cartData.items?.length ?? 0,
+    });
 
     // Fire add_to_cart analytics event
     try {
@@ -584,7 +621,12 @@ async function handleUnauthenticatedAddonAddition(
       variation: addonVariation,
     };
 
-    logger.log("🛒 Adding addon via cartService:", addonData);
+    logger.log("🛒 Adding addon via cartService:", {
+      productId: addonData.productId,
+      variationId: addonData.variationId,
+      quantity: addonData.quantity,
+      price: addonData.price,
+    });
     logger.log(
       `💰 Addon price conversion: $${addonPriceInDollars} → ${addonPriceInCents} cents`,
     );
@@ -594,10 +636,10 @@ async function handleUnauthenticatedAddonAddition(
 
     // Get the updated cart from cartService
     const cartData = getLocalCart();
-    logger.log(
-      "✅ Addon added to localStorage cart via cartService:",
-      cartData,
-    );
+    logger.log("✅ Addon added to localStorage cart via cartService:", {
+      total_items: cartData.total_items,
+      itemCount: cartData.items?.length ?? 0,
+    });
 
     // Return success with cart data formatted for display
     return {
@@ -939,7 +981,7 @@ async function prepareCartItems(mainProduct, addons, flowType, options) {
     items.push(bodyOptimizationProgram);
     logger.log(
       "🛒 Flow Handler - Body Optimization Program prepared:",
-      bodyOptimizationProgram,
+      summarizeCartItem(bodyOptimizationProgram),
     );
   }
 
@@ -1169,7 +1211,11 @@ export const addToCartEarly = async (
 ) => {
   try {
     logger.log(`🛒 Early Cart Addition - Starting for ${flowType} flow`);
-    logger.log("Main Product:", mainProduct);
+    // Product name/dose is treatment data, so log identifiers only.
+    logger.log("Main Product:", {
+      id: mainProduct?.id ?? mainProduct?.productId ?? null,
+      variationId: mainProduct?.variationId ?? null,
+    });
 
     const {
       preserveExistingCart = true,
@@ -1371,7 +1417,11 @@ export const addAddonToCart = async (
 ) => {
   try {
     logger.log(`🛒 Adding addon to cart for ${flowType} flow`);
-    logger.log("Addon Product:", addonProduct);
+    // Product name/dose is treatment data, so log identifiers only.
+    logger.log("Addon Product:", {
+      id: addonProduct?.id ?? addonProduct?.productId ?? null,
+      variationId: addonProduct?.variationId ?? null,
+    });
 
     // Check authentication
     const isAuthenticated = isUserAuthenticated();
@@ -1426,7 +1476,7 @@ export const addAddonToCart = async (
       ...(addonProduct.meta_data || []),
     ];
 
-    logger.log(`🛒 Adding addon item:`, addonItem);
+    logger.log(`🛒 Adding addon item:`, summarizeCartItem(addonItem));
 
     // Add to cart
     const cartResult = await addSingleItem(addonItem);

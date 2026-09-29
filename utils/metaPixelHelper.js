@@ -1,3 +1,5 @@
+import { logger } from '@/utils/devLogger';
+
 /**
  * Capture fbclid from URL and store as _fbc cookie
  * Format of _fbc cookie: fb.{subdomain_index}.{creation_time}.{fbclid}
@@ -36,7 +38,8 @@ export function captureMetaParameters() {
         fbc = `fb.${subdomainIndex}.${clickTime}.${fbclid}`;
         
         setCookie('_fbc', fbc, domain, 7);
-        console.log('[Meta Helper] Captured fbclid and set _fbc:', fbc);
+        // _fbc holds the raw Meta click id, so log only that it was set.
+        logger.log('[Meta Helper] Captured fbclid and set _fbc');
       }
     }
 
@@ -46,7 +49,7 @@ export function captureMetaParameters() {
       fbclid: fbclid || ''
     };
   } catch (error) {
-    console.error('[Meta Helper] Error capturing Meta parameters:', error);
+    logger.error('[Meta Helper] Error capturing Meta parameters:', error);
     return { fbp: '', fbc: '', fbclid: '' };
   }
 }
@@ -77,7 +80,7 @@ function setCookie(name, value, domain, days) {
       document.cookie = `${name}=${value};path=/;max-age=${maxAge};SameSite=Lax;Secure`;
     }
   } catch (error) {
-    console.error('[Meta Helper] Error setting cookie:', error);
+    logger.error('[Meta Helper] Error setting cookie:', error);
   }
 }
 
@@ -94,7 +97,7 @@ function deleteCookie(name, domain) {
       document.cookie = `${name}=;path=/;max-age=0;SameSite=Lax;Secure`;
     }
   } catch (error) {
-    console.error('[Meta Helper] Error deleting cookie:', error);
+    logger.error('[Meta Helper] Error deleting cookie:', error);
   }
 }
 

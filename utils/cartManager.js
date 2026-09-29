@@ -33,7 +33,7 @@ export const fetchCart = async () => {
     }
 
     const cartData = await response.json();
-    logger.log("📦 Cart fetched successfully:", cartData);
+    logger.log("📦 Cart fetched successfully, item count:", cartData.items?.length ?? 0);
 
     return {
       success: true,
@@ -144,7 +144,7 @@ export const formatCartForDisplay = (cartData) => {
       const subtotalInDollars = parseFloat(rawSubtotal) / divisor;
       const totalInDollars = parseFloat(rawTotal) / divisor;
 
-      logger.log(`💰 Price conversion for ${item.name}:`, {
+      logger.log(`💰 Price conversion for item ${item.key || item.id}:`, {
         rawTotal,
         divisor,
         totalInDollars,

@@ -96,9 +96,7 @@ export async function GET(req, { params }) {
     return new Response(
       JSON.stringify({
         error: "Failed to fetch blog post",
-        details: error.message,
         status: error.response?.status,
-        responseData: error.response?.data,
       }),
       {
         status: 500,

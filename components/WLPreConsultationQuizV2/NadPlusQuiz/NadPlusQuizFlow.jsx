@@ -121,7 +121,8 @@ const NadPlusQuizFlow = () => {
                 "[NadPlusQuizFlow] Popup config:",
                 activePopupConfig,
             );
-            logger.log("[NadPlusQuizFlow] User data:", userData);
+            // Quiz answers are PHI, so log the field names only.
+      logger.log("[NadPlusQuizFlow] User data fields:", Object.keys(userData || {}));
         }
     }, [activePopup, activePopupConfig, userData]);
 

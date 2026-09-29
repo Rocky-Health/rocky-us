@@ -19,9 +19,9 @@ const BillingDetails = ({
   onProvinceChange,
 }) => {
   logger.log("BillingDetails props:", {
-    onAgeValidation,
-    onAgeValidationReset,
-    cartItems,
+    hasAgeValidation: Boolean(onAgeValidation),
+    hasAgeValidationReset: Boolean(onAgeValidationReset),
+    cartItemCount: cartItems?.items?.length || 0,
   });
 
   const addressSelectedRef = useRef(false);
@@ -57,7 +57,7 @@ const BillingDetails = ({
   ]);
   // Handle date change in the date picker with real-time age validation
   const handleDateChange = (value) => {
-    logger.log("handleDateChange called with value:", value);
+    logger.log("handleDateChange called, value length:", value?.length || 0);
 
     // Update the form data
     handleBillingAddressChange({
@@ -83,14 +83,12 @@ const BillingDetails = ({
 
       if (hasZonnic) {
         // The date is already in YYYY-MM-DD format from DOBInput
-        logger.log("Date format from DOBInput:", value);
-
         const ageCheck = checkAgeRestriction(value, 19);
         logger.log("Age validation result:", ageCheck);
 
         if (ageCheck.blocked) {
           logger.log("User is too young, triggering age popup");
-          logger.log("onAgeValidation function:", onAgeValidation);
+          logger.log("onAgeValidation available:", Boolean(onAgeValidation));
           // Trigger age validation popup
           if (onAgeValidation) {
             logger.log("Calling onAgeValidation function");
@@ -139,7 +137,7 @@ const BillingDetails = ({
 
   const handleAddressSelected = (address) => {
     if (!address.address_1 || address.address_1.trim() === "") {
-      logger.error("❌ ERROR: address_1 is empty or invalid!", address);
+      logger.error("❌ ERROR: address_1 is empty or invalid!");
       return;
     }
 

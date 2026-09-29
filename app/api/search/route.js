@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
-import { logger } from "@/utils/devLogger";
+import { logger, redactSensitive } from "@/utils/devLogger";
 
 const BASE_URL = process.env.BASE_URL;
 
@@ -112,7 +112,10 @@ export async function GET(request) {
             if (response.data.length > 0) {
               logger.log(
                 "Page data example:",
-                JSON.stringify(response.data[0]).substring(0, 500)
+                JSON.stringify(redactSensitive(response.data[0])).substring(
+                  0,
+                  500
+                )
               );
             }
 
@@ -166,7 +169,10 @@ export async function GET(request) {
             if (response.data.length > 0) {
               logger.log(
                 "Product data example:",
-                JSON.stringify(response.data[0]).substring(0, 500)
+                JSON.stringify(redactSensitive(response.data[0])).substring(
+                  0,
+                  500
+                )
               );
             }
 

@@ -78,7 +78,7 @@ const CrossSellPopup = ({
       // Track locally for UI state
       setAddedProducts((prevProducts) => {
         const newProducts = [...prevProducts, addon.id];
-        logger.log(`Added WL addon ${addon.id} (${addon.name}) to cart`);
+        logger.log(`Added WL addon ${addon.id} to cart`);
         logger.log("Updated WL added products:", newProducts);
         return newProducts;
       });
@@ -87,7 +87,7 @@ const CrossSellPopup = ({
         addRequiredConsultation(addon.id, "wl-flow");
       }
     } else {
-      logger.log(`Failed to add WL addon ${addon.id} (${addon.name}) to cart`);
+      logger.log(`Failed to add WL addon ${addon.id} to cart`);
     }
   };
 

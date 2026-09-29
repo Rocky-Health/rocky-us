@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { captureMetaParameters } from "@/utils/metaPixelHelper";
+import { logger } from "@/utils/devLogger";
 
 export default function MetaCookieInitializer() {
   const pathname = usePathname();
@@ -12,7 +13,7 @@ export default function MetaCookieInitializer() {
     captureMetaParameters();
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('[Meta Cookie Init] Initialized on:', pathname);
+      logger.log('[Meta Cookie Init] Initialized on:', pathname);
     }
   }, [pathname, searchParams]);
 

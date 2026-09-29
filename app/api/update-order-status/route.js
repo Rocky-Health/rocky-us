@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
-import { logger } from "@/utils/devLogger";
+import { logger, redactSensitive } from "@/utils/devLogger";
 import { resolveOrderTimeIso } from "@/lib/northbeam/orderTime";
 import { shouldSendOnStatus } from "@/lib/northbeam/statusSendGate";
 import { NB_WRITE_CONTEXT } from "@/lib/northbeam/writeContext";
@@ -300,7 +300,10 @@ export async function POST(req) {
       orderNote = `Payment failed: ${errorMessage || "Unknown error"}`;
     }
 
-    logger.log("Update payload:", JSON.stringify(updateData, null, 2));
+    logger.log(
+      "Update payload:",
+      JSON.stringify(redactSensitive(updateData), null, 2)
+    );
 
     // Update order using WooCommerce REST API
     const response = await axios.put(
@@ -455,7 +458,6 @@ export async function POST(req) {
     return NextResponse.json(
       {
         error: "Failed to update order status",
-        details: error.response?.data || error.message,
       },
       { status: error.response?.status || 500 }
     );

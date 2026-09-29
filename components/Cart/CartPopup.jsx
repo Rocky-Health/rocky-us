@@ -263,9 +263,6 @@ const CartPopup = ({ isOpen, onClose, productType, onContinueShopping }) => {
                           <div className="text-[#666666] text-xs">
                             {item.variation
                               .map((variation, index) => {
-                                // Debug: Log the variation data structure
-                                console.log("Variation data:", variation);
-
                                 // Handle different variation data structures
                                 const variationName =
                                   variation.name ||

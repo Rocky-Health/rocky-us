@@ -118,7 +118,8 @@ const BOSimplifiedFlow = () => {
     if (activePopup) {
       logger.log("[BOSimplifiedFlow] Active popup:", activePopup);
       logger.log("[BOSimplifiedFlow] Popup config:", activePopupConfig);
-      logger.log("[BOSimplifiedFlow] User data:", userData);
+      // Quiz answers are PHI, so log the field names only.
+      logger.log("[BOSimplifiedFlow] User data fields:", Object.keys(userData || {}));
     }
   }, [activePopup, activePopupConfig, userData]);
 

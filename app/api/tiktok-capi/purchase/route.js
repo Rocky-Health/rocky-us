@@ -3,6 +3,7 @@ import { getTikTokGatewayConfig, getTikTokEndpoint, TIKTOK_CAPI_GATEWAYS } from 
 import { hashEmail, hashPhone, hashSHA256 } from '@/utils/analytics/hashServerSide';
 import { toMoney } from '@/utils/priceFormatter';
 import axios from 'axios';
+import { logger } from '@/utils/devLogger';
 
 const BASE_URL = process.env.BASE_URL;
 const CONSUMER_KEY = process.env.CONSUMER_KEY;
@@ -19,7 +20,7 @@ const _missingTiktokConfig = Object.entries(TIKTOK_CAPI_GATEWAYS)
   })
   .filter(Boolean);
 if (_missingTiktokConfig.length > 0) {
-  console.warn(
+  logger.warn(
     `[TikTok CAPI] Cold start: missing config for gateways: ${_missingTiktokConfig.join(', ')}`
   );
 }
@@ -39,7 +40,7 @@ const fetchOrderFromWooCommerce = async (orderId) => {
 
     return response.data;
   } catch (error) {
-    console.error(`[TikTok CAPI] Error fetching order ${orderId}:`, error.message);
+    logger.error(`[TikTok CAPI] Error fetching order ${orderId}:`, error.message);
     return null;
   }
 };
@@ -61,7 +62,7 @@ const fetchCustomerProfile = async (customerId) => {
     );
     return response.data;
   } catch (error) {
-    console.warn(`[TikTok CAPI] Could not fetch customer profile:`, error.message);
+    logger.warn(`[TikTok CAPI] Could not fetch customer profile:`, error.message);
     return null;
   }
 };
@@ -74,7 +75,7 @@ export async function POST(req) {
     const gatewayConfig = getTikTokGatewayConfig(gateway);
 
     if (!gatewayConfig.accessToken || !gatewayConfig.pixelId) {
-      console.error(
+      logger.error(
         `[TikTok CAPI] Refusing event for order ${order_id}: gateway "${gateway}" has missing config (accessToken=${!!gatewayConfig.accessToken}, pixelId=${!!gatewayConfig.pixelId}). Check TIKTOK_ACCESS_TOKEN_${gateway} / TIKTOK_PIXEL_ID_${gateway}.`
       );
       return NextResponse.json(
@@ -85,12 +86,12 @@ export async function POST(req) {
 
     // Skip $0 orders (100% discount)
     if (parseFloat(value) <= 0) {
-      console.log(`[TikTok CAPI] Skipping $0 order ${order_id} for gateway ${gateway}`);
+      logger.log(`[TikTok CAPI] Skipping $0 order ${order_id} for gateway ${gateway}`);
       return NextResponse.json({ success: true, skipped: true, reason: 'Zero value order', gateway, order_id });
     }
 
     if (!order_data?.billing || !order_data?.line_items) {
-      console.log(`[TikTok CAPI] Fetching order ${order_id} from WooCommerce...`);
+      logger.log(`[TikTok CAPI] Fetching order ${order_id} from WooCommerce...`);
       order_data = await fetchOrderFromWooCommerce(order_id);
       
       if (!order_data) {
@@ -176,7 +177,7 @@ export async function POST(req) {
       }
     };
 
-    console.log(`[TikTok CAPI] Sending event for order ${order_id} to ${gateway}:`, {
+    logger.log(`[TikTok CAPI] Sending event for order ${order_id} to ${gateway}:`, {
       pixel_code: eventPayload.pixel_code,
       event: eventPayload.event,
       value: eventPayload.properties.value,
@@ -195,7 +196,7 @@ export async function POST(req) {
 
     if (!response.ok) {
       const text = await response.text();
-      console.error(`[TikTok CAPI] HTTP Error ${gateway}:`, {
+      logger.error(`[TikTok CAPI] HTTP Error ${gateway}:`, {
         status: response.status,
         statusText: response.statusText,
         body: text
@@ -206,11 +207,11 @@ export async function POST(req) {
     const data = await response.json();
 
     if (data.code !== 0) {
-        console.error(`[TikTok CAPI] Error ${gateway}:`, data);
+        logger.error(`[TikTok CAPI] Error ${gateway}:`, data);
         return NextResponse.json({ success: false, error: data.message }, { status: 400 });
     }
 
-    console.log(`[TikTok CAPI] ✅ Success ${gateway}:`, {
+    logger.log(`[TikTok CAPI] ✅ Success ${gateway}:`, {
       event_id: eventPayload.event_id,
       response: data
     });
@@ -222,8 +223,8 @@ export async function POST(req) {
     });
 
   } catch (error) {
-    console.error('[TikTok CAPI] System Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    logger.error('[TikTok CAPI] System Error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 

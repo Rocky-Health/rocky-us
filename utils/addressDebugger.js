@@ -16,15 +16,14 @@ export const debugAddressData = () => {
     const billingStored = localStorage.getItem("checkout_billing_address");
     const shippingStored = localStorage.getItem("checkout_shipping_address");
     
-    logger.log("📦 localStorage billing_address:", billingStored);
-    logger.log("📦 localStorage shipping_address:", shippingStored);
+    logger.log("📦 localStorage billing_address present:", Boolean(billingStored));
+    logger.log("📦 localStorage shipping_address present:", Boolean(shippingStored));
     
     if (billingStored) {
       try {
         const parsed = JSON.parse(billingStored);
-        logger.log("✅ Parsed billing address:", parsed);
+        logger.log("✅ Parsed billing address fields:", Object.keys(parsed));
         logger.log("🏠 Billing address_1 length:", parsed.address_1?.length || 0);
-        logger.log("🏠 Billing address_1 value:", `"${parsed.address_1}"`);
       } catch (e) {
         logger.log("❌ Error parsing billing address:", e);
       }
@@ -33,9 +32,8 @@ export const debugAddressData = () => {
     if (shippingStored) {
       try {
         const parsed = JSON.parse(shippingStored);
-        logger.log("✅ Parsed shipping address:", parsed);
+        logger.log("✅ Parsed shipping address fields:", Object.keys(parsed));
         logger.log("🏠 Shipping address_1 length:", parsed.address_1?.length || 0);
-        logger.log("🏠 Shipping address_1 value:", `"${parsed.address_1}"`);
       } catch (e) {
         logger.log("❌ Error parsing shipping address:", e);
       }
@@ -145,12 +143,12 @@ export const monitorFormData = () => {
   const addressInput = document.querySelector('input[name="address_1"]');
   if (addressInput) {
     const originalValue = addressInput.value;
-    logger.log("📍 Initial address value:", `"${originalValue}"`);
+    logger.log("📍 Initial address length:", originalValue?.length || 0);
     
     // Add event listeners to monitor changes
     ['input', 'change', 'blur', 'focus'].forEach(eventType => {
       addressInput.addEventListener(eventType, (e) => {
-        logger.log(`📝 ${eventType.toUpperCase()} event - Address value:`, `"${e.target.value}"`);
+        logger.log(`📝 ${eventType.toUpperCase()} event - Address length:`, e.target.value?.length || 0);
       });
     });
     
@@ -159,7 +157,7 @@ export const monitorFormData = () => {
     const monitor = setInterval(() => {
       const currentValue = addressInput.value;
       if (currentValue !== lastValue) {
-        logger.log("🔄 Address value changed (polling):", `"${lastValue}" → "${currentValue}"`);
+        logger.log("🔄 Address length changed (polling):", lastValue?.length || 0, "→", currentValue?.length || 0);
         lastValue = currentValue;
       }
     }, 500);

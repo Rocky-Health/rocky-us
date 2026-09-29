@@ -84,8 +84,12 @@ export const addToCartAndRedirect = async (
 ) => {
   try {
     logger.log(`🛒 CrossSell - Starting ${flowType} flow cart addition`);
-    logger.log("Main Product:", mainProduct);
-    logger.log("Addons:", addons);
+    // Product name/dose is treatment data, so log identifiers only.
+    logger.log("Main Product:", {
+      id: mainProduct?.id ?? mainProduct?.productId ?? null,
+      variationId: mainProduct?.variationId ?? null,
+    });
+    logger.log("Addon count:", Array.isArray(addons) ? addons.length : 0);
 
     // Use direct cart addition with proper options
     const result = await addToCartDirectly(mainProduct, addons, flowType, {
@@ -143,8 +147,12 @@ export const addToCartDirectlyWithResult = async (
     logger.log(
       `🛒 CrossSell (Modern) - Starting ${flowType} flow cart addition`
     );
-    logger.log("Main Product:", mainProduct);
-    logger.log("Addons:", addons);
+    // Product name/dose is treatment data, so log identifiers only.
+    logger.log("Main Product:", {
+      id: mainProduct?.id ?? mainProduct?.productId ?? null,
+      variationId: mainProduct?.variationId ?? null,
+    });
+    logger.log("Addon count:", Array.isArray(addons) ? addons.length : 0);
 
     // Use direct cart addition with proper options
     const result = await addToCartDirectly(mainProduct, addons, flowType, {
