@@ -136,7 +136,20 @@ const CheckoutPageContent = ({ onStripeAmountChange, paymentRegionRef }) => {
     return params.length > 0 ? `&${params.join("&")}` : "";
   };
 
-  const [submitting, setSubmitting] = useState(false);
+  const [submitting, setSubmittingState] = useState(false);
+  // Sync lock so a second click/Enter can't start another order before re-render
+  const submitLockRef = useRef(false);
+  const orderPlacedRef = useRef(false);
+  const setSubmitting = (value) => {
+    submitLockRef.current = value || orderPlacedRef.current;
+    setSubmittingState(value);
+  };
+  // Stay locked once the order is placed and we're navigating away
+  const redirectToOrderReceived = (url) => {
+    orderPlacedRef.current = true;
+    submitLockRef.current = true;
+    router.push(url);
+  };
   const [cartItems, setCartItems] = useState();
   const [isProcessingUrlParams, setIsProcessingUrlParams] = useState(false);
   const beginCheckoutFiredRef = useRef(false);
@@ -1730,7 +1743,7 @@ const CheckoutPageContent = ({ onStripeAmountChange, paymentRegionRef }) => {
       }
 
       // Redirect to success page
-      router.push(
+      redirectToOrderReceived(
         `/checkout/order-received/${orderId}?key=${orderKey}${buildFlowQueryString()}`,
       );
     } catch (error) {
@@ -1985,6 +1998,7 @@ const CheckoutPageContent = ({ onStripeAmountChange, paymentRegionRef }) => {
     // Tracks whether we've handed off to the processing modal yet — once we
     // have, processStripePayment owns error display, so we don't also toast.
     let modalShown = false;
+    if (submitLockRef.current) return;
     try {
       setSubmitting(true);
 
@@ -2053,6 +2067,8 @@ const CheckoutPageContent = ({ onStripeAmountChange, paymentRegionRef }) => {
   };
 
   const handleSubmit = async () => {
+    // Payment modal open means an order already exists; retry goes through the modal
+    if (submitLockRef.current || showPaymentProcessingPopup) return;
     try {
       setSubmitting(true);
 
@@ -2534,7 +2550,7 @@ const CheckoutPageContent = ({ onStripeAmountChange, paymentRegionRef }) => {
                 }
 
                 // Redirect to success page immediately (non-blocking)
-                router.push(
+                redirectToOrderReceived(
                   `/checkout/order-received/${orderId}?key=${orderKey}${buildFlowQueryString()}`,
                 );
                 return;
@@ -2561,7 +2577,7 @@ const CheckoutPageContent = ({ onStripeAmountChange, paymentRegionRef }) => {
                   toast.success("Order is already being processed!");
 
                   // Redirect to order received page
-                  router.push(
+                  redirectToOrderReceived(
                     `/checkout/order-received/${orderId}?key=${orderKey}${buildFlowQueryString()}`,
                   );
                   return;
@@ -2806,7 +2822,7 @@ const CheckoutPageContent = ({ onStripeAmountChange, paymentRegionRef }) => {
           );
 
           // Redirect to order received page with the correct order details
-          router.push(
+          redirectToOrderReceived(
             `/checkout/order-received/${paymentOrderId}?key=${paymentOrderKey}${buildFlowQueryString()}`,
           );
           return;
@@ -3058,7 +3074,7 @@ const CheckoutPageContent = ({ onStripeAmountChange, paymentRegionRef }) => {
             }
 
             // Redirect to success page immediately (non-blocking)
-            router.push(
+            redirectToOrderReceived(
               `/checkout/order-received/${orderId}?key=${orderKey}${buildFlowQueryString()}`,
             );
             return;
@@ -3136,7 +3152,7 @@ const CheckoutPageContent = ({ onStripeAmountChange, paymentRegionRef }) => {
           // Don't block the redirect if cart emptying fails
         }
 
-        router.push(
+        redirectToOrderReceived(
           `/checkout/order-received/${order_id}?key=${order_key}${
             buildFlowQueryString() ? buildFlowQueryString() : ""
           }`,
@@ -3264,6 +3280,7 @@ const CheckoutPageContent = ({ onStripeAmountChange, paymentRegionRef }) => {
     setFormData,
     formData,
     handleSubmit,
+    submitting,
     cardNumber,
     isUpdatingShipping,
     setCardNumber,

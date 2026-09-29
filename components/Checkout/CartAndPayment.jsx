@@ -12,6 +12,7 @@ const CartAndPayment = ({
   setFormData,
   formData,
   handleSubmit,
+  submitting = false,
   cardNumber,
   setCardNumber,
   expiry,
@@ -89,16 +90,16 @@ const CartAndPayment = ({
       <button
         onClick={handleSubmit}
         type="button"
-        disabled={isUpdatingShipping || ageValidationFailed || !isPaymentValid}
+        disabled={submitting || isUpdatingShipping || ageValidationFailed || !isPaymentValid}
         className={
           isGlp2
             ? `bg-black text-white text-sm font-bold h-[52px] flex items-center justify-center rounded-xl w-full mt-6 tracking-wide uppercase transition ${
-                isUpdatingShipping || ageValidationFailed || !isPaymentValid
+                submitting || isUpdatingShipping || ageValidationFailed || !isPaymentValid
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:-translate-y-1"
               }`
             : `bg-black text-white text-sm font-semibold h-[44px] flex items-center justify-center rounded-full w-full lg:max-w-[512px] mt-6 transition ${
-                isUpdatingShipping || ageValidationFailed || !isPaymentValid
+                submitting || isUpdatingShipping || ageValidationFailed || !isPaymentValid
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:-translate-y-1"
               }`
