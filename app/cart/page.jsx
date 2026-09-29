@@ -1,9 +1,10 @@
 import CartPageContent from "@/components/Cart/CartPageContent";
+import CartSkeleton from "@/components/ui/skeletons/CartSkeleton";
 import { Suspense } from "react";
 
 const CartPage = () => {
   return (
-    <Suspense fallback={<></>}>
+    <Suspense fallback={<CartSkeleton />}>
       <style
         dangerouslySetInnerHTML={{
           __html: `
