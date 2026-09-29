@@ -84,12 +84,6 @@ const HeroSection = ({ onOpenMenu }) => {
             image: "/home/hair-foam.webp",
             link: "/product/finasteride-minoxidil-topical-foam",
         },
-
-        {
-            name: "Chewalis",
-            image: "/home/chewalis.webp",
-            link: "/product/chewable-tadalafil",
-        },
     ];
 
     const renderMedName = (name) => {

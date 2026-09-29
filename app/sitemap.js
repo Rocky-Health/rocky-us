@@ -26,7 +26,7 @@ function toSitemapDate(...candidates) {
 
 // Static routes – main pages, policies, and landing pages.
 // US-only, 200-status URLs only. Excluded: blocked routes (mental-health, merch,
-// zonnic, chewalis – redirect to /blocked), CA-only pages (service-across-canada
+// zonnic – redirect to /blocked), CA-only pages (service-across-canada
 // and its cities), and dead/non-indexable URLs (/blog/all 500, /cart auth
 // redirect, /podcast 404).
 const staticRoutes = [

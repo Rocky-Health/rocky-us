@@ -1669,7 +1669,6 @@ const FALLBACK_PRODUCT_MAPPING = {
   Cialis: "261",
   Tadalafil: "259",
   Sildenafil: "258",
-  Chewalis: "261",
 
   // Add-on products - ED flow
   "testosterone-support": "262914",

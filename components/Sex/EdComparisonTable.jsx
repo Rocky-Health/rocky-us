@@ -26,17 +26,6 @@ const EdComparisonTable = ({ leftAlign = false }) => {
       canTakeWithFood: false,
       prescriptionNeeded: true,
       costPerDose: "$13.50"
-    },
-    {
-      name: "Dissolvable Tadalafil",
-      subtitle: "(Tadalafil)",
-      image: "/ed-comparison/Dissolvable+Tadalafil.png",
-      onsetTime: "15-30 minutes",
-      duration: "Up to 36 hours",
-      frequency: "As needed",
-      canTakeWithFood: true,
-      prescriptionNeeded: true,
-      costPerDose: "$17.25"
     }
   ];
 
@@ -76,14 +65,7 @@ const EdComparisonTable = ({ leftAlign = false }) => {
                 />
               </div>
               <div className="text-xs font-semibold text-black text-center h-8 flex items-center justify-center">
-                {treatment.name === "Dissolvable Tadalafil" ? (
-                  <div className="flex flex-col items-center">
-                    <div>Dissolvable</div>
-                    <div>Tadalafil</div>
-                  </div>
-                ) : (
-                  treatment.name
-                )}
+                {treatment.name}
               </div>
               <div className="text-xs text-black text-center">
                 {treatment.subtitle}
