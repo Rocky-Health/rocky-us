@@ -175,18 +175,32 @@ export default function FBPixelLoader() {
   // Mirror of advancedMatching for the PageView/init effect to read without
   // taking advancedMatching as a dependency (which would re-fire PageView).
   const amRef = useRef(null);
+  // Cold load: first init waits for this so an already-identified visitor's
+  // first PageView carries AM instead of going out empty. Flips once, never back.
+  const [amReady, setAmReady] = useState(false);
 
   useEffect(() => {
     const key = getIdentityKey();
-    if (!key || key === lastIdentityKeyRef.current) return;
+    if (!key) {
+      setAmReady(true);
+      return;
+    }
+    if (key === lastIdentityKeyRef.current) return;
     lastIdentityKeyRef.current = key;
     buildAdvancedMatching()
       .then((am) => {
         amRef.current = am || null;
         setAdvancedMatching(am || null);
       })
-      .catch(() => {/* AM errors must never surface */});
+      .catch(() => {/* AM errors must never surface */})
+      .finally(() => setAmReady(true));
   }, [pathname]);
+
+  // Never let slow hashing hold PageView back.
+  useEffect(() => {
+    const t = setTimeout(() => setAmReady(true), 1500);
+    return () => clearTimeout(t);
+  }, []);
 
   // Async refinement for /product/* pages using server-side category data.
   // Falls back to slug-based matching (syncPixelId) if the lookup fails.
@@ -331,6 +345,7 @@ export default function FBPixelLoader() {
     if (process.env.NODE_ENV !== "production") return;
     if (!resolvedPixelId || typeof window === "undefined") return;
     if (typeof window.fbq !== "function") return;
+    if (!amReady) return;
 
     const secondaryIds = SECONDARY_PIXEL_IDS[resolvedPixelKey] || [];
     const pixelsToFire = [resolvedPixelId, ...secondaryIds];
@@ -349,7 +364,8 @@ export default function FBPixelLoader() {
       }
       window.fbq("trackSingle", pid, "PageView");
     }
-  }, [resolvedPixelKey, resolvedPixelId, pathname]);
+    // amReady only ever goes false -> true once, so it can't double a PageView.
+  }, [resolvedPixelKey, resolvedPixelId, pathname, amReady]);
 
   // Advanced-matching enrichment. Runs when advancedMatching becomes available
   // (post-login). For each active pixel already initialized WITHOUT AM, issue a

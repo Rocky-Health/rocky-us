@@ -12,7 +12,8 @@ import { getCookie } from '@/utils/cookieHelper';
 import {
   hashSHA256Client,
   hashEmailClient,
-  hashPhoneClient,
+  hashPhoneForMetaClient,
+  hashExternalIdForMetaClient,
 } from '@/utils/analytics/hashClientSide';
 
 /**
@@ -54,7 +55,9 @@ export async function buildAdvancedMatching() {
 
   try {
     const userEmail = getCookie('userEmail');
-    const rawPhone = getCookie('pn'); // may be URL-encoded; getCookie already decodes
+    // Login sets `pn`, registration only sets `phone` -- read both or every
+    // freshly registered user goes out with an empty ph.
+    const rawPhone = getCookie('pn') || getCookie('phone');
     const userId = getCookie('userId'); // WooCommerce customer_id
     const userName = getCookie('userName'); // full name, e.g. "John Doe"
     const displayName = getCookie('displayName'); // first name fallback
@@ -79,8 +82,8 @@ export async function buildAdvancedMatching() {
     // Hash all fields in parallel for performance
     const [em, ph, external_id, fn, ln, st, db] = await Promise.all([
       hashEmailClient(userEmail),
-      hashPhoneClient(rawPhone, 'US'),
-      hashSHA256Client(userId),   // server: hashSHA256(customer_id.toString()) = sha256(lowercase(trim(id)))
+      hashPhoneForMetaClient(rawPhone, 'US'),
+      hashExternalIdForMetaClient(userId), // same input as CAPI's hashExternalIdForMeta
       hashSHA256Client(firstName),
       hashSHA256Client(lastName),
       hashSHA256Client(province),

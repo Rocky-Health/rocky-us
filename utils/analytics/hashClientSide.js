@@ -4,7 +4,12 @@
  * SSR-safe: all exports return '' when window/crypto.subtle are unavailable.
  */
 
-import { normalizeEmail, normalizePhone } from './normalize';
+import {
+  normalizeEmail,
+  normalizePhone,
+  normalizePhoneForMeta,
+  metaExternalIdSource,
+} from './normalize';
 
 /**
  * SHA-256 hash of text.toLowerCase().trim() → lowercase hex string.
@@ -51,4 +56,18 @@ export async function hashPhoneClient(phone, country = 'US') {
   const normalized = normalizePhone(phone, country);
   if (!normalized) return '';
   return hashSHA256Client(normalized);
+}
+
+// Meta-only: digits without "+", must match hashPhoneForMeta on the server.
+export async function hashPhoneForMetaClient(phone, country = 'US') {
+  const normalized = normalizePhoneForMeta(phone, country);
+  if (!normalized) return '';
+  return hashSHA256Client(normalized);
+}
+
+// Meta-only: must match hashExternalIdForMeta on the server.
+export async function hashExternalIdForMetaClient(value) {
+  const source = metaExternalIdSource(value);
+  if (!source) return '';
+  return hashSHA256Client(source);
 }

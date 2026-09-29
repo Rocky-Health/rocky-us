@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getGatewayConfig, META_CAPI_GATEWAYS } from '@/utils/metaCapiConfig';
-import { hashEmail, hashPhone, hashSHA256 } from '@/utils/analytics/hashServerSide';
+import {
+  hashEmail,
+  hashPhoneForMeta,
+  hashExternalIdForMeta,
+  hashSHA256,
+} from '@/utils/analytics/hashServerSide';
 import { processMetaParameters } from '@/lib/meta/paramBuilderHelper';
 import { toMoney } from '@/utils/priceFormatter';
 import axios from 'axios';
@@ -304,7 +309,7 @@ export async function POST(req) {
 
     // Hash all PII
     const email = hashEmail(userEmail);
-    const phone = hashPhone(userPhone, country);
+    const phone = hashPhoneForMeta(userPhone, country);
     const fn = hashSHA256(firstName);
     const ln = hashSHA256(lastName);
     const ct = hashSHA256(city);
@@ -314,7 +319,8 @@ export async function POST(req) {
     const ge = gender ? hashSHA256(gender) : '';
     const db = dob ? hashSHA256(dob) : '';
     const externalIdSource = payload.customer_id_canonical || payload.customer_id || order_data.customer_id;
-    const external_id = externalIdSource ? hashSHA256(externalIdSource.toString()) : '';
+    // customer_id_canonical is "wc:121149"; the pixel hashes the bare id, so strip it.
+    const external_id = hashExternalIdForMeta(externalIdSource);
 
     // Client Info
     const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getGatewayConfig } from "@/utils/metaCapiConfig";
 import { MILESTONES } from "@/utils/metaBrowserEventConfig";
-import { hashEmail, hashSHA256 } from "@/utils/analytics/hashServerSide";
+import { hashEmail, hashExternalIdForMeta } from "@/utils/analytics/hashServerSide";
 import { processMetaParameters } from "@/lib/meta/paramBuilderHelper";
 import { toMoney } from "@/utils/priceFormatter";
 
@@ -96,7 +96,7 @@ export async function POST(req) {
     const userId = safeDecode(cookies.userId);
 
     const em = userEmail ? hashEmail(userEmail) : "";
-    const external_id = userId ? hashSHA256(String(userId)) : "";
+    const external_id = hashExternalIdForMeta(userId);
 
     const clientIP =
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||

@@ -19,6 +19,7 @@ export default defineConfig({
     include: [
       "lib/customerio/__tests__/**/*.test.js",
       "lib/northbeam/__tests__/**/*.test.js",
+      "utils/analytics/__tests__/**/*.test.js",
     ],
     environment: "node",
   },

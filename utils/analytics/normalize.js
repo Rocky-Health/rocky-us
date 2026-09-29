@@ -62,3 +62,32 @@ export const normalizePhone = (phone, defaultCountry = 'US') => {
 
   return '';
 };
+
+/**
+ * Phone in Meta's pre-hash format: country code + number, digits only, no "+".
+ * (416) 555-1234 -> 14165551234. Meta can't normalize a value we hash
+ * ourselves, so the "+" has to go before hashing. Meta only -- TikTok wants
+ * the "+" kept, so normalizePhone above stays as is.
+ * @param {string} phone
+ * @param {string} defaultCountry
+ * @returns {string}
+ */
+export const normalizePhoneForMeta = (phone, defaultCountry = 'US') =>
+  normalizePhone(phone, defaultCountry).replace(/^\+/, '');
+
+/**
+ * The one string both the pixel and CAPI hash for Meta external_id: the bare
+ * Woo customer id ("121149"). Accepts the canonical "wc:121149" too and strips
+ * the prefix, so every Meta surface hashes the same input. Non-wc values
+ * (guest "email:..." canonicals) pass through unchanged.
+ * @param {string|number} value
+ * @returns {string}
+ */
+export const metaExternalIdSource = (value) => {
+  if (value === null || value === undefined) return '';
+  const str = String(value).trim();
+  if (!str) return '';
+  const wc = str.match(/^wc:(\d+)$/i);
+  if (wc) return wc[1];
+  return str;
+};
