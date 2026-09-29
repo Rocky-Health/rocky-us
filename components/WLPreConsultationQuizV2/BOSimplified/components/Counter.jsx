@@ -49,8 +49,7 @@ const Counter = ({
     useEffect(() => {
         if (count <= 0 && typeof onAction === "function" && nextPopup) {
             const timeout = setTimeout(() => {
-                // Always route to EmailPopUp first (it will check authentication)
-                onAction("showPopup", "EmailPopUp");
+                onAction("showPopup", nextPopup);
             }, 500); // 500ms delay
             return () => clearTimeout(timeout);
         }
