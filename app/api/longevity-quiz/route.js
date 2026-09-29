@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { logger } from "@/utils/devLogger";
 import { randomBytes } from "crypto";
-import https from "https";
 import axios from "axios";
 
 /** Maps `action` from the client to the entrykey cookie name for that quiz. */
@@ -18,9 +17,6 @@ const LONGEVITY_ENTRYKEY_COOKIE_NAMES = Object.values(
 
 const crmApi = axios.create({
   baseURL: "https://crm.myrocky.com/api",
-  httpsAgent: new https.Agent({
-    rejectUnauthorized: false,
-  }),
   timeout: 60000,
   headers: { "Content-Type": "application/json; charset=utf-8" },
 });

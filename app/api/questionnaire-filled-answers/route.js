@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
 import { logger } from "@/utils/devLogger";
-import https from "https";
 import axios from "axios";
 
 const crmApi = axios.create({
   baseURL: process.env.CRM_HOST || "https://crm.myrocky.com",
-  httpsAgent: new https.Agent({ rejectUnauthorized: false }),
   timeout: 30000,
   headers: { "Content-Type": "application/json" },
 });
