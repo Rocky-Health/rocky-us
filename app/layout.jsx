@@ -154,11 +154,10 @@ export default function RootLayout({ children }) {
             <>
               {/* AWIN: consent stub stays beforeInteractive (tiny inline, no
                   network cost) so AWIN.Tracking.AdvertiserConsent is guaranteed
-                  set before the MasterTag executes. The MasterTag itself is
-                  deferred to afterInteractive — it only needs to exist before a
-                  journey click is recorded, not before first paint. Conversion
-                  tracking fires post-purchase and is unaffected. Verify
-                  attribution on Vercel preview before merge. */}
+                  set before the MasterTag executes. The MasterTag is lazyOnload:
+                  awc is captured first-party (AttributionTracker), so the tag
+                  doesn't need to race hydration. Conversion tracking fires
+                  post-purchase and is unaffected. */}
               <Script id="awin-consent" strategy="beforeInteractive">
                 {`
                   window.AWIN = window.AWIN || {};
@@ -170,7 +169,7 @@ export default function RootLayout({ children }) {
               </Script>
               <Script
                 id="awin-mastertag"
-                strategy="afterInteractive"
+                strategy="lazyOnload"
                 src={`https://www.dwin1.com/${
                   process.env.AWIN_MERCHANT_ID || "101159"
                 }.js`}
@@ -182,7 +181,9 @@ export default function RootLayout({ children }) {
             calls keep buffering; the gtm.js fetch (and all 4 downstream gtag scripts it
             injects) waits until first user interaction. Idle fallback at 15s ensures
             attribution still fires for engaged-but-still users. Bouncers who close the
-            tab within 15s skip ~2.35 MB of Google tag JS entirely. */}
+            tab within 15s skip ~2.35 MB of Google tag JS entirely.
+            TK-424: the 15s fallback is a real timer now; rIC alone fired at the
+            first idle slot and pulled gtm.js into the cold-load window. */}
         <Script id="google-tag-manager" strategy="beforeInteractive">
           {`
             (function(w,d,s,l,i){
@@ -198,13 +199,14 @@ export default function RootLayout({ children }) {
                 j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
                 f.parentNode.insertBefore(j,f);
                 __gtmEvents.forEach(function(ev){w.removeEventListener(ev,__gtmBoot,true);});
-                if(__gtmIdle&&w.cancelIdleCallback){w.cancelIdleCallback(__gtmIdle);}
-                else if(__gtmIdle){w.clearTimeout(__gtmIdle);}
+                w.clearTimeout(__gtmTimer);
               }
               __gtmEvents.forEach(function(ev){w.addEventListener(ev,__gtmBoot,{passive:true,capture:true,once:true});});
-              var __gtmIdle=w.requestIdleCallback
-                ? w.requestIdleCallback(__gtmBoot,{timeout:15000})
-                : w.setTimeout(__gtmBoot,15000);
+              // wait 15s, then boot on the next idle slot
+              var __gtmTimer=w.setTimeout(function(){
+                if(w.requestIdleCallback){w.requestIdleCallback(__gtmBoot,{timeout:2000});}
+                else{__gtmBoot();}
+              },15000);
             })(window,document,'script','dataLayer','GTM-K9PC394B');
           `}
         </Script>
